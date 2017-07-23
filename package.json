@@ -1,0 +1,49 @@
+{
+  "name": "safex_wallet",
+  "description": "Safex Community Wallet",
+  "version": "0.0.1",
+  "homepage": "http://safex.io",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/safex/safex_wallet.git"
+  },
+  "author": {
+    "name": "Safex Developers",
+    "url": "https://safex.io"
+  },
+  "maintainers": [
+    {
+      "name": "Daniel Dabek",
+      "url": "https://github.com/ddabek",
+      "email": "daniel@safex.io"
+    }
+  ],
+  "license": "MIT",
+  "bugs": "https://github.com/safex/safex_wallet/issues",
+  "keywords": [
+    "safex coin",
+    "wallet",
+    "bitcoin",
+    "blockchain",
+    "electron"
+  ],
+  "devDependencies": {
+    "electron": "^1.4.14",
+    "foreman": "^2.0.0",
+    "react-scripts": "0.8.5"
+  },
+  "dependencies": {
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "react-router": "^3.0.4"
+  },
+  "main": "src/electron-starter.js",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "electron": "electron .",
+    "dev": "nf start -p 3000"
+  }
+}
