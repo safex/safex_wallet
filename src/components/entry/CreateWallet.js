@@ -1,4 +1,5 @@
 import React from 'react';
+import crypto from 'crypto';
 var fs = window.require('fs');
 var os = window.require('os');
 

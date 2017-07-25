@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router';
 var fs = window.require('fs');
 var os = window.require('os');
-import crypto from 'crypto';
 
 
 export default class SelectWallet extends React.Component {
