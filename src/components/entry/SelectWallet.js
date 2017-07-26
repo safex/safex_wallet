@@ -25,7 +25,6 @@ export default class SelectWallet extends React.Component {
 
     componentWillMount() {
         var home_dir = os.homedir();
-        var it_works = false;
         fs.readFile(home_dir + '/safexwallet.dat', (err, fd) => {
             if (err) {
                 //if the error is that No File exists, let's step through and make the file
