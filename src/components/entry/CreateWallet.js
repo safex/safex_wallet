@@ -28,8 +28,12 @@ export default class CreateWallet extends React.Component {
     render() {
         return (
             <div>
+                <form>
+                    <input type="password" name="first_password" />
+                    <input type="password" name="secon_password" />
 
-                Create Wallet
+
+                </form>
             </div>
         );
     }
