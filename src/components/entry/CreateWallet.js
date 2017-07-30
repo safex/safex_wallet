@@ -72,26 +72,22 @@ export default class CreateWallet extends React.Component {
 
             var cipher_text = this.encrypt(JSON.stringify(json), algorithm, password);
 
-            console.log(cipher_text);
 
-            var decrypt_text = this.decrypt(cipher_text, algorithm, "a");
 
-            console.log(decrypt_text);
+            var home_dir = os.homedir();
 
-            this.create_wallet(cipher_text);
+            fs.writeFile(home_dir + '/safexwallet.dat', cipher_text, (err) => {
+                if (err) {
+                    console.log(err)
+                } else {
+                    localStorage.setItem("wallet", JSON.stringify(json));
+                    this.context.router.push('/wallet');
+                }
+            });
 
         }
     }
 
-    create_wallet(encrypted_wallet_info) {
-        var home_dir = os.homedir();
-
-        fs.writeFile(home_dir + '/safexwallet.dat', encrypted_wallet_info, function (err) {
-            if (err) {
-                console.log(err);
-            }
-        });
-    }
 
     encrypt(text, algorithm, password) {
         var cipher = crypto.createCipher(algorithm,password)
@@ -128,6 +124,8 @@ export default class CreateWallet extends React.Component {
     }
 
 
+}
 
-
+CreateWallet.contextTypes = {
+    router: React.PropTypes.object.isRequired
 }
