@@ -106,14 +106,25 @@ export default class CreateWallet extends React.Component {
 
     render() {
         return (
-            <div>
-                <form onSubmit={this.handleSubmit}>
-                    <input type="password" name="password1" />
-                    <input type="password" name="password2" />
-                    <button type="submit">Save Wallet</button>
-
+          <div className="container">
+              <div className="col-xs-12 Login-logo">
+                  <img src="/images/logo.png" />
+              </div>
+              <div className="col-xs-12 Login-form">
+                <form className="form-group" onSubmit={this.handleSubmit}>
+                    <input className="form-control" type="password" name="password1" placeholder="Enter Password" />
+                    <input className="form-control" type="password" name="password2" placeholder="Repeat Password" />
+                    <button className="btn btn-default" type="submit">CREATE</button>
                 </form>
-            </div>
+                <p className="text-center">
+                    Write password down and <br />
+                    NEVER loose it.
+                </p>
+              </div>
+              <div className="col-xs-12 text-center Intro-footer">
+                  <p className="text-center">2014-2017 All Rights Reserved Safe Exchange Developers &copy;</p>
+              </div>
+          </div>
         );
     }
 

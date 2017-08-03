@@ -1,0 +1,79 @@
+html, body, body #root, body #root > div{
+  height:100%;
+}
+body{
+  background:#000D12;
+}
+.Login-logo{
+  height:100px;
+  display:flex;
+  align-content:center;
+  align-items: center;
+}
+.Login-logo img{
+  margin:auto;
+  display:block;
+  max-width:200px;
+}
+.App-intro, .Login-form{
+  height:calc(90% - 100px);
+}
+.App-intro img{
+  display:block;
+  margin:auto;
+}
+.App-intro .col-xs-6 a{
+  background:url('/images/import-block-bg.png');
+  background-size:100% 100%;
+  display:block;
+  padding-bottom:20px;
+}
+.App-intro .col-xs-6 a > img{
+  width:40%;
+  margin:auto;
+  padding-top:15px;
+  padding-bottom:15px;
+}
+.App-intro .col-xs-6 .btn{
+  width:90%;
+}
+.App-intro .col-xs-6 .btn img{
+  display:inline-block;
+}
+.Intro-footer{
+  height:10%;
+  display:flex;
+  align-content:center;
+  align-items: center;
+}
+.Intro-footer p{
+  width:100%;
+}
+.Login-form > form{
+  max-width:300px;
+  margin:auto;
+  margin-top:50px;
+  margin-bottom:20px;
+  padding-top:30px;
+  text-align: center;
+}
+.Login-form input{
+  margin-bottom:10px;
+  border-radius: 0px;
+  text-align: center;
+  border:1px solid #002F42;
+  background:rgba(1, 34, 47, 0.6);
+  padding:20px 15px;
+}
+.Login-form .btn{
+  width:100%;
+  border:1px solid #002F42;
+  background:rgba(1, 34, 47, 0.6);
+  color:#fff;
+  border-radius: 0px;
+  padding:15px 10px;
+  margin-top:20px;
+}
+.Login-form > p{
+  color:#00C9FF;
+}

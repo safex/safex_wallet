@@ -48,23 +48,58 @@ export default class SelectWallet extends React.Component {
 
             if (wallet_exists) {
                 show_options = (
-                <div>
-                    <Link to="/login">login</Link>
-                    <Link to="/importwallet">Import Wallet</Link>
-                </div>);
+                    <div className="row text-center">
+                      <div className="col-xs-6">
+                          <Link to="/login">
+                              <img src="/images/safex-icon-circle.png" />
+                              <span className="btn btn-default">Login <img src="/images/create.png" /></span>
+                          </Link>
+                      </div>
+                      <div className="col-xs-6">
+                          <Link to="/importwallet">
+                              <img src="/images/safex-icon-circle.png" />
+                              <span className="btn btn-default">Import Wallet <img src="/images/import.png" /></span>
+                              <p>Import your wallet or recover</p>
+                              <p>from backup file</p>
+                          </Link>
+                      </div>
+                    </div>
+                );
             } else {
-                show_options = (<div>
-                    <Link to="/createwallet">Create Wallet</Link>
-                    <Link to="/importwallet">Import Wallet</Link>
-                </div>);
+                show_options = (
+                  <div className="row text-center">
+                    <div className="col-xs-6">
+                        <Link to="/createwallet">
+                            <img src="/images/safex-icon-circle.png" />
+                            <span className="btn btn-default">New Wallet <img src="/images/create.png" /></span>
+                            <p>New to SAFEX?</p>
+                            <p>Or you just need a new wallet?</p>
+                        </Link>
+                    </div>
+                    <div className="col-xs-6">
+                        <Link to="/importwallet">
+                            <img src="/images/safex-icon-circle.png" />
+                            <span className="btn btn-default">Import Wallet <img src="/images/import.png" /></span>
+                            <p>Import your wallet or recover</p>
+                            <p>from backup file</p>
+                        </Link>
+                    </div>
+                  </div>
+              );
             }
 
 
         return (
 
-            <div>
-                <div className="App-intro">
+            <div className="container">
+                <div className="col-xs-12 Login-logo">
+                    <img src="/images/logo.png" />
+                </div>
+                <div className="col-xs-12 App-intro">
                     {show_options}
+                </div>
+                <div className="col-xs-12 text-center Intro-footer">
+                    <p className="text-center">2014-2017 All Rights Reserved Safe Exchange Developers &copy;</p>
                 </div>
             </div>
         );
