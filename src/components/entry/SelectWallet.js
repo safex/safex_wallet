@@ -34,6 +34,7 @@ export default class SelectWallet extends React.Component {
 
                 }
             } else {
+                localStorage.setItem('encrypted_wallet', fd);
                 this.setState({walletExists: true});
             }
 

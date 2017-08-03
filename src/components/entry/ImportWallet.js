@@ -8,7 +8,9 @@ export default class ImportWallet extends React.Component {
 
     render() {
         return (
-            <div>Import Wallet</div>
+            <div>
+
+            </div>
         );
     }
 

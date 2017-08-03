@@ -4,6 +4,7 @@ var fs = window.require('fs');
 var os = window.require('os');
 var bs58 = require('bs58');
 var bitcoin = window.require('bitcoinjs-lib');
+import { toHexString } from '../../utils/utils';
 
 
 
@@ -12,8 +13,6 @@ export default class CreateWallet extends React.Component {
         super(props);
 
         this.state = {
-            password1: '',
-            password2: '',
             walletExists: false,
         }
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -25,6 +24,7 @@ export default class CreateWallet extends React.Component {
 
 
     handleSubmit(e) {
+        e.preventDefault();
         if (e.target.password1.value === e.target.password2.value) {
             var random_array = new Uint8Array(32);
             window.crypto.getRandomValues(random_array);
@@ -34,13 +34,13 @@ export default class CreateWallet extends React.Component {
                 priv_key_bytes[i] = random_array[i];
             }
 
-            var hex_string = this.toHexString(priv_key_bytes).toUpperCase();
+            var hex_string = toHexString(priv_key_bytes).toUpperCase();
 
             var priv_key_and_version = "80" + hex_string;
             var first_bytes = Buffer.from(priv_key_and_version, 'hex');
             var first_sha = bitcoin.crypto.sha256(first_bytes);
             var second_sha = bitcoin.crypto.sha256(first_sha);
-            var checksum = this.toHexString(second_sha).substr(0, 8).toUpperCase();
+            var checksum = toHexString(second_sha).substr(0, 8).toUpperCase();
             var key_with_checksum = priv_key_and_version + checksum;
 
             var final_bytes = Buffer.from(key_with_checksum, 'hex');
@@ -52,16 +52,16 @@ export default class CreateWallet extends React.Component {
 
 
             var key_json = {};
-            key_json["public_key"] = address;
-            key_json["private_key"] = priv_key_wif;
+            key_json['public_key'] = address;
+            key_json['private_key'] = priv_key_wif;
 
             var key_array = [];
             key_array.push(key_json);
 
             var json = {};
 
-            json["version"] = "1";
-            json["keys"] = key_array;
+            json['version'] = '1';
+            json['keys'] = key_array;
 
             console.log(json);
 
@@ -80,7 +80,7 @@ export default class CreateWallet extends React.Component {
                 if (err) {
                     console.log(err)
                 } else {
-                    localStorage.setItem("wallet", JSON.stringify(json));
+                    localStorage.setItem('wallet', JSON.stringify(json));
                     this.context.router.push('/wallet');
                 }
             });
@@ -101,12 +101,6 @@ export default class CreateWallet extends React.Component {
         var dec = decipher.update(text,'hex','utf8')
         dec += decipher.final('utf8');
         return dec;
-    }
-
-    toHexString(byteArray) {
-        return Array.from(byteArray, function(byte) {
-            return ('0' + (byte & 0xFF).toString(16)).slice(-2);
-        }).join('')
     }
 
 
