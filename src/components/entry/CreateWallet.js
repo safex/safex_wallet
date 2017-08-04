@@ -118,7 +118,7 @@ export default class CreateWallet extends React.Component {
                 </form>
                 <p className="text-center">
                     Write password down and <br />
-                    NEVER loose it.
+                    NEVER lose it.
                 </p>
               </div>
               <div className="col-xs-12 text-center Intro-footer">

@@ -1,3 +1,6 @@
+
+import crypto from 'crypto';
+
 module.exports = {
     bytesToHex: function(bytes)
 {
@@ -12,6 +15,19 @@ module.exports = {
     return Array.from(byteArray, function (byte) {
         return ('0' + (byte & 0xFF).toString(16)).slice(-2);
     }).join('')
-}
+},
+    encrypt: function(text, algorithm, password) {
+        var cipher = crypto.createCipher(algorithm, password)
+        var crypted = cipher.update(text, 'utf8', 'hex')
+        crypted += cipher.final('hex');
+        return crypted;
+    },
+
+    decrypt: function(text, algorithm, password) {
+        var decipher = crypto.createDecipher(algorithm, password)
+        var dec = decipher.update(text, 'hex', 'utf8')
+        dec += decipher.final('utf8');
+        return dec;
+    }
 
 }
