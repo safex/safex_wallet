@@ -95,6 +95,34 @@ body{
 .Intro-footer p{
   width:100%;
 }
+.Import-wallet .fileandpass{
+  width:100%;
+  border:1px solid #445059;
+  border-radius: 0px;
+  background:url('/images/btn-bg.png');
+  background-size:100% 100%;
+  background-repeat:no-repeat;
+  color:#fff;
+  font-size:18px;
+  padding:15px;
+}
+.Import-wallet .fileandpass > p{
+  color:#777E85;
+  margin:0;
+}
+.Import-wallet .fileandpass > p.filename{
+  color:#fff;
+}
+.Import-wallet .fileandpass > input{
+  max-width:100%;
+  border:none;
+  border-bottom:1px solid #3580A0;
+  background:url('/images/lock.png') no-repeat;
+  background-size:auto 70%;
+  background-position:left center;
+  padding:3px;
+  font-size:14px;
+}
 .Login-form > form{
   max-width:300px;
   margin:auto;
@@ -197,10 +225,16 @@ body{
   height:20px;
 }
 .form-send{
+  height:0;
+  overflow:hidden;
+  transition: all 0.4s;
+}
+.form-send.active{
   border-top:1px solid #3A464A;
   margin-top:15px;
   padding-top:15px;
   padding-bottom:15px;
+  height:auto;
 }
 .form-send button{
   float:right;
@@ -220,16 +254,19 @@ body{
   text-align:left;
 }
 .form-send .send-left img{
-  width:150px;
+  width:100px;
   padding:10px;
 }
 .form-send input{
   border:none;
   background:none;
   border-bottom:1px solid #fff;
+  color:#fff;
+  text-align:right;
 }
 .form-send .send-left input{
   border-bottom:1px solid #54C4F8;
+  text-align: left;
 }
 .form-send .send-left .input-group{
   width:100%;
@@ -240,6 +277,23 @@ body{
   border:none;
   color:#fff;
   text-align:right;
+}
+.form-send .coin{
+  opacity:0.5;
+}
+.form-send .coin.active{
+  opacity:1;
+}
+.receive{
+  height:0;
+  overflow:hidden;
+  transition: all 0.4s;
+}
+.receive.active{
+  height:auto;
+  border-top:1px solid #3A464A;
+  margin-top:15px;
+  padding-top:15px;
 }
 .receive input[name="receive-address"]{
   width:100%;
@@ -256,6 +310,30 @@ body{
   background:none;
   border:none;
   border-bottom:1px solid #fff;
+}
+.receive canvas{
+  margin-top:20px;
+  margin-bottom:20px;
+  width:110px !important;
+  height:110px !important;
+}
+.receive button{
+  border:1px solid #327A9B;
+  border-radius: 0px;
+  background:url('/images/btn-bg.png');
+  background-size:100% 100%;
+  background-repeat:no-repeat;
+  color:#fff;
+  text-transform: uppercase;
+  font-size:17px;
+  padding:10px;
+  width:100%;
+  margin-top:20px;
+}
+.receive button img{
+  display:inline-block;
+  margin-left:5px;
+  height:20px;
 }
 .explorer h3{
   border-bottom:1px solid #3E94B2;
