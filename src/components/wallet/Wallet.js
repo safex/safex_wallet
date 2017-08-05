@@ -20,6 +20,7 @@ export default class Wallet extends React.Component {
             is_loading: false,
             safex_price: 0,
             bitcoin_price: 0,
+            receive_amount: 0,
         }
 
         this.createKey = this.createKey.bind(this);
@@ -133,6 +134,7 @@ export default class Wallet extends React.Component {
 
         axios.get('http://46.101.251.77/insight-api/addr/' + address + '/balance').then(res => {
             console.log(res);
+            return res;
         });
         //take in an address, return the balance for bitcoins
         // /insight-api/addr/[:addr]/balance
@@ -148,6 +150,10 @@ export default class Wallet extends React.Component {
         //take in an address, return the balance for safex coins
 
         //  http://omniexplorer.info/ask.aspx?api=getbalance&prop=1&address=1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P
+        axios.get('http://omniexplorer.info/ask.aspx?api=getbalance&prop=1&address=' + address ).then(res => {
+            console.log(res);
+            return res;
+        });
     }
 
     getAverageFee() {
@@ -293,6 +299,11 @@ export default class Wallet extends React.Component {
     exportKey() {
 
     }
+    amountChange(receive_amount) {
+        this.setState({
+            receive_amount: receive_amount.value
+          });
+    }
 
 
     render() {
@@ -300,60 +311,93 @@ export default class Wallet extends React.Component {
         const {keys} = this.state;
 
         var table = Object.keys(keys).map((key) => {
-            return <tbody key={key}>
-            <tr>
-                <td>{keys[key].public_key}</td>
-                <td>safex: 00.00</td>
-                <td>bitcoin: 00.00</td>
-                <td>
-                    <button>send</button>
-                </td>
-                <td>
-                    <button>receive</button>
-                </td>
-                <td>
-                    <button>clipboard</button>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <form>
-                        <label htmlFor="which">btc or safex</label>
+
+            return <div className="col-xs-12 single-key" key={key}>
+                <div className="col-xs-7">
+                    <div className="key">{keys[key].public_key}</div>
+                    <div className="amounts">
+                        AMOUNT: <span className="amount">Safex: {this.getSafexBalance(keys[key].public_key)}</span> <span className="amount">Bitcoin: {this.getBitcoinBalance(keys[key].public_key)}</span>
+                    </div>
+                </div>
+                <div className="pull-right">
+                    <button href={'#collapsesend'+key}>SEND  <img src="/images/send.png" /></button>
+                    <button>RECEIVE <img src="/images/import.png" /></button>
+                    <button><img src="/images/history.png" /></button>
+                </div>
+            <form className="col-xs-12 form-inline form-send" id={'collapsesend'+key}>
+                <div className="row">
+                    <div className="col-xs-8 send-left">
+                        <label htmlFor="which">Currency</label>
+                        <img src="/images/safex-coin.png" />
+                        <img src="/images/btc-coin.png" />
                         <input type="checkbox" name="which"></input>
-                        <label htmlFor="amount">amount</label>
-                        <input name="amount"></input>
-                        <label htmlFor="fee">fee</label>
-                        <input name="fee"></input>
-                        <label htmlFor="destination">to</label>
-                        <input name="destination"></input>
+                        <div className="input-group">
+                          <span className="input-group-addon" id="basic-addon1">TO:</span>
+                          <input name="destination" type="text" className="form-control" placeholder="Address" aria-describedby="basic-addon1" />
+                        </div>
+                    </div>
+                    <div className="col-xs-4">
+                        <div className="form-group">
+                            <label htmlFor="amount">Amount:</label>
+                            <input name="amount"></input>
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="fee">Fee:</label>
+                            <input name="fee"></input>
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="total">Total:</label>
+                            <input name="total"></input>
+                        </div>
                         <button>Send</button>
-                    </form>
-                </td>
-            </tr>
-            </tbody>
+                    </div>
+                </div>
+            </form>
+            <div className="col-xs-12 receive">
+                <div className="col-xs-12">
+                    <label htmlFor="receive-address">Address:</label>
+                    <input name="receive-address" value={keys[key].public_key} />
+                </div>
+                <div className="col-xs-8">
+                    <label htmlFor="amount">Amount:</label>
+                    <input type="amount" placeholder="1" onChange={this.amountChange.bind(this)} value={this.state.receive_amount} />
+                </div>
+                <div className="col-xs-4">
+                    <div className="row">
+                        <div className="col-xs-6">
+
+                        </div>
+                        <div className="col-xs-6">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         });
 
         return (
             <div>
                 <Navigation />
-                <ul>
-                    <li>
-                        <button onClick={this.createKey}>create key</button>
-                    </li>
-                    <li>
-                        <form onSubmit={this.importKey}>
-                            <input name="key"></input>
-                            <button type="submit">import key</button>
-                        </form>
-                    </li>
-                    <li>
-                        <button>export key</button>
-                    </li>
-                </ul>
-                <table>
-                    {table}
-
-                </table>
+                <div className="container key-buttons">
+                        <div className="row">
+                            <div className="col-xs-12">
+                                <button onClick={this.createKey}>create key</button>
+                                <form onSubmit={this.importKey}>
+                                    <input name="key"></input>
+                                    <button type="submit">import key</button>
+                                </form>
+                                <button>export key</button>
+                            </div>
+                        </div>
+                </div>
+                <div className="container">
+                    <div className="col-xs-12">
+                        <div className="row">
+                            {table}
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

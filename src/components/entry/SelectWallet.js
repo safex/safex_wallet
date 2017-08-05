@@ -51,14 +51,18 @@ export default class SelectWallet extends React.Component {
                     <div className="row text-center">
                       <div className="col-xs-6">
                           <Link to="/login">
-                              <img src="/images/safex-icon-circle.png" />
-                              <span className="btn btn-default">Login <img src="/images/create.png" /></span>
+                              <div className="col-xs-12">
+                                  <img src="/images/safex-icon-circle.png" />
+                                  <span className="btn btn-default">Login <img src="/images/create.png" /></span>
+                              </div>
                           </Link>
                       </div>
                       <div className="col-xs-6">
                           <Link to="/importwallet">
-                              <img src="/images/safex-icon-circle.png" />
-                              <span className="btn btn-default">Import Wallet <img src="/images/import.png" /></span>
+                              <div className="col-xs-12">
+                                  <img src="/images/safex-icon-circle.png" />
+                                  <span className="btn btn-default">Import Wallet <img src="/images/import.png" /></span>
+                              </div>
                               <p>Import your wallet or recover</p>
                               <p>from backup file</p>
                           </Link>
@@ -70,16 +74,20 @@ export default class SelectWallet extends React.Component {
                   <div className="row text-center">
                     <div className="col-xs-6">
                         <Link to="/createwallet">
-                            <img src="/images/safex-icon-circle.png" />
-                            <span className="btn btn-default">New Wallet <img src="/images/create.png" /></span>
+                            <div className="col-xs-12">
+                                <img src="/images/safex-icon-circle.png" />
+                                <span className="btn btn-default">New Wallet <img src="/images/create.png" /></span>
+                            </div>
                             <p>New to SAFEX?</p>
                             <p>Or you just need a new wallet?</p>
                         </Link>
                     </div>
                     <div className="col-xs-6">
                         <Link to="/importwallet">
-                            <img src="/images/safex-icon-circle.png" />
-                            <span className="btn btn-default">Import Wallet <img src="/images/import.png" /></span>
+                            <div className="col-xs-12">
+                                <img src="/images/safex-icon-circle.png" />
+                                <span className="btn btn-default">Import Wallet <img src="/images/import.png" /></span>
+                            </div>
                             <p>Import your wallet or recover</p>
                             <p>from backup file</p>
                         </Link>

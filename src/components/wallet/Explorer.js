@@ -80,15 +80,18 @@ export default class Explorer extends React.Component {
         return (
             <div>
                 <Navigation />
-                <form onSubmit={this.exploreAddress}>
-                    <label htmlFor="address"></label>
-                    <input name="address"></input>
-                    <button type="submit">explore</button>
-                </form>
+                <div className="container explorer">
+                    <h3>Explorer</h3>
+                    <p>You may enter a block height, address, block hash, transaction hash, hash160, or ipv4 address...</p>
+                    <form onSubmit={this.exploreAddress}>
+                        <label htmlFor="address"></label>
+                        <input name="address"></input>
+                        <button type="submit">explore</button>
+                    </form>
+                </div>
                 <table>
-                    {history}
-                </table>
 
+                </table>
             </div>
         );
     }

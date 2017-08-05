@@ -114,7 +114,7 @@ export default class CreateWallet extends React.Component {
                 <form className="form-group" onSubmit={this.handleSubmit}>
                     <input className="form-control" type="password" name="password1" placeholder="Enter Password" />
                     <input className="form-control" type="password" name="password2" placeholder="Repeat Password" />
-                    <button className="btn btn-default" type="submit">CREATE</button>
+                    <button className="btn btn-default" type="submit">CREATE <img src="/images/create.png" /></button>
                 </form>
                 <p className="text-center">
                     Write password down and <br />

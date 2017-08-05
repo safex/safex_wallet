@@ -52,15 +52,20 @@ export default class Login extends React.Component {
     render() {
 
         return (
-            <div>
-                <form onSubmit={this.handleSubmit}>
-                    <input type="password" name="password" />
-                    <button type="submit">Open Wallet</button>
-
-                </form>
-
-            </div>
-
+          <div className="container">
+                   <div className="col-xs-12 Login-logo">
+                       <img src="/images/logo.png" />
+                   </div>
+                   <div className="col-xs-12 Login-form">
+                     <form className="form-group" onSubmit={this.handleSubmit}>
+                         <input className="form-control" type="password" name="password" placeholder="Enter Password" />
+                         <button className="btn btn-default" type="submit">LOGIN <img src="/images/create.png" /></button>
+                     </form>
+                   </div>
+                   <div className="col-xs-12 text-center Intro-footer">
+                       <p className="text-center">2014-2017 All Rights Reserved Safe Exchange Developers &copy;</p>
+                   </div>
+               </div>
         );
     }
 }
@@ -69,5 +74,3 @@ export default class Login extends React.Component {
 Login.contextTypes = {
     router: React.PropTypes.object.isRequired
 }
-
-
