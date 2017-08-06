@@ -5,6 +5,9 @@ import Navigation from '../Navigation';
 export default class Explorer extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            transactions: []
+        }
         this.exploreAddress = this.exploreAddress.bind(this);
         this.getSafexHistory = this.getBitcoinHistory.bind(this);
     }
@@ -84,38 +87,65 @@ export default class Explorer extends React.Component {
 
         var options = {
                 method: 'POST',
+                dataType: 'json',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: 'addr=' + e.target.address.value,
-                mode: 'no-cors',
+                //mode: 'no-cors',
             };
+        var response;
         console.log(e.target.address.value);
-        fetch('https://www.omniwallet.org/v1/transaction/address', options)
+        fetch('https://cors-anywhere.herokuapp.com/https://www.omniwallet.org/v1/transaction/address', options)
             .then(res => res.json())
-            .then(json => console.log(json));
+            .then(json => {
+    var transactions = json.transactions;
+    var result = [];
+    for(var i in transactions)
+    result.push([i, transactions [i]]);
+    this.setState({transactions:result});
+    console.log(this.state.transactions);
+ })
+            .catch(e => console.log(e));
     }
 
 
     render() {
+        const {transactions} = this.state;
 
+        var table = Object.keys(transactions).map((transaction) => {
+
+                return <tr key={transaction}>
+                            <td>{transactions[transaction][1].hash}</td>
+                            <td>{transactions[transaction][1].amount}</td>
+                            <td>{transactions[transaction][1].role}</td>
+                       </tr>
+                    });
         return (
             <div>
                 <Navigation/>
                 <div className="container explorer">
                     <h3>Explorer</h3>
-                    <p>You may enter a block height, address, block hash, transaction hash, hash160, or ipv4
+                    <p className="text-center">You may enter a block height, address, block hash, transaction hash, hash160, or ipv4
                         address...</p>
                     <form onSubmit={this.exploreAddress}>
-                        <label htmlFor="address"></label>
-                        <input name="address"></input>
-                        <button type="submit">explore</button>
+                        <div className="input-group">
+                          <input type="text" name="address" className="form-control" placeholder="Address, Ip, Hash" aria-describedby="basic-addon2" />
+                          <span className="input-group-addon" id="basic-addon2"><button type="submit">SEARCH</button></span>
+                        </div>
                     </form>
+                    <table className="table">
+                        <thead>
+                            <th>Hash</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </thead>
+                        <tbody>
+                            {table}
+                        </tbody>
+                    </table>
                 </div>
-                <table>
-
-                </table>
             </div>
         );
     }

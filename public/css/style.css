@@ -335,10 +335,54 @@ body{
   margin-left:5px;
   height:20px;
 }
+.explorer{
+  color:#fff;
+}
 .explorer h3{
   border-bottom:1px solid #3E94B2;
   color:#fff;
   text-align:center;
   text-transform: uppercase;
   padding-bottom:5px;
+}
+.explorer .input-group input, .explorer .input-group button{
+    background:url('/images/btn-bg.png');
+    border:1px solid #1B4B65;
+    color:#fff;
+}
+.explorer .input-group input{
+    padding: 36px;
+    font-size: 23px;
+}
+.explorer .input-group{
+  width:100%;
+}
+.explorer .input-group .input-group-addon{
+  padding:0;
+  border:none;
+  background:none;
+  position:absolute;
+  right:0;
+}
+.explorer .input-group .input-group-addon button{
+  position: absolute;
+  right: 10px;
+  z-index: 9999;
+  top: 10px;
+  padding: 15px;
+  font-size: 20px
+}
+.explorer table.table{
+  margin-top:20px;
+}
+.explorer .table>tbody>tr>td,
+.explorer .table>tbody>tr>th,
+.explorer .table>tfoot>tr>td,
+.explorer .table>tfoot>tr>th,
+.explorer .table>thead>tr>td,
+.explorer .table>thead>tr>th{
+  border-top:1px solid #2D719D;
+}
+.explorer th{
+  padding:8px;
 }
