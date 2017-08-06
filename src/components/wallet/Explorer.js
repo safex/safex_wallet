@@ -6,6 +6,7 @@ export default class Explorer extends React.Component {
     constructor(props) {
         super(props);
         this.exploreAddress = this.exploreAddress.bind(this);
+        this.getSafexHistory = this.getBitcoinHistory.bind(this);
     }
 
     getBitcoinPrice() {
@@ -58,7 +59,13 @@ export default class Explorer extends React.Component {
         // /insight-api/addr/[:addr]/balance
     }
 
-    getSafexHistory() {
+    getSafexHistory(address) {
+    console.log('in there');
+        fetch('https://www.omniwallet.org/v1/transaction/address', { method: 'POST', body: 'addr=' + address })
+            .then(res => res.json())
+            .then(json => console.log(json));
+
+
         //take in an address, return the history of transactions for safex
 
         // http://omniexplorer.info/ask.aspx?api=gethistory&address=1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P
@@ -72,6 +79,22 @@ export default class Explorer extends React.Component {
 
     exploreAddress(e) {
 
+
+        e.preventDefault();
+
+        var options = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'addr=' + e.target.address.value,
+                mode: 'no-cors',
+            };
+        console.log(e.target.address.value);
+        fetch('https://www.omniwallet.org/v1/transaction/address', options)
+            .then(res => res.json())
+            .then(json => console.log(json));
     }
 
 
@@ -79,10 +102,11 @@ export default class Explorer extends React.Component {
 
         return (
             <div>
-                <Navigation />
+                <Navigation/>
                 <div className="container explorer">
                     <h3>Explorer</h3>
-                    <p>You may enter a block height, address, block hash, transaction hash, hash160, or ipv4 address...</p>
+                    <p>You may enter a block height, address, block hash, transaction hash, hash160, or ipv4
+                        address...</p>
                     <form onSubmit={this.exploreAddress}>
                         <label htmlFor="address"></label>
                         <input name="address"></input>
