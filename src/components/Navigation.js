@@ -73,22 +73,22 @@ export default class Navigation extends React.Component {
                         <span className="icon-bar"></span>
                         <span className="icon-bar"></span>
                     </button>
-                    <a className="navbar-brand" href="#">
-                        <Link to="/wallet"><img src="/images/logo.png"/></Link>
-                    </a>
+                    <span className="navbar-brand" href="#">
+                        <Link to="/wallet"><img src="/images/logo.png" alt="Logo"/></Link>
+                    </span>
                 </div>
 
                 <div className="collapse navbar-collapse" id="navbar-collapse">
                     <ul className="nav navbar-nav navbar-right">
                         <li>
                             <Link to="/wallet" activeClassName="activeLink" onlyActiveOnIndex>Wallet <img
-                                src="/images/create.png"/></Link>
+                                src="/images/create.png" alt="Create"/></Link>
                         </li>
                         <li>
-                            <Link to="/explorer" activeClassName="activeLink">Explorer <img src="/images/explorer.png"/></Link>
+                            <Link to="/explorer" activeClassName="activeLink">Explorer <img src="/images/explorer.png" alt="Explorer"/></Link>
                         </li>
                         <li>
-                            <Link to="/chat" activeClassName="activeLink">Chat <img src="/images/history.png"/></Link>
+                            <Link to="/chat" activeClassName="activeLink">Chat <img src="/images/history.png" alt="Explorer"/></Link>
                         </li>
                     </ul>
                 </div>

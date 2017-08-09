@@ -52,16 +52,16 @@ export default class SelectWallet extends React.Component {
                       <div className="col-xs-6">
                           <Link to="/login">
                               <div className="col-xs-12">
-                                  <img src="/images/safex-icon-circle.png" />
-                                  <span className="btn btn-default">Login <img src="/images/create.png" /></span>
+                                  <img src="/images/safex-icon-circle.png" alt="Safex Icon Circle" />
+                                  <span className="btn btn-default">Login <img src="/images/create.png" alt="Create" /></span>
                               </div>
                           </Link>
                       </div>
                       <div className="col-xs-6">
                           <Link to="/importwallet">
                               <div className="col-xs-12">
-                                  <img src="/images/safex-icon-circle.png" />
-                                  <span className="btn btn-default">Import Wallet <img src="/images/import.png" /></span>
+                                  <img src="/images/safex-icon-circle.png" alt="Safex Icon Circle" />
+                                  <span className="btn btn-default">Import Wallet <img src="/images/import.png" alt="Import" /></span>
                               </div>
                               <p>Import your wallet or recover</p>
                               <p>from backup file</p>
@@ -75,8 +75,8 @@ export default class SelectWallet extends React.Component {
                     <div className="col-xs-6">
                         <Link to="/createwallet">
                             <div className="col-xs-12">
-                                <img src="/images/safex-icon-circle.png" />
-                                <span className="btn btn-default">New Wallet <img src="/images/create.png" /></span>
+                                <img src="/images/safex-icon-circle.png" alt="Safex Icon Circle" />
+                                <span className="btn btn-default">New Wallet <img src="/images/create.png" alt="Create" /></span>
                             </div>
                             <p>New to SAFEX?</p>
                             <p>Or you just need a new wallet?</p>
@@ -85,8 +85,8 @@ export default class SelectWallet extends React.Component {
                     <div className="col-xs-6">
                         <Link to="/importwallet">
                             <div className="col-xs-12">
-                                <img src="/images/safex-icon-circle.png" />
-                                <span className="btn btn-default">Import Wallet <img src="/images/import.png" /></span>
+                                <img src="/images/safex-icon-circle.png" alt="Safex Icon Circle" />
+                                <span className="btn btn-default">Import Wallet <img src="/images/import.png" alt="Import" /></span>
                             </div>
                             <p>Import your wallet or recover</p>
                             <p>from backup file</p>
@@ -101,7 +101,7 @@ export default class SelectWallet extends React.Component {
 
             <div className="container">
                 <div className="col-xs-12 Login-logo">
-                    <img src="/images/logo.png" />
+                    <img src="/images/logo.png" alt="Logo" />
                 </div>
                 <div className="col-xs-12 App-intro">
                     {show_options}

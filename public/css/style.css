@@ -178,6 +178,11 @@ body{
   height:25px;
   margin-left:5px;
 }
+.key-buttons > .row > .col-xs-12{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
 .key-buttons input{
   background:url('/images/btn-bg.png');
   border:1px solid #327A9B;
@@ -189,6 +194,16 @@ body{
   display:inline-block;
   margin-right:10px;
   margin-bottom:10px;
+}
+.key-buttons .row .col-xs-12 > button:last-child{
+  margin-right:0;
+}
+.key-buttons .row .col-xs-12 > form{
+    flex-grow: 1;
+    display: flex;
+}
+.key-buttons .row .col-xs-12 > form > input{
+    flex-grow: 1;
 }
 .single-key{
   background:url('/images/btn-bg.png');
@@ -207,7 +222,7 @@ body{
 .single-key .amounts{
   text-transform: uppercase;
 }
-.single-key .pull-right button, .key-buttons button, .form-send button{
+.single-key .pull-right button, .key-buttons button, .form-send button, .overflow.sendModal button{
   border:1px solid #327A9B;
   border-radius: 0px;
   background:url('/images/btn-bg.png');
@@ -385,4 +400,79 @@ body{
 }
 .explorer th{
   padding:8px;
+}
+.overflow.sendModal{
+    position: absolute;
+    top: 80px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 80px);
+    display: flex;
+    background:rgba(42, 105, 137, 0.7);
+    transition: all 0.4s;
+    opacity:0;
+    z-index:-9999;
+}
+.overflow.sendModal.active{
+  opacity:1;
+  z-index:9999;
+}
+.overflow.sendModal > form{
+  max-width:80%;
+  min-width:400px;
+  margin:auto;
+  height:100%;
+}
+.overflow.sendModal > form h3{
+  text-align:center;
+  border-bottom:1px solid #4D5D66;
+  color:#fff;
+  text-transform: uppercase;
+}
+.overflow.sendModal > form h3 span{
+  text-align:right;
+  color:#fff;
+  text-shadow: none;
+  opacity:1;
+}
+.overflow.sendModal .currency{
+  color:#fff;
+  margin:10px auto;
+  text-align:center;
+}
+.overflow.sendModal .currency img{
+  max-width:100px;
+}
+.overflow.sendModal input{
+  border:none;
+  background:none;
+  border-bottom:1px solid #fff;
+  color:#fff;
+  text-align:right;
+  border-bottom:1px solid #54C4F8;
+  text-align: left;
+}
+.overflow.sendModal .input-group{
+  width:100%;
+}
+.overflow.sendModal .input-group .input-group-addon{
+  padding:0;
+  background:none;
+  border:none;
+  color:#fff;
+  text-align:right;
+  min-width:50px;
+}
+.overflow.sendModal .col-xs-6.col-xs-offset-3{
+  text-align:center;
+  margin-top:15px;
+}
+.overflow.sendModal .col-xs-6.col-xs-offset-3 label{
+  min-width: 60px;
+  text-align: right;
+  margin-right: 5px;
+  color: #fff;
+}
+.overflow.sendModal .col-xs-6.col-xs-offset-3 input{
+  border-bottom:1px solid #fff;
 }

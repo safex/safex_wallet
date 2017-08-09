@@ -54,12 +54,12 @@ export default class Login extends React.Component {
         return (
           <div className="container">
                    <div className="col-xs-12 Login-logo">
-                       <img src="/images/logo.png" />
+                       <img src="/images/logo.png" alt="Logo" />
                    </div>
                    <div className="col-xs-12 Login-form">
                      <form className="form-group" onSubmit={this.handleSubmit}>
                          <input className="form-control" type="password" name="password" placeholder="Enter Password" />
-                         <button className="btn btn-default" type="submit">LOGIN <img src="/images/create.png" /></button>
+                         <button className="btn btn-default" type="submit">LOGIN <img src="/images/create.png" alt="Create" /></button>
                      </form>
                    </div>
                    <div className="col-xs-12 text-center Intro-footer">
