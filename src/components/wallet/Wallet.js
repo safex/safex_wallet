@@ -4,7 +4,6 @@ var fs = window.require('fs');
 var os = window.require('os');
 var bs58 = require('bs58');
 var bitcoin = window.require('bitcoinjs-lib');
-var bitcore = window.require('bitcore-lib');
 import axios from 'axios';
 import {toHexString, encrypt, decrypt} from '../../utils/utils';
 import QRCode from 'qrcode.react';
@@ -263,6 +262,11 @@ export default class Wallet extends React.Component {
                 console.log(resp)
             });
     }
+
+    formSafexTransaction() {
+
+    }
+
 
 
     createKey() {
