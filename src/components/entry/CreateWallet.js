@@ -4,7 +4,7 @@ var fs = window.require('fs');
 var os = window.require('os');
 var bs58 = require('bs58');
 var bitcoin = window.require('bitcoinjs-lib');
-import { toHexString } from '../../utils/utils';
+import { toHexString, encrypt } from '../../utils/utils';
 
 
 
@@ -16,7 +16,6 @@ export default class CreateWallet extends React.Component {
             walletExists: false,
         }
         this.handleSubmit = this.handleSubmit.bind(this);
-
     }
 
     //here we create the wallet file in the default location after prompting for a password and creating the encrypted file.
@@ -50,10 +49,11 @@ export default class CreateWallet extends React.Component {
 
             var address = key_pair.getAddress();
 
-
             var key_json = {};
             key_json['public_key'] = address;
             key_json['private_key'] = priv_key_wif;
+            key_json['safex_bal'] = 0;
+            key_json['btc_bal'] = 0;
 
             var key_array = [];
             key_array.push(key_json);
@@ -65,14 +65,11 @@ export default class CreateWallet extends React.Component {
 
             console.log(json);
 
-
             var crypto = require('crypto'),
                 algorithm = 'aes-256-ctr',
                 password = e.target.password1.value;
 
-            var cipher_text = this.encrypt(JSON.stringify(json), algorithm, password);
-
-
+            var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
 
             var home_dir = os.homedir();
 
@@ -80,6 +77,7 @@ export default class CreateWallet extends React.Component {
                 if (err) {
                     console.log(err)
                 } else {
+                    localStorage.setItem('password', password);
                     localStorage.setItem('wallet', JSON.stringify(json));
                     this.context.router.push('/wallet');
                 }
@@ -89,19 +87,6 @@ export default class CreateWallet extends React.Component {
     }
 
 
-    encrypt(text, algorithm, password) {
-        var cipher = crypto.createCipher(algorithm,password)
-        var crypted = cipher.update(text,'utf8','hex')
-        crypted += cipher.final('hex');
-        return crypted;
-    }
-
-    decrypt(text, algorithm, password){
-        var decipher = crypto.createDecipher(algorithm,password)
-        var dec = decipher.update(text,'hex','utf8')
-        dec += decipher.final('utf8');
-        return dec;
-    }
 
 
     render() {

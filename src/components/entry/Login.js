@@ -1,13 +1,12 @@
 import React from 'react';
 import crypto from 'crypto';
 var fs = window.require('fs');
+import { decrypt } from '../../utils/utils';
 
 export default class Login extends React.Component {
 
     constructor(props) {
         super(props);
-
-
         this.handleSubmit = this.handleSubmit.bind(this);
 
     }
@@ -23,7 +22,7 @@ export default class Login extends React.Component {
 
         var cipher_text = localStorage.getItem('encrypted_wallet');
 
-        var decryped_wallet = this.decrypt(cipher_text, algorithm, password);
+        var decryped_wallet = decrypt(cipher_text, algorithm, password);
 
         try {
             var parse_wallet = JSON.parse(decryped_wallet);
@@ -39,13 +38,6 @@ export default class Login extends React.Component {
             console.log('error parsing wallet');
         }
 
-    }
-
-    decrypt(text, algorithm, password){
-        var decipher = crypto.createDecipher(algorithm,password)
-        var dec = decipher.update(text,'hex','utf8')
-        dec += decipher.final('utf8');
-        return dec;
     }
 
     //here we load up the wallet into the local storage and move on with life.

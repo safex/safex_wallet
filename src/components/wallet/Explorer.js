@@ -6,11 +6,67 @@ export default class Explorer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            transactions: []
+            bitcoin_transactions: [],
+            total_txns: 0
         }
         this.exploreAddress = this.exploreAddress.bind(this);
-        this.getSafexHistory = this.getBitcoinHistory.bind(this);
+        //this.getSafexHistory = this.getSafexHistory.bind(this);
     }
+
+    componentDidMount() {
+        //this.getSafexHistory('1DUb2YYbQA1jjaNYzVXLZ7ZioEhLXtbUru');
+    }
+
+    getTransactionCount(address) {
+        axios.get('http://46.101.251.77:3001/insight-api/addrs/' + address + '/txs?from=0&to=20').then(res => {
+            var json = JSON.stringify(res.data);
+            json = JSON.parse(json);
+            console.log('got total items ' + json["totalItems"])
+
+        });
+    }
+
+   /* getSafexHistory(address) {
+        var txn_count = 0;
+        console.log('txn count ' + txn_count)
+        var txids = [];
+        var index = 0;
+
+
+        axios.get('http://46.101.251.77:3001/insight-api/addrs/' + address + '/txs?from=0&to=20').then(res => {
+            var json = JSON.stringify(res.data);
+            json = JSON.parse(json);
+            console.log('got total items ' + json["totalItems"])
+            txn_count = json["totalItems"];
+            while (index < txn_count) {
+                if ((txn_count - index) > 50) {
+                    axios.get('http://46.101.251.77:3001/insight-api/addrs/' + address + '/txs?from=' + index + '&to=' + (index + 50)).then(res => {
+                        var json = JSON.stringify(res.data);
+                        console.log('index is ' + index);
+                        json = JSON.parse(json);
+                        index += 50;
+                        for (var x in json['items']) {
+                            txids.push(x['txid'])
+                        }
+                    });
+                } else {
+                    axios.get('http://46.101.251.77:3001/insight-api/addrs/' + address + '/txs?from=' + index + '&to=' + txn_count).then(res => {
+                        var json = JSON.stringify(res.data);
+                        json = JSON.parse(json);
+
+                        console.log('index is ' + index);
+                        index = txn_count;
+                        for (var x in json['items']) {
+                            txids.push(x['txid'])
+                        }
+                    });
+                }
+            }
+        });
+
+        console.log('tx ids lenght ' + txids.length)
+    }
+
 
     getBitcoinPrice() {
         axios.get('https://api.coinmarketcap.com/v1/ticker/').then(res => {
@@ -47,11 +103,6 @@ export default class Explorer extends React.Component {
         //get latest price of safex
     }
 
-    getBitcoinHistory() {
-        //take in an address, return the history of transactions
-        //transaction history:
-        // /insight-api/txs/?address=mmhmMNfBiZZ37g1tgg2t8DDbNoEdqKVxAL
-    }
 
     getBitcoinBalance(address) {
 
@@ -63,86 +114,68 @@ export default class Explorer extends React.Component {
     }
 
     getSafexHistory(address) {
-    console.log('in there');
-        fetch('https://www.omniwallet.org/v1/transaction/address', { method: 'POST', body: 'addr=' + address })
-            .then(res => res.json())
-            .then(json => console.log(json));
+
+        var json = {};
+        json['address'] = address;
+        axios.post('http://localhost:3001/transactions', JSON.stringify(json)).then(res => {
+            console.log('safex balance repsonse ' + JSON.stringify(res.data));
+
+            var balance = res.data;
+            //console.log(balance);
+            return balance;
+        });
 
 
         //take in an address, return the history of transactions for safex
 
         // http://omniexplorer.info/ask.aspx?api=gethistory&address=1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P
-    }
+    }*/
 
-    getSafexBalance(address) {
-        //take in an address, return the balance for safex coins
-
-        //  http://omniexplorer.info/ask.aspx?api=getbalance&prop=1&address=1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P
-    }
 
     exploreAddress(e) {
-
-
         e.preventDefault();
 
-        var options = {
-                method: 'POST',
-                dataType: 'json',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'addr=' + e.target.address.value,
-                //mode: 'no-cors',
-            };
-        var response;
-        console.log(e.target.address.value);
-        fetch('https://cors-anywhere.herokuapp.com/https://www.omniwallet.org/v1/transaction/address', options)
-            .then(res => res.json())
-            .then(json => {
-    var transactions = json.transactions;
-    var result = [];
-    for(var i in transactions)
-    result.push([i, transactions [i]]);
-    this.setState({transactions:result});
-    console.log(this.state.transactions);
- })
-            .catch(e => console.log(e));
+
+
+
+
     }
+
+
 
 
     render() {
-        const {transactions} = this.state;
+        const {bitcoin_transactions} = this.state;
 
-        var table = Object.keys(transactions).map((transaction) => {
+        var table = Object.keys(bitcoin_transactions).map((transaction) => {
 
-                return <tr key={transaction}>
-                            <td>{transactions[transaction][1].hash}</td>
-                            <td>{transactions[transaction][1].amount}</td>
-                            <td>{transactions[transaction][1].role}</td>
-                       </tr>
-                    });
+            return <tr key={transaction}>
+                <td>{bitcoin_transactions[transaction][1].hash}</td>
+                <td>{bitcoin_transactions[transaction][1].amount}</td>
+                <td>{bitcoin_transactions[transaction][1].role}</td>
+            </tr>
+        });
         return (
             <div>
                 <Navigation/>
                 <div className="container explorer">
                     <h3>Explorer</h3>
-                    <p className="text-center">You may enter a block height, address, block hash, transaction hash, hash160, or ipv4
-                        address...</p>
+                    <p className="text-center">Enter an address to explore</p>
                     <form onSubmit={this.exploreAddress}>
                         <div className="input-group">
-                          <input type="text" name="address" className="form-control" placeholder="Address, Ip, Hash" aria-describedby="basic-addon2" />
-                          <span className="input-group-addon" id="basic-addon2"><button type="submit">SEARCH</button></span>
+                            <input type="text" name="address" className="form-control" placeholder="Address, Ip, Hash"
+                                   aria-describedby="basic-addon2"/>
+                            <span className="input-group-addon" id="basic-addon2"><button type="submit">SEARCH</button></span>
                         </div>
                     </form>
                     <table className="table">
                         <thead>
-                            <th>Hash</th>
-                            <th>Amount</th>
-                            <th>Status</th>
+                        <th>Hash</th>
+                        <th>Amount</th>
+                        <th>Status</th>
                         </thead>
                         <tbody>
-                            {table}
+                        {table}
                         </tbody>
                     </table>
                 </div>
