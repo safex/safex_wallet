@@ -22,6 +22,19 @@ export default class Wallet extends React.Component {
             is_loading: false,
             safex_price: 0,
             bitcoin_price: 0,
+            receive_amount: 0.0000001.toFixed(7),
+            colapse_open: {
+                key: '',
+                receive_open: false,
+                send_open: false
+            },
+            send_coin: 'safex',
+            send_amount: 0.0000001.toFixed(7),
+            send_fee: 0,
+            send_total: 0,
+            send_overflow_active: false,
+            send_public_key: '',
+            send_to:''
 
         }
 
@@ -29,6 +42,8 @@ export default class Wallet extends React.Component {
         this.importKey = this.importKey.bind(this);
         this.sendCoins = this.sendCoins.bind(this);
         this.prepareDisplay = this.prepareDisplay.bind(this);
+        this.openCoinModal = this.openCoinModal.bind(this);
+        this.closeCoinModal = this.closeCoinModal.bind(this);
     }
 
 
@@ -209,7 +224,7 @@ export default class Wallet extends React.Component {
 
     sendCoins(e) {
         e.preventDefault();
-        if (e.target.which.value === true) {
+        if (this.state.send_coin === 'safex') {
 
             //send safex
 
@@ -411,66 +426,225 @@ export default class Wallet extends React.Component {
 
     }
 
+    amountChange(receive_amount) {
+        this.setState({
+            receive_amount: receive_amount.value
+          });
+    }
+
+    openSendReceive(key,sendreceive){
+        if(sendreceive === 'send'){
+
+                if(this.state.colapse_open.send_open){
+                    this.setState({
+                        colapse_open: {
+                            key: key,
+                            send_open: !this.state.colapse_open.send_open,
+                            receive_open: false
+                        },
+                        send_public_key: ''
+                    });
+                }else{
+                    this.setState({
+                        colapse_open: {
+                            key: key,
+                            send_open: !this.state.colapse_open.send_open,
+                            receive_open: false
+                        },
+                        send_public_key: this.state.keys[key].public_key
+                    });
+                }
+            }
+        if(sendreceive === 'receive'){
+                this.setState({
+                    colapse_open: {
+                        key: key,
+                        send_open: false,
+                        receive_open: !this.state.colapse_open.receive_open
+                    }
+                });
+            }
+    }
+
+    sendCoinChoose(coin){
+        this.setState({
+            send_coin: coin
+        })
+    }
+
+    openCoinModal(e){
+        e.preventDefault();
+        console.log(this.state.keys[this.state.colapse_open.key].public_key);
+        this.setState({
+            send_overflow_active: true,
+            send_to: e.target.destination.value
+        })
+    }
+
+    sendCoinOnChange(e){
+        if(e.target.name === 'amount'){
+            var send_fee = 0.0001;
+            var send_total = 0;
+            if(this.state.send_coin === 'safex'){
+                send_total = parseFloat(e.target.value);
+            }else{
+                send_total = parseFloat(e.target.value) + send_fee;
+            }
+
+            this.setState({
+                send_amount: e.target.value,
+                send_fee: send_fee,
+                send_total: send_total
+            });
+        }
+    }
+
+    closeCoinModal(){
+        this.setState({
+            send_overflow_active: false,
+            send_to: ''
+        })
+    }
 
     render() {
         const {keys} = this.state;
 
-
         var table = Object.keys(keys).map((key) => {
-            return <tbody key={key}>
-            <tr>
-                <td>{keys[key].public_key}</td>
-                <td>safex: {keys[key].safex_bal}</td>
-                <td>bitcoin: {keys[key].btc_bal}</td>
-                <td>
-                    <button>send</button>
-                </td>
-                <td>
-                    <button>receive</button>
-                </td>
-                <td>
-                    <button>clipboard</button>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <form onSubmit={this.sendCoins}>
-                        <input type="hidden" name="private_key" value={keys[key].private_key}></input>
-                        <input type="hidden" name="public_key" value={keys[key].public_key}></input>
-                        <label htmlFor="which">btc or safex</label>
-                        <input type="checkbox" name="which"></input>
-                        <label htmlFor="amount">amount</label>
-                        <input name="amount"></input>
-                        <label htmlFor="fee">fee</label>
-                        <input name="fee"></input>
-                        <label htmlFor="destination">destination</label>
-                        <input name="destination"></input>
-                        <button>Send</button>
-                    </form>
-                </td>
-            </tr>
-            </tbody>
+
+            return <div className="col-xs-12 single-key" key={key}>
+                <div className="col-xs-7">
+                    <div className="key">{keys[key].public_key}</div>
+                    <div className="amounts">
+                        AMOUNT: <span className="amount">Safex: {keys[key].safex_bal}</span> <span className="amount">Bitcoin: {keys[key].btc_bal}</span>
+                    </div>
+                </div>
+                <div className="pull-right">
+                    <button onClick={this.openSendReceive.bind(this,key,'send')}>SEND  <img src="/images/send.png" alt="Send" /></button>
+                    <button onClick={this.openSendReceive.bind(this,key,'receive')}>RECEIVE <img src="/images/import.png" alt="Receive" /></button>
+                    <button><img src="/images/history.png" alt="history" /></button>
+                </div>
+                <form onChange={this.sendCoinOnChange.bind(this)} onSubmit={this.openCoinModal} className={this.state.colapse_open.send_open && this.state.colapse_open.key === key
+                ? 'col-xs-12 form-inline form-send active'
+                : 'col-xs-12 form-inline form-send'}>
+                    <div className="row">
+                        <div className="col-xs-8 send-left">
+                            <label htmlFor="which">Currency</label>
+                            <img className={this.state.send_coin === 'safex'
+                            ? 'coin active'
+                            : 'coin'} onClick={this.sendCoinChoose.bind(this,'safex')} src="/images/safex-coin.png" alt="Safex Coin" />
+                            <img className={this.state.send_coin === 'btc'
+                            ? 'coin active'
+                            : 'coin'} onClick={this.sendCoinChoose.bind(this,'btc')} src="/images/btc-coin.png" alt="Bitcoin Coin" />
+                            <input type="hidden" name="which" value={this.state.send_coin}></input>
+                            <div className="input-group">
+                              <span className="input-group-addon" id="basic-addon1">TO:</span>
+                              <input name="destination" type="text" className="form-control" placeholder="Address" aria-describedby="basic-addon1" />
+                            </div>
+                        </div>
+                        <div className="col-xs-4">
+                            <div className="form-group">
+                                <label htmlFor="amount">Amount:</label>
+                                <input name="amount" value={this.state.send_amount} />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="fee">Fee(BTC):</label>
+                                <input name="fee" value={this.state.send_fee} />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="total">Total:</label>
+                                <input name="total" readOnly value={this.state.send_total}></input>
+                            </div>
+                            <button type="submit">Send</button>
+                        </div>
+                    </div>
+                </form>
+                <div className={this.state.colapse_open.receive_open && this.state.colapse_open.key === key
+                ? 'col-xs-12 receive active'
+                : 'col-xs-12 receive'}>
+                    <div className="col-xs-12">
+                        <label htmlFor="receive-address">Address:</label>
+                        <input name="receive-address" value={keys[key].public_key} />
+                    </div>
+                    <div className="col-xs-8">
+                        <label htmlFor="amount">Amount:</label>
+                        <input type="amount" placeholder="1" onChange={this.amountChange.bind(this)} value={this.state.receive_amount} />
+                    </div>
+                    <div className="col-xs-4">
+                        <div className="row">
+                            <div className="col-xs-6">
+                                <QRCode value={"bitcoin:"+keys[key].public_key+"?amount="+this.state.receive_amount} />
+                            </div>
+                            <div className="col-xs-6">
+                                <button>Print <img src="/images/print.png" alt="Print" /></button>
+                                <button>PDF <img src="/images/pdf.png" alt="Pdf" /></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
         });
         return (
             <div>
-                <Navigation/>
-                <ul>
-                    <li>
-                        <button onClick={this.createKey}>create key</button>
-                    </li>
-                    <li>
-                        <form onSubmit={this.importKey}>
-                            <input name="key"></input>
-                            <button type="submit">import key</button>
-                        </form>
-                    </li>
-                    <li>
-                        <button>export key</button>
-                    </li>
-                </ul>
-                <table>
-                    {table}
-                </table>
+                <Navigation />
+                <div className="container key-buttons">
+                        <div className="row">
+                            <div className="col-xs-12">
+                                <button onClick={this.createKey}>Create key</button>
+                                <form onSubmit={this.importKey}>
+                                    <input name="key"></input>
+                                    <button type="submit">Import key</button>
+                                </form>
+                                <button>Export key</button>
+                            </div>
+                        </div>
+                </div>
+                <div className="container">
+                    <div className="col-xs-12">
+                        <div className="row">
+                            {table}
+                        </div>
+                    </div>
+                </div>
+                <div className={this.state.send_overflow_active
+                ? 'overflow sendModal active'
+                : 'overflow sendModal'}>
+                    <form onSubmit={this.sendCoins}>
+                        <h3>Sending <span className="close" onClick={this.closeCoinModal}>X</span></h3>
+                        <div className="col-xs-12">
+                            <div className="currency">
+                                Currency: <img className={this.state.send_coin === 'safex'
+                                ? 'coin'
+                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'} onClick={this.sendCoinChoose.bind(this,'safex')} src="/images/safex-coin.png" alt="Safex Coin" />
+                                <img className={this.state.send_coin === 'btc'
+                                ? 'coin'
+                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'} onClick={this.sendCoinChoose.bind(this,'btc')} src="/images/btc-coin.png" alt="Bitcoin Coin" />
+                            </div>
+                        </div>
+                        <div className="input-group">
+                          <span className="input-group-addon" id="basic-addon1">FROM:</span>
+                          <input name="destination" type="text" className="form-control" readOnly value={this.state.send_public_key} placeholder="Address" aria-describedby="basic-addon1" />
+                        </div>
+                        <div className="input-group">
+                          <span className="input-group-addon" id="basic-addon1">TO:</span>
+                          <input name="destination" type="text" className="form-control" readOnly value={this.state.send_to} placeholder="Address" aria-describedby="basic-addon1" />
+                        </div>
+                        <div className="col-xs-6 col-xs-offset-3">
+                            <div className="form-group">
+                                <label htmlFor="amount">Amount:</label>
+                                <input name="amount" value={this.state.send_amount} />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="fee">Fee(BTC):</label>
+                                <input name="fee" value={this.state.send_fee} />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="total">Total:</label>
+                                <input name="total" value={this.state.send_total}></input>
+                            </div>
+                            <button type="submit">CONFIRM</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         );
     }
