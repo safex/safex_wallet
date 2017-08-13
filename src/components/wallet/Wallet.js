@@ -4,6 +4,7 @@ var fs = window.require('fs');
 var os = window.require('os');
 var bs58 = require('bs58');
 var bitcoin = window.require('bitcoinjs-lib');
+var bitcore = window.require('bitcore-lib');
 import axios from 'axios';
 import {toHexString, encrypt, decrypt} from '../../utils/utils';
 import QRCode from 'qrcode.react';
@@ -223,14 +224,14 @@ export default class Wallet extends React.Component {
                 .then(resp => resp.json())
                 .then((resp) => {
                     console.log(resp)
-                    this.formTransaction(resp, amount * 100000000, fee * 100000000, destination, keys, source);
+                    this.formBitcoinTransaction(resp, amount * 100000000, fee * 100000000, destination, keys, source);
                 });
 
 
         }
     }
 
-    formTransaction(utxos, amount, fee, destination, key, source) {
+    formBitcoinTransaction(utxos, amount, fee, destination, key, source) {
         var running_total = 0;
         var tx = new bitcoin.TransactionBuilder();
         var inputs_num = 0;
@@ -256,8 +257,8 @@ export default class Wallet extends React.Component {
         var json = {};
         json['rawtx'] = tx.build().toHex();
         console.log('the json ' + JSON.stringify(json))
-        fetch('http://46.101.251.77:3001/insight-api/tx/send', {method: "POST", body: tx.build().toHex()})
-            .then(resp => resp.json())
+        fetch('http://localhost:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
+            .then(resp => resp.text())
             .then((resp) => {
                 console.log(resp)
             });
