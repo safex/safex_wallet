@@ -27,8 +27,6 @@ export default class Wallet extends React.Component {
 
         this.createKey = this.createKey.bind(this);
         this.importKey = this.importKey.bind(this);
-        this.getSafexPrice = this.getSafexPrice.bind(this);
-        this.getBitcoinPrice = this.getBitcoinPrice.bind(this);
         this.sendCoins = this.sendCoins.bind(this);
         this.prepareDisplay = this.prepareDisplay.bind(this);
     }
@@ -43,8 +41,6 @@ export default class Wallet extends React.Component {
             console.log(e);
         }
 
-        this.getSafexPrice();
-        this.getBitcoinPrice();
 
     }
 
@@ -131,8 +127,35 @@ export default class Wallet extends React.Component {
         //get the latest price of safex
     }
 
+    getPrices() {
 
+        var myHeaders = new Headers();
+        myHeaders.append('pragma', 'no-cache');
+        myHeaders.append('cache-control', 'no-cache');
 
+        fetch('https://api.coinmarketcap.com/v1/ticker/', {method: "GET", headers: myHeaders})
+            .then(resp => resp.json())
+            .then((resp) => {
+                try {
+                    var btc = 0;
+                    var safex = 0;
+                    for (var i = 0; i < resp.length; i++) {
+                        // look for the entry with a matching `code` value
+                        if (resp[i].symbol === 'SAFEX') {
+                            console.log(resp)
+                            safex = resp[i].price_usd
+                        } else if (resp[i].symbol === 'BTC') {
+                            console.log(resp)
+                            btc = resp[i].price_usd
+                        }
+                    }
+
+                    this.setState({safex_price: safex, bitcoin_price: btc});
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+    }
 
 
     getAverageFee() {
@@ -150,7 +173,10 @@ export default class Wallet extends React.Component {
         this.state.keys.forEach((key) => {
             var json = {};
             json['address'] = key.public_key;
-            promises.push(fetch('http://localhost:3001/balance', {method: "POST", body: JSON.stringify(json)})
+            promises.push(fetch('http://localhost:3001/balance', {
+                method: "POST",
+                body: JSON.stringify(json)
+            })
                 .then(resp => resp.json())
                 .then((resp) => {
                     return resp
@@ -168,12 +194,12 @@ export default class Wallet extends React.Component {
                 if (x === 0) {
                     hold_keys[internal_index].safex_bal = values[x].balance;
                 } else if (x === 1) {
-                    hold_keys[internal_index].btc_bal = values[x]/100000000;
+                    hold_keys[internal_index].btc_bal = values[x] / 100000000;
                     internal_index += 1;
                 } else if ((x % 2) === 0) {
                     hold_keys[internal_index].safex_bal = values[x].balance;
                 } else {
-                    hold_keys[internal_index].btc_bal = values[x]/100000000;
+                    hold_keys[internal_index].btc_bal = values[x] / 100000000;
                     internal_index += 1;
                 }
             }
@@ -184,13 +210,57 @@ export default class Wallet extends React.Component {
     sendCoins(e) {
         e.preventDefault();
         if (e.target.which.value === true) {
+
             //send safex
 
         } else {
+            var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
+            var source = e.target.public_key.value;
+            var amount = e.target.amount.value;
+            var fee = e.target.fee.value;
+            var destination = e.target.destination.value;
+            fetch('http://46.101.251.77:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
+                .then(resp => resp.json())
+                .then((resp) => {
+                    console.log(resp)
+                    this.formTransaction(resp, amount * 100000000, fee * 100000000, destination, keys, source);
+                });
 
-            //insight-api/addr/[:addr]/utxo
-            //send bitcoin
+
         }
+    }
+
+    formTransaction(utxos, amount, fee, destination, key, source) {
+        var running_total = 0;
+        var tx = new bitcoin.TransactionBuilder();
+        var inputs_num = 0;
+        utxos.forEach(txn => {
+            console.log(txn);
+            if (running_total < (amount + fee)) {
+                running_total += txn.satoshis;
+                tx.addInput(txn.txid, txn.vout);
+                inputs_num += 1;
+            }
+        });
+        console.log('running total ' + running_total)
+        console.log('fee ' + fee)
+        console.log('amount ' + amount)
+        console.log('subtracted total ' + (running_total - (amount + fee)))
+        console.log('inputs num ' + inputs_num)
+        tx.addOutput(destination, amount);
+        tx.addOutput(source, (running_total - (amount + fee)));
+        for (var i = 0; i < inputs_num; i++) {
+            tx.sign(i, key);
+        }
+
+        var json = {};
+        json['rawtx'] = tx.build().toHex();
+        console.log('the json ' + JSON.stringify(json))
+        fetch('http://46.101.251.77:3001/insight-api/tx/send', {method: "POST", body: tx.build().toHex()})
+            .then(resp => resp.json())
+            .then((resp) => {
+                console.log(resp)
+            });
     }
 
 
@@ -360,6 +430,8 @@ export default class Wallet extends React.Component {
             <tr>
                 <td>
                     <form onSubmit={this.sendCoins}>
+                        <input type="hidden" name="private_key" value={keys[key].private_key}></input>
+                        <input type="hidden" name="public_key" value={keys[key].public_key}></input>
                         <label htmlFor="which">btc or safex</label>
                         <input type="checkbox" name="which"></input>
                         <label htmlFor="amount">amount</label>

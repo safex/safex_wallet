@@ -13,13 +13,42 @@ export default class Navigation extends React.Component {
         }
         this.getSafexPrice = this.getSafexPrice.bind(this);
         this.getBitcoinPrice = this.getBitcoinPrice.bind(this);
+        this.getPrices = this.getPrices.bind(this);
 
     }
 
     componentDidMount() {
 
-        this.getSafexPrice();
-        this.getBitcoinPrice();
+        this.getPrices();
+    }
+
+    getPrices() {
+        var myHeaders = new Headers();
+        myHeaders.append('pragma', 'no-cache');
+        myHeaders.append('cache-control', 'no-cache');
+
+        fetch('https://api.coinmarketcap.com/v1/ticker/', {method: "GET", headers: myHeaders, mode: 'no-cors'})
+            .then(resp => console.log(resp))
+            .then((resp) => {
+                try {
+                    var btc = 0;
+                    var safex = 0;
+                    for (var i = 0; i < resp.length; i++) {
+                        // look for the entry with a matching `code` value
+                        if (resp[i].symbol === 'SAFEX') {
+                            console.log(resp)
+                            safex = resp[i].price_usd
+                        } else if (resp[i].symbol === 'BTC') {
+                            console.log(resp)
+                            btc = resp[i].price_usd
+                        }
+                    }
+
+                    this.setState({safex_price: safex, bitcoin_price: btc});
+                } catch (e) {
+                    console.log(e);
+                }
+            });
     }
 
 
