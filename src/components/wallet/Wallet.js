@@ -29,7 +29,7 @@ export default class Wallet extends React.Component {
                 send_open: false
             },
             send_coin: 'safex',
-            send_amount: 0.0000001.toFixed(7),
+            send_amount: 1,
             send_fee: 0.0001,
             send_total: 0,
             send_overflow_active: false,
@@ -502,15 +502,20 @@ export default class Wallet extends React.Component {
             var send_fee = this.state.send_fee;
             var send_total = 0;
             if(this.state.send_coin === 'safex'){
-                send_total = parseFloat(e.target.value);
+                send_total = parseInt(e.target.value);
+                this.setState({
+                    send_amount: parseInt(e.target.value),
+                    send_total: send_total
+                });
             }else{
                 send_total = parseFloat(e.target.value) + parseFloat(send_fee);
+                this.setState({
+                    send_amount: e.target.value,
+                    send_total: send_total
+                });
             }
 
-            this.setState({
-                send_amount: e.target.value,
-                send_total: send_total
-            });
+
     }
 
     sendFeeOnChange(e){
@@ -543,13 +548,20 @@ export default class Wallet extends React.Component {
         var send_amount = this.state.send_amount;
         var send_fee = this.state.send_fee;
         if(coin === 'safex'){
+            send_amount = parseFloat(this.state.send_amount).toFixed(0);
             var send_total = parseFloat(send_amount);
+            this.setState({
+                send_amount: send_amount,
+                send_total: send_total
+            });
         }else{
             var send_total = parseFloat(send_fee) + parseFloat(send_amount);
+            this.setState({
+                send_amount: parseFloat(send_amount).toFixed(7),
+                send_total: send_total.toFixed(7)
+            });
         }
-        this.setState({
-            send_total: send_total.toFixed(7)
-        });
+
     }
 
     closeCoinModal(){
