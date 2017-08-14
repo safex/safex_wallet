@@ -23,18 +23,21 @@ export default class Wallet extends React.Component {
             safex_price: 0,
             bitcoin_price: 0,
             receive_amount: 0.0000001.toFixed(7),
-            colapse_open: {
+            collapse_open: {
                 key: '',
                 receive_open: false,
                 send_open: false
             },
             send_coin: 'safex',
             send_amount: 0.0000001.toFixed(7),
-            send_fee: 0,
+            send_fee: 0.0001,
             send_total: 0,
             send_overflow_active: false,
-            send_public_key: '',
-            send_to:''
+            send_to:'',
+            send_keys: {
+              public_key: '',
+              private_key: ''
+            }
 
         }
 
@@ -44,6 +47,10 @@ export default class Wallet extends React.Component {
         this.prepareDisplay = this.prepareDisplay.bind(this);
         this.openCoinModal = this.openCoinModal.bind(this);
         this.closeCoinModal = this.closeCoinModal.bind(this);
+        this.sendAmountOnChange = this.sendAmountOnChange.bind(this);
+        this.sendFeeOnChange = this.sendFeeOnChange.bind(this);
+        this.sendFeeOnBlur = this.sendFeeOnBlur.bind(this);
+        this.sendTotalAdjustCoinChange = this.sendTotalAdjustCoinChange.bind(this);
     }
 
 
@@ -435,20 +442,20 @@ export default class Wallet extends React.Component {
     openSendReceive(key,sendreceive){
         if(sendreceive === 'send'){
 
-                if(this.state.colapse_open.send_open){
+                if(this.state.collapse_open.send_open){
                     this.setState({
-                        colapse_open: {
+                        collapse_open: {
                             key: key,
-                            send_open: !this.state.colapse_open.send_open,
+                            send_open: !this.state.collapse_open.send_open,
                             receive_open: false
                         },
                         send_public_key: ''
                     });
                 }else{
                     this.setState({
-                        colapse_open: {
+                        collapse_open: {
                             key: key,
-                            send_open: !this.state.colapse_open.send_open,
+                            send_open: !this.state.collapse_open.send_open,
                             receive_open: false
                         },
                         send_public_key: this.state.keys[key].public_key
@@ -457,10 +464,10 @@ export default class Wallet extends React.Component {
             }
         if(sendreceive === 'receive'){
                 this.setState({
-                    colapse_open: {
+                    collapse_open: {
                         key: key,
                         send_open: false,
-                        receive_open: !this.state.colapse_open.receive_open
+                        receive_open: !this.state.collapse_open.receive_open
                     }
                 });
             }
@@ -469,40 +476,90 @@ export default class Wallet extends React.Component {
     sendCoinChoose(coin){
         this.setState({
             send_coin: coin
-        })
+        });
+        this.sendTotalAdjustCoinChange(coin);
     }
 
     openCoinModal(e){
         e.preventDefault();
-        console.log(this.state.keys[this.state.colapse_open.key].public_key);
+        if(this.state.send_fee <= 0.0001){
+            var send_fee = 0.0001;
+        }else{
+            var send_fee = this.state.send_fee;
+        }
         this.setState({
             send_overflow_active: true,
-            send_to: e.target.destination.value
+            send_to: e.target.destination.value,
+            send_fee: send_fee,
+            send_keys: {
+              public_key: e.target.public_key.value,
+              private_key: e.target.private_key.value
+            }
         })
     }
 
-    sendCoinOnChange(e){
-        if(e.target.name === 'amount'){
-            var send_fee = 0.0001;
+    sendAmountOnChange(e){
+            var send_fee = this.state.send_fee;
             var send_total = 0;
             if(this.state.send_coin === 'safex'){
                 send_total = parseFloat(e.target.value);
             }else{
-                send_total = parseFloat(e.target.value) + send_fee;
+                send_total = parseFloat(e.target.value) + parseFloat(send_fee);
             }
 
             this.setState({
                 send_amount: e.target.value,
-                send_fee: send_fee,
                 send_total: send_total
             });
+    }
+
+    sendFeeOnChange(e){
+            var send_amount = this.state.send_amount;
+            var send_fee = parseFloat(e.target.value);
+
+            if(this.state.send_coin === 'safex'){
+                var send_total = parseFloat(send_amount);
+            }else{
+                var send_total = parseFloat(send_fee) + parseFloat(send_amount);
+            }
+            this.setState({
+                send_fee: send_fee,
+                send_total: send_total.toFixed(7)
+            });
+    }
+
+    sendFeeOnBlur(e){
+        if(this.state.send_fee <= 0.0001){
+            var send_fee = 0.0001;
+        }else{
+            var send_fee = this.state.send_fee;
         }
+        this.setState({
+            send_fee: send_fee
+        })
+    }
+
+    sendTotalAdjustCoinChange(coin){
+        var send_amount = this.state.send_amount;
+        var send_fee = this.state.send_fee;
+        if(coin === 'safex'){
+            var send_total = parseFloat(send_amount);
+        }else{
+            var send_total = parseFloat(send_fee) + parseFloat(send_amount);
+        }
+        this.setState({
+            send_total: send_total.toFixed(7)
+        });
     }
 
     closeCoinModal(){
         this.setState({
             send_overflow_active: false,
-            send_to: ''
+            send_to: '',
+            send_keys: {
+              public_key: '',
+              private_key: ''
+            }
         })
     }
 
@@ -523,7 +580,7 @@ export default class Wallet extends React.Component {
                     <button onClick={this.openSendReceive.bind(this,key,'receive')}>RECEIVE <img src="/images/import.png" alt="Receive" /></button>
                     <button><img src="/images/history.png" alt="history" /></button>
                 </div>
-                <form onChange={this.sendCoinOnChange.bind(this)} onSubmit={this.openCoinModal} className={this.state.colapse_open.send_open && this.state.colapse_open.key === key
+                <form onSubmit={this.openCoinModal} className={this.state.collapse_open.send_open && this.state.collapse_open.key === key
                 ? 'col-xs-12 form-inline form-send active'
                 : 'col-xs-12 form-inline form-send'}>
                     <div className="row">
@@ -536,6 +593,8 @@ export default class Wallet extends React.Component {
                             ? 'coin active'
                             : 'coin'} onClick={this.sendCoinChoose.bind(this,'btc')} src="/images/btc-coin.png" alt="Bitcoin Coin" />
                             <input type="hidden" name="which" value={this.state.send_coin}></input>
+                            <input type="hidden" name="private_key" value={keys[key].private_key}></input>
+                            <input type="hidden" name="public_key" value={keys[key].public_key}></input>
                             <div className="input-group">
                               <span className="input-group-addon" id="basic-addon1">TO:</span>
                               <input name="destination" type="text" className="form-control" placeholder="Address" aria-describedby="basic-addon1" />
@@ -544,21 +603,21 @@ export default class Wallet extends React.Component {
                         <div className="col-xs-4">
                             <div className="form-group">
                                 <label htmlFor="amount">Amount:</label>
-                                <input name="amount" value={this.state.send_amount} />
+                                <input type="number" name="amount" onChange={this.sendAmountOnChange} value={this.state.send_amount} />
                             </div>
                             <div className="form-group">
                                 <label htmlFor="fee">Fee(BTC):</label>
-                                <input name="fee" value={this.state.send_fee} />
+                                <input type="number" name="fee" onChange={this.sendFeeOnChange} onBlur={this.sendFeeOnBlur} value={this.state.send_fee} />
                             </div>
                             <div className="form-group">
                                 <label htmlFor="total">Total:</label>
-                                <input name="total" readOnly value={this.state.send_total}></input>
+                                <input type="number" name="total" readOnly value={this.state.send_total}></input>
                             </div>
                             <button type="submit">Send</button>
                         </div>
                     </div>
                 </form>
-                <div className={this.state.colapse_open.receive_open && this.state.colapse_open.key === key
+                <div className={this.state.collapse_open.receive_open && this.state.collapse_open.key === key
                 ? 'col-xs-12 receive active'
                 : 'col-xs-12 receive'}>
                     <div className="col-xs-12">
@@ -622,24 +681,26 @@ export default class Wallet extends React.Component {
                         </div>
                         <div className="input-group">
                           <span className="input-group-addon" id="basic-addon1">FROM:</span>
-                          <input name="destination" type="text" className="form-control" readOnly value={this.state.send_public_key} placeholder="Address" aria-describedby="basic-addon1" />
+                          <input name="from" type="text" className="form-control" readOnly value={this.state.send_keys.public_key} placeholder="Address" aria-describedby="basic-addon1" />
                         </div>
                         <div className="input-group">
                           <span className="input-group-addon" id="basic-addon1">TO:</span>
                           <input name="destination" type="text" className="form-control" readOnly value={this.state.send_to} placeholder="Address" aria-describedby="basic-addon1" />
                         </div>
+                        <input type="hidden" name="private_key" value={this.state.send_keys.private_key}></input>
+                        <input type="hidden" name="public_key" value={this.state.send_keys.public_key}></input>
                         <div className="col-xs-6 col-xs-offset-3">
                             <div className="form-group">
                                 <label htmlFor="amount">Amount:</label>
-                                <input name="amount" value={this.state.send_amount} />
+                                <input readOnly name="amount" value={this.state.send_amount} />
                             </div>
                             <div className="form-group">
                                 <label htmlFor="fee">Fee(BTC):</label>
-                                <input name="fee" value={this.state.send_fee} />
+                                <input readOnly name="fee" value={this.state.send_fee} />
                             </div>
                             <div className="form-group">
                                 <label htmlFor="total">Total:</label>
-                                <input name="total" value={this.state.send_total}></input>
+                                <input readOnly name="total" value={this.state.send_total}></input>
                             </div>
                             <button type="submit">CONFIRM</button>
                         </div>

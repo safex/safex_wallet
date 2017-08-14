@@ -155,11 +155,15 @@ body{
   color:#00C9FF;
 }
 .navbar-default{
-  height:80px;
-  background:rgba(0,0,0,0.07);
+  height:85px;
+  background:url('/images/menu-bg.png');
+  background-size:cover;
   border:none;
   border-radius: 0px;
-  border-bottom:1px solid #0D2B3C;
+  padding-bottom:10px;
+}
+.navbar-default .coin-amounts{
+  padding-bottom:5px;
 }
 .navbar-default .navbar-brand img{
   height:40px;
@@ -478,4 +482,10 @@ body{
 }
 .overflow.sendModal .col-xs-6.col-xs-offset-3 input{
   border-bottom:1px solid #fff;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 }
