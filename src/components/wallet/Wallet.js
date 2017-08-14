@@ -31,7 +31,7 @@ export default class Wallet extends React.Component {
             send_coin: 'safex',
             send_amount: 1,
             send_fee: 0.0001,
-            send_total: 0,
+            send_total: 1,
             send_overflow_active: false,
             send_to:'',
             send_keys: {
@@ -441,28 +441,51 @@ export default class Wallet extends React.Component {
 
     openSendReceive(key,sendreceive){
         if(sendreceive === 'send'){
-
-                if(this.state.collapse_open.send_open){
+                if(!this.state.collapse_open.send_open && this.state.collapse_open.key !== key || this.state.collapse_open.send_open && this.state.collapse_open.key !== key){
                     this.setState({
                         collapse_open: {
                             key: key,
-                            send_open: !this.state.collapse_open.send_open,
-                            receive_open: false
-                        },
-                        send_public_key: ''
-                    });
-                }else{
-                    this.setState({
-                        collapse_open: {
-                            key: key,
-                            send_open: !this.state.collapse_open.send_open,
+                            send_open: true,
                             receive_open: false
                         },
                         send_public_key: this.state.keys[key].public_key
                     });
                 }
+
+                if(this.state.collapse_open.send_open && this.state.collapse_open.key === key){
+                    this.setState({
+                        collapse_open: {
+                            key: key,
+                            send_open: false,
+                            receive_open: false
+                        },
+                        send_public_key: ''
+                    });
+                }
+
+                if(!this.state.collapse_open.send_open && this.state.collapse_open.key === key){
+                    this.setState({
+                        collapse_open: {
+                            key: key,
+                            send_open: true,
+                            receive_open: false
+                        },
+                        send_public_key: ''
+                    });
+                }
+
             }
         if(sendreceive === 'receive'){
+            if(!this.state.collapse_open.receive_open && this.state.collapse_open.key !== key || this.state.collapse_open.receive_open && this.state.collapse_open.key !== key){
+                this.setState({
+                    collapse_open: {
+                        key: key,
+                        send_open: false,
+                        receive_open: true
+                    }
+                });
+            }
+            if(this.state.collapse_open.receive_open && this.state.collapse_open.key === key || !this.state.collapse_open.receive_open && this.state.collapse_open.key === key){
                 this.setState({
                     collapse_open: {
                         key: key,
@@ -471,6 +494,7 @@ export default class Wallet extends React.Component {
                     }
                 });
             }
+        }
     }
 
     sendCoinChoose(coin){
@@ -551,13 +575,14 @@ export default class Wallet extends React.Component {
             send_amount = parseFloat(this.state.send_amount).toFixed(0);
             var send_total = parseFloat(send_amount);
             this.setState({
-                send_amount: send_amount,
-                send_total: send_total
+                send_amount: 1,
+                send_fee: 0.0001,
+                send_total: 1
             });
         }else{
-            var send_total = parseFloat(send_fee) + parseFloat(send_amount);
+            var send_total = parseFloat(send_fee) + 0.0000001;
             this.setState({
-                send_amount: parseFloat(send_amount).toFixed(7),
+                send_amount: 0.0000001.toFixed(7),
                 send_total: send_total.toFixed(7)
             });
         }
