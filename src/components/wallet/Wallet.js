@@ -161,7 +161,7 @@ export default class Wallet extends React.Component {
                 }
 
             }
-            this.setState({keys: hold_keys, average_fee: hold_fee, send_fee: hold_fee});
+            this.setState({keys: hold_keys, average_fee: hold_fee, send_fee: parseFloat(hold_fee)});
         });
     }
 
@@ -570,7 +570,7 @@ export default class Wallet extends React.Component {
             var send_total = parseFloat(send_amount);
             this.setState({
                 send_amount: 1,
-                send_fee: this.state.average_fee,
+                send_fee: parseFloat(this.state.average_fee),
                 send_total: 1
             });
         } else {
