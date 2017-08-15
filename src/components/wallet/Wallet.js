@@ -131,7 +131,6 @@ export default class Wallet extends React.Component {
         console.log(promises.length);
 
 
-
         Promise.all(promises).then(values => {
             var hold_keys = this.state.keys;
             var internal_index = 0;
@@ -237,9 +236,8 @@ export default class Wallet extends React.Component {
 
         utxos.forEach(txn => {
             console.log(txn);
-            if (running_total < (1e3 + fee)) {
+            if (running_total < (2730 + fee)) {
                 running_total += txn.satoshis;
-                var scriptkey = txn.scriptPubKey;
                 var the_utxo = {
                     'txId': txn.txid,
                     'outputIndex': txn.vout,
@@ -254,7 +252,7 @@ export default class Wallet extends React.Component {
         console.log(safexPayload(amount).toString('utf8'));
         var tx = new bitcore.Transaction()
             .from(tx_array)
-            .to(destination, 1e3)
+            .to(destination, 2730)
             .fee(fee)
             .addData(safexPayload(amount).toString('utf8'))
             .change(source)
