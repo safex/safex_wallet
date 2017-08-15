@@ -609,7 +609,7 @@ export default class Wallet extends React.Component {
                 <div className="col-xs-7">
                     <div className="key">{keys[key].public_key}</div>
                     <div className="amounts">
-                        AMOUNT: <span className="amount">Safex: {keys[key].safex_bal}</span> <span className="amount">Bitcoin: {keys[key].btc_bal}</span>
+                        <span className="amount">Safex: {keys[key].safex_bal}</span> <span className="amount">Bitcoin: {keys[key].btc_bal}</span>
                     </div>
                 </div>
                 <div className="pull-right">
