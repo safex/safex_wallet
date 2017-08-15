@@ -337,8 +337,10 @@ body{
 .receive canvas{
   margin-top:20px;
   margin-bottom:20px;
-  width:110px !important;
-  height:110px !important;
+  width:140px !important;
+  height:140px !important;
+  background:#fff;
+  padding:5px;
 }
 .receive button{
   border:1px solid #327A9B;
