@@ -20,15 +20,25 @@ export default class Navigation extends React.Component {
     componentDidMount() {
 
         this.getPrices();
+        this.timerID = setInterval(
+            () => this.tick(),
+            600000
+        );
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.timerID);
+    }
+
+    tick() {
+        console.log('hello');
+        this.getPrices();
     }
 
     getPrices() {
-        var myHeaders = new Headers();
-        myHeaders.append('pragma', 'no-cache');
-        myHeaders.append('cache-control', 'no-cache');
 
-        fetch('https://api.coinmarketcap.com/v1/ticker/', {method: "GET", headers: myHeaders, mode: 'no-cors'})
-            .then(resp => console.log(resp))
+        fetch('https://api.coinmarketcap.com/v1/ticker/', {method: "GET"})
+            .then(resp => resp.json())
             .then((resp) => {
                 try {
                     var btc = 0;
