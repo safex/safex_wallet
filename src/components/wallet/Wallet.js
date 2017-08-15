@@ -606,7 +606,7 @@ export default class Wallet extends React.Component {
                     <div className="key">{keys[key].public_key}</div>
                 </div>
                 <div className="pull-right">
-                    <button disabled={keys[key].pending_btc_bal === 0
+                    <button disabled={keys[key].pending_btc_bal >= 0
                         ? ''
                         : 'disabled'} onClick={this.openSendReceive.bind(this, key, 'send')}>SEND <img src="/images/send.png"
                                                                                              alt="Send"/></button>
