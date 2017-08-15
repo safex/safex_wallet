@@ -649,7 +649,9 @@ export default class Wallet extends React.Component {
                         </div>
                         <div className="col-xs-4">
                             <div className="form-group">
-                                <label htmlFor="amount">Amount:</label>
+                                <label htmlFor="amount">Amount<span className={this.state.send_coin === "safex"
+                                    ? ''
+                                    : 'hidden-xs hidden-sm hidden-md hidden-lg'}>(Safex)</span>:</label>
                                 <input type="number" name="amount" onChange={this.sendAmountOnChange}
                                        value={this.state.send_amount}/>
                             </div>

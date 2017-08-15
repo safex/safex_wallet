@@ -21,17 +21,6 @@
   font-style:   normal;
   font-weight:  200;
 }
-@font-face {
-  font-family: 'Klavika Regular';
-  src: url('/fonts/klavika.eot'); /* IE9 Compat Modes */
-  src: url('/fonts/klavika.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('/fonts/klavika.woff') format('woff'), /* Modern Browsers */
-       url('/fonts/klavika.ttf')  format('truetype'), /* Safari, Android, iOS */
-       url('/fonts/klavika.svg#6498678996bd6656ab27fa464205c398') format('svg'); /* Legacy iOS */
-
-  font-style:   normal;
-  font-weight:  400;
-}
 
 
 textarea, input:focus, button { outline-color: transparent;
@@ -272,7 +261,7 @@ body{
 }
 .single-key .key{
   font-size:18px;
-  font-family: 'Klavika Regular';
+  font-family: Arial;
   letter-spacing: 0.1em;
   margin-top: 12px;
   margin-bottom: 10px;
@@ -407,6 +396,7 @@ body{
   border:none;
   border-bottom:1px solid #45A0C1;
   padding:10px;
+  font-family: Arial;
 }
 .receive .col-xs-8 label{
   display:block;
