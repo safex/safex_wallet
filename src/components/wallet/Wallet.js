@@ -43,7 +43,7 @@ export default class Wallet extends React.Component {
             transaction_sent: false,
             txid: "",
             average_fee: 0,
-            import_key: ''
+            import_key: '',
         }
 
         this.createKey = this.createKey.bind(this);
@@ -176,13 +176,23 @@ export default class Wallet extends React.Component {
             var fee = e.target.fee.value;
             console.log('the fee ' + e.target.fee.value)
             var destination = e.target.destination.value;
-            fetch('http://46.101.251.77:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
-                .then(resp => resp.json())
-                .then((resp) => {
-                    console.log(resp)
-                    this.formSafexTransaction(resp, amount, parseFloat((fee * 100000000).toFixed(0)), destination, keys, source);
-                });
 
+            try {
+                var address = bitcore.Address.fromString(destination);
+
+                try {
+                    fetch('http://46.101.251.77:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
+                        .then(resp => resp.json())
+                        .then((resp) => {
+                            console.log(resp)
+                            this.formSafexTransaction(resp, amount, parseFloat((fee * 100000000).toFixed(0)), destination, keys, source);
+                        });
+                } catch (e) {
+                    alert('network communication error, please try again later');
+                }
+            } catch (e) {
+                alert('invalid destination address');
+            }
             //send safex
 
         } else {
@@ -191,12 +201,20 @@ export default class Wallet extends React.Component {
             var amount = e.target.amount.value;
             var fee = e.target.fee.value;
             var destination = e.target.destination.value;
+            try {
+               var address = bitcore.Address.fromString(destination);
+                try {
             fetch('http://46.101.251.77:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
                 .then(resp => resp.json())
                 .then((resp) => {
                     this.formBitcoinTransaction(resp, parseFloat((amount * 100000000).toFixed(0)), parseFloat((fee * 100000000).toFixed(0)), destination, keys, source);
                 });
-
+                } catch (e) {
+                    alert('network communication error, please try again later');
+                }
+            } catch (e) {
+                alert('invalid destination address');
+            }
 
         }
     }
@@ -357,7 +375,6 @@ export default class Wallet extends React.Component {
         e.preventDefault();
         try {
             var key_pair = bitcoin.ECPair.fromWIF(e.target.key.value);
-
             var address = key_pair.getAddress();
 
             var key_json = {};
@@ -419,6 +436,7 @@ export default class Wallet extends React.Component {
                 console.log(e);
             }
         } catch (e) {
+            alert('invalid private key')
             console.log(e);
         }
 
