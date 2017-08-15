@@ -70,13 +70,30 @@ export default class ImportWallet extends React.Component {
 
     render() {
         return (
-            <div>
-                <form onSubmit={this.handleSubmit}>
-                    <FileInput name="fileInput" placeholder="safexwallet.dat" onChange={this.handleChange} />
-                    <input type="password" name="password" />
-                    <button type="submit">Import </button>
-                </form>
-            </div>
+           <div className="container">
+                    <div className="col-xs-12 Login-logo">
+                        <img src="/images/logo.png" />
+                    </div>
+                    <div className="col-xs-12 Login-form Import-wallet">
+                      <form className="form-group" onSubmit={this.handleSubmit}>
+                       <FileInput name="fileInput" accept=".dat" placeholder="wallet.dat" className="inputClass" onChange={this.handleChange} />
+
+                          <div className="col-xs-12 fileandpass">
+                              <p>Selected File:</p>
+                              <p className="filename">{this.state.filename}</p>
+                              <input type="password" name="password" placeholder="Enter Password" />
+                         </div>
+                          <button className="btn btn-default" type="submit">IMPORT <img src="/images/import.png" /></button>
+                     </form>
+                      <p className="text-center">
+                          Write password down and <br />
+                          NEVER lose it.
+                      </p>
+                    </div>
+                    <div className="col-xs-12 text-center Intro-footer">
+                        <p className="text-center">2014-2017 All Rights Reserved Safe Exchange Developers &copy;</p>
+                    </div>
+                </div>
         );
     }
 

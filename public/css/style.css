@@ -123,6 +123,21 @@ body{
   padding:3px;
   font-size:14px;
 }
+.Import-wallet input[name="fileInput_filename"]{
+  text-indent: -9999px !important;
+  background: url('/images/import-top.png') !important;
+  background-size: auto 100% !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  padding: 50px !important;
+  z-index: 99999 !important;
+  cursor: pointer;
+  border:none;
+}
+.Import-wallet input[name="fileInput"]{
+  z-index:999999 !important;
+  padding:50px !important;
+}
 .Login-form > form{
   max-width:300px;
   margin:auto;
