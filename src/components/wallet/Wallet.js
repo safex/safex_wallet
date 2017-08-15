@@ -1,5 +1,5 @@
 import React from 'react';
-
+var fileDownload = require('react-file-download');
 var fs = window.require('fs');
 var os = window.require('os');
 var bs58 = require('bs58');
@@ -55,7 +55,7 @@ export default class Wallet extends React.Component {
         this.sendFeeOnBlur = this.sendFeeOnBlur.bind(this);
         this.sendTotalAdjustCoinChange = this.sendTotalAdjustCoinChange.bind(this);
         this.closeSuccessModal = this.closeSuccessModal.bind(this);
-        this.exportKey = this.exportKey.bind(this);
+        this.exportWallet = this.exportWallet.bind(this);
     }
 
 
@@ -412,7 +412,9 @@ export default class Wallet extends React.Component {
 
     }
 
-    exportKey() {
+    exportWallet() {
+        var wallet_data = localStorage.getItem('wallet');
+        fileDownload(wallet_data, 'safexwallet.json');
 
     }
 
@@ -699,7 +701,7 @@ export default class Wallet extends React.Component {
                                 <input name="key"></input>
                                 <button type="submit">Import key</button>
                             </form>
-                            <button>Export key</button>
+                            <button onClick={this.exportWallet}>Export Wallet</button>
                         </div>
                     </div>
                 </div>
