@@ -54,6 +54,8 @@ export default class CreateWallet extends React.Component {
             key_json['private_key'] = priv_key_wif;
             key_json['safex_bal'] = 0;
             key_json['btc_bal'] = 0;
+            key_json['pending_safex_bal'] = 0;
+            key_json['pending_btc_bal'] = 0;
 
             var key_array = [];
             key_array.push(key_json);

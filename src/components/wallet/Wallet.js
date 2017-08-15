@@ -4,8 +4,9 @@ var fs = window.require('fs');
 var os = window.require('os');
 var bs58 = require('bs58');
 var bitcoin = window.require('bitcoinjs-lib');
+var bitcore = window.require('bitcore-lib');
 import axios from 'axios';
-import {toHexString, encrypt, decrypt} from '../../utils/utils';
+import {toHexString, encrypt, safexPayload} from '../../utils/utils';
 import QRCode from 'qrcode.react';
 
 
@@ -67,31 +68,6 @@ export default class Wallet extends React.Component {
 
     }
 
-    safexPayload(amount) {
-        const prefix = 'omni';
-        const payload = this.padZeroes16(this.toHex(56)) + this.padZeroes16(this.toHex(amount));
-
-        return new Buffer.concat([new Buffer(prefix), new Buffer(payload, 'hex')]);
-    }
-
-    toHex(num) {
-        return (num).toString(16);
-    }
-
-    padZeroes16(str) {
-        var result = str,
-            left = 16 - str.length;
-
-        if (left < 0) {
-            throw new Error('invalid amount');
-        }
-
-        for (let i = left; i--;) {
-            result = '0' + result;
-        }
-
-        return result;
-    }
 
     getBitcoinPrice() {
         axios.get('https://api.coinmarketcap.com/v1/ticker/').then(res => {
@@ -186,20 +162,38 @@ export default class Wallet extends React.Component {
                 .then((resp) => {
                     return resp
                 }));
+            promises.push(fetch('http://46.101.251.77:3001/insight-api/addr/' + key.public_key + '/unconfirmedBalance')
+                .then(resp => resp.text())
+                .then((resp) => {
+                    return resp
+                }));
+            promises.push(fetch('http://localhost:3001/unconfirmed', {
+                method: "POST",
+                body: JSON.stringify(json)
+            })
+                .then(resp => resp.json())
+                .then((resp) => {
+                    return resp
+                }));
         });
         Promise.all(promises).then(values => {
             var hold_keys = this.state.keys;
             var internal_index = 0;
+            var iteration = 0;
             for (var x = 0; x < values.length; x++) {
-                if (x === 0) {
+
+                if (iteration === 0) {
                     hold_keys[internal_index].safex_bal = values[x].balance;
-                } else if (x === 1) {
+                    iteration += 1;
+                } else if (iteration === 1) {
                     hold_keys[internal_index].btc_bal = values[x] / 100000000;
-                    internal_index += 1;
-                } else if ((x % 2) === 0) {
-                    hold_keys[internal_index].safex_bal = values[x].balance;
-                } else {
-                    hold_keys[internal_index].btc_bal = values[x] / 100000000;
+                    iteration += 1;
+                } else if (iteration === 2) {
+                    hold_keys[internal_index].pending_btc_bal = values[x] / 100000000;
+                    iteration += 1;
+                } else if (iteration === 3) {
+                    hold_keys[internal_index].pending_safex_bal = values[x];
+                    iteration = 0;
                     internal_index += 1;
                 }
             }
@@ -209,7 +203,19 @@ export default class Wallet extends React.Component {
 
     sendCoins(e) {
         e.preventDefault();
-        if (e.target.which.value === true) {
+        console.log(e.target.which.checked);
+        if (e.target.which.checked === true) {
+            var keys = bitcore.PrivateKey.fromWIF(e.target.private_key.value);
+            var source = e.target.public_key.value;
+            var amount = e.target.amount.value;
+            var fee = e.target.fee.value;
+            var destination = e.target.destination.value;
+            fetch('http://46.101.251.77:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
+                .then(resp => resp.json())
+                .then((resp) => {
+                    console.log(resp)
+                    this.formSafexTransaction(resp, amount, fee * 100000000, destination, keys, source);
+                });
 
             //send safex
 
@@ -263,8 +269,74 @@ export default class Wallet extends React.Component {
             });
     }
 
-    formSafexTransaction() {
+    formSafexTransaction(utxos, amount, fee, destination, key, source) {
 
+        var tx_array = [];
+        var running_total = 0;
+        console.log(utxos);
+
+        utxos.forEach(txn => {
+            console.log(txn);
+            if (running_total < (1e3 + fee)) {
+                running_total += txn.satoshis;
+                var scriptkey = txn.scriptPubKey;
+                var the_utxo = {
+                    'txId' : txn.txid,
+                    'outputIndex' : txn.vout,
+                    'address' : txn.address,
+                    'script' : txn.scriptPubKey,
+                    'satoshis' : txn.satoshis,
+                };
+                tx_array.push(the_utxo);
+            }
+        });
+
+        console.log(safexPayload(amount).toString('utf8'));
+        var tx = new bitcore.Transaction()
+            .from(tx_array)
+            .to(destination, 1e3)
+            .fee(fee)
+            .addData(safexPayload(amount).toString('utf8'))
+            .change(source)
+            .sign(key);
+
+        console.log(tx.serialize());
+        var json = {};
+        json['rawtx'] = tx.serialize();
+        console.log('the json ' + JSON.stringify(json))
+        fetch('http://localhost:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
+           .then(resp => resp.text())
+            .then((resp) => {
+               console.log(resp)
+            });
+
+    }
+
+
+    safexPayload(amount) {
+        const prefix = 'omni';
+        const payload = this.padZeroes16(this.toHex(56)) + this.padZeroes16(this.toHex(amount));
+
+        return new Buffer.concat([new Buffer(prefix), new Buffer(payload, 'hex')]);
+    }
+
+    toHex(num) {
+        return (num).toString(16);
+    }
+
+    padZeroes16(str) {
+        var result = str,
+            left = 16 - str.length;
+
+        if (left < 0) {
+            throw new Error('invalid amount');
+        }
+
+        for (let i = left; i--;) {
+            result = '0' + result;
+        }
+
+        return result;
     }
 
 
@@ -300,6 +372,10 @@ export default class Wallet extends React.Component {
         var key_json = {};
         key_json['public_key'] = address;
         key_json['private_key'] = priv_key_wif;
+        key_json['safex_bal'] = 0;
+        key_json['btc_bal'] = 0;
+        key_json['pending_safex_bal'] = 0;
+        key_json['pending_btc_bal'] = 0;
 
 
         try {
@@ -350,6 +426,8 @@ export default class Wallet extends React.Component {
             key_json['private_key'] = e.target.key.value;
             key_json['safex_bal'] = 0;
             key_json['btc_bal'] = 0;
+            key_json['pending_safex_bal'] = 0;
+            key_json['pending_btc_bal'] = 0;
 
 
             try {
@@ -420,16 +498,14 @@ export default class Wallet extends React.Component {
             return <tbody key={key}>
             <tr>
                 <td>{keys[key].public_key}</td>
-                <td>safex: {keys[key].safex_bal}</td>
-                <td>bitcoin: {keys[key].btc_bal}</td>
+                <td>safex: {keys[key].pending_safex_bal > 0 | keys[key].pending_safex_bal < 0 ? (keys[key].safex_bal + keys[key].pending_safex_bal) : keys[key].safex_bal}
+                {keys[key].pending_safex_bal > 0 | keys[key].pending_safex_bal < 0 ? '(pending ' + keys[key].pending_safex_bal + ')' : ''}</td>
+                <td>bitcoin: {keys[key].btc_bal} {keys[key].pending_btc_bal > 0 | keys[key].pending_btc_bal < 0 ? '(pending ' + keys[key].pending_btc_bal + ')' : ''}</td>
                 <td>
                     <button>send</button>
                 </td>
                 <td>
                     <button>receive</button>
-                </td>
-                <td>
-                    <button>clipboard</button>
                 </td>
             </tr>
             <tr>
