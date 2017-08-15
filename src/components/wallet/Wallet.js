@@ -39,7 +39,8 @@ export default class Wallet extends React.Component {
               public_key: '',
               private_key: ''
             },
-            transaction_sent: false
+            transaction_sent: false,
+            txid: "",
         }
 
         this.createKey = this.createKey.bind(this);
@@ -72,25 +73,6 @@ export default class Wallet extends React.Component {
 
         this.prepareDisplay();
     }
-
-    sendBitcoin() {
-        //send bitcoins
-        //fetch UTXOs for a specific address /insight-api/addr/[:addr]/utxo
-        //broadcast /insight-api/tx/send
-        // rawtx: "signed transaction as hex string"
-
-        //eg
-
-        //rawtx: 01000000017b1eabe0209b1fe794124575ef807057c77ada2138ae4fa8d6c4de0398a14f3f00000000494830450221008949f0cb400094ad2b5eb399d59d01c14d73d8fe6e96df1a7150deb388ab8935022079656090d7f6bac4c9a94e0aad311a4268e082a725f8aeae0573fb12ff866a5f01ffffffff01f0ca052a010000001976a914cbc20a7664f2f69e5355aa427045bc15e7c6c77288ac00000000
-
-        //estimate fee:
-        // /insight-api/utils/estimatefee[?nbBlocks=2]
-    }
-
-    sendSafex() {
-
-    }
-
 
     getBitcoinPrice() {
         axios.get('https://api.coinmarketcap.com/v1/ticker/').then(res => {
@@ -127,7 +109,6 @@ export default class Wallet extends React.Component {
     }
 
     getPrices() {
-
         var myHeaders = new Headers();
         myHeaders.append('pragma', 'no-cache');
         myHeaders.append('cache-control', 'no-cache');
@@ -226,8 +207,7 @@ export default class Wallet extends React.Component {
 
     sendCoins(e) {
         e.preventDefault();
-        console.log(e.target.which.checked);
-        if (e.target.which.checked === true) {
+        if (this.state.send_coin === 'safex') {
             var keys = bitcore.PrivateKey.fromWIF(e.target.private_key.value);
             var source = e.target.public_key.value;
             var amount = e.target.amount.value;
@@ -251,7 +231,6 @@ export default class Wallet extends React.Component {
             fetch('http://46.101.251.77:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
                 .then(resp => resp.json())
                 .then((resp) => {
-                    console.log(resp)
                     this.formBitcoinTransaction(resp, amount * 100000000, fee * 100000000, destination, keys, source);
                 });
 
@@ -271,11 +250,6 @@ export default class Wallet extends React.Component {
                 inputs_num += 1;
             }
         });
-        console.log('running total ' + running_total)
-        console.log('fee ' + fee)
-        console.log('amount ' + amount)
-        console.log('subtracted total ' + (running_total - (amount + fee)))
-        console.log('inputs num ' + inputs_num)
         tx.addOutput(destination, amount);
         tx.addOutput(source, (running_total - (amount + fee)));
         for (var i = 0; i < inputs_num; i++) {
@@ -284,13 +258,13 @@ export default class Wallet extends React.Component {
 
         var json = {};
         json['rawtx'] = tx.build().toHex();
-        console.log('the json ' + JSON.stringify(json))
         fetch('http://localhost:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
             .then(resp => resp.text())
             .then((resp) => {
                 console.log(resp);
                 this.setState({
-                    transaction_sent: true
+                    transaction_sent: true,
+                    txid: resp
                 });
             });
     }
@@ -329,46 +303,17 @@ export default class Wallet extends React.Component {
         console.log(tx.serialize());
         var json = {};
         json['rawtx'] = tx.serialize();
-        console.log('the json ' + JSON.stringify(json))
         fetch('http://localhost:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
            .then(resp => resp.text())
             .then((resp) => {
-               console.log(resp);
+
                this.setState({
-                   transaction_sent: true
+                   transaction_sent: true,
+                   txid: resp
                });
             });
 
     }
-
-
-    safexPayload(amount) {
-        const prefix = 'omni';
-        const payload = this.padZeroes16(this.toHex(56)) + this.padZeroes16(this.toHex(amount));
-
-        return new Buffer.concat([new Buffer(prefix), new Buffer(payload, 'hex')]);
-    }
-
-    toHex(num) {
-        return (num).toString(16);
-    }
-
-    padZeroes16(str) {
-        var result = str,
-            left = 16 - str.length;
-
-        if (left < 0) {
-            throw new Error('invalid amount');
-        }
-
-        for (let i = left; i--;) {
-            result = '0' + result;
-        }
-
-        return result;
-    }
-
-
 
     createKey() {
         this.setState({is_loading: true});
@@ -415,7 +360,6 @@ export default class Wallet extends React.Component {
 
 
         json['keys'].push(key_json);
-        console.log(json);
 
 
         var crypto = require('crypto'),
@@ -623,8 +567,6 @@ export default class Wallet extends React.Component {
                     send_total: send_total.toFixed(7)
                 });
             }
-
-
     }
 
     sendFeeOnChange(e){
@@ -706,9 +648,10 @@ export default class Wallet extends React.Component {
                 <div className="col-xs-7">
                     <div className="key">{keys[key].public_key}</div>
                     <div className="amounts">
-                        <span className="amount">Safex: {keys[key].pending_safex_bal > 0 | keys[key].pending_safex_bal < 0 ? (keys[key].safex_bal + keys[key].pending_safex_bal) : keys[key].safex_bal}
+                        <span className="amount">Safex: {keys[key].pending_safex_bal < 0 ? (parseFloat(keys[key].safex_bal) + parseFloat(keys[key].pending_safex_bal)) : keys[key].safex_bal}
                         {keys[key].pending_safex_bal > 0 | keys[key].pending_safex_bal < 0 ? '(pending ' + keys[key].pending_safex_bal + ')' : ''}</span>
-                        <span className="amount">Bitcoin: {keys[key].btc_bal} {keys[key].pending_btc_bal > 0 | keys[key].pending_btc_bal < 0 ? '(pending ' + keys[key].pending_btc_bal + ')' : ''}</span>
+                        <span className="amount">Bitcoin: {keys[key].pending_btc_bal < 0 ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)) : keys[key].btc_bal}
+                            {keys[key].pending_btc_bal > 0 | keys[key].pending_btc_bal < 0 ? '(pending ' + keys[key].pending_btc_bal + ')' : ''}</span>
                     </div>
                 </div>
                 <div className="pull-right">
@@ -873,7 +816,7 @@ export default class Wallet extends React.Component {
                               </div>
                               <div className="input-group">
                                 <span className="input-group-addon" id="basic-addon1">TX ID:</span>
-                                <input name="destination" type="text" className="form-control" readOnly value={this.state.send_to} placeholder="Address" aria-describedby="basic-addon1" />
+                                <input name="destination" type="text" className="form-control" readOnly value={this.state.txid} placeholder="Address" aria-describedby="basic-addon1" />
                               </div>
                               <input type="hidden" readOnly name="private_key" value={this.state.send_keys.private_key}></input>
                               <input type="hidden" readOnly name="public_key" value={this.state.send_keys.public_key}></input>
