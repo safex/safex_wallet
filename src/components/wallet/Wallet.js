@@ -5,8 +5,6 @@ var os = window.require('os');
 var bs58 = require('bs58');
 var bitcoin = window.require('bitcoinjs-lib');
 var bitcore = window.require('bitcore-lib');
-var bigInt = require('big-integer');
-import axios from 'axios';
 import {toHexString, encrypt, safexPayload} from '../../utils/utils';
 import QRCode from 'qrcode.react';
 
@@ -99,7 +97,7 @@ export default class Wallet extends React.Component {
         this.state.keys.forEach((key) => {
             var json = {};
             json['address'] = key.public_key;
-            promises.push(fetch('http://localhost:3001/balance', {
+            promises.push(fetch('http://omni.safex.io:3001/balance', {
                 method: "POST",
                 body: JSON.stringify(json)
             })
@@ -107,17 +105,17 @@ export default class Wallet extends React.Component {
                 .then((resp) => {
                     return resp
                 }));
-            promises.push(fetch('http://46.101.251.77:3001/insight-api/addr/' + key.public_key + '/balance')
+            promises.push(fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + key.public_key + '/balance')
                 .then(resp => resp.text())
                 .then((resp) => {
                     return resp
                 }));
-            promises.push(fetch('http://46.101.251.77:3001/insight-api/addr/' + key.public_key + '/unconfirmedBalance')
+            promises.push(fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + key.public_key + '/unconfirmedBalance')
                 .then(resp => resp.text())
                 .then((resp) => {
                     return resp
                 }));
-            promises.push(fetch('http://localhost:3001/unconfirmed', {
+            promises.push(fetch('http://omni.safex.io:3001/unconfirmed', {
                 method: "POST",
                 body: JSON.stringify(json)
             })
@@ -126,7 +124,7 @@ export default class Wallet extends React.Component {
                     return resp
                 }));
         });
-        promises.push(fetch('http://localhost:3001/getfee')
+        promises.push(fetch('http://omni.safex.io:3001/getfee')
             .then(resp => resp.text())
             .then((resp) => {
                 return resp
@@ -181,7 +179,7 @@ export default class Wallet extends React.Component {
                 var address = bitcore.Address.fromString(destination);
 
                 try {
-                    fetch('http://46.101.251.77:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
+                    fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
                         .then(resp => resp.json())
                         .then((resp) => {
                             console.log(resp)
@@ -204,7 +202,7 @@ export default class Wallet extends React.Component {
             try {
                var address = bitcore.Address.fromString(destination);
                 try {
-            fetch('http://46.101.251.77:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
+            fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
                 .then(resp => resp.json())
                 .then((resp) => {
                     this.formBitcoinTransaction(resp, parseFloat((amount * 100000000).toFixed(0)), parseFloat((fee * 100000000).toFixed(0)), destination, keys, source);
@@ -239,7 +237,7 @@ export default class Wallet extends React.Component {
 
         var json = {};
         json['rawtx'] = tx.build().toHex();
-        fetch('http://localhost:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
+        fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
             .then(resp => resp.text())
             .then((resp) => {
                 console.log(resp);
@@ -283,7 +281,7 @@ export default class Wallet extends React.Component {
         console.log(tx.serialize());
         var json = {};
         json['rawtx'] = tx.serialize();
-        fetch('http://localhost:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
+        fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
             .then(resp => resp.text())
             .then((resp) => {
 
