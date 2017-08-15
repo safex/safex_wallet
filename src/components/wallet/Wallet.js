@@ -606,15 +606,17 @@ export default class Wallet extends React.Component {
                     <div className="key">{keys[key].public_key}</div>
                     <div className="amounts">
                         <span
-                            className="amount">Safex: {keys[key].pending_safex_bal < 0 ? (parseFloat(keys[key].safex_bal) + parseFloat(keys[key].pending_safex_bal)) : keys[key].safex_bal}
-                            {keys[key].pending_safex_bal > 0 | keys[key].pending_safex_bal < 0 ? '(pending ' + keys[key].pending_safex_bal + ')' : ''}</span>
+                            className="amount">Safex: <span>{keys[key].pending_safex_bal < 0 ? (parseFloat(keys[key].safex_bal) + parseFloat(keys[key].pending_safex_bal)) : keys[key].safex_bal}
+                            {keys[key].pending_safex_bal > 0 | keys[key].pending_safex_bal < 0 ? '(pending ' + keys[key].pending_safex_bal + ')' : ''}</span></span>
                         <span
-                            className="amount">Bitcoin: {keys[key].pending_btc_bal < 0 ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)) : keys[key].btc_bal}
-                            {keys[key].pending_btc_bal > 0 | keys[key].pending_btc_bal < 0 ? '(pending ' + keys[key].pending_btc_bal + ')' : ''}</span>
+                            className="amount">Bitcoin: <span>{keys[key].pending_btc_bal < 0 ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)) : keys[key].btc_bal}
+                            {keys[key].pending_btc_bal > 0 | keys[key].pending_btc_bal < 0 ? '(pending ' + keys[key].pending_btc_bal + ')' : ''}</span></span>
                     </div>
                 </div>
                 <div className="pull-right">
-                    <button onClick={this.openSendReceive.bind(this, key, 'send')}>SEND <img src="/images/send.png"
+                    <button disabled={keys[key].pending_btc_bal === 0
+                        ? ''
+                        : 'disabled'} onClick={this.openSendReceive.bind(this, key, 'send')}>SEND <img src="/images/send.png"
                                                                                              alt="Send"/></button>
                     <button onClick={this.openSendReceive.bind(this, key, 'receive')}>RECEIVE <img
                         src="/images/import.png" alt="Receive"/></button>
