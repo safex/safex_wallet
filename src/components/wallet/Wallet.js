@@ -5,6 +5,7 @@ var os = window.require('os');
 var bs58 = require('bs58');
 var bitcoin = window.require('bitcoinjs-lib');
 var bitcore = window.require('bitcore-lib');
+var bigInt = require('big-integer');
 import axios from 'axios';
 import {toHexString, encrypt, safexPayload} from '../../utils/utils';
 import QRCode from 'qrcode.react';
@@ -23,7 +24,7 @@ export default class Wallet extends React.Component {
             is_loading: false,
             safex_price: 0,
             bitcoin_price: 0,
-            receive_amount: 0.0000001.toFixed(7),
+            receive_amount: 0.00000001.toFixed(8),
             collapse_open: {
                 key: '',
                 receive_open: false,
@@ -161,7 +162,7 @@ export default class Wallet extends React.Component {
                 }
 
             }
-            this.setState({keys: hold_keys, average_fee: hold_fee, send_fee: parseFloat(hold_fee)});
+            this.setState({keys: hold_keys, average_fee: hold_fee, send_fee: hold_fee});
         });
     }
 
@@ -173,12 +174,13 @@ export default class Wallet extends React.Component {
             var source = e.target.public_key.value;
             var amount = e.target.amount.value;
             var fee = e.target.fee.value;
+            console.log('the fee ' + e.target.fee.value)
             var destination = e.target.destination.value;
             fetch('http://46.101.251.77:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
                 .then(resp => resp.json())
                 .then((resp) => {
                     console.log(resp)
-                    this.formSafexTransaction(resp, amount, fee * 100000000, destination, keys, source);
+                    this.formSafexTransaction(resp, amount, parseFloat((fee * 100000000).toFixed(0)), destination, keys, source);
                 });
 
             //send safex
@@ -192,7 +194,7 @@ export default class Wallet extends React.Component {
             fetch('http://46.101.251.77:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
                 .then(resp => resp.json())
                 .then((resp) => {
-                    this.formBitcoinTransaction(resp, amount * 100000000, fee * 100000000, destination, keys, source);
+                    this.formBitcoinTransaction(resp, parseFloat((amount * 100000000).toFixed(0)), parseFloat((fee * 100000000).toFixed(0)), destination, keys, source);
                 });
 
 
@@ -531,7 +533,7 @@ export default class Wallet extends React.Component {
             send_total = parseFloat(e.target.value) + parseFloat(send_fee);
             this.setState({
                 send_amount: e.target.value,
-                send_total: send_total.toFixed(7)
+                send_total: send_total.toFixed(8)
             });
         }
     }
@@ -547,7 +549,7 @@ export default class Wallet extends React.Component {
         }
         this.setState({
             send_fee: send_fee,
-            send_total: send_total.toFixed(7)
+            send_total: send_total.toFixed(8)
         });
     }
 
@@ -574,11 +576,11 @@ export default class Wallet extends React.Component {
                 send_total: 1
             });
         } else {
-            var send_total = parseFloat(send_fee) + 0.0000001;
+            var send_total = parseFloat(send_fee) + 0.00000001;
             this.setState({
-                send_amount: 0.0000001.toFixed(7),
+                send_amount: 0.00000001.toFixed(8),
                 send_fee: send_fee,
-                send_total: send_total.toFixed(7)
+                send_total: send_total.toFixed(8)
             });
         }
 
@@ -599,12 +601,14 @@ export default class Wallet extends React.Component {
         e.preventDefault();
         this.setState({
             transaction_sent: false,
+            send_overflow_active: false,
             send_to: '',
             send_keys: {
                 public_key: '',
                 private_key: ''
             }
-        })
+        });
+        this.prepareDisplay();
     }
 
 
