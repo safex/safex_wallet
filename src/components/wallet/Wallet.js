@@ -604,14 +604,6 @@ export default class Wallet extends React.Component {
             return <div className="col-xs-12 single-key" key={key}>
                 <div className="col-xs-7">
                     <div className="key">{keys[key].public_key}</div>
-                    <div className="amounts">
-                        <span
-                            className="amount">Safex: <span>{keys[key].pending_safex_bal < 0 ? (parseFloat(keys[key].safex_bal) + parseFloat(keys[key].pending_safex_bal)) : keys[key].safex_bal}
-                            {keys[key].pending_safex_bal > 0 | keys[key].pending_safex_bal < 0 ? '(pending ' + keys[key].pending_safex_bal + ')' : ''}</span></span>
-                        <span
-                            className="amount">Bitcoin: <span>{keys[key].pending_btc_bal < 0 ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)) : keys[key].btc_bal}
-                            {keys[key].pending_btc_bal > 0 | keys[key].pending_btc_bal < 0 ? '(pending ' + keys[key].pending_btc_bal + ')' : ''}</span></span>
-                    </div>
                 </div>
                 <div className="pull-right">
                     <button disabled={keys[key].pending_btc_bal === 0
@@ -620,6 +612,16 @@ export default class Wallet extends React.Component {
                                                                                              alt="Send"/></button>
                     <button onClick={this.openSendReceive.bind(this, key, 'receive')}>RECEIVE <img
                         src="/images/import.png" alt="Receive"/></button>
+                </div>
+                <div className="col-xs-12">
+                    <div className="row amounts">
+                        <span
+                            className="col-xs-6 amount">Safex: <span>{keys[key].pending_safex_bal < 0 ? (parseFloat(keys[key].safex_bal) + parseFloat(keys[key].pending_safex_bal)) : keys[key].safex_bal}
+                            {keys[key].pending_safex_bal > 0 | keys[key].pending_safex_bal < 0 ? '(pending ' + keys[key].pending_safex_bal + ')' : ''}</span></span>
+                        <span
+                            className="col-xs-6 amount">Bitcoin: <span>{keys[key].pending_btc_bal < 0 ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)) : keys[key].btc_bal}
+                            {keys[key].pending_btc_bal > 0 | keys[key].pending_btc_bal < 0 ? '(pending ' + keys[key].pending_btc_bal + ')' : ''}</span></span>
+                    </div>
                 </div>
                 <form onSubmit={this.openCoinModal}
                       className={this.state.collapse_open.send_open && this.state.collapse_open.key === key
@@ -681,10 +683,6 @@ export default class Wallet extends React.Component {
                             <div className="col-xs-6">
                                 <QRCode
                                     value={"bitcoin:" + keys[key].public_key + "?amount=" + this.state.receive_amount}/>
-                            </div>
-                            <div className="col-xs-6">
-                                <button>Print <img src="/images/print.png" alt="Print"/></button>
-                                <button>PDF <img src="/images/pdf.png" alt="Pdf"/></button>
                             </div>
                         </div>
                     </div>
