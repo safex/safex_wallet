@@ -36,6 +36,7 @@ export default class SelectWallet extends React.Component {
                 }
             } else {
                 localStorage.setItem('encrypted_wallet', fd);
+                localStorage.setItem('wallet_path', home_dir + '/safexwallet.dat');
                 this.setState({walletExists: true});
             }
 

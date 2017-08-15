@@ -81,6 +81,8 @@ export default class CreateWallet extends React.Component {
                 } else {
                     localStorage.setItem('password', password);
                     localStorage.setItem('wallet', JSON.stringify(json));
+
+                    localStorage.setItem('wallet_path', home_dir + '/safexwallet.dat');
                     this.context.router.push('/wallet');
                 }
             });

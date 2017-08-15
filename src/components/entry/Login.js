@@ -29,6 +29,7 @@ export default class Login extends React.Component {
 
             if (parse_wallet['version'] === '1') {
                 localStorage.setItem('wallet', decryped_wallet);
+
                 this.context.router.push('/wallet');
             } else {
                 console.log('wrong password');

@@ -371,7 +371,7 @@ export default class Wallet extends React.Component {
 
         var home_dir = os.homedir();
 
-        fs.writeFile(home_dir + '/safexwallet.dat', cipher_text, (err) => {
+        fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
             if (err) {
                 console.log(err)
             } else {
@@ -428,7 +428,7 @@ export default class Wallet extends React.Component {
 
                     var home_dir = os.homedir();
 
-                    fs.writeFile(home_dir + '/safexwallet.dat', cipher_text, (err) => {
+                    fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
                         if (err) {
                             console.log(err)
                         } else {
@@ -627,7 +627,8 @@ export default class Wallet extends React.Component {
         })
     }
 
-    closeSuccessModal(){
+    closeSuccessModal(e) {
+        e.preventDefault();
         this.setState({
             transaction_sent: false,
             send_to: '',
