@@ -54,6 +54,8 @@ export default class Wallet extends React.Component {
         this.sendFeeOnBlur = this.sendFeeOnBlur.bind(this);
         this.sendTotalAdjustCoinChange = this.sendTotalAdjustCoinChange.bind(this);
         this.closeSuccessModal = this.closeSuccessModal.bind(this);
+        this.exportKey = this.exportKey.bind(this);
+        this.getAverageFee = this.getAverageFee.bind(this);
     }
 
 
@@ -74,68 +76,6 @@ export default class Wallet extends React.Component {
         this.prepareDisplay();
     }
 
-    getBitcoinPrice() {
-        axios.get('https://api.coinmarketcap.com/v1/ticker/').then(res => {
-            try {
-                for (var i = 0; i < res.data.length; i++) {
-                    // look for the entry with a matching `code` value
-                    if (res.data[i].symbol === 'BTC') {
-                        console.log('bitcoin price ' + res.data[i].price_usd)
-                        this.setState({bitcoin_price: res.data[i].price_usd});
-                    }
-                }
-            } catch (e) {
-                console.log(e);
-            }
-        });
-        //get the current price of bitcoin
-    }
-
-    getSafexPrice() {
-        axios.get('https://api.coinmarketcap.com/v1/ticker/').then(res => {
-            try {
-                for (var i = 0; i < res.data.length; i++) {
-                    // look for the entry with a matching `code` value
-                    if (res.data[i].symbol === 'SAFEX') {
-                        console.log('safex price ' + res.data[i].price_usd)
-                        this.setState({safex_price: res.data[i].price_usd});
-                    }
-                }
-            } catch (e) {
-                console.log(e);
-            }
-        });
-        //get the latest price of safex
-    }
-
-    getPrices() {
-        var myHeaders = new Headers();
-        myHeaders.append('pragma', 'no-cache');
-        myHeaders.append('cache-control', 'no-cache');
-
-        fetch('https://api.coinmarketcap.com/v1/ticker/', {method: "GET", headers: myHeaders})
-            .then(resp => resp.json())
-            .then((resp) => {
-                try {
-                    var btc = 0;
-                    var safex = 0;
-                    for (var i = 0; i < resp.length; i++) {
-                        // look for the entry with a matching `code` value
-                        if (resp[i].symbol === 'SAFEX') {
-                            console.log(resp)
-                            safex = resp[i].price_usd
-                        } else if (resp[i].symbol === 'BTC') {
-                            console.log(resp)
-                            btc = resp[i].price_usd
-                        }
-                    }
-
-                    this.setState({safex_price: safex, bitcoin_price: btc});
-                } catch (e) {
-                    console.log(e);
-                }
-            });
-    }
 
 
     getAverageFee() {
@@ -369,8 +309,6 @@ export default class Wallet extends React.Component {
         var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
 
 
-        var home_dir = os.homedir();
-
         fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
             if (err) {
                 console.log(err)
@@ -425,8 +363,6 @@ export default class Wallet extends React.Component {
 
                     var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
 
-
-                    var home_dir = os.homedir();
 
                     fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
                         if (err) {
