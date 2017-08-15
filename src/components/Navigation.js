@@ -31,7 +31,6 @@ export default class Navigation extends React.Component {
     }
 
     tick() {
-        console.log('hello');
         this.getPrices();
     }
 
@@ -46,10 +45,8 @@ export default class Navigation extends React.Component {
                     for (var i = 0; i < resp.length; i++) {
                         // look for the entry with a matching `code` value
                         if (resp[i].symbol === 'SAFEX') {
-                            console.log(resp)
                             safex = resp[i].price_usd
                         } else if (resp[i].symbol === 'BTC') {
-                            console.log(resp)
                             btc = resp[i].price_usd
                         }
                     }
@@ -69,7 +66,6 @@ export default class Navigation extends React.Component {
                 for (var i = 0; i < res.data.length; i++) {
                     // look for the entry with a matching `code` value
                     if (res.data[i].symbol === 'SAFEX') {
-                        console.log(res.data[i].price_usd)
                         this.setState({safex_price: res.data[i].price_usd});
                     }
                 }
@@ -87,7 +83,6 @@ export default class Navigation extends React.Component {
                 for (var i = 0; i < res.data.length; i++) {
                     // look for the entry with a matching `code` value
                     if (res.data[i].symbol === 'BTC') {
-                        console.log(res.data[i].price_usd)
                         this.setState({bitcoin_price: res.data[i].price_usd});
                     }
                 }

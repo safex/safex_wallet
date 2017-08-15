@@ -106,8 +106,9 @@ export default class CreateWallet extends React.Component {
                     <button className="btn btn-default" type="submit">CREATE <img src="/images/create.png" alt="Create" /></button>
                 </form>
                 <p className="text-center">
-                    Write password down and <br />
-                    NEVER lose it.
+                    If you lose your password<br />
+                    There is no recovery. <br />
+                    Write it down, keep it safe. <br />
                 </p>
               </div>
               <div className="col-xs-12 text-center Intro-footer">

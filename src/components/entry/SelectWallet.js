@@ -45,7 +45,6 @@ export default class SelectWallet extends React.Component {
 
     render() {
         const wallet_exists = this.state.walletExists;
-        console.log('is wallet exists? ' + wallet_exists);
         let show_options;
 
         if (wallet_exists) {
@@ -58,8 +57,7 @@ export default class SelectWallet extends React.Component {
                                 <span className="btn btn-default">Login <img src="/images/create.png"
                                                                              alt="Create"/></span>
                             </div>
-                            <p>Already have a wallet?</p>
-                            <p>Enter your credentials</p>
+                            <p>Enter your password</p>
                         </Link>
                     </div>
                     <div className="col-xs-6">
@@ -69,8 +67,7 @@ export default class SelectWallet extends React.Component {
                                 <span className="btn btn-default">Import Wallet <img src="/images/import.png"
                                                                                      alt="Import"/></span>
                             </div>
-                            <p>Import your wallet or recover</p>
-                            <p>from backup file</p>
+                            <p>Import a safexwallet file</p>
                         </Link>
                     </div>
                 </div>
@@ -85,8 +82,7 @@ export default class SelectWallet extends React.Component {
                                 <span className="btn btn-default">New Wallet <img src="/images/create.png"
                                                                                   alt="Create"/></span>
                             </div>
-                            <p>New to SAFEX?</p>
-                            <p>Or you just need a new wallet?</p>
+                            <p>Create a new Wallet</p>
                         </Link>
                     </div>
                     <div className="col-xs-6">
@@ -96,8 +92,7 @@ export default class SelectWallet extends React.Component {
                                 <span className="btn btn-default">Import Wallet <img src="/images/import.png"
                                                                                      alt="Import"/></span>
                             </div>
-                            <p>Import your wallet or recover</p>
-                            <p>from backup file</p>
+                            <p>Import a safexwallet file</p>
                         </Link>
                     </div>
                 </div>
