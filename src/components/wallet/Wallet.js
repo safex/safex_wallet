@@ -159,7 +159,7 @@ export default class Wallet extends React.Component {
                 }
 
             }
-            this.setState({keys: hold_keys});
+            this.setState({keys: hold_keys, average_fee: hold_fee});
         });
     }
 
