@@ -42,10 +42,12 @@ export default class Wallet extends React.Component {
             transaction_sent: false,
             txid: "",
             average_fee: 0,
+            import_key: ''
         }
 
         this.createKey = this.createKey.bind(this);
         this.importKey = this.importKey.bind(this);
+        this.importKeyChange = this.importKeyChange.bind(this);
         this.sendCoins = this.sendCoins.bind(this);
         this.prepareDisplay = this.prepareDisplay.bind(this);
         this.openCoinModal = this.openCoinModal.bind(this);
@@ -159,7 +161,7 @@ export default class Wallet extends React.Component {
                 }
 
             }
-            this.setState({keys: hold_keys, average_fee: hold_fee});
+            this.setState({keys: hold_keys, average_fee: hold_fee, send_fee: hold_fee});
         });
     }
 
@@ -343,6 +345,12 @@ export default class Wallet extends React.Component {
         });
     }
 
+    importKeyChange(e){
+        this.setState({
+            import_key: e.target.value
+        })
+    }
+
     importKey(e) {
         e.preventDefault();
         try {
@@ -387,6 +395,9 @@ export default class Wallet extends React.Component {
                             console.log(err)
                         } else {
                             localStorage.setItem('wallet', JSON.stringify(json));
+                            this.setState({
+                                import_key: ''
+                            })
                             try {
                                 var json2 = JSON.parse(localStorage.getItem('wallet'));
                                 this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
@@ -553,19 +564,20 @@ export default class Wallet extends React.Component {
 
     sendTotalAdjustCoinChange(coin) {
         var send_amount = this.state.send_amount;
-        var send_fee = this.state.send_fee;
+        var send_fee = parseFloat(0.0001);
         if (coin === 'safex') {
             send_amount = parseFloat(this.state.send_amount).toFixed(0);
             var send_total = parseFloat(send_amount);
             this.setState({
                 send_amount: 1,
-                send_fee: 0.0001,
+                send_fee: this.state.average_fee,
                 send_total: 1
             });
         } else {
             var send_total = parseFloat(send_fee) + 0.0000001;
             this.setState({
                 send_amount: 0.0000001.toFixed(7),
+                send_fee: send_fee,
                 send_total: send_total.toFixed(7)
             });
         }
@@ -699,8 +711,8 @@ export default class Wallet extends React.Component {
                     <div className="row">
                         <div className="col-xs-12">
                             <button onClick={this.createKey}>Create key</button>
-                            <form onSubmit={this.importKey}>
-                                <input name="key"></input>
+                            <form onChange={this.importKeyChange} onSubmit={this.importKey}>
+                                <input name="key" value={this.state.import_key}></input>
                                 <button type="submit">Import key</button>
                             </form>
                             <button onClick={this.exportWallet}>Export Wallet</button>
