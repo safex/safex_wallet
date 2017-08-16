@@ -268,28 +268,38 @@ export default class Wallet extends React.Component {
                 tx_array.push(the_utxo);
             }
         });
+        var amount_json = {};
+        amount_json['amount'] = amount;
 
-        console.log(safexPayload(amount).toString('utf8'));
-        var tx = new bitcore.Transaction()
-            .from(tx_array)
-            .to(destination, 2730)
-            .fee(fee)
-            .addData(safexPayload(amount).toString('utf8'))
-            .change(source)
-            .sign(key);
-
-        console.log(tx.serialize());
-        var json = {};
-        json['rawtx'] = tx.serialize();
-        fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
+        fetch('http://omni.safex.io:3001/getpayload', {method: "POST", body: JSON.stringify(amount_json)})
             .then(resp => resp.text())
             .then((resp) => {
+                console.log(resp);
+                var pay = '6f6d6e69' + resp;
+                console.log('pay ' + pay);
+                var tx = new bitcore.Transaction()
+                    .from(tx_array)
+                    .to(destination, 2730)
+                    .fee(fee)
+                    .addData(pay)
+                    .change(source)
+                    .sign(key);
 
-                this.setState({
-                    transaction_sent: true,
-                    txid: resp
-                });
+                console.log(tx.serialize());
+                var json = {};
+                json['rawtx'] = tx.serialize();
+                fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
+                    .then(resp => resp.text())
+                    .then((resp) => {
+
+                        this.setState({
+                            transaction_sent: true,
+                            txid: resp
+                        });
+                    });
             });
+
+
 
     }
 
