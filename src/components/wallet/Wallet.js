@@ -9,6 +9,7 @@ import {toHexString, encrypt, safexPayload} from '../../utils/utils';
 import QRCode from 'qrcode.react';
 
 
+
 import Navigation from '../Navigation';
 
 
@@ -168,7 +169,7 @@ export default class Wallet extends React.Component {
     sendCoins(e) {
         e.preventDefault();
         if (this.state.send_coin === 'safex') {
-            var keys = bitcore.PrivateKey.fromWIF(e.target.private_key.value);
+            var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
             var source = e.target.public_key.value;
             var amount = e.target.amount.value;
             var fee = e.target.fee.value;
@@ -231,6 +232,7 @@ export default class Wallet extends React.Component {
         });
         tx.addOutput(destination, amount);
         tx.addOutput(source, (running_total - (amount + fee)));
+        console.log(tx);
         for (var i = 0; i < inputs_num; i++) {
             tx.sign(i, key);
         }
@@ -249,45 +251,38 @@ export default class Wallet extends React.Component {
     }
 
     formSafexTransaction(utxos, amount, fee, destination, key, source) {
-
-        var tx_array = [];
         var running_total = 0;
-        console.log(utxos);
-
+        var tx = new bitcoin.TransactionBuilder();
+        var inputs_num = 0;
         utxos.forEach(txn => {
             console.log(txn);
             if (running_total < (2730 + fee)) {
                 running_total += txn.satoshis;
-                var the_utxo = {
-                    'txId': txn.txid,
-                    'outputIndex': txn.vout,
-                    'address': txn.address,
-                    'script': txn.scriptPubKey,
-                    'satoshis': txn.satoshis,
-                };
-                tx_array.push(the_utxo);
+                tx.addInput(txn.txid, txn.vout);
+                inputs_num += 1;
             }
         });
-        var amount_json = {};
-        amount_json['amount'] = amount;
+        tx.addOutput(destination, 2730);
+        tx.addOutput(source, (running_total - (2730 + fee)));
 
-        fetch('http://omni.safex.io:3001/getpayload', {method: "POST", body: JSON.stringify(amount_json)})
+        console.log(tx.buildIncomplete().toHex())
+
+        var SafexTransaction = {};
+        SafexTransaction['incomplete_tx'] = tx.buildIncomplete().toHex();
+        SafexTransaction['amount'] = amount;
+        fetch('http://omni.safex.io:3001/getsafextxn', {method: "POST", body: JSON.stringify(SafexTransaction)})
             .then(resp => resp.text())
             .then((resp) => {
-                console.log(resp);
-                var pay = '6f6d6e69' + resp;
-                console.log('pay ' + pay);
-                var tx = new bitcore.Transaction()
-                    .from(tx_array)
-                    .to(destination, 2730)
-                    .fee(fee)
-                    .addData(pay)
-                    .change(source)
-                    .sign(key);
+                var decoded_txn = bitcoin.Transaction.fromHex(resp);
+                var txn = bitcoin.TransactionBuilder.fromTransaction(decoded_txn);
+                for (var i = 0; i < inputs_num; i++) {
+                    txn.sign(i, key);
+                }
+                console.log(txn.build().toHex())
 
-                console.log(tx.serialize());
                 var json = {};
-                json['rawtx'] = tx.serialize();
+                json['rawtx'] = txn.build().toHex();
+
                 fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
                     .then(resp => resp.text())
                     .then((resp) => {
@@ -299,9 +294,8 @@ export default class Wallet extends React.Component {
                     });
             });
 
-
-
     }
+
 
     createKey() {
         this.setState({is_loading: true});
@@ -452,8 +446,10 @@ export default class Wallet extends React.Component {
     }
 
     exportWallet() {
+        alert("This will create a file where you can see your private keys. It is a very sensitive file Be responsible with it." +
+            "You can use this file to Import the Private Keys into another wallet.")
         var wallet_data = localStorage.getItem('wallet');
-        fileDownload(wallet_data, 'safexwallet.json');
+        fileDownload(wallet_data, 'safex.txt');
 
     }
 
