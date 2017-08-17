@@ -1,8 +1,8 @@
 {
-  "name": "safex_wallet",
+  "name": "SafexWallet",
   "description": "Safex Community Wallet",
   "version": "0.0.1",
-  "homepage": "http://safex.io",
+  "homepage": ".",
   "repository": {
     "type": "git",
     "url": "git://github.com/safex/safex_wallet.git"
@@ -29,6 +29,9 @@
   ],
   "devDependencies": {
     "electron": "^1.7.5",
+    "electron-installer-dmg": "^0.2.1",
+    "electron-packager": "^8.7.2",
+    "electron-winstaller": "^2.6.3",
     "foreman": "^2.0.0",
     "react-scripts": "0.8.5"
   },
@@ -44,15 +47,21 @@
     "react-dom": "^15.4.2",
     "react-file-download": "^0.3.4",
     "react-file-input": "^0.2.5",
-    "react-router": "^3.0.4",
+    "react-router": "^3.0.4"
   },
-  "main": "src/electron-starter.js",
+  "main": "src/electron-wallet.js",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "electron": "electron .",
-    "dev": "nf start -p 3000"
+    "dev": "nf start -p 3000",
+    "package-mac": "npm run build && electron-packager . --overwrite --platform=darwin --arch=x64 --icon=public/images/icons/wallet-icon.icns --prune=true --out=release-builds",
+    "package-win": "npm run build && electron-packager . --overwrite --asar=true --platform=win32 --arch=ia32 --icon=public/images/icons/wallet-icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Safex Community Wallet\"",
+    "package-linux": "npm run build && electron-packager . --overwrite --platform=linux --arch=x64 --icon=public/images/icons/wallet-icon.png --prune=true --out=release-builds",
+    "make-mac-installer": "mkdir -p installers && npm run package-mac && electron-installer-dmg ./release-builds/SafexWallet-darwin-x64/SafexWallet.app SafexWallet --out=installers --overwrite --icon=public/images/icons/wallet-icon.icns --background=public/images/icons/bg.jpg",
+    "make-win-installer": "mkdir -p installers && npm run package-win && node createWinInstaller.js",
+    "make-all-installers": "mkdir -p installers && npm run build && electron-packager . --overwrite --platform=darwin --arch=x64 --icon=public/images/icons/wallet-icon.icns --prune=true --out=release-builds && electron-packager . --overwrite --asar=true --platform=win32 --arch=ia32 --icon=public/images/icons/wallet-icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Safex Community Wallet\" && electron-installer-dmg ./release-builds/SafexWallet-darwin-x64/SafexWallet.app SafexWallet --out=installers --overwrite --icon=public/images/icons/wallet-icon.icns --background=public/images/icons/bg.jpg && node createWinInstaller.js && electron-packager . --overwrite --platform=linux --arch=x64 --icon=public/images/icons/wallet-icon.png --prune=true --out=release-builds"
   }
 }

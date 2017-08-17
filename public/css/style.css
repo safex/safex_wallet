@@ -1,22 +1,22 @@
 @font-face {
   font-family: 'Gotham Medium';
-  src: url('/fonts/GOTHAM-MEDIUM.eot');
+  src: url('../fonts/GOTHAM-MEDIUM.eot');
   /* IE9 Compat Modes */
-  src: url('/fonts/GOTHAM-MEDIUM.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-  url('/fonts/GOTHAM-MEDIUM.woff') format('woff'), /* Modern Browsers */
-  url('/fonts/GOTHAM-MEDIUM.ttf') format('truetype'), /* Safari, Android, iOS */
-  url('/fonts/GOTHAM-MEDIUM.svg#0fbe3a09622d8fb1f474f00917396ba1') format('svg');
+  src: url('../fonts/GOTHAM-MEDIUM.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('../fonts/GOTHAM-MEDIUM.woff') format('woff'), /* Modern Browsers */
+  url('../fonts/GOTHAM-MEDIUM.ttf') format('truetype'), /* Safari, Android, iOS */
+  url('../fonts/GOTHAM-MEDIUM.svg#0fbe3a09622d8fb1f474f00917396ba1') format('svg');
   /* Legacy iOS */
   font-style: normal;
   font-weight: 400;
 }
 @font-face {
   font-family: 'Gotham Light';
-  src: url('/fonts/GOTHAM-LIGHT.eot'); /* IE9 Compat Modes */
-  src: url('/fonts/GOTHAM-LIGHT.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('/fonts/GOTHAM-LIGHT.woff') format('woff'), /* Modern Browsers */
-       url('/fonts/GOTHAM-LIGHT.ttf')  format('truetype'), /* Safari, Android, iOS */
-       url('/fonts/GOTHAM-LIGHT.svg#0fdc6c734a7ca54436fb28af9ab2f202') format('svg'); /* Legacy iOS */
+  src: url('../fonts/GOTHAM-LIGHT.eot'); /* IE9 Compat Modes */
+  src: url('../fonts/GOTHAM-LIGHT.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/GOTHAM-LIGHT.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/GOTHAM-LIGHT.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/GOTHAM-LIGHT.svg#0fdc6c734a7ca54436fb28af9ab2f202') format('svg'); /* Legacy iOS */
 
   font-style:   normal;
   font-weight:  200;
@@ -29,7 +29,7 @@ html, body, body #root, body #root > div{
   height:100%;
 }
 body{
-  background:url('/images/bg.jpg');
+  background:url('../images/bg.jpg');
   background-size:cover;
   background-position: top center;
   font-family: 'Gotham Medium';
@@ -57,7 +57,7 @@ body{
   text-decoration: none;
 }
 .App-intro .col-xs-6 a > div, .Login-form form{
-  background:url('/images/import-block-bg.png');
+  background:url('../images/import-block-bg.png');
   background-size:100% 100%;
   display:block;
   padding-bottom:20px;
@@ -77,7 +77,7 @@ body{
   width:90%;
   border:1px solid #445059;
   border-radius: 0px;
-  background:url('/images/btn-bg.png');
+  background:url('../images/btn-bg.png');
   background-size:100% 100%;
   background-repeat:no-repeat;
   color:#fff;
@@ -116,7 +116,7 @@ body{
   width:100%;
   border:1px solid #445059;
   border-radius: 0px;
-  background:url('/images/btn-bg.png');
+  background:url('../images/btn-bg.png');
   background-size:100% 100%;
   background-repeat:no-repeat;
   color:#fff;
@@ -134,7 +134,7 @@ body{
   max-width:100%;
   border:none;
   border-bottom:1px solid #3580A0;
-  background:url('/images/lock.png') no-repeat;
+  background:url('../images/lock.png') no-repeat;
   background-size:auto 70%;
   background-position:left center;
   padding:3px;
@@ -143,7 +143,7 @@ body{
 }
 .Import-wallet input[name="fileInput_filename"]{
   text-indent: -9999px !important;
-  background: url('/images/import-top.png') !important;
+  background: url('../images/import-top.png') !important;
   background-size: auto 100% !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
@@ -169,7 +169,7 @@ body{
   border-radius: 0px;
   text-align: center;
   border:1px solid #002F42;
-  background:url('/images/btn-bg.png');
+  background:url('../images/btn-bg.png');
   padding:20px 15px;
   line-height:60px;
   height:60px;
@@ -190,7 +190,7 @@ body{
 }
 .navbar-default{
   height:85px;
-  background:url('/images/menu-bg.png');
+  background:url('../images/menu-bg.png');
   background-size:cover;
   background-position: center center;
   border:none;
@@ -226,7 +226,7 @@ body{
     width: 100%;
 }
 .key-buttons input{
-  background:url('/images/btn-bg.png');
+  background:url('../images/btn-bg.png');
   border:1px solid #327A9B;
   color:#fff;
   padding:10px;
@@ -271,7 +271,7 @@ body{
 }
 .single-key .amounts > span{
   display:block;
-  background:url('/images/prelaz.png');
+  background:url('../images/prelaz.png');
   background-repeat: no-repeat;
   background-position: left center;
   margin-bottom:5px;
@@ -283,7 +283,7 @@ body{
 .single-key .pull-right button, .key-buttons button, .form-send button, .overflow.sendModal button{
   border:1px solid #327A9B;
   border-radius: 0px;
-  background:url('/images/btn-bg.png');
+  background:url('../images/btn-bg.png');
   background-size:100% 100%;
   background-repeat:no-repeat;
   color:#fff;
@@ -418,7 +418,7 @@ body{
 .receive button{
   border:1px solid #327A9B;
   border-radius: 0px;
-  background:url('/images/btn-bg.png');
+  background:url('../images/btn-bg.png');
   background-size:100% 100%;
   background-repeat:no-repeat;
   color:#fff;
@@ -444,7 +444,7 @@ body{
   padding-bottom:5px;
 }
 .explorer .input-group input, .explorer .input-group button{
-    background:url('/images/btn-bg.png');
+    background:url('../images/btn-bg.png');
     border:1px solid #1B4B65;
     color:#fff;
 }

@@ -72,7 +72,7 @@ export default class ImportWallet extends React.Component {
         return (
            <div className="container">
                     <div className="col-xs-12 Login-logo">
-                        <img src="/images/logo.png" />
+                        <img src="images/logo.png" />
                     </div>
                     <div className="col-xs-12 Login-form Import-wallet">
                       <form className="form-group" onSubmit={this.handleSubmit}>
@@ -83,7 +83,7 @@ export default class ImportWallet extends React.Component {
                               <p className="filename">{this.state.filename}</p>
                               <input type="password" name="password" placeholder="Enter Password" />
                          </div>
-                          <button className="btn btn-default" type="submit">IMPORT <img src="/images/import.png" /></button>
+                          <button className="btn btn-default" type="submit">IMPORT <img src="images/import.png" /></button>
                      </form>
                       <p className="text-center">
                           Write password down and <br />

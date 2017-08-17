@@ -646,10 +646,10 @@ export default class Wallet extends React.Component {
                 <div className="pull-right">
                     <button disabled={keys[key].pending_btc_bal >= 0
                         ? ''
-                        : 'disabled'} onClick={this.openSendReceive.bind(this, key, 'send')}>SEND <img src="/images/send.png"
+                        : 'disabled'} onClick={this.openSendReceive.bind(this, key, 'send')}>SEND <img src="images/send.png"
                                                                                              alt="Send"/></button>
                     <button onClick={this.openSendReceive.bind(this, key, 'receive')}>RECEIVE <img
-                        src="/images/import.png" alt="Receive"/></button>
+                        src="images/import.png" alt="Receive"/></button>
                 </div>
                 <div className="col-xs-12">
                     <div className="row amounts">
@@ -670,11 +670,11 @@ export default class Wallet extends React.Component {
                             <label htmlFor="which">Currency</label>
                             <img className={this.state.send_coin === 'safex'
                                 ? 'coin active'
-                                : 'coin'} onClick={this.sendCoinChoose.bind(this, 'safex')} src="/images/safex-coin.png"
+                                : 'coin'} onClick={this.sendCoinChoose.bind(this, 'safex')} src="images/safex-coin.png"
                                  alt="Safex Coin"/>
                             <img className={this.state.send_coin === 'btc'
                                 ? 'coin active'
-                                : 'coin'} onClick={this.sendCoinChoose.bind(this, 'btc')} src="/images/btc-coin.png"
+                                : 'coin'} onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
                                  alt="Bitcoin Coin"/>
                             <input type="hidden" name="which" readOnly value={this.state.send_coin}></input>
                             <input type="hidden" name="private_key" readOnly value={keys[key].private_key}></input>
@@ -765,11 +765,11 @@ export default class Wallet extends React.Component {
                                         ? 'coin'
                                         : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
                                                        onClick={this.sendCoinChoose.bind(this, 'safex')}
-                                                       src="/images/safex-coin.png" alt="Safex Coin"/>
+                                                       src="images/safex-coin.png" alt="Safex Coin"/>
                                         <img className={this.state.send_coin === 'btc'
                                             ? 'coin'
                                             : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                             onClick={this.sendCoinChoose.bind(this, 'btc')} src="/images/btc-coin.png"
+                                             onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
                                              alt="Bitcoin Coin"/>
                                     </div>
                                 </div>
@@ -821,11 +821,11 @@ export default class Wallet extends React.Component {
                                         ? 'coin'
                                         : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
                                                        onClick={this.sendCoinChoose.bind(this, 'safex')}
-                                                       src="/images/safex-coin.png" alt="Safex Coin"/>
+                                                       src="images/safex-coin.png" alt="Safex Coin"/>
                                         <img className={this.state.send_coin === 'btc'
                                             ? 'coin'
                                             : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                             onClick={this.sendCoinChoose.bind(this, 'btc')} src="/images/btc-coin.png"
+                                             onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
                                              alt="Bitcoin Coin"/>
                                     </div>
                                 </div>
