@@ -2,6 +2,7 @@ import React from 'react';
 import crypto from 'crypto';
 var fs = window.require('fs');
 import { decrypt } from '../../utils/utils';
+import {Link} from 'react-router';
 
 export default class Login extends React.Component {
 
@@ -50,6 +51,7 @@ export default class Login extends React.Component {
         return (
           <div className="container">
                    <div className="col-xs-12 Login-logo">
+                       <Link className="pul-left back-button" to="/"><img src="images/back.png" /> Back</Link>
                        <img src="images/logo.png" alt="Logo" />
                    </div>
                    <div className="col-xs-12 Login-form">

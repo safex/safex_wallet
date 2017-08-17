@@ -761,7 +761,7 @@ export default class Wallet extends React.Component {
         });
 
         return (
-            <div>
+            <div className="wallet-page">
                 <Navigation/>
                 <div className="container key-buttons">
                     <div className="row">
@@ -775,7 +775,7 @@ export default class Wallet extends React.Component {
                         </div>
                     </div>
                 </div>
-                <div className="container">
+                <div className="container keys-container">
                     <div className="col-xs-12">
                         <div className="row">
                             {table}

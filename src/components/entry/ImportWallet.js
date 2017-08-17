@@ -3,6 +3,7 @@ import crypto from 'crypto';
 var fs = window.require('fs');
 import FileInput from 'react-file-input';
 import { decrypt } from '../../utils/utils';
+import {Link} from 'react-router';
 
 export default class ImportWallet extends React.Component {
     constructor(props) {
@@ -72,6 +73,7 @@ export default class ImportWallet extends React.Component {
         return (
            <div className="container">
                     <div className="col-xs-12 Login-logo">
+                      <Link className="pul-left back-button" to="/"><img src="images/back.png" /> Back</Link>
                         <img src="images/logo.png" />
                     </div>
                     <div className="col-xs-12 Login-form Import-wallet">

@@ -28,6 +28,9 @@ textarea, input:focus, button { outline-color: transparent;
 html, body, body #root, body #root > div{
   height:100%;
 }
+html{
+  overflow:hidden;
+}
 body{
   background:url('../images/bg.jpg');
   background-size:cover;
@@ -572,4 +575,30 @@ input::-webkit-inner-spin-button {
 .overflow.sendModal button{
   padding:5px 10px;
   margin-bottom:20px;
+}
+.keys-container{
+  overflow-y: scroll;
+	height: calc(100% - 169px);
+}
+.wallet-page{
+  overflow:hidden;
+}
+.back-button{
+  text-transform: uppercase;
+  color:#fff;
+  font-size:14px;
+  font-weight: 500;
+  background:url('../images/prelaz.png');
+  background-repeat: no-repeat;
+  background-position: left center;
+  padding:0px 5px;
+}
+.back-button:hover{
+  color:#fff;
+  text-decoration: none;
+}
+.back-button img{
+  display:inline-block;
+  position:relative;
+  top:-2px;
 }

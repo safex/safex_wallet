@@ -5,6 +5,7 @@ var os = window.require('os');
 var bs58 = require('bs58');
 var bitcoin = window.require('bitcoinjs-lib');
 import { toHexString, encrypt } from '../../utils/utils';
+import {Link} from 'react-router';
 
 
 
@@ -97,6 +98,7 @@ export default class CreateWallet extends React.Component {
         return (
           <div className="container">
               <div className="col-xs-12 Login-logo">
+                <Link className="pul-left back-button" to="/"><img src="images/back.png" /> Back</Link>
                   <img src="images/logo.png" alt="Logo" />
               </div>
               <div className="col-xs-12 Login-form">
