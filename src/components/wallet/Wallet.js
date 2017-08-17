@@ -178,7 +178,7 @@ export default class Wallet extends React.Component {
 
             try {
                 var address = bitcore.Address.fromString(destination);
-
+                var address2 = bitcore.Address.fromString(source);
                 try {
                     fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
                         .then(resp => resp.json())
@@ -202,6 +202,7 @@ export default class Wallet extends React.Component {
             var destination = e.target.destination.value;
             try {
                var address = bitcore.Address.fromString(destination);
+                var address2 = bitcore.Address.fromString(source);
                 try {
             fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
                 .then(resp => resp.json())
@@ -386,6 +387,7 @@ export default class Wallet extends React.Component {
                     var json2 = JSON.parse(localStorage.getItem('wallet'));
                     this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
                     this.prepareDisplay();
+                    alert('key added to wallet')
                 } catch (e) {
                     console.log(e);
                 }
