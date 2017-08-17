@@ -5,6 +5,7 @@ var os = window.require('os');
 var bs58 = require('bs58');
 var bitcoin = window.require('bitcoinjs-lib');
 import { toHexString, encrypt } from '../../utils/utils';
+import {Link} from 'react-router';
 
 
 
@@ -54,6 +55,8 @@ export default class CreateWallet extends React.Component {
             key_json['private_key'] = priv_key_wif;
             key_json['safex_bal'] = 0;
             key_json['btc_bal'] = 0;
+            key_json['pending_safex_bal'] = 0;
+            key_json['pending_btc_bal'] = 0;
 
             var key_array = [];
             key_array.push(key_json);
@@ -79,6 +82,8 @@ export default class CreateWallet extends React.Component {
                 } else {
                     localStorage.setItem('password', password);
                     localStorage.setItem('wallet', JSON.stringify(json));
+
+                    localStorage.setItem('wallet_path', home_dir + '/safexwallet.dat');
                     this.context.router.push('/wallet');
                 }
             });
@@ -93,17 +98,19 @@ export default class CreateWallet extends React.Component {
         return (
           <div className="container">
               <div className="col-xs-12 Login-logo">
-                  <img src="/images/logo.png" alt="Logo" />
+                <Link className="pul-left back-button" to="/"><img src="images/back.png" /> Back</Link>
+                  <img src="images/logo.png" alt="Logo" />
               </div>
               <div className="col-xs-12 Login-form">
                 <form className="form-group" onSubmit={this.handleSubmit}>
                     <input className="form-control" type="password" name="password1" placeholder="Enter Password" />
                     <input className="form-control" type="password" name="password2" placeholder="Repeat Password" />
-                    <button className="btn btn-default" type="submit">CREATE <img src="/images/create.png" alt="Create" /></button>
+                    <button className="btn btn-default" type="submit">CREATE <img src="images/create.png" alt="Create" /></button>
                 </form>
                 <p className="text-center">
-                    Write password down and <br />
-                    NEVER lose it.
+                    If you lose your password<br />
+                    There is no recovery. <br />
+                    Write it down, keep it safe. <br />
                 </p>
               </div>
               <div className="col-xs-12 text-center Intro-footer">

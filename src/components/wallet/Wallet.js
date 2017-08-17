@@ -1,12 +1,13 @@
 import React from 'react';
-
+var fileDownload = require('react-file-download');
 var fs = window.require('fs');
 var os = window.require('os');
 var bs58 = require('bs58');
 var bitcoin = window.require('bitcoinjs-lib');
-import axios from 'axios';
-import {toHexString, encrypt, decrypt} from '../../utils/utils';
+var bitcore = window.require('bitcore-lib');
+import {toHexString, encrypt, safexPayload} from '../../utils/utils';
 import QRCode from 'qrcode.react';
+
 
 
 import Navigation from '../Navigation';
@@ -22,7 +23,7 @@ export default class Wallet extends React.Component {
             is_loading: false,
             safex_price: 0,
             bitcoin_price: 0,
-            receive_amount: 0.0000001.toFixed(7),
+            receive_amount: 0.00000001.toFixed(8),
             collapse_open: {
                 key: '',
                 receive_open: false,
@@ -33,16 +34,20 @@ export default class Wallet extends React.Component {
             send_fee: 0.0001,
             send_total: 1,
             send_overflow_active: false,
-            send_to:'',
+            send_to: '',
             send_keys: {
-              public_key: '',
-              private_key: ''
-            }
-
+                public_key: '',
+                private_key: ''
+            },
+            transaction_sent: false,
+            txid: "",
+            average_fee: 0,
+            import_key: '',
         }
 
         this.createKey = this.createKey.bind(this);
         this.importKey = this.importKey.bind(this);
+        this.importKeyChange = this.importKeyChange.bind(this);
         this.sendCoins = this.sendCoins.bind(this);
         this.prepareDisplay = this.prepareDisplay.bind(this);
         this.openCoinModal = this.openCoinModal.bind(this);
@@ -51,6 +56,8 @@ export default class Wallet extends React.Component {
         this.sendFeeOnChange = this.sendFeeOnChange.bind(this);
         this.sendFeeOnBlur = this.sendFeeOnBlur.bind(this);
         this.sendTotalAdjustCoinChange = this.sendTotalAdjustCoinChange.bind(this);
+        this.closeSuccessModal = this.closeSuccessModal.bind(this);
+        this.exportWallet = this.exportWallet.bind(this);
     }
 
 
@@ -69,124 +76,20 @@ export default class Wallet extends React.Component {
     componentDidMount() {
 
         this.prepareDisplay();
+        this.timerID = setInterval(
+            () => this.tick(),
+            330000
+        );
     }
 
-    sendBitcoin() {
-        //send bitcoins
-        //fetch UTXOs for a specific address /insight-api/addr/[:addr]/utxo
-        //broadcast /insight-api/tx/send
-        // rawtx: "signed transaction as hex string"
-
-        //eg
-
-        //rawtx: 01000000017b1eabe0209b1fe794124575ef807057c77ada2138ae4fa8d6c4de0398a14f3f00000000494830450221008949f0cb400094ad2b5eb399d59d01c14d73d8fe6e96df1a7150deb388ab8935022079656090d7f6bac4c9a94e0aad311a4268e082a725f8aeae0573fb12ff866a5f01ffffffff01f0ca052a010000001976a914cbc20a7664f2f69e5355aa427045bc15e7c6c77288ac00000000
-
-        //estimate fee:
-        // /insight-api/utils/estimatefee[?nbBlocks=2]
+    componentWillUnmount() {
+        clearInterval(this.timerID);
     }
 
-    sendSafex() {
-
+    tick() {
+        this.prepareDisplay();
     }
 
-    safexPayload(amount) {
-        const prefix = 'omni';
-        const payload = this.padZeroes16(this.toHex(56)) + this.padZeroes16(this.toHex(amount));
-
-        return new Buffer.concat([new Buffer(prefix), new Buffer(payload, 'hex')]);
-    }
-
-    toHex(num) {
-        return (num).toString(16);
-    }
-
-    padZeroes16(str) {
-        var result = str,
-            left = 16 - str.length;
-
-        if (left < 0) {
-            throw new Error('invalid amount');
-        }
-
-        for (let i = left; i--;) {
-            result = '0' + result;
-        }
-
-        return result;
-    }
-
-    getBitcoinPrice() {
-        axios.get('https://api.coinmarketcap.com/v1/ticker/').then(res => {
-            try {
-                for (var i = 0; i < res.data.length; i++) {
-                    // look for the entry with a matching `code` value
-                    if (res.data[i].symbol === 'BTC') {
-                        console.log('bitcoin price ' + res.data[i].price_usd)
-                        this.setState({bitcoin_price: res.data[i].price_usd});
-                    }
-                }
-            } catch (e) {
-                console.log(e);
-            }
-        });
-        //get the current price of bitcoin
-    }
-
-    getSafexPrice() {
-        axios.get('https://api.coinmarketcap.com/v1/ticker/').then(res => {
-            try {
-                for (var i = 0; i < res.data.length; i++) {
-                    // look for the entry with a matching `code` value
-                    if (res.data[i].symbol === 'SAFEX') {
-                        console.log('safex price ' + res.data[i].price_usd)
-                        this.setState({safex_price: res.data[i].price_usd});
-                    }
-                }
-            } catch (e) {
-                console.log(e);
-            }
-        });
-        //get the latest price of safex
-    }
-
-    getPrices() {
-
-        var myHeaders = new Headers();
-        myHeaders.append('pragma', 'no-cache');
-        myHeaders.append('cache-control', 'no-cache');
-
-        fetch('https://api.coinmarketcap.com/v1/ticker/', {method: "GET", headers: myHeaders})
-            .then(resp => resp.json())
-            .then((resp) => {
-                try {
-                    var btc = 0;
-                    var safex = 0;
-                    for (var i = 0; i < resp.length; i++) {
-                        // look for the entry with a matching `code` value
-                        if (resp[i].symbol === 'SAFEX') {
-                            console.log(resp)
-                            safex = resp[i].price_usd
-                        } else if (resp[i].symbol === 'BTC') {
-                            console.log(resp)
-                            btc = resp[i].price_usd
-                        }
-                    }
-
-                    this.setState({safex_price: safex, bitcoin_price: btc});
-                } catch (e) {
-                    console.log(e);
-                }
-            });
-    }
-
-
-    getAverageFee() {
-        //fetch the average fee cost, for preloading into transactions, for safex or for bitcoin
-
-        //axios.post('http://localhost:3001/balance', JSON.stringify(json)).then(res => {
-        // return res.data["balance"];
-        //});
-    }
 
     prepareDisplay() {
         var promises = [];
@@ -195,7 +98,7 @@ export default class Wallet extends React.Component {
         this.state.keys.forEach((key) => {
             var json = {};
             json['address'] = key.public_key;
-            promises.push(fetch('http://localhost:3001/balance', {
+            promises.push(fetch('http://omni.safex.io:3001/balance', {
                 method: "POST",
                 body: JSON.stringify(json)
             })
@@ -203,36 +106,92 @@ export default class Wallet extends React.Component {
                 .then((resp) => {
                     return resp
                 }));
-            promises.push(fetch('http://46.101.251.77:3001/insight-api/addr/' + key.public_key + '/balance')
+            promises.push(fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + key.public_key + '/balance')
                 .then(resp => resp.text())
                 .then((resp) => {
                     return resp
                 }));
+            promises.push(fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + key.public_key + '/unconfirmedBalance')
+                .then(resp => resp.text())
+                .then((resp) => {
+                    return resp
+                }));
+            promises.push(fetch('http://omni.safex.io:3001/unconfirmed', {
+                method: "POST",
+                body: JSON.stringify(json)
+            })
+                .then(resp => resp.json())
+                .then((resp) => {
+                    return resp
+                }));
         });
+        promises.push(fetch('http://omni.safex.io:3001/getfee')
+            .then(resp => resp.text())
+            .then((resp) => {
+                return resp
+            }));
+        console.log(promises.length);
+
+
         Promise.all(promises).then(values => {
             var hold_keys = this.state.keys;
             var internal_index = 0;
+            var iteration = 0;
+            var hold_fee = 0;
             for (var x = 0; x < values.length; x++) {
-                if (x === 0) {
+
+                if (x === values.length -1) {
+                    console.log(x)
+                    hold_fee = values[x];
+                    iteration = 4;
+                }
+                if (iteration === 0) {
                     hold_keys[internal_index].safex_bal = values[x].balance;
-                } else if (x === 1) {
+                    iteration += 1;
+                } else if (iteration === 1) {
                     hold_keys[internal_index].btc_bal = values[x] / 100000000;
-                    internal_index += 1;
-                } else if ((x % 2) === 0) {
-                    hold_keys[internal_index].safex_bal = values[x].balance;
-                } else {
-                    hold_keys[internal_index].btc_bal = values[x] / 100000000;
+                    iteration += 1;
+                } else if (iteration === 2) {
+                    hold_keys[internal_index].pending_btc_bal = values[x] / 100000000;
+                    iteration += 1;
+                } else if (iteration === 3) {
+                    hold_keys[internal_index].pending_safex_bal = values[x];
+                    iteration = 0;
                     internal_index += 1;
                 }
+
             }
-            this.setState({keys: hold_keys});
+            this.setState({keys: hold_keys, average_fee: hold_fee, send_fee: hold_fee});
         });
     }
+
 
     sendCoins(e) {
         e.preventDefault();
         if (this.state.send_coin === 'safex') {
+            var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
+            var source = e.target.public_key.value;
+            var amount = e.target.amount.value;
+            var fee = e.target.fee.value;
+            console.log('the fee ' + e.target.fee.value)
+            var destination = e.target.destination.value;
 
+            try {
+                var address = bitcore.Address.fromString(destination);
+                var address2 = bitcore.Address.fromString(source);
+                try {
+                    fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
+                        .then(resp => resp.json())
+                        .then((resp) => {
+                            console.log(resp)
+                            this.formSafexTransaction(resp, amount, parseFloat((fee * 100000000).toFixed(0)), destination, keys, source);
+                        });
+                } catch (e) {
+                    alert('network communication error, please try again later');
+                }
+            } catch (e) {
+                alert('invalid destination address');
+            }
             //send safex
 
         } else {
@@ -241,13 +200,21 @@ export default class Wallet extends React.Component {
             var amount = e.target.amount.value;
             var fee = e.target.fee.value;
             var destination = e.target.destination.value;
-            fetch('http://46.101.251.77:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
+            try {
+               var address = bitcore.Address.fromString(destination);
+                var address2 = bitcore.Address.fromString(source);
+                try {
+            fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
                 .then(resp => resp.json())
                 .then((resp) => {
-                    console.log(resp)
-                    this.formBitcoinTransaction(resp, amount * 100000000, fee * 100000000, destination, keys, source);
+                    this.formBitcoinTransaction(resp, parseFloat((amount * 100000000).toFixed(0)), parseFloat((fee * 100000000).toFixed(0)), destination, keys, source);
                 });
-
+                } catch (e) {
+                    alert('network communication error, please try again later');
+                }
+            } catch (e) {
+                alert('invalid destination address');
+            }
 
         }
     }
@@ -264,31 +231,97 @@ export default class Wallet extends React.Component {
                 inputs_num += 1;
             }
         });
-        console.log('running total ' + running_total)
-        console.log('fee ' + fee)
-        console.log('amount ' + amount)
-        console.log('subtracted total ' + (running_total - (amount + fee)))
-        console.log('inputs num ' + inputs_num)
         tx.addOutput(destination, amount);
         tx.addOutput(source, (running_total - (amount + fee)));
+        console.log(tx);
         for (var i = 0; i < inputs_num; i++) {
             tx.sign(i, key);
         }
 
         var json = {};
         json['rawtx'] = tx.build().toHex();
-        console.log('the json ' + JSON.stringify(json))
-        fetch('http://localhost:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
+        fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
             .then(resp => resp.text())
             .then((resp) => {
-                console.log(resp)
+                console.log(resp);
+                this.setState({
+                    transaction_sent: true,
+                    txid: resp
+                });
             });
     }
 
-    formSafexTransaction() {
+    formSafexTransaction(utxos, amount, fee, destination, key, source) {
+        var running_total = 0;
+        var tx = new bitcoin.TransactionBuilder();
+        var inputs_num = 0;
+        utxos.forEach(txn => {
+            console.log(txn);
+            if (running_total < (2730 + fee)) {
+                running_total += txn.satoshis;
+                tx.addInput(txn.txid, txn.vout);
+                inputs_num += 1;
+            }
+        });
+        tx.addOutput(destination, 2730);
+        tx.addOutput(source, (running_total - (2730 + fee)));
+
+        console.log(tx.buildIncomplete().toHex())
+
+        var SafexTransaction = {};
+        SafexTransaction['incomplete_tx'] = tx.buildIncomplete().toHex();
+        SafexTransaction['amount'] = amount;
+        fetch('http://omni.safex.io:3001/getsafextxn', {method: "POST", body: JSON.stringify(SafexTransaction)})
+            .then(resp => resp.text())
+            .then((resp) => {
+                var decoded_txn = bitcoin.Transaction.fromHex(resp);
+                var txn = bitcoin.TransactionBuilder.fromTransaction(decoded_txn);
+
+
+
+                var check = 0;
+
+                console.log(txn.tx.outs);
+                txn.tx.outs.forEach(out => {
+                    if (check === 0) {
+                        var pubkey = bitcoin.address.fromOutputScript(out.script, bitcoin.networks.livenet);
+                        if (pubkey === destination) {
+                            check += 1;
+                        }
+                    } else if (check === 1) {
+                        var pubkey = bitcoin.address.fromOutputScript(out.script, bitcoin.networks.livenet);
+                        if (pubkey === source) {
+                            check += 1;
+                        }
+                    }
+                });
+
+
+            if (check === 2) {
+                for (var i = 0; i < inputs_num; i++) {
+                    txn.sign(i, key);
+                }
+                console.log(txn.build().toHex())
+
+                var json = {};
+                json['rawtx'] = txn.build().toHex();
+
+                fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
+                     .then(resp => resp.text())
+                     .then((resp) => {
+
+                         this.setState({
+                             transaction_sent: true,
+                             txid: resp
+                         });
+                     });
+            } else {
+                alert("error with transaction")
+            }
+
+            });
 
     }
-
 
 
     createKey() {
@@ -322,6 +355,10 @@ export default class Wallet extends React.Component {
         var key_json = {};
         key_json['public_key'] = address;
         key_json['private_key'] = priv_key_wif;
+        key_json['safex_bal'] = 0;
+        key_json['btc_bal'] = 0;
+        key_json['pending_safex_bal'] = 0;
+        key_json['pending_btc_bal'] = 0;
 
 
         try {
@@ -332,7 +369,6 @@ export default class Wallet extends React.Component {
 
 
         json['keys'].push(key_json);
-        console.log(json);
 
 
         var crypto = require('crypto'),
@@ -342,9 +378,7 @@ export default class Wallet extends React.Component {
         var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
 
 
-        var home_dir = os.homedir();
-
-        fs.writeFile(home_dir + '/safexwallet.dat', cipher_text, (err) => {
+        fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
             if (err) {
                 console.log(err)
             } else {
@@ -352,6 +386,8 @@ export default class Wallet extends React.Component {
                 try {
                     var json2 = JSON.parse(localStorage.getItem('wallet'));
                     this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
+                    this.prepareDisplay();
+                    alert('key added to wallet')
                 } catch (e) {
                     console.log(e);
                 }
@@ -360,11 +396,16 @@ export default class Wallet extends React.Component {
         });
     }
 
+    importKeyChange(e){
+        this.setState({
+            import_key: e.target.value
+        })
+    }
+
     importKey(e) {
         e.preventDefault();
         try {
             var key_pair = bitcoin.ECPair.fromWIF(e.target.key.value);
-
             var address = key_pair.getAddress();
 
             var key_json = {};
@@ -372,6 +413,8 @@ export default class Wallet extends React.Component {
             key_json['private_key'] = e.target.key.value;
             key_json['safex_bal'] = 0;
             key_json['btc_bal'] = 0;
+            key_json['pending_safex_bal'] = 0;
+            key_json['pending_btc_bal'] = 0;
 
 
             try {
@@ -397,13 +440,14 @@ export default class Wallet extends React.Component {
                     var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
 
 
-                    var home_dir = os.homedir();
-
-                    fs.writeFile(home_dir + '/safexwallet.dat', cipher_text, (err) => {
+                    fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
                         if (err) {
                             console.log(err)
                         } else {
                             localStorage.setItem('wallet', JSON.stringify(json));
+                            this.setState({
+                                import_key: ''
+                            })
                             try {
                                 var json2 = JSON.parse(localStorage.getItem('wallet'));
                                 this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
@@ -423,14 +467,202 @@ export default class Wallet extends React.Component {
                 console.log(e);
             }
         } catch (e) {
+            alert('invalid private key')
             console.log(e);
         }
 
 
     }
 
-    exportKey() {
+    exportWallet() {
+        alert("This will create a file where you can see your private keys. It is a very sensitive file Be responsible with it." +
+            "You can use this file to Import the Private Keys into another wallet.")
+        var wallet_data = localStorage.getItem('wallet');
+        fileDownload(wallet_data, 'safex.txt');
 
+    }
+
+    amountChange(receive_amount) {
+        this.setState({
+            receive_amount: receive_amount.value
+        });
+    }
+
+    openSendReceive(key, sendreceive) {
+        if (sendreceive === 'send') {
+            if (!this.state.collapse_open.send_open && this.state.collapse_open.key !== key || this.state.collapse_open.send_open && this.state.collapse_open.key !== key) {
+                this.setState({
+                    collapse_open: {
+                        key: key,
+                        send_open: true,
+                        receive_open: false
+                    },
+                    send_public_key: this.state.keys[key].public_key
+                });
+            }
+
+            if (this.state.collapse_open.send_open && this.state.collapse_open.key === key) {
+                this.setState({
+                    collapse_open: {
+                        key: key,
+                        send_open: false,
+                        receive_open: false
+                    },
+                    send_public_key: ''
+                });
+            }
+
+            if (!this.state.collapse_open.send_open && this.state.collapse_open.key === key) {
+                this.setState({
+                    collapse_open: {
+                        key: key,
+                        send_open: true,
+                        receive_open: false
+                    },
+                    send_public_key: ''
+                });
+            }
+
+        }
+        if (sendreceive === 'receive') {
+            if (!this.state.collapse_open.receive_open && this.state.collapse_open.key !== key || this.state.collapse_open.receive_open && this.state.collapse_open.key !== key) {
+                this.setState({
+                    collapse_open: {
+                        key: key,
+                        send_open: false,
+                        receive_open: true
+                    }
+                });
+            }
+            if (this.state.collapse_open.receive_open && this.state.collapse_open.key === key || !this.state.collapse_open.receive_open && this.state.collapse_open.key === key) {
+                this.setState({
+                    collapse_open: {
+                        key: key,
+                        send_open: false,
+                        receive_open: !this.state.collapse_open.receive_open
+                    }
+                });
+            }
+        }
+    }
+
+    sendCoinChoose(coin) {
+        this.setState({
+            send_coin: coin
+        });
+        this.sendTotalAdjustCoinChange(coin);
+    }
+
+    openCoinModal(e) {
+        e.preventDefault();
+        if (this.state.send_fee <= 0.0001) {
+            var send_fee = 0.0001;
+        } else {
+            var send_fee = this.state.send_fee;
+        }
+        this.setState({
+            send_overflow_active: true,
+            send_to: e.target.destination.value,
+            send_fee: send_fee,
+            send_keys: {
+                public_key: e.target.public_key.value,
+                private_key: e.target.private_key.value
+            }
+        })
+    }
+
+    sendAmountOnChange(e) {
+        var send_fee = this.state.send_fee;
+        var send_total = 0;
+        if (this.state.send_coin === 'safex') {
+            send_total = parseInt(e.target.value);
+            this.setState({
+                send_amount: parseInt(e.target.value),
+                send_total: send_total
+            });
+        } else {
+            send_total = parseFloat(e.target.value) + parseFloat(send_fee);
+            this.setState({
+                send_amount: e.target.value,
+                send_total: send_total.toFixed(8)
+            });
+        }
+    }
+
+    sendFeeOnChange(e) {
+        var send_amount = this.state.send_amount;
+        var send_fee = parseFloat(e.target.value);
+
+        if (this.state.send_coin === 'safex') {
+            var send_total = parseFloat(send_amount);
+        } else {
+            var send_total = parseFloat(send_fee) + parseFloat(send_amount);
+        }
+        this.setState({
+            send_fee: send_fee,
+            send_total: send_total.toFixed(8)
+        });
+    }
+
+    sendFeeOnBlur(e) {
+        if (this.state.send_fee <= 0.0001) {
+            var send_fee = 0.0001;
+        } else {
+            var send_fee = this.state.send_fee;
+        }
+        this.setState({
+            send_fee: send_fee
+        })
+    }
+
+    sendTotalAdjustCoinChange(coin) {
+        var send_amount = this.state.send_amount;
+        var send_fee = parseFloat(0.0001);
+        if (coin === 'safex') {
+            send_amount = parseFloat(this.state.send_amount).toFixed(0);
+            var send_total = parseFloat(send_amount);
+            this.setState({
+                send_amount: 1,
+                send_fee: parseFloat(this.state.average_fee),
+                send_total: 1
+            });
+        } else {
+            var send_total = parseFloat(send_fee) + 0.00000001;
+            this.setState({
+                send_amount: 0.00000001.toFixed(8),
+                send_fee: send_fee,
+                send_total: send_total.toFixed(8)
+            });
+        }
+
+    }
+
+    closeCoinModal() {
+        this.setState({
+            send_overflow_active: false,
+            send_to: '',
+            send_keys: {
+                public_key: '',
+                private_key: ''
+            }
+        })
+    }
+
+    closeSuccessModal(e) {
+        e.preventDefault();
+        this.setState({
+            transaction_sent: false,
+            send_overflow_active: false,
+            send_to: '',
+            send_keys: {
+                public_key: '',
+                private_key: ''
+            }
+        });
+        this.prepareDisplay();
+        setTimeout(() => {
+            this.prepareDisplay();
+        },35000)
     }
 
     amountChange(receive_amount) {
@@ -608,43 +840,61 @@ export default class Wallet extends React.Component {
             return <div className="col-xs-12 single-key" key={key}>
                 <div className="col-xs-7">
                     <div className="key">{keys[key].public_key}</div>
-                    <div className="amounts">
-                        <span className="amount">Safex: {keys[key].safex_bal}</span> <span className="amount">Bitcoin: {keys[key].btc_bal}</span>
-                    </div>
                 </div>
                 <div className="pull-right">
-                    <button onClick={this.openSendReceive.bind(this,key,'send')}>SEND  <img src="/images/send.png" alt="Send" /></button>
-                    <button onClick={this.openSendReceive.bind(this,key,'receive')}>RECEIVE <img src="/images/import.png" alt="Receive" /></button>
-                    <button><img src="/images/history.png" alt="history" /></button>
+                    <button disabled={keys[key].pending_btc_bal >= 0
+                        ? ''
+                        : 'disabled'} onClick={this.openSendReceive.bind(this, key, 'send')}>SEND <img src="images/send.png"
+                                                                                             alt="Send"/></button>
+                    <button onClick={this.openSendReceive.bind(this, key, 'receive')}>RECEIVE <img
+                        src="images/import.png" alt="Receive"/></button>
                 </div>
-                <form onSubmit={this.openCoinModal} className={this.state.collapse_open.send_open && this.state.collapse_open.key === key
-                ? 'col-xs-12 form-inline form-send active'
-                : 'col-xs-12 form-inline form-send'}>
+                <div className="col-xs-12">
+                    <div className="row amounts">
+                        <span
+                            className="col-xs-6 amount">Safex: <span>{keys[key].pending_safex_bal < 0 ? (parseFloat(keys[key].safex_bal) + parseFloat(keys[key].pending_safex_bal)) : keys[key].safex_bal}
+                            {keys[key].pending_safex_bal > 0 | keys[key].pending_safex_bal < 0 ? '(pending ' + keys[key].pending_safex_bal + ')' : ''}</span></span>
+                        <span
+                            className="col-xs-6 amount">Bitcoin: <span>{keys[key].pending_btc_bal < 0 ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)) : keys[key].btc_bal}
+                            {keys[key].pending_btc_bal > 0 | keys[key].pending_btc_bal < 0 ? '(pending ' + keys[key].pending_btc_bal + ')' : ''}</span></span>
+                    </div>
+                </div>
+                <form onSubmit={this.openCoinModal}
+                      className={this.state.collapse_open.send_open && this.state.collapse_open.key === key
+                          ? 'col-xs-12 form-inline form-send active'
+                          : 'col-xs-12 form-inline form-send'}>
                     <div className="row">
                         <div className="col-xs-8 send-left">
                             <label htmlFor="which">Currency</label>
                             <img className={this.state.send_coin === 'safex'
-                            ? 'coin active'
-                            : 'coin'} onClick={this.sendCoinChoose.bind(this,'safex')} src="/images/safex-coin.png" alt="Safex Coin" />
+                                ? 'coin active'
+                                : 'coin'} onClick={this.sendCoinChoose.bind(this, 'safex')} src="images/safex-coin.png"
+                                 alt="Safex Coin"/>
                             <img className={this.state.send_coin === 'btc'
-                            ? 'coin active'
-                            : 'coin'} onClick={this.sendCoinChoose.bind(this,'btc')} src="/images/btc-coin.png" alt="Bitcoin Coin" />
-                            <input type="hidden" name="which" value={this.state.send_coin}></input>
-                            <input type="hidden" name="private_key" value={keys[key].private_key}></input>
-                            <input type="hidden" name="public_key" value={keys[key].public_key}></input>
+                                ? 'coin active'
+                                : 'coin'} onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
+                                 alt="Bitcoin Coin"/>
+                            <input type="hidden" name="which" readOnly value={this.state.send_coin}></input>
+                            <input type="hidden" name="private_key" readOnly value={keys[key].private_key}></input>
+                            <input type="hidden" name="public_key" readOnly value={keys[key].public_key}></input>
                             <div className="input-group">
-                              <span className="input-group-addon" id="basic-addon1">TO:</span>
-                              <input name="destination" type="text" className="form-control" placeholder="Address" aria-describedby="basic-addon1" />
+                                <span className="input-group-addon" id="basic-addon1">TO:</span>
+                                <input name="destination" type="text" className="form-control" placeholder="Address"
+                                       aria-describedby="basic-addon1"/>
                             </div>
                         </div>
                         <div className="col-xs-4">
                             <div className="form-group">
-                                <label htmlFor="amount">Amount:</label>
-                                <input type="number" name="amount" onChange={this.sendAmountOnChange} value={this.state.send_amount} />
+                                <label htmlFor="amount">Amount<span className={this.state.send_coin === "safex"
+                                    ? ''
+                                    : 'hidden-xs hidden-sm hidden-md hidden-lg'}>(Safex)</span>:</label>
+                                <input type="number" name="amount" onChange={this.sendAmountOnChange}
+                                       value={this.state.send_amount}/>
                             </div>
                             <div className="form-group">
                                 <label htmlFor="fee">Fee(BTC):</label>
-                                <input type="number" name="fee" onChange={this.sendFeeOnChange} onBlur={this.sendFeeOnBlur} value={this.state.send_fee} />
+                                <input type="number" name="fee" onChange={this.sendFeeOnChange}
+                                       onBlur={this.sendFeeOnBlur} value={this.state.send_fee}/>
                             </div>
                             <div className="form-group">
                                 <label htmlFor="total">Total:</label>
@@ -655,46 +905,45 @@ export default class Wallet extends React.Component {
                     </div>
                 </form>
                 <div className={this.state.collapse_open.receive_open && this.state.collapse_open.key === key
-                ? 'col-xs-12 receive active'
-                : 'col-xs-12 receive'}>
+                    ? 'col-xs-12 receive active'
+                    : 'col-xs-12 receive'}>
                     <div className="col-xs-12">
                         <label htmlFor="receive-address">Address:</label>
-                        <input name="receive-address" value={keys[key].public_key} />
+                        <input name="receive-address" value={keys[key].public_key}/>
                     </div>
                     <div className="col-xs-8">
                         <label htmlFor="amount">Amount:</label>
-                        <input type="amount" placeholder="1" onChange={this.amountChange.bind(this)} value={this.state.receive_amount} />
+                        <input type="amount" placeholder="1" onChange={this.amountChange.bind(this)}
+                               value={this.state.receive_amount}/>
                     </div>
                     <div className="col-xs-4">
                         <div className="row">
                             <div className="col-xs-6">
-                                <QRCode value={"bitcoin:"+keys[key].public_key+"?amount="+this.state.receive_amount} />
-                            </div>
-                            <div className="col-xs-6">
-                                <button>Print <img src="/images/print.png" alt="Print" /></button>
-                                <button>PDF <img src="/images/pdf.png" alt="Pdf" /></button>
+                                <QRCode
+                                    value={"bitcoin:" + keys[key].public_key + "?amount=" + this.state.receive_amount}/>
                             </div>
                         </div>
                     </div>
                 </div>
-        </div>
+            </div>
         });
+
         return (
-            <div>
-                <Navigation />
+            <div className="wallet-page">
+                <Navigation/>
                 <div className="container key-buttons">
-                        <div className="row">
-                            <div className="col-xs-12">
-                                <button onClick={this.createKey}>Create key</button>
-                                <form onSubmit={this.importKey}>
-                                    <input name="key"></input>
-                                    <button type="submit">Import key</button>
-                                </form>
-                                <button>Export key</button>
-                            </div>
+                    <div className="row">
+                        <div className="col-xs-12">
+                            <button onClick={this.createKey}>Create key</button>
+                            <form onChange={this.importKeyChange} onSubmit={this.importKey}>
+                                <input name="key" value={this.state.import_key}></input>
+                                <button type="submit">Import key</button>
+                            </form>
+                            <button onClick={this.exportWallet}>Export Wallet</button>
                         </div>
+                    </div>
                 </div>
-                <div className="container">
+                <div className="container keys-container">
                     <div className="col-xs-12">
                         <div className="row">
                             {table}
@@ -702,44 +951,120 @@ export default class Wallet extends React.Component {
                     </div>
                 </div>
                 <div className={this.state.send_overflow_active
-                ? 'overflow sendModal active'
-                : 'overflow sendModal'}>
-                    <form onSubmit={this.sendCoins}>
-                        <h3>Sending <span className="close" onClick={this.closeCoinModal}>X</span></h3>
+                    ? 'overflow sendModal active'
+                    : 'overflow sendModal'}>
+                    <form className="container" onSubmit={this.sendCoins}>
                         <div className="col-xs-12">
-                            <div className="currency">
-                                Currency: <img className={this.state.send_coin === 'safex'
-                                ? 'coin'
-                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'} onClick={this.sendCoinChoose.bind(this,'safex')} src="/images/safex-coin.png" alt="Safex Coin" />
-                                <img className={this.state.send_coin === 'btc'
-                                ? 'coin'
-                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'} onClick={this.sendCoinChoose.bind(this,'btc')} src="/images/btc-coin.png" alt="Bitcoin Coin" />
+                            <h3>Sending <span className="close" onClick={this.closeCoinModal}>X</span></h3>
+                            <div className="col-xs-10 col-xs-offset-1">
+                                <div className="col-xs-12">
+                                    <div className="currency">
+                                        Currency: <img className={this.state.send_coin === 'safex'
+                                        ? 'coin'
+                                        : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
+                                                       onClick={this.sendCoinChoose.bind(this, 'safex')}
+                                                       src="images/safex-coin.png" alt="Safex Coin"/>
+                                        <img className={this.state.send_coin === 'btc'
+                                            ? 'coin'
+                                            : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
+                                             onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
+                                             alt="Bitcoin Coin"/>
+                                    </div>
+                                </div>
+                                <div className="input-group">
+                                    <span className="input-group-addon" id="basic-addon1">FROM:</span>
+                                    <input name="from" type="text" className="form-control" readOnly
+                                           value={this.state.send_keys.public_key} placeholder="Address"
+                                           aria-describedby="basic-addon1"/>
+                                </div>
+                                <div className="input-group">
+                                    <span className="input-group-addon" id="basic-addon1">TO:</span>
+                                    <input name="destination" type="text" className="form-control" readOnly
+                                           value={this.state.send_to} placeholder="Address"
+                                           aria-describedby="basic-addon1"/>
+                                </div>
+                                <input type="hidden" readOnly name="private_key"
+                                       value={this.state.send_keys.private_key}></input>
+                                <input type="hidden" readOnly name="public_key"
+                                       value={this.state.send_keys.public_key}></input>
+                                <div className="col-xs-6 col-xs-offset-3">
+                                    <div className="form-group">
+                                        <label htmlFor="amount">Amount:</label>
+                                        <input readOnly name="amount" value={this.state.send_amount}/>
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="fee">Fee(BTC):</label>
+                                        <input readOnly name="fee" value={this.state.send_fee}/>
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="total">Total:</label>
+                                        <input readOnly name="total" value={this.state.send_total}></input>
+                                    </div>
+                                    <button type="submit">CONFIRM</button>
+                                </div>
                             </div>
                         </div>
-                        <div className="input-group">
-                          <span className="input-group-addon" id="basic-addon1">FROM:</span>
-                          <input name="from" type="text" className="form-control" readOnly value={this.state.send_keys.public_key} placeholder="Address" aria-describedby="basic-addon1" />
-                        </div>
-                        <div className="input-group">
-                          <span className="input-group-addon" id="basic-addon1">TO:</span>
-                          <input name="destination" type="text" className="form-control" readOnly value={this.state.send_to} placeholder="Address" aria-describedby="basic-addon1" />
-                        </div>
-                        <input type="hidden" name="private_key" value={this.state.send_keys.private_key}></input>
-                        <input type="hidden" name="public_key" value={this.state.send_keys.public_key}></input>
-                        <div className="col-xs-6 col-xs-offset-3">
-                            <div className="form-group">
-                                <label htmlFor="amount">Amount:</label>
-                                <input readOnly name="amount" value={this.state.send_amount} />
+                    </form>
+                </div>
+                <div className={this.state.transaction_sent
+                    ? 'overflow sendModal active'
+                    : 'overflow sendModal'}>
+                    <form className="container" onSubmit={this.closeSuccessModal}>
+                        <div className="col-xs-12">
+                            <h3>Sent <span className="close" onClick={this.closeSuccessModal}>X</span></h3>
+                            <div className="col-xs-10 col-xs-offset-1">
+                                <div className="col-xs-12">
+                                    <div className="currency">
+                                        Currency: <img className={this.state.send_coin === 'safex'
+                                        ? 'coin'
+                                        : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
+                                                       onClick={this.sendCoinChoose.bind(this, 'safex')}
+                                                       src="images/safex-coin.png" alt="Safex Coin"/>
+                                        <img className={this.state.send_coin === 'btc'
+                                            ? 'coin'
+                                            : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
+                                             onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
+                                             alt="Bitcoin Coin"/>
+                                    </div>
+                                </div>
+                                <div className="input-group">
+                                    <span className="input-group-addon" id="basic-addon1">FROM:</span>
+                                    <input name="from" type="text" className="form-control" readOnly
+                                           value={this.state.send_keys.public_key} placeholder="Address"
+                                           aria-describedby="basic-addon1"/>
+                                </div>
+                                <div className="input-group">
+                                    <span className="input-group-addon" id="basic-addon1">TO:</span>
+                                    <input name="destination" type="text" className="form-control" readOnly
+                                           value={this.state.send_to} placeholder="Address"
+                                           aria-describedby="basic-addon1"/>
+                                </div>
+                                <div className="input-group">
+                                    <span className="input-group-addon" id="basic-addon1">TX ID:</span>
+                                    <input name="destination" type="text" className="form-control" readOnly
+                                           value={this.state.txid} placeholder="Address"
+                                           aria-describedby="basic-addon1"/>
+                                </div>
+                                <input type="hidden" readOnly name="private_key"
+                                       value={this.state.send_keys.private_key}></input>
+                                <input type="hidden" readOnly name="public_key"
+                                       value={this.state.send_keys.public_key}></input>
+                                <div className="col-xs-6 col-xs-offset-3">
+                                    <div className="form-group">
+                                        <label htmlFor="amount">Amount:</label>
+                                        <input readOnly name="amount" value={this.state.send_amount}/>
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="fee">Fee(BTC):</label>
+                                        <input readOnly name="fee" value={this.state.send_fee}/>
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="total">Total:</label>
+                                        <input readOnly name="total" value={this.state.send_total}></input>
+                                    </div>
+                                    <button type="submit">Close X</button>
+                                </div>
                             </div>
-                            <div className="form-group">
-                                <label htmlFor="fee">Fee(BTC):</label>
-                                <input readOnly name="fee" value={this.state.send_fee} />
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="total">Total:</label>
-                                <input readOnly name="total" value={this.state.send_total}></input>
-                            </div>
-                            <button type="submit">CONFIRM</button>
                         </div>
                     </form>
                 </div>

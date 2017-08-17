@@ -20,15 +20,24 @@ export default class Navigation extends React.Component {
     componentDidMount() {
 
         this.getPrices();
+        this.timerID = setInterval(
+            () => this.tick(),
+            600000
+        );
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.timerID);
+    }
+
+    tick() {
+        this.getPrices();
     }
 
     getPrices() {
-        var myHeaders = new Headers();
-        myHeaders.append('pragma', 'no-cache');
-        myHeaders.append('cache-control', 'no-cache');
 
-        fetch('https://api.coinmarketcap.com/v1/ticker/', {method: "GET", headers: myHeaders, mode: 'no-cors'})
-            .then(resp => console.log(resp))
+        fetch('https://api.coinmarketcap.com/v1/ticker/', {method: "GET"})
+            .then(resp => resp.json())
             .then((resp) => {
                 try {
                     var btc = 0;
@@ -36,10 +45,8 @@ export default class Navigation extends React.Component {
                     for (var i = 0; i < resp.length; i++) {
                         // look for the entry with a matching `code` value
                         if (resp[i].symbol === 'SAFEX') {
-                            console.log(resp)
                             safex = resp[i].price_usd
                         } else if (resp[i].symbol === 'BTC') {
-                            console.log(resp)
                             btc = resp[i].price_usd
                         }
                     }
@@ -59,7 +66,6 @@ export default class Navigation extends React.Component {
                 for (var i = 0; i < res.data.length; i++) {
                     // look for the entry with a matching `code` value
                     if (res.data[i].symbol === 'SAFEX') {
-                        console.log(res.data[i].price_usd)
                         this.setState({safex_price: res.data[i].price_usd});
                     }
                 }
@@ -77,7 +83,6 @@ export default class Navigation extends React.Component {
                 for (var i = 0; i < res.data.length; i++) {
                     // look for the entry with a matching `code` value
                     if (res.data[i].symbol === 'BTC') {
-                        console.log(res.data[i].price_usd)
                         this.setState({bitcoin_price: res.data[i].price_usd});
                     }
                 }
@@ -103,7 +108,7 @@ export default class Navigation extends React.Component {
                         <span className="icon-bar"></span>
                     </button>
                     <span className="navbar-brand" href="#">
-                        <img src="/images/logo.png" alt="Logo"/>
+                        <img src="images/logo.png" alt="Logo"/>
                     </span>
                 </div>
 
@@ -111,7 +116,7 @@ export default class Navigation extends React.Component {
                     <ul className="nav navbar-nav navbar-right">
                         <li>
                             <Link to="/wallet" activeClassName="activeLink" onlyActiveOnIndex>Wallet <img
-                                src="/images/create.png" alt="Create"/></Link>
+                                src="images/create.png" alt="Create"/></Link>
                         </li>
                     </ul>
                 </div>

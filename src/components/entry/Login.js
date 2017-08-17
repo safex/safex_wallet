@@ -2,6 +2,7 @@ import React from 'react';
 import crypto from 'crypto';
 var fs = window.require('fs');
 import { decrypt } from '../../utils/utils';
+import {Link} from 'react-router';
 
 export default class Login extends React.Component {
 
@@ -22,19 +23,23 @@ export default class Login extends React.Component {
 
         var cipher_text = localStorage.getItem('encrypted_wallet');
 
-        var decryped_wallet = decrypt(cipher_text, algorithm, password);
+
+            var decryped_wallet = decrypt(cipher_text, algorithm, password);
 
         try {
             var parse_wallet = JSON.parse(decryped_wallet);
 
             if (parse_wallet['version'] === '1') {
                 localStorage.setItem('wallet', decryped_wallet);
+
                 this.context.router.push('/wallet');
             } else {
+
                 console.log('wrong password');
             }
 
         } catch (e) {
+            alert('wrong password');
             console.log('error parsing wallet');
         }
 
@@ -46,12 +51,13 @@ export default class Login extends React.Component {
         return (
           <div className="container">
                    <div className="col-xs-12 Login-logo">
-                       <img src="/images/logo.png" alt="Logo" />
+                       <Link className="pul-left back-button" to="/"><img src="images/back.png" /> Back</Link>
+                       <img src="images/logo.png" alt="Logo" />
                    </div>
                    <div className="col-xs-12 Login-form">
                      <form className="form-group" onSubmit={this.handleSubmit}>
                          <input className="form-control" type="password" name="password" placeholder="Enter Password" />
-                         <button className="btn btn-default" type="submit">LOGIN <img src="/images/create.png" alt="Create" /></button>
+                         <button className="btn btn-default" type="submit">LOGIN <img src="images/create.png" alt="Create" /></button>
                      </form>
                    </div>
                    <div className="col-xs-12 text-center Intro-footer">

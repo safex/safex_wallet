@@ -1,33 +1,38 @@
 @font-face {
   font-family: 'Gotham Medium';
-  src: url('/added/fonts/GOTHAM-MEDIUM.eot');
+  src: url('../fonts/GOTHAM-MEDIUM.eot');
   /* IE9 Compat Modes */
-  src: url('/added/fonts/GOTHAM-MEDIUM.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-  url('/added/fonts/GOTHAM-MEDIUM.woff') format('woff'), /* Modern Browsers */
-  url('/added/fonts/GOTHAM-MEDIUM.ttf') format('truetype'), /* Safari, Android, iOS */
-  url('/added/fonts/GOTHAM-MEDIUM.svg#0fbe3a09622d8fb1f474f00917396ba1') format('svg');
+  src: url('../fonts/GOTHAM-MEDIUM.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('../fonts/GOTHAM-MEDIUM.woff') format('woff'), /* Modern Browsers */
+  url('../fonts/GOTHAM-MEDIUM.ttf') format('truetype'), /* Safari, Android, iOS */
+  url('../fonts/GOTHAM-MEDIUM.svg#0fbe3a09622d8fb1f474f00917396ba1') format('svg');
   /* Legacy iOS */
   font-style: normal;
   font-weight: 400;
 }
 @font-face {
   font-family: 'Gotham Light';
-  src: url('/added/fonts/GOTHAM-LIGHT.eot'); /* IE9 Compat Modes */
-  src: url('/added/fonts/GOTHAM-LIGHT.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('/added/fonts/GOTHAM-LIGHT.woff') format('woff'), /* Modern Browsers */
-       url('/added/fonts/GOTHAM-LIGHT.ttf')  format('truetype'), /* Safari, Android, iOS */
-       url('/added/fonts/GOTHAM-LIGHT.svg#0fdc6c734a7ca54436fb28af9ab2f202') format('svg'); /* Legacy iOS */
+  src: url('../fonts/GOTHAM-LIGHT.eot'); /* IE9 Compat Modes */
+  src: url('../fonts/GOTHAM-LIGHT.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/GOTHAM-LIGHT.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/GOTHAM-LIGHT.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/GOTHAM-LIGHT.svg#0fdc6c734a7ca54436fb28af9ab2f202') format('svg'); /* Legacy iOS */
 
   font-style:   normal;
   font-weight:  200;
 }
+
+
 textarea, input:focus, button { outline-color: transparent;
   outline-style: none; box-shadow: none !important;}
 html, body, body #root, body #root > div{
   height:100%;
 }
+html{
+  overflow:hidden;
+}
 body{
-  background:url('/images/bg.jpg');
+  background:url('../images/bg.jpg');
   background-size:cover;
   background-position: top center;
   font-family: 'Gotham Medium';
@@ -55,13 +60,18 @@ body{
   text-decoration: none;
 }
 .App-intro .col-xs-6 a > div, .Login-form form{
-  background:url('/images/import-block-bg.png');
+  background:url('../images/import-block-bg.png');
   background-size:100% 100%;
   display:block;
   padding-bottom:20px;
 }
+.App-intro .col-xs-6 a > div{
+  padding-top:50px;
+  padding-bottom:30px;
+  margin-bottom:10px;
+}
 .App-intro .col-xs-6 a > div > img{
-  width:40%;
+  height:190px;
   margin:auto;
   padding-top:15px;
   padding-bottom:15px;
@@ -70,13 +80,17 @@ body{
   width:90%;
   border:1px solid #445059;
   border-radius: 0px;
-  background:url('/images/btn-bg.png');
+  background:url('../images/btn-bg.png');
   background-size:100% 100%;
   background-repeat:no-repeat;
   color:#fff;
   text-transform: uppercase;
-  font-size:24px;
+  font-size:20px;
   padding:15px;
+  transition: all 0.4s;
+}
+.App-intro .col-xs-6 .btn:hover, .Login-form .btn:hover{
+  border:1px solid #5BD0FB;
 }
 .App-intro .col-xs-6 a:hover .btn, , .Login-form .btn:hover{
   border:1px solid #205372;
@@ -85,6 +99,9 @@ body{
   display:inline-block;
   margin-left:5px;
   height:25px;
+}
+.App-intro .col-xs-6 p{
+  margin-bottom:0px;
 }
 .Intro-footer{
   height:10%;
@@ -95,11 +112,14 @@ body{
 .Intro-footer p{
   width:100%;
 }
+.Import-wallet{
+  height:auto;
+}
 .Import-wallet .fileandpass{
   width:100%;
   border:1px solid #445059;
   border-radius: 0px;
-  background:url('/images/btn-bg.png');
+  background:url('../images/btn-bg.png');
   background-size:100% 100%;
   background-repeat:no-repeat;
   color:#fff;
@@ -117,19 +137,34 @@ body{
   max-width:100%;
   border:none;
   border-bottom:1px solid #3580A0;
-  background:url('/images/lock.png') no-repeat;
+  background:url('../images/lock.png') no-repeat;
   background-size:auto 70%;
   background-position:left center;
   padding:3px;
   font-size:14px;
+  height:30px;
+}
+.Import-wallet input[name="fileInput_filename"]{
+  text-indent: -9999px !important;
+  background: url('../images/import-top.png') !important;
+  background-size: auto 100% !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  padding: 50px !important;
+  z-index: 99999 !important;
+  cursor: pointer;
+  border:none;
+}
+.Import-wallet input[name="fileInput"]{
+  z-index:999999 !important;
+  padding:50px !important;
 }
 .Login-form > form{
-  max-width:300px;
+  max-width: 440px;
   margin:auto;
   margin-top:50px;
   margin-bottom:20px;
-  padding:15px;
-  padding-top:30px;
+  padding: 85px 40px;
   text-align: center;
 }
 .Login-form input{
@@ -137,8 +172,10 @@ body{
   border-radius: 0px;
   text-align: center;
   border:1px solid #002F42;
-  background:url('/images/btn-bg.png');
+  background:url('../images/btn-bg.png');
   padding:20px 15px;
+  line-height:60px;
+  height:60px;
 }
 .Login-form .btn{
   width:100%;
@@ -156,8 +193,9 @@ body{
 }
 .navbar-default{
   height:85px;
-  background:url('/images/menu-bg.png');
+  background:url('../images/menu-bg.png');
   background-size:cover;
+  background-position: center center;
   border:none;
   border-radius: 0px;
   padding-bottom:10px;
@@ -191,7 +229,7 @@ body{
     width: 100%;
 }
 .key-buttons input{
-  background:url('/images/btn-bg.png');
+  background:url('../images/btn-bg.png');
   border:1px solid #327A9B;
   color:#fff;
   padding:10px;
@@ -213,26 +251,42 @@ body{
     flex-grow: 1;
 }
 .single-key{
-  background:url('/images/btn-bg.png');
+  background:rgba(0,0,0,0.3);
   background-size:cover;
   background-repeat: no-repeat;
   color:#fff;
-  padding:5px;
+  padding:1px 5px;
   border:1px solid #327A9B;
+  margin-bottom:5px;
 }
 .single-key .col-xs-7{
   padding-left:0;
 }
 .single-key .key{
-  font-size:20px;
+  font-size:18px;
+  font-family: Arial;
+  letter-spacing: 0.1em;
+  margin-top: 12px;
+  margin-bottom: 10px;
 }
 .single-key .amounts{
   text-transform: uppercase;
 }
+.single-key .amounts > span{
+  display:block;
+  background:url('../images/prelaz.png');
+  background-repeat: no-repeat;
+  background-position: left center;
+  margin-bottom:5px;
+  padding-left:5px;
+}
+.single-key .amounts > span > span{
+  color:#00d1ff;
+}
 .single-key .pull-right button, .key-buttons button, .form-send button, .overflow.sendModal button{
   border:1px solid #327A9B;
   border-radius: 0px;
-  background:url('/images/btn-bg.png');
+  background:url('../images/btn-bg.png');
   background-size:100% 100%;
   background-repeat:no-repeat;
   color:#fff;
@@ -241,10 +295,27 @@ body{
   padding:10px;
   margin-right:5px;
 }
+.single-key .pull-right button{
+  padding: 5px 10px;
+  margin-top:7px;
+  padding-top: 5px;
+  padding-bottom: 3px;
+}
+.single-key .pull-right button:disabled{
+  opacity:0.5;
+}
+.single-key .pull-right button:hover, .key-buttons .row .col-xs-12 > button:hover, .key-buttons .row .col-xs-12 > form > button:hover{
+  border:1px solid #5BD0FB;
+}
+.single-key .pull-right{
+  margin-right:3px;
+}
 .single-key .pull-right button img{
   display:inline-block;
   margin-left:5px;
-  height:20px;
+  height: 15px;
+  position: relative;
+  top: -2px;
 }
 .form-send{
   height:0;
@@ -262,7 +333,10 @@ body{
   float:right;
   margin-top:10px;
   margin-right:0;
-  padding:10px 15px;
+  padding:5px 15px;
+}
+.form-send button:hover{
+  border:1px solid #5BD0FB;
 }
 .form-send .form-group{
   width:100%;
@@ -271,18 +345,20 @@ body{
 .form-send .form-group label{
   margin-right:5px;
   text-transform: uppercase;
+  font-size:12px;
 }
 .form-send .send-left .form-group{
   text-align:left;
 }
 .form-send .send-left img{
-  width:100px;
+  width:130px;
   padding:10px;
+  padding-top:0;
 }
 .form-send input{
   border:none;
   background:none;
-  border-bottom:1px solid #fff;
+  border-bottom:1px solid #8c8c8c;
   color:#fff;
   text-align:right;
 }
@@ -323,6 +399,7 @@ body{
   border:none;
   border-bottom:1px solid #45A0C1;
   padding:10px;
+  font-family: Arial;
 }
 .receive .col-xs-8 label{
   display:block;
@@ -336,13 +413,15 @@ body{
 .receive canvas{
   margin-top:20px;
   margin-bottom:20px;
-  width:110px !important;
-  height:110px !important;
+  width:140px !important;
+  height:140px !important;
+  background:#fff;
+  padding:5px;
 }
 .receive button{
   border:1px solid #327A9B;
   border-radius: 0px;
-  background:url('/images/btn-bg.png');
+  background:url('../images/btn-bg.png');
   background-size:100% 100%;
   background-repeat:no-repeat;
   color:#fff;
@@ -368,7 +447,7 @@ body{
   padding-bottom:5px;
 }
 .explorer .input-group input, .explorer .input-group button{
-    background:url('/images/btn-bg.png');
+    background:url('../images/btn-bg.png');
     border:1px solid #1B4B65;
     color:#fff;
 }
@@ -413,9 +492,8 @@ body{
     top: 80px;
     left: 0;
     width: 100%;
-    height: calc(100% - 80px);
+    height: 100%;
     display: flex;
-    background:rgba(1, 30, 44, 0.88);
     transition: all 0.4s;
     opacity:0;
     z-index:-9999;
@@ -425,9 +503,12 @@ body{
   z-index:9999;
 }
 .overflow.sendModal > form{
-  max-width:80%;
   min-width:400px;
   margin:auto;
+  height:100%;
+}
+.overflow.sendModal > form > .col-xs-12{
+  background:rgba(1, 30, 44, 1);
   height:100%;
 }
 .overflow.sendModal > form h3{
@@ -482,6 +563,43 @@ body{
 }
 .overflow.sendModal .col-xs-6.col-xs-offset-3 input{
   border-bottom:1px solid #fff;
+  text-align: right;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+.overflow.sendModal button{
+  padding:5px 10px;
+  margin-bottom:20px;
+}
+.keys-container{
+  overflow-y: scroll;
+	height: calc(100% - 169px);
+}
+.wallet-page{
+  overflow:hidden;
+}
+.back-button{
+  text-transform: uppercase;
+  color:#fff;
+  font-size:14px;
+  font-weight: 500;
+  background:url('../images/prelaz.png');
+  background-repeat: no-repeat;
+  background-position: left center;
+  padding:0px 5px;
+}
+.back-button:hover{
+  color:#fff;
+  text-decoration: none;
+}
+.back-button img{
+  display:inline-block;
+  position:relative;
+  top:-2px;
 }
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {

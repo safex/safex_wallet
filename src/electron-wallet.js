@@ -1,10 +1,20 @@
+//handle setupevents as quickly as possible
+const setupEvents = require('./setupWinEvents')
+if (setupEvents.handleSquirrelEvent()) {
+   // squirrel event handled and app will exit in 1000ms, so don't do anything else
+   return;
+}
 const electron = require('electron');
 // Module to control application life.
 const app = electron.app;
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
 
-
+require('electron-context-menu')({
+	prepend: (params, browserWindow) => [{
+		label: 'Select'
+	}]
+});
 const path = require('path');
 const url = require('url');
 
@@ -15,8 +25,10 @@ let mainWindow;
 function createWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600
+        width: 1024,
+        height: 768,
+        minWidth: 1024,
+        minHeight: 768,
     });
 
     // and load the index.html of the app.
@@ -27,7 +39,7 @@ function createWindow() {
         });
     mainWindow.loadURL(startUrl);
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    //mainWindow.webContents.openDevTools();
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
@@ -48,9 +60,9 @@ app.on('window-all-closed', function () {
     // On OS X it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
 
-    if (process.platform !== 'darwin') {
+    //if (process.platform !== 'darwin') {
         app.quit()
-    }
+    //}
 
 
 });
