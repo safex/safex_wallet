@@ -19,7 +19,7 @@ function getInstallerConfig () {
        noMsi: true,
        outputDirectory: outPath,
        exe: 'SafexWallet.exe',
-       setupExe: 'SafexWalletInstaller.exe',
+       setupExe: 'SafexWalletWindowsInstaller.exe',
        setupIcon: 'public/images/icons/wallet-icon.ico',
        skipUpdateIcon: true
    })
