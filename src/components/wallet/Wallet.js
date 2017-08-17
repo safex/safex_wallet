@@ -78,7 +78,7 @@ export default class Wallet extends React.Component {
         this.prepareDisplay();
         this.timerID = setInterval(
             () => this.tick(),
-            660000
+            330000
         );
     }
 
@@ -275,6 +275,28 @@ export default class Wallet extends React.Component {
             .then((resp) => {
                 var decoded_txn = bitcoin.Transaction.fromHex(resp);
                 var txn = bitcoin.TransactionBuilder.fromTransaction(decoded_txn);
+
+
+
+                var check = 0;
+
+                console.log(txn.tx.outs);
+                txn.tx.outs.forEach(out => {
+                    if (check === 0) {
+                        var pubkey = bitcoin.address.fromOutputScript(out.script, bitcoin.networks.livenet);
+                        if (pubkey === destination) {
+                            check += 1;
+                        }
+                    } else if (check === 1) {
+                        var pubkey = bitcoin.address.fromOutputScript(out.script, bitcoin.networks.livenet);
+                        if (pubkey === source) {
+                            check += 1;
+                        }
+                    }
+                });
+
+
+            if (check === 2) {
                 for (var i = 0; i < inputs_num; i++) {
                     txn.sign(i, key);
                 }
@@ -284,14 +306,18 @@ export default class Wallet extends React.Component {
                 json['rawtx'] = txn.build().toHex();
 
                 fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
-                    .then(resp => resp.text())
-                    .then((resp) => {
+                     .then(resp => resp.text())
+                     .then((resp) => {
 
-                        this.setState({
-                            transaction_sent: true,
-                            txid: resp
-                        });
-                    });
+                         this.setState({
+                             transaction_sent: true,
+                             txid: resp
+                         });
+                     });
+            } else {
+                alert("error with transaction")
+            }
+
             });
 
     }
@@ -359,6 +385,7 @@ export default class Wallet extends React.Component {
                 try {
                     var json2 = JSON.parse(localStorage.getItem('wallet'));
                     this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
+                    this.prepareDisplay();
                 } catch (e) {
                     console.log(e);
                 }
@@ -631,6 +658,9 @@ export default class Wallet extends React.Component {
             }
         });
         this.prepareDisplay();
+        setTimeout(() => {
+            this.prepareDisplay();
+        },35000)
     }
 
 
