@@ -39,6 +39,7 @@ export default class Wallet extends React.Component {
                 public_key: '',
                 private_key: ''
             },
+            transaction_being_sent: false,
             transaction_sent: false,
             txid: "",
             average_fee: 0,
@@ -168,6 +169,9 @@ export default class Wallet extends React.Component {
 
     sendCoins(e) {
         e.preventDefault();
+        this.setState({
+          transaction_being_sent: true,
+        });
         if (this.state.send_coin === 'safex') {
             var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
             var source = e.target.public_key.value;
@@ -644,7 +648,8 @@ export default class Wallet extends React.Component {
             send_keys: {
                 public_key: '',
                 private_key: ''
-            }
+            },
+            transaction_being_sent: false
         })
     }
 
@@ -1000,7 +1005,12 @@ export default class Wallet extends React.Component {
                                         <label htmlFor="total">Total:</label>
                                         <input readOnly name="total" value={this.state.send_total}></input>
                                     </div>
-                                    <button type="submit">CONFIRM</button>
+                                    <button className={this.state.transaction_being_sent
+                                    ? 'hidden-xs hidden-sm hidden-md hidden-lg'
+                                    : ''} type="submit">CONFIRM</button>
+                                    <p className={this.state.transaction_being_sent
+                                    ? ''
+                                    : 'hidden-xs hidden-sm hidden-md hidden-lg'}>In Progress</p>
                                 </div>
                             </div>
                         </div>

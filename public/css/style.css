@@ -283,7 +283,7 @@ body{
 .single-key .amounts > span > span{
   color:#00d1ff;
 }
-.single-key .pull-right button, .key-buttons button, .form-send button, .overflow.sendModal button{
+.single-key .pull-right button, .key-buttons button, .form-send button, .overflow.sendModal button, .overflow.sendModal p{
   border:1px solid #327A9B;
   border-radius: 0px;
   background:url('../images/btn-bg.png');
@@ -571,9 +571,12 @@ input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 }
-.overflow.sendModal button{
+.overflow.sendModal button, .overflow.sendModal p{
   padding:5px 10px;
   margin-bottom:20px;
+}
+.overflow.sendModal p {
+  color:#54C4F8;
 }
 .keys-container{
   overflow-y: scroll;
