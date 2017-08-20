@@ -63,7 +63,7 @@ export default class Wallet extends React.Component {
 
 
     componentWillMount() {
-
+        //todo documentation and refactor
         try {
             var json = JSON.parse(localStorage.getItem('wallet'));
             this.setState({wallet: json, keys: json['keys']});
