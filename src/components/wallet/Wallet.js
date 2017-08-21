@@ -150,10 +150,10 @@ export default class Wallet extends React.Component {
                     hold_keys[internal_index].safex_bal = values[x].balance;
                     iteration += 1;
                 } else if (iteration === 1) {
-                    hold_keys[internal_index].btc_bal = values[x] / 100000000;
+                    hold_keys[internal_index].btc_bal = (values[x] / 100000000).toFixed(8);
                     iteration += 1;
                 } else if (iteration === 2) {
-                    hold_keys[internal_index].pending_btc_bal = values[x] / 100000000;
+                    hold_keys[internal_index].pending_btc_bal = (values[x] / 100000000).toFixed(8);
                     iteration += 1;
                 } else if (iteration === 3) {
                     hold_keys[internal_index].pending_safex_bal = values[x];
@@ -790,7 +790,7 @@ export default class Wallet extends React.Component {
             }
             this.setState({
                 send_fee: send_fee,
-                send_total: send_total.toFixed(7)
+                send_total: send_total.toFixed(8)
             });
     }
 
@@ -817,10 +817,10 @@ export default class Wallet extends React.Component {
                 send_total: 1
             });
         }else{
-            var send_total = parseFloat(send_fee) + 0.0000001;
+            var send_total = parseFloat(send_fee) + 0.00000001;
             this.setState({
-                send_amount: 0.0000001.toFixed(7),
-                send_total: send_total.toFixed(7)
+                send_amount: 0.00000001.toFixed(8),
+                send_total: send_total.toFixed(8)
             });
         }
 

@@ -24,13 +24,13 @@ export default class Login extends React.Component {
         var cipher_text = localStorage.getItem('encrypted_wallet');
 
 
-            var decryped_wallet = decrypt(cipher_text, algorithm, password);
+            var decrypted_wallet = decrypt(cipher_text, algorithm, password);
 
         try {
-            var parse_wallet = JSON.parse(decryped_wallet);
+            var parse_wallet = JSON.parse(decrypted_wallet);
 
             if (parse_wallet['version'] === '1') {
-                localStorage.setItem('wallet', decryped_wallet);
+                localStorage.setItem('wallet', decrypted_wallet);
 
                 this.context.router.push('/wallet');
             } else {
