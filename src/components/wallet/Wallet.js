@@ -26,7 +26,6 @@ export default class Wallet extends React.Component {
 
 
             //UI state
-
             is_loading: false,
             receive_amount: 0.00000001.toFixed(8),
             collapse_open: {
@@ -866,7 +865,7 @@ export default class Wallet extends React.Component {
                             className="col-xs-6 amount">Safex: <span>{keys[key].pending_safex_bal < 0 ? (parseFloat(keys[key].safex_bal) + parseFloat(keys[key].pending_safex_bal)) : keys[key].safex_bal}
                             {keys[key].pending_safex_bal > 0 | keys[key].pending_safex_bal < 0 ? '(pending ' + keys[key].pending_safex_bal + ')' : ''}</span></span>
                         <span
-                            className="col-xs-6 amount">Bitcoin: <span>{keys[key].pending_btc_bal < 0 ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)) : keys[key].btc_bal}
+                            className="col-xs-6 amount">Bitcoin: <span>{keys[key].pending_btc_bal < 0 ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)).toFixed(8) : keys[key].btc_bal}
                             {keys[key].pending_btc_bal > 0 | keys[key].pending_btc_bal < 0 ? '(pending ' + keys[key].pending_btc_bal + ')' : ''}</span></span>
                     </div>
                 </div>
