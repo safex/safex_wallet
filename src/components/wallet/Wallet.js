@@ -276,6 +276,7 @@ export default class Wallet extends React.Component {
                 console.log(resp);
                 this.setState({
                     transaction_sent: true,
+                    transaction_being_sent: false,
                     txid: resp
                 });
             });
@@ -338,6 +339,7 @@ export default class Wallet extends React.Component {
 
                          this.setState({
                              transaction_sent: true,
+                             transaction_being_sent: false,
                              txid: resp
                          });
                      });
@@ -514,190 +516,9 @@ export default class Wallet extends React.Component {
         });
     }
 
-    openSendReceive(key, sendreceive) {
-        if (sendreceive === 'send') {
-            if (!this.state.collapse_open.send_open && this.state.collapse_open.key !== key || this.state.collapse_open.send_open && this.state.collapse_open.key !== key) {
-                this.setState({
-                    collapse_open: {
-                        key: key,
-                        send_open: true,
-                        receive_open: false
-                    },
-                    send_public_key: this.state.keys[key].public_key
-                });
-            }
 
-            if (this.state.collapse_open.send_open && this.state.collapse_open.key === key) {
-                this.setState({
-                    collapse_open: {
-                        key: key,
-                        send_open: false,
-                        receive_open: false
-                    },
-                    send_public_key: ''
-                });
-            }
 
-            if (!this.state.collapse_open.send_open && this.state.collapse_open.key === key) {
-                this.setState({
-                    collapse_open: {
-                        key: key,
-                        send_open: true,
-                        receive_open: false
-                    },
-                    send_public_key: ''
-                });
-            }
-
-        }
-        if (sendreceive === 'receive') {
-            if (!this.state.collapse_open.receive_open && this.state.collapse_open.key !== key || this.state.collapse_open.receive_open && this.state.collapse_open.key !== key) {
-                this.setState({
-                    collapse_open: {
-                        key: key,
-                        send_open: false,
-                        receive_open: true
-                    }
-                });
-            }
-            if (this.state.collapse_open.receive_open && this.state.collapse_open.key === key || !this.state.collapse_open.receive_open && this.state.collapse_open.key === key) {
-                this.setState({
-                    collapse_open: {
-                        key: key,
-                        send_open: false,
-                        receive_open: !this.state.collapse_open.receive_open
-                    }
-                });
-            }
-        }
-    }
-
-    sendCoinChoose(coin) {
-        this.setState({
-            send_coin: coin
-        });
-        this.sendTotalAdjustCoinChange(coin);
-    }
-
-    openCoinModal(e) {
-        e.preventDefault();
-        if (this.state.send_fee <= 0.0001) {
-            var send_fee = 0.0001;
-        } else {
-            var send_fee = this.state.send_fee;
-        }
-        this.setState({
-            send_overflow_active: true,
-            send_to: e.target.destination.value,
-            send_fee: send_fee,
-            send_keys: {
-                public_key: e.target.public_key.value,
-                private_key: e.target.private_key.value
-            }
-        })
-    }
-
-    sendAmountOnChange(e) {
-        var send_fee = this.state.send_fee;
-        var send_total = 0;
-        if (this.state.send_coin === 'safex') {
-            send_total = parseInt(e.target.value);
-            this.setState({
-                send_amount: parseInt(e.target.value),
-                send_total: send_total
-            });
-        } else {
-            send_total = parseFloat(e.target.value) + parseFloat(send_fee);
-            this.setState({
-                send_amount: e.target.value,
-                send_total: send_total.toFixed(8)
-            });
-        }
-    }
-
-    sendFeeOnChange(e) {
-        var send_amount = this.state.send_amount;
-        var send_fee = parseFloat(e.target.value);
-
-        if (this.state.send_coin === 'safex') {
-            var send_total = parseFloat(send_amount);
-        } else {
-            var send_total = parseFloat(send_fee) + parseFloat(send_amount);
-        }
-        this.setState({
-            send_fee: send_fee,
-            send_total: send_total.toFixed(8)
-        });
-    }
-
-    sendFeeOnBlur(e) {
-        if (this.state.send_fee <= 0.0001) {
-            var send_fee = 0.0001;
-        } else {
-            var send_fee = this.state.send_fee;
-        }
-        this.setState({
-            send_fee: send_fee
-        })
-    }
-
-    sendTotalAdjustCoinChange(coin) {
-        var send_amount = this.state.send_amount;
-        var send_fee = parseFloat(0.0001);
-        if (coin === 'safex') {
-            send_amount = parseFloat(this.state.send_amount).toFixed(0);
-            var send_total = parseFloat(send_amount);
-            this.setState({
-                send_amount: 1,
-                send_fee: parseFloat(this.state.average_fee),
-                send_total: 1
-            });
-        } else {
-            var send_total = parseFloat(send_fee) + 0.00000001;
-            this.setState({
-                send_amount: 0.00000001.toFixed(8),
-                send_fee: send_fee,
-                send_total: send_total.toFixed(8)
-            });
-        }
-
-    }
-
-    closeCoinModal() {
-        this.setState({
-            send_overflow_active: false,
-            send_to: '',
-            send_keys: {
-                public_key: '',
-                private_key: ''
-            },
-            transaction_being_sent: false
-        })
-    }
-
-    closeSuccessModal(e) {
-        e.preventDefault();
-        this.setState({
-            transaction_sent: false,
-            send_overflow_active: false,
-            send_to: '',
-            send_keys: {
-                public_key: '',
-                private_key: ''
-            }
-        });
-        this.prepareDisplay();
-        setTimeout(() => {
-            this.prepareDisplay();
-        },35000)
-    }
-
-    amountChange(receive_amount) {
-        this.setState({
-            receive_amount: receive_amount.value
-          });
-    }
-
+    //This function is connected to Send expansion button and receive expansion button
     openSendReceive(key,sendreceive){
         if(sendreceive === 'send'){
                 if(!this.state.collapse_open.send_open && this.state.collapse_open.key !== key || this.state.collapse_open.send_open && this.state.collapse_open.key !== key){
@@ -756,58 +577,83 @@ export default class Wallet extends React.Component {
         }
     }
 
-    sendCoinChoose(coin){
-        this.setState({
-            send_coin: coin
-        });
-        this.sendTotalAdjustCoinChange(coin);
-    }
 
+
+    //Activates send_overflow_active state which opens Modal screen displaying transaction pre-confirmation information
     openCoinModal(e){
         e.preventDefault();
-        if(this.state.send_fee <= 0.0001){
-            var send_fee = 0.0001;
-        }else{
-            var send_fee = this.state.send_fee;
+
+        //todo add error message and validation for public keys (address) here as valid destination
+        if (e.target.destination.value === '') {
+
+        } else {
+            this.setState({
+                send_overflow_active: true,
+                send_to: e.target.destination.value,
+                send_keys: {
+                    public_key: e.target.public_key.value,
+                    private_key: e.target.private_key.value
+                }
+            })
         }
+    }
+
+
+    closeCoinModal(){
         this.setState({
-            send_overflow_active: true,
-            send_to: e.target.destination.value,
-            send_fee: send_fee,
+            send_overflow_active: false,
+            send_to: '',
             send_keys: {
-              public_key: e.target.public_key.value,
-              private_key: e.target.private_key.value
+                public_key: '',
+                private_key: ''
             }
         })
     }
 
+    closeSuccessModal(e) {
+        e.preventDefault();
+        this.setState({
+            transaction_sent: false,
+            send_overflow_active: false,
+            send_to: '',
+            send_keys: {
+                public_key: '',
+                private_key: ''
+            }
+        });
+        this.prepareDisplay();
+        setTimeout(() => {
+            this.prepareDisplay();
+        },35000)
+    }
+
+    //This is fired when amount is changed
     sendAmountOnChange(e){
             var send_fee = this.state.send_fee;
             var send_total = 0;
-            if(this.state.send_coin === 'safex'){
+            if (this.state.send_coin === 'safex') {
                 send_total = parseInt(e.target.value);
                 this.setState({
                     send_amount: parseInt(e.target.value),
                     send_total: send_total
                 });
-            }else{
+            } else {
                 send_total = parseFloat(e.target.value) + parseFloat(send_fee);
                 this.setState({
                     send_amount: e.target.value,
                     send_total: send_total
                 });
             }
-
-
     }
 
+    //This is fired when fee is changed
     sendFeeOnChange(e){
             var send_amount = this.state.send_amount;
             var send_fee = parseFloat(e.target.value);
 
-            if(this.state.send_coin === 'safex'){
+            if (this.state.send_coin === 'safex') {
                 var send_total = parseFloat(send_amount);
-            }else{
+            } else {
                 var send_total = parseFloat(send_fee) + parseFloat(send_amount);
             }
             this.setState({
@@ -816,9 +662,10 @@ export default class Wallet extends React.Component {
             });
     }
 
+    //This is protection against way too small fees
     sendFeeOnBlur(e){
-        if(this.state.send_fee <= 0.0001){
-            var send_fee = 0.0001;
+        if(this.state.send_fee <= 0.00005){
+            var send_fee = 0.00005;
         }else{
             var send_fee = this.state.send_fee;
         }
@@ -827,6 +674,15 @@ export default class Wallet extends React.Component {
         })
     }
 
+    //This fires the currency selection method and sets the currency state
+    sendCoinChoose(coin){
+        this.setState({
+            send_coin: coin
+        });
+        this.sendTotalAdjustCoinChange(coin);
+    }
+
+    //This is fired when change of currency is selected BTC SAFEX
     sendTotalAdjustCoinChange(coin){
         var send_amount = this.state.send_amount;
         var send_fee = this.state.send_fee;
@@ -839,24 +695,13 @@ export default class Wallet extends React.Component {
                 send_total: 1
             });
         }else{
-            var send_total = parseFloat(send_fee) + 0.00000001;
+            var send_total = parseFloat(send_fee) + 0.00001;
             this.setState({
-                send_amount: 0.00000001.toFixed(8),
+                send_amount: 0.00001.toFixed(8),
                 send_total: send_total.toFixed(8)
             });
         }
 
-    }
-
-    closeCoinModal(){
-        this.setState({
-            send_overflow_active: false,
-            send_to: '',
-            send_keys: {
-              public_key: '',
-              private_key: ''
-            }
-        })
     }
 
 
