@@ -18,11 +18,16 @@ export default class Wallet extends React.Component {
         super(props);
 
         this.state = {
+            //wallet state
             keys: [],
             wallet: {},
+
+            //fees
+
+
+            //UI state
+
             is_loading: false,
-            safex_price: 0,
-            bitcoin_price: 0,
             receive_amount: 0.00000001.toFixed(8),
             collapse_open: {
                 key: '',
