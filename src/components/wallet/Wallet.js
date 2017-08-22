@@ -44,6 +44,7 @@ export default class Wallet extends React.Component {
             txid: "",
             average_fee: 0,
             import_key: '',
+            safex_fee: 0
         }
 
         this.createKey = this.createKey.bind(this);
@@ -59,6 +60,7 @@ export default class Wallet extends React.Component {
         this.sendTotalAdjustCoinChange = this.sendTotalAdjustCoinChange.bind(this);
         this.closeSuccessModal = this.closeSuccessModal.bind(this);
         this.exportWallet = this.exportWallet.bind(this);
+        this.getFee = this.getFee.bind(this);
     }
 
 
@@ -75,12 +77,12 @@ export default class Wallet extends React.Component {
     }
 
     componentDidMount() {
-
         this.prepareDisplay();
         this.timerID = setInterval(
             () => this.tick(),
             330000
         );
+        this.getFee();
     }
 
     componentWillUnmount() {
@@ -91,6 +93,13 @@ export default class Wallet extends React.Component {
         this.prepareDisplay();
     }
 
+    getFee() {
+        fetch('http://omni.safex.io:3001/getfee')
+            .then(resp => resp.text())
+            .then((resp) => {
+                this.setState({safex_fee: resp});
+            });
+    }
 
     prepareDisplay() {
         var promises = [];
@@ -126,11 +135,6 @@ export default class Wallet extends React.Component {
                     return resp
                 }));
         });
-        promises.push(fetch('http://omni.safex.io:3001/getfee')
-            .then(resp => resp.text())
-            .then((resp) => {
-                return resp
-            }));
         console.log(promises.length);
 
 
@@ -138,14 +142,7 @@ export default class Wallet extends React.Component {
             var hold_keys = this.state.keys;
             var internal_index = 0;
             var iteration = 0;
-            var hold_fee = 0;
             for (var x = 0; x < values.length; x++) {
-
-                if (x === values.length -1) {
-                    console.log(x)
-                    hold_fee = values[x];
-                    iteration = 4;
-                }
                 if (iteration === 0) {
                     hold_keys[internal_index].safex_bal = values[x].balance;
                     iteration += 1;
@@ -162,7 +159,7 @@ export default class Wallet extends React.Component {
                 }
 
             }
-            this.setState({keys: hold_keys, average_fee: hold_fee, send_fee: hold_fee});
+            this.setState({keys: hold_keys});
         });
     }
 
