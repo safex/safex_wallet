@@ -610,3 +610,25 @@ input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 }
+.refresh-button{
+  position:relative;
+}
+.refresh-button img{
+  max-width:30px;
+  height:auto;
+}
+.refresh-button span{
+  display:none;
+}
+.refresh-button.disabled span{
+  display:block;
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.7);
+  padding-top:18px;
+  line-height:1;
+  text-transform: lowercase;
+}

@@ -48,7 +48,9 @@ export default class Wallet extends React.Component {
             txid: "",
             average_fee: 0,
             import_key: '',
-            safex_fee: 0
+            safex_fee: 0,
+            refreshTimer:0,
+            refreshInterval: ''
         }
 
         this.createKey = this.createKey.bind(this);
@@ -65,6 +67,7 @@ export default class Wallet extends React.Component {
         this.closeSuccessModal = this.closeSuccessModal.bind(this);
         this.exportWallet = this.exportWallet.bind(this);
         this.getFee = this.getFee.bind(this);
+        this.refreshWallet = this.refreshWallet.bind(this);
     }
 
 
@@ -842,6 +845,25 @@ export default class Wallet extends React.Component {
         })
     }
 
+    refreshWallet(){
+        if(this.state.refreshTimer === 0){
+            this.prepareDisplay();
+            let interval = setInterval(this.refreshWalletTimer, 1000);
+            this.setState({
+                refreshTimer: 180,
+                refreshInterval: interval
+            });
+        }
+    }
+    refreshWalletTimer = () => {
+        if (this.state.refreshTimer > 0){
+          this.setState({ refreshTimer: this.state.refreshTimer -1 });
+        }
+        else {
+          clearInterval(this.state.refreshInterval);
+        }
+    }
+
     render() {
         const {keys} = this.state;
 
@@ -950,6 +972,9 @@ export default class Wallet extends React.Component {
                                 <button type="submit">Import key</button>
                             </form>
                             <button onClick={this.exportWallet}>Export Wallet</button>
+                            <button className={this.state.refreshTimer === 0
+                                ? 'refresh-button'
+                                : 'refresh-button disabled'} onClick={this.refreshWallet}><img src="images/refresh.png" /><span>{this.state.refreshTimer+'s'}</span></button>
                         </div>
                     </div>
                 </div>
