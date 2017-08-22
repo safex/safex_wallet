@@ -8,7 +8,7 @@ var bitcore = window.require('bitcore-lib');
 import {toHexString, encrypt, safexPayload} from '../../utils/utils';
 import QRCode from 'qrcode.react';
 
-
+//todo settings icon with export encrypted and unencrypted, also change password feature
 
 import Navigation from '../Navigation';
 
@@ -21,21 +21,13 @@ export default class Wallet extends React.Component {
             //wallet state
             keys: [],
             wallet: {},
+            import_key: '',
 
-            //fees
-
-
-            //UI state
-            is_loading: false,
-            receive_amount: 0.00000001.toFixed(8),
-            collapse_open: {
-                key: '',
-                receive_open: false,
-                send_open: false
-            },
+            //transaction
             send_coin: 'safex',
             send_amount: 1,
             send_fee: 0.0001,
+            safex_fee: 0,
             send_total: 1,
             send_overflow_active: false,
             send_to: '',
@@ -47,9 +39,18 @@ export default class Wallet extends React.Component {
             transaction_sent: false,
             txid: "",
             average_fee: 0,
-            import_key: '',
-            safex_fee: 0,
-            refreshTimer:0,
+
+            //UI state
+            btc_sync: false,
+            safex_sync: false,
+            is_loading: false,
+            receive_amount: 0.00000001.toFixed(8),
+            collapse_open: {
+                key: '',
+                receive_open: false,
+                send_open: false
+            },
+            refreshTimer: 0,
             refreshInterval: '',
             status_text: 'Loading...'
         }
@@ -180,7 +181,9 @@ export default class Wallet extends React.Component {
                 }
 
             }
-            this.setState({keys: hold_keys});
+            this.setState({keys: hold_keys, btc_sync: true, safex_sync: true, status_text: 'Synchronized'});
+        }).catch(e => {
+            this.setState({btc_sync: false, safex_sync: false, status_text: 'Synchronization error, try refreshing later'});
         });
     }
 
@@ -814,8 +817,12 @@ export default class Wallet extends React.Component {
                 <Navigation/>
                 <div className="container key-buttons status">
                     <button disabled>Status:
-                        <span className="status-red">BTC</span>
-                        <span className="status-green">SAFEX</span>
+                        <span className={this.state.btc_sync
+                            ? 'status-green'
+                            : 'status-red'}>BTC</span>
+                        <span className={this.state.safex_sync
+                            ? 'status-green'
+                            : 'status-red'}>SAFEX</span>
                     </button>
                     <button disabled>
                         {this.state.status_text}

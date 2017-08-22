@@ -22,7 +22,7 @@ export default class CreateWallet extends React.Component {
     //here we create the wallet file in the default location after prompting for a password and creating the encrypted file.
 
 
-
+    //todo require setting a password
     handleSubmit(e) {
         e.preventDefault();
         if (e.target.password1.value === e.target.password2.value) {
