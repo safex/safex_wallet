@@ -71,6 +71,26 @@ export default class Wallet extends React.Component {
     }
 
 
+
+    refreshWallet(){
+        if(this.state.refreshTimer === 0){
+            this.prepareDisplay();
+            let interval = setInterval(this.refreshWalletTimer, 1000);
+            this.setState({
+                refreshTimer: 180,
+                refreshInterval: interval
+            });
+        }
+    }
+    refreshWalletTimer = () => {
+        if (this.state.refreshTimer > 0){
+            this.setState({ refreshTimer: this.state.refreshTimer -1 });
+        }
+        else {
+            clearInterval(this.state.refreshInterval);
+        }
+    }
+
     componentWillMount() {
         //todo documentation and refactor
         try {
@@ -84,11 +104,7 @@ export default class Wallet extends React.Component {
     }
 
     componentDidMount() {
-        this.prepareDisplay();
-        this.timerID = setInterval(
-            () => this.tick(),
-            330000
-        );
+        this.refreshWallet();
         this.getFee();
     }
 
@@ -96,9 +112,6 @@ export default class Wallet extends React.Component {
         clearInterval(this.timerID);
     }
 
-    tick() {
-        this.prepareDisplay();
-    }
 
     getFee() {
         fetch('http://omni.safex.io:3001/getfee')
@@ -845,24 +858,6 @@ export default class Wallet extends React.Component {
         })
     }
 
-    refreshWallet(){
-        if(this.state.refreshTimer === 0){
-            this.prepareDisplay();
-            let interval = setInterval(this.refreshWalletTimer, 1000);
-            this.setState({
-                refreshTimer: 180,
-                refreshInterval: interval
-            });
-        }
-    }
-    refreshWalletTimer = () => {
-        if (this.state.refreshTimer > 0){
-          this.setState({ refreshTimer: this.state.refreshTimer -1 });
-        }
-        else {
-          clearInterval(this.state.refreshInterval);
-        }
-    }
 
     render() {
         const {keys} = this.state;
