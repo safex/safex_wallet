@@ -50,7 +50,8 @@ export default class Wallet extends React.Component {
             import_key: '',
             safex_fee: 0,
             refreshTimer:0,
-            refreshInterval: ''
+            refreshInterval: '',
+            status_text: 'Loading...'
         }
 
         this.createKey = this.createKey.bind(this);
@@ -924,6 +925,14 @@ export default class Wallet extends React.Component {
                                        onBlur={this.sendFeeOnBlur} value={this.state.send_fee}/>
                             </div>
                             <div className="form-group">
+                                <p>Insufficient BTC for Safex transaction</p>
+                            </div>
+                            <div className="form-group fee-buttons">
+                                <button>High</button>
+                                <button>Med</button>
+                                <button>Low</button>
+                            </div>
+                            <div className="form-group">
                                 <label htmlFor="total">Total:</label>
                                 <input type="number" name="total" readOnly value={this.state.send_total}></input>
                             </div>
@@ -958,6 +967,15 @@ export default class Wallet extends React.Component {
         return (
             <div className="wallet-page">
                 <Navigation/>
+                <div className="container key-buttons status">
+                    <button disabled>Status:
+                        <span className="status-red">BTC</span>
+                        <span className="status-green">SAFEX</span>
+                    </button>
+                    <button disabled>
+                        {this.state.status_text}
+                    </button>
+                </div>
                 <div className="container key-buttons">
                     <div className="row">
                         <div className="col-xs-12">

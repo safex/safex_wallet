@@ -632,3 +632,51 @@ input::-webkit-inner-spin-button {
   line-height:1;
   text-transform: lowercase;
 }
+.status{
+  margin-bottom:10px;
+  display:flex;
+}
+.status button{
+  padding:5px;
+  text-align: left;
+  display:flex;
+}
+.status button:first-child{
+  flex-grow:0;
+}
+.status button:last-child{
+  flex-grow: 1;
+  margin-right:0;
+}
+.status span{
+  padding-right:5px;
+}
+.status span:first-child{
+  padding-left:5px;
+}
+.status span.status-red:after{
+  content:"\2b24";
+  color: #f00;
+  position: relative;
+  top: -2px;
+  font-size:12px;
+  margin-left: 5px;
+}
+.status span.status-green:after{
+  content:"\2b24";
+  color: #0f0;
+  position: relative;
+  top: -2px;
+  font-size:12px;
+  margin-left: 5px;
+}
+.fee-buttons button{
+  margin-left:5px;
+  padding: 1px 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+.form-send .form-group p{
+  color:#f00;
+  margin-bottom:0;
+}
