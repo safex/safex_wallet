@@ -228,15 +228,23 @@ export default class Wallet extends React.Component {
         var tx = new bitcoin.TransactionBuilder();
         var inputs_num = 0;
         utxos.forEach(txn => {
-            console.log(txn);
-            if (running_total < (amount + fee)) {
-                running_total += txn.satoshis;
-                tx.addInput(txn.txid, txn.vout);
-                inputs_num += 1;
+            console.log(txn.confirmations > 0);
+            if (!txn.confirmations > 0) {
+                console.log(false)
+            } else {
+                console.log(true)
+                if (running_total < (amount + fee)) {
+                    running_total += txn.satoshis;
+                    tx.addInput(txn.txid, txn.vout);
+                    inputs_num += 1;
+                }
             }
         });
         tx.addOutput(destination, amount);
-        tx.addOutput(source, (running_total - (amount + fee)));
+
+        if ((running_total - (amount + fee)) > 0) {
+            tx.addOutput(source, (running_total - (amount + fee)));
+        }
         console.log(tx);
         for (var i = 0; i < inputs_num; i++) {
             tx.sign(i, key);
@@ -268,10 +276,11 @@ export default class Wallet extends React.Component {
             }
         });
         tx.addOutput(destination, 2730);
-        tx.addOutput(source, (running_total - (2730 + fee)));
 
+        if ((running_total - (2730 + fee)) > 0) {
+            tx.addOutput(source, (running_total - (2730 + fee)));
+        }
         console.log(tx.buildIncomplete().toHex())
-
         var SafexTransaction = {};
         SafexTransaction['incomplete_tx'] = tx.buildIncomplete().toHex();
         SafexTransaction['amount'] = amount;
@@ -280,11 +289,7 @@ export default class Wallet extends React.Component {
             .then((resp) => {
                 var decoded_txn = bitcoin.Transaction.fromHex(resp);
                 var txn = bitcoin.TransactionBuilder.fromTransaction(decoded_txn);
-
-
-
                 var check = 0;
-
                 console.log(txn.tx.outs);
                 txn.tx.outs.forEach(out => {
                     if (check === 0) {
@@ -299,7 +304,6 @@ export default class Wallet extends React.Component {
                         }
                     }
                 });
-
 
             if (check === 2) {
                 for (var i = 0; i < inputs_num; i++) {
@@ -1005,12 +1009,7 @@ export default class Wallet extends React.Component {
                                         <label htmlFor="total">Total:</label>
                                         <input readOnly name="total" value={this.state.send_total}></input>
                                     </div>
-                                    <button className={this.state.transaction_being_sent
-                                    ? 'hidden-xs hidden-sm hidden-md hidden-lg'
-                                    : ''} type="submit">CONFIRM</button>
-                                    <p className={this.state.transaction_being_sent
-                                    ? ''
-                                    : 'hidden-xs hidden-sm hidden-md hidden-lg'}>In Progress</p>
+                                    <button className='' type="submit">CONFIRM</button>
                                 </div>
                             </div>
                         </div>
