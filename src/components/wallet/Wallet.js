@@ -38,7 +38,7 @@ export default class Wallet extends React.Component {
             transaction_sent: false,
             txid: "",
             average_fee: 0,
-            active_fee: '',
+            active_fee: 'fast',
 
             //UI state
             btc_sync: false,
@@ -702,14 +702,16 @@ export default class Wallet extends React.Component {
             this.setState({
                 send_amount: 1,
                 send_fee: parseFloat(this.state.average_fee).toFixed(8),
-                send_total: 1
+                send_total: 1,
+                active_fee: 'fast'
             });
         }else{
-            var send_total = parseFloat(send_fee) + 0.00001;
+            var send_total = parseFloat(this.state.average_fee) + 0.00001;
             this.setState({
                 send_amount: 0.00001.toFixed(8),
                 send_fee: parseFloat(parseFloat(this.state.average_fee)/2).toFixed(8),
-                send_total: send_total.toFixed(8)
+                send_total: send_total.toFixed(8),
+                active_fee: 'fast'
             });
         }
 
