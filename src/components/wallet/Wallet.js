@@ -38,6 +38,7 @@ export default class Wallet extends React.Component {
             transaction_sent: false,
             txid: "",
             average_fee: 0,
+            active_fee: '',
 
             //UI state
             btc_sync: false,
@@ -688,7 +689,11 @@ export default class Wallet extends React.Component {
     //This is fired when change of currency is selected BTC SAFEX
     sendTotalAdjustCoinChange(coin){
         var send_amount = this.state.send_amount;
-        var send_fee = this.state.send_fee;
+        if(this.state.average_fee > 0){
+            var send_fee = this.state.average_fee;
+        }else{
+            var send_fee = this.state.send_fee;
+        }
 
         //if this.state.average_fee > 0 send_fee == fast. Set active fee selection fastest.
         if(coin === 'safex'){
@@ -696,14 +701,14 @@ export default class Wallet extends React.Component {
             var send_total = parseFloat(send_amount);
             this.setState({
                 send_amount: 1,
-                send_fee: 0.0001,
+                send_fee: parseFloat(this.state.average_fee).toFixed(8),
                 send_total: 1
             });
         }else{
             var send_total = parseFloat(send_fee) + 0.00001;
             this.setState({
                 send_amount: 0.00001.toFixed(8),
-                send_fee: 0.0001,
+                send_fee: parseFloat(parseFloat(this.state.average_fee)/2).toFixed(8),
                 send_total: send_total.toFixed(8)
             });
         }
@@ -715,17 +720,20 @@ export default class Wallet extends React.Component {
         if (coin === 'safex'){
             if(speed === 'fast'){
                 this.setState({
-                    send_fee: parseFloat(this.state.average_fee).toFixed(8)
+                    send_fee: parseFloat(this.state.average_fee).toFixed(8),
+                    active_fee: speed
                 });
             }
             if(speed === 'med'){
                 this.setState({
-                    send_fee: parseFloat(parseFloat(this.state.average_fee)/2).toFixed(8)
+                    send_fee: parseFloat(parseFloat(this.state.average_fee)/2).toFixed(8),
+                    active_fee: speed
                 });
             }
             if(speed === 'slow'){
                 this.setState({
-                    send_fee: parseFloat(parseFloat(this.state.average_fee)/3).toFixed(8)
+                    send_fee: parseFloat(parseFloat(this.state.average_fee)/3).toFixed(8),
+                    active_fee: speed
                 });
             }
         }
@@ -733,19 +741,22 @@ export default class Wallet extends React.Component {
             if(speed === 'fast'){
                 this.setState({
                     send_fee: parseFloat(parseFloat(this.state.average_fee)/2).toFixed(8),
-                    send_total: parseFloat(parseFloat(this.state.send_amount)+parseFloat(this.state.average_fee)/2).toFixed(8)
+                    send_total: parseFloat(parseFloat(this.state.send_amount)+parseFloat(this.state.average_fee)/2).toFixed(8),
+                    active_fee: speed
                 });
             }
             if(speed === 'med'){
                 this.setState({
                     send_fee: parseFloat(parseFloat(this.state.average_fee)/4).toFixed(8),
-                    send_total: parseFloat(parseFloat(this.state.send_amount)+parseFloat(this.state.average_fee)/4).toFixed(8)
+                    send_total: parseFloat(parseFloat(this.state.send_amount)+parseFloat(this.state.average_fee)/4).toFixed(8),
+                    active_fee: speed
                 });
             }
             if(speed === 'slow'){
                 this.setState({
                     send_fee: parseFloat(parseFloat(this.state.average_fee)/8).toFixed(8),
-                    send_total: parseFloat(parseFloat(this.state.send_amount)+parseFloat(this.state.average_fee)/8).toFixed(8)
+                    send_total: parseFloat(parseFloat(this.state.send_amount)+parseFloat(this.state.average_fee)/8).toFixed(8),
+                    active_fee: speed
                 });
             }
         }
@@ -761,7 +772,7 @@ export default class Wallet extends React.Component {
                     <div className="key">{keys[key].public_key}</div>
                 </div>
                 <div className="pull-right">
-                    <button disabled={keys[key].pending_btc_bal >= 0
+                    <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0
                         ? ''
                         : 'disabled'} onClick={this.openSendReceive.bind(this, key, 'send')}>SEND <img src="images/send.png"
                                                                                              alt="Send"/></button>
@@ -819,9 +830,15 @@ export default class Wallet extends React.Component {
                                 <p>Insufficient BTC for Safex transaction</p>
                             </div>
                             <div className="form-group fee-buttons">
-                                <button onClick={this.feeChange.bind(this, 'slow')}>Slow</button>
-                                <button onClick={this.feeChange.bind(this, 'med')}>Med</button>
-                                <button onClick={this.feeChange.bind(this, 'fast')}>Fast</button>
+                                <button className={this.state.active_fee === 'slow'
+                                    ? 'active'
+                                    : ''} onClick={this.feeChange.bind(this, 'slow')}>Slow</button>
+                                <button className={this.state.active_fee === 'med'
+                                    ? 'active'
+                                    : ''} onClick={this.feeChange.bind(this, 'med')}>Med</button>
+                                <button className={this.state.active_fee === 'fast'
+                                    ? 'active'
+                                    : ''} onClick={this.feeChange.bind(this, 'fast')}>Fast</button>
                             </div>
                             <div className="form-group">
                                 <label htmlFor="total">Total:</label>

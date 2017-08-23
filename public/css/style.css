@@ -676,6 +676,9 @@ input::-webkit-inner-spin-button {
   margin-top: 5px;
   margin-bottom: 5px;
 }
+.fee-buttons button.active{
+  border:1px solid #5BD0FB;
+}
 .form-send .form-group p{
   color:#f00;
   margin-bottom:0;
