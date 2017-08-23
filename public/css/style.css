@@ -613,7 +613,7 @@ input::-webkit-inner-spin-button {
 .refresh-button{
   position:relative;
 }
-.refresh-button img{
+.refresh-button img, .settings img{
   max-width:30px;
   height:auto;
 }
@@ -682,4 +682,10 @@ input::-webkit-inner-spin-button {
 .form-send .form-group p{
   color:#f00;
   margin-bottom:0;
+}
+.settingsModal{
+  color:#fff;
+}
+.settingsModal .form-group{
+  width:100%;
 }

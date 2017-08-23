@@ -50,6 +50,7 @@ export default class Wallet extends React.Component {
                 receive_open: false,
                 send_open: false
             },
+            settings_active: false,
             refreshTimer: 0,
             refreshInterval: '',
             status_text: 'Loading...'
@@ -71,6 +72,8 @@ export default class Wallet extends React.Component {
         this.getFee = this.getFee.bind(this);
         this.refreshWallet = this.refreshWallet.bind(this);
         this.feeChange = this.feeChange.bind(this);
+        this.openSettingsModal = this.openSettingsModal.bind(this);
+        this.closeSettingsModal = this.closeSettingsModal.bind(this);
     }
 
 
@@ -631,6 +634,20 @@ export default class Wallet extends React.Component {
         },35000)
     }
 
+    openSettingsModal(e){
+        e.preventDefault();
+        this.setState({
+            settings_active: true
+        });
+
+    }
+
+    closeSettingsModal(){
+        this.setState({
+            settings_active: false
+        });
+    }
+
     //This is fired when amount is changed
     sendAmountOnChange(e){
             var send_fee = this.state.send_fee;
@@ -706,7 +723,7 @@ export default class Wallet extends React.Component {
                 active_fee: 'fast'
             });
         }else{
-            var send_total = parseFloat(this.state.average_fee) + 0.00001;
+            var send_total = parseFloat(this.state.average_fee)/2 + 0.00001;
             this.setState({
                 send_amount: 0.00001.toFixed(8),
                 send_fee: parseFloat(parseFloat(this.state.average_fee)/2).toFixed(8),
@@ -898,7 +915,7 @@ export default class Wallet extends React.Component {
                                 <input name="key" value={this.state.import_key}></input>
                                 <button type="submit">Import key</button>
                             </form>
-                            <button onClick={this.exportWallet}>Export Wallet</button>
+                            <button className="settings" onClick={this.openSettingsModal}><img src="images/settings.png" /></button>
                             <button className={this.state.refreshTimer === 0
                                 ? 'refresh-button'
                                 : 'refresh-button disabled'} onClick={this.refreshWallet}><img src="images/refresh.png" /><span>{this.state.refreshTimer+'s'}</span></button>
@@ -1025,6 +1042,40 @@ export default class Wallet extends React.Component {
                                         <input readOnly name="total" value={this.state.send_total}></input>
                                     </div>
                                     <button type="submit">Close X</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div className={this.state.settings_active
+                    ? 'overflow sendModal settingsModal active'
+                    : 'overflow sendModal settingsModal'}>
+                    <form className="container" onSubmit={this.closeSettingsModal}>
+                        <div className="col-xs-12">
+                            <h3>Settings <span className="close" onClick={this.closeSettingsModal}>X</span></h3>
+                            <div className="col-xs-10 col-xs-offset-1">
+                                <form className="col-xs-12 col-sm-6" onSubmit={this.changePassword}>
+                                    <div className="form-group">
+                                        <label htmlFor="old-pass">Old Password:</label>
+                                        <input name="old-pass" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="new-pass">New Password:</label>
+                                        <input name="new-pass" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="repeat-pass">Repeat New Password:</label>
+                                        <input name="repeat-pass" />
+                                    </div>
+                                    <div className="col-xs-12">
+                                        <div className="row">
+                                            <button type="submit">Submit</button>
+                                        </div>
+                                    </div>
+                                </form>
+                                <div className="col-xs-12 col-sm-6">
+                                    <button onClick={this.exportWallet}>Export Unencrypted Wallet</button>
+                                    <button>Export Encrypted Wallet</button>
                                 </div>
                             </div>
                         </div>
