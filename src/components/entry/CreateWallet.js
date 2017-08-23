@@ -25,7 +25,8 @@ export default class CreateWallet extends React.Component {
     //todo require setting a password
     handleSubmit(e) {
         e.preventDefault();
-        if (e.target.password1.value === e.target.password2.value) {
+
+        if (e.target.password1.value.length > 0 && e.target.password1.value === e.target.password2.value) {
             var random_array = new Uint8Array(32);
             window.crypto.getRandomValues(random_array);
             var priv_key_bytes = [];
@@ -88,6 +89,8 @@ export default class CreateWallet extends React.Component {
                 }
             });
 
+        } else {
+            alert('you must enter a password and they must be matching')
         }
     }
 
