@@ -689,6 +689,8 @@ export default class Wallet extends React.Component {
     sendTotalAdjustCoinChange(coin){
         var send_amount = this.state.send_amount;
         var send_fee = this.state.send_fee;
+
+        //if this.state.average_fee > 0 send_fee == fast. Set active fee selection fastest.
         if(coin === 'safex'){
             send_amount = parseFloat(this.state.send_amount).toFixed(0);
             var send_total = parseFloat(send_amount);
