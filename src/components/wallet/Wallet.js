@@ -776,9 +776,9 @@ export default class Wallet extends React.Component {
                                 <p>Insufficient BTC for Safex transaction</p>
                             </div>
                             <div className="form-group fee-buttons">
-                                <button>High</button>
+                                <button>Slow</button>
                                 <button>Med</button>
-                                <button>Low</button>
+                                <button>Fast</button>
                             </div>
                             <div className="form-group">
                                 <label htmlFor="total">Total:</label>
