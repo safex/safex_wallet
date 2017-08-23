@@ -120,7 +120,7 @@ export default class Wallet extends React.Component {
         fetch('http://omni.safex.io:3001/getfee')
             .then(resp => resp.text())
             .then((resp) => {
-                this.setState({average_fee: resp});
+                    this.setState({average_fee: resp, send_fee: resp});
             });
     }
 
