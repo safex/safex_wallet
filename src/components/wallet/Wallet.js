@@ -27,7 +27,6 @@ export default class Wallet extends React.Component {
             send_coin: 'safex',
             send_amount: 1,
             send_fee: 0.0001,
-            safex_fee: 0,
             send_total: 1,
             send_overflow_active: false,
             send_to: '',
@@ -70,6 +69,7 @@ export default class Wallet extends React.Component {
         this.exportWallet = this.exportWallet.bind(this);
         this.getFee = this.getFee.bind(this);
         this.refreshWallet = this.refreshWallet.bind(this);
+        this.feeChange = this.feeChange.bind(this);
     }
 
 
@@ -119,7 +119,7 @@ export default class Wallet extends React.Component {
         fetch('http://omni.safex.io:3001/getfee')
             .then(resp => resp.text())
             .then((resp) => {
-                this.setState({safex_fee: resp});
+                this.setState({average_fee: resp});
             });
     }
 
@@ -701,12 +701,53 @@ export default class Wallet extends React.Component {
             var send_total = parseFloat(send_fee) + 0.00001;
             this.setState({
                 send_amount: 0.00001.toFixed(8),
+                send_fee: 0.0001,
                 send_total: send_total.toFixed(8)
             });
         }
 
     }
 
+    feeChange(speed){
+        var coin = this.state.send_coin;
+        if (coin === 'safex'){
+            if(speed === 'fast'){
+                this.setState({
+                    send_fee: parseFloat(this.state.average_fee).toFixed(8)
+                });
+            }
+            if(speed === 'med'){
+                this.setState({
+                    send_fee: parseFloat(parseFloat(this.state.average_fee)/2).toFixed(8)
+                });
+            }
+            if(speed === 'slow'){
+                this.setState({
+                    send_fee: parseFloat(parseFloat(this.state.average_fee)/3).toFixed(8)
+                });
+            }
+        }
+        if (coin === 'btc'){
+            if(speed === 'fast'){
+                this.setState({
+                    send_fee: parseFloat(parseFloat(this.state.average_fee)/2).toFixed(8),
+                    send_total: parseFloat(parseFloat(this.state.send_amount)+parseFloat(this.state.average_fee)/2).toFixed(8)
+                });
+            }
+            if(speed === 'med'){
+                this.setState({
+                    send_fee: parseFloat(parseFloat(this.state.average_fee)/4).toFixed(8),
+                    send_total: parseFloat(parseFloat(this.state.send_amount)+parseFloat(this.state.average_fee)/4).toFixed(8)
+                });
+            }
+            if(speed === 'slow'){
+                this.setState({
+                    send_fee: parseFloat(parseFloat(this.state.average_fee)/8).toFixed(8),
+                    send_total: parseFloat(parseFloat(this.state.send_amount)+parseFloat(this.state.average_fee)/8).toFixed(8)
+                });
+            }
+        }
+    }
 
     render() {
         const {keys} = this.state;
@@ -776,9 +817,9 @@ export default class Wallet extends React.Component {
                                 <p>Insufficient BTC for Safex transaction</p>
                             </div>
                             <div className="form-group fee-buttons">
-                                <button>Slow</button>
-                                <button>Med</button>
-                                <button>Fast</button>
+                                <button onClick={this.feeChange.bind(this, 'slow')}>Slow</button>
+                                <button onClick={this.feeChange.bind(this, 'med')}>Med</button>
+                                <button onClick={this.feeChange.bind(this, 'fast')}>Fast</button>
                             </div>
                             <div className="form-group">
                                 <label htmlFor="total">Total:</label>
