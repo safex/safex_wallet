@@ -191,7 +191,7 @@ export default class Wallet extends React.Component {
         });
     }
 
-
+	//todo prevent 0 balance safex/bitcoin transactions
     sendCoins(e) {
         e.preventDefault();
         this.setState({
