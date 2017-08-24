@@ -849,15 +849,15 @@ export default class Wallet extends React.Component {
                                 <p>Insufficient BTC for Safex transaction</p>
                             </div>
                             <div className="form-group fee-buttons">
-                                <button className={this.state.active_fee === 'slow'
+                                <span className={this.state.active_fee === 'slow'
                                     ? 'active'
-                                    : ''} onClick={this.feeChange.bind(this, 'slow')}>Slow</button>
-                                <button className={this.state.active_fee === 'med'
+                                    : ''} onClick={this.feeChange.bind(this, 'slow')}>Slow</span>
+                                <span className={this.state.active_fee === 'med'
                                     ? 'active'
-                                    : ''} onClick={this.feeChange.bind(this, 'med')}>Med</button>
-                                <button className={this.state.active_fee === 'fast'
+                                    : ''} onClick={this.feeChange.bind(this, 'med')}>Med</span>
+                                <span className={this.state.active_fee === 'fast'
                                     ? 'active'
-                                    : ''} onClick={this.feeChange.bind(this, 'fast')}>Fast</button>
+                                    : ''} onClick={this.feeChange.bind(this, 'fast')}>Fast</span>
                             </div>
                             <div className="form-group">
                                 <label htmlFor="total">Total:</label>

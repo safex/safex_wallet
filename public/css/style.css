@@ -283,7 +283,7 @@ body{
 .single-key .amounts > span > span{
   color:#00d1ff;
 }
-.single-key .pull-right button, .key-buttons button, .form-send button, .overflow.sendModal button, .overflow.sendModal p{
+.single-key .pull-right button, .key-buttons button, .form-send button, .form-send .fee-buttons span, .overflow.sendModal button, .overflow.sendModal p{
   border:1px solid #327A9B;
   border-radius: 0px;
   background:url('../images/btn-bg.png');
@@ -329,7 +329,7 @@ body{
   padding-bottom:15px;
   height:auto;
 }
-.form-send button{
+.form-send button, .form-send .fee-buttons span{
   float:right;
   margin-top:10px;
   margin-right:0;
@@ -670,13 +670,14 @@ input::-webkit-inner-spin-button {
   font-size:12px;
   margin-left: 5px;
 }
-.fee-buttons button{
+.form-send .fee-buttons span{
   margin-left:5px;
   padding: 1px 10px;
   margin-top: 5px;
   margin-bottom: 5px;
+  cursor: pointer;
 }
-.fee-buttons button.active{
+.form-send .fee-buttons span.active{
   border:1px solid #5BD0FB;
 }
 .form-send .form-group p{
