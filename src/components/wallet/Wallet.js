@@ -69,12 +69,15 @@ export default class Wallet extends React.Component {
         this.sendFeeOnBlur = this.sendFeeOnBlur.bind(this);
         this.sendTotalAdjustCoinChange = this.sendTotalAdjustCoinChange.bind(this);
         this.closeSuccessModal = this.closeSuccessModal.bind(this);
-        this.exportWallet = this.exportWallet.bind(this);
+
+        this.exportUnencryptedWallet = this.exportUnencryptedWallet.bind(this);
+        this.exportEncryptedWallet = this.exportEncryptedWallet.bind(this);
         this.getFee = this.getFee.bind(this);
         this.refreshWallet = this.refreshWallet.bind(this);
         this.feeChange = this.feeChange.bind(this);
         this.openSettingsModal = this.openSettingsModal.bind(this);
         this.closeSettingsModal = this.closeSettingsModal.bind(this);
+        this.changePassword = this.changePassword.bind(this);
     }
 
 
@@ -523,13 +526,36 @@ export default class Wallet extends React.Component {
 
     }
 
-    exportWallet() {
+    exportUnencryptedWallet() {
         alert("This will create a file where you can see your private keys. It is a very sensitive file Be responsible with it." +
-            "You can use this file to Import the Private Keys into another wallet.")
+            "You can not import this file directly into a new wallet. You can open this file and see the sensitive private keys" +
+            "which allow you to import them using the 'import key' feature in another wallet.")
         var wallet_data = localStorage.getItem('wallet');
         fileDownload(wallet_data, 'safex.txt');
 
     }
+
+    exportEncryptedWallet() {
+        alert("This will create an encrypted file that is your Safex Wallet. You use this file to import it into another wallet for use" +
+            "It requires a password, and if you lose the password your precious coins may be irrecoverable.")
+
+        fs.readFile(localStorage.getItem('wallet_path'), (err, fd) => {
+            if (err) {
+                //if the error is that No File exists, let's step through and make the file
+                if (err.code === 'ENOENT') {
+                    console.log('error');
+                    this.setState({walletExists: false});
+
+                }
+            } else {
+
+                fileDownload(fd, 'safex.dat');
+            }
+
+        });
+    }
+
+
 
     amountChange(receive_amount) {
         this.setState({
@@ -614,25 +640,32 @@ export default class Wallet extends React.Component {
             alert('you do not have enough BTC to cover the fee');
         } else if (this.state.send_coin === 'safex' & this.state.send_amount > key_safex_bal) {
             alert('you do not have enough SAFEX to cover this transaction');
+        } else if (this.state.send_coin === 'btc' & this.state.send_total > key_btc_bal) {
+            alert('you do not have enough BTC to cover this transaction');
         } else if (e.target.destination.value === '') {
-                alert('destination field is empty');
-            } else {
-                try {
-                    bitcore.Address.fromString(e.target.destination.value)
-                    this.setState({
-                        send_overflow_active: true,
-                        send_to: e.target.destination.value,
-                        send_keys: {
-                            public_key: e.target.public_key.value,
-                            private_key: e.target.private_key.value
-                        }
-                    })
-                } catch (e) {
-                    alert('destination address is invalid');
-                }
-
+            alert('destination field is empty');
+        } else {
+            try {
+                bitcore.Address.fromString(e.target.destination.value)
+                this.setState({
+                    send_overflow_active: true,
+                    send_to: e.target.destination.value,
+                    send_keys: {
+                        public_key: e.target.public_key.value,
+                        private_key: e.target.private_key.value
+                    }
+                })
+            } catch (e) {
+                alert('destination address is invalid');
             }
 
+        }
+
+    }
+
+    changePassword(e) {
+        //decrypt
+        //encrypt
     }
 
 
@@ -1104,8 +1137,8 @@ export default class Wallet extends React.Component {
                                     </div>
                                 </form>
                                 <div className="col-xs-12 col-sm-6">
-                                    <button onClick={this.exportWallet}>Export Unencrypted Wallet</button>
-                                    <button>Export Encrypted Wallet</button>
+                                    <button onClick={this.exportEncryptedWallet}>Export Encrypted Wallet</button>
+                                    <button onClick={this.exportUnencryptedWallet}>Export Unencrypted Wallet</button>
                                 </div>
                             </div>
                         </div>
