@@ -875,32 +875,13 @@ export default class Wallet extends React.Component {
                             <div className="form-group fee-buttons">
                                 <span className={this.state.active_fee === 'slow'
                                     ? 'active'
-<<<<<<< Updated upstream
                                     : ''} onClick={this.feeChange.bind(this, 'slow')}>Slow</span>
                                 <span className={this.state.active_fee === 'med'
                                     ? 'active'
                                     : ''} onClick={this.feeChange.bind(this, 'med')}>Med</span>
                                 <span className={this.state.active_fee === 'fast'
                                     ? 'active'
-<<<<<<< Updated upstream
                                     : ''} onClick={this.feeChange.bind(this, 'fast')}>Fast</span>
-=======
-=======
->>>>>>> Stashed changes
-                                    : ''} onClick={this.feeChange.bind(this, 'slow')}>Slow
-                                </button>
-                                <button className={this.state.active_fee === 'med'
-                                    ? 'active'
-                                    : ''} onClick={this.feeChange.bind(this, 'med')}>Med
-                                </button>
-                                <button className={this.state.active_fee === 'fast'
-                                    ? 'active'
-                                    : ''} onClick={this.feeChange.bind(this, 'fast')}>Fast
-                                </button>
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
                             </div>
                             <div className="form-group">
                                 <label htmlFor="total">Total:</label>
