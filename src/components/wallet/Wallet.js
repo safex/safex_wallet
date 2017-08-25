@@ -197,78 +197,67 @@ export default class Wallet extends React.Component {
         });
     }
 
-	//todo prevent 0 balance safex/bitcoin transactions
+    //todo prevent 0 balance safex/bitcoin transactions
     sendCoins(e) {
         e.preventDefault();
-        var keys_obj = {};
-        for (var x in this.state.keys) {
-            if (x.public_key === e.target.public_key.value) {
-                keys_obj = x;
-            }
-        }
-        if (this.state.send_coin === 'safex') {
-            if (e.target.fee.value > keys_obj['btc_bal']) {
-                alert('you do not have enough BTC to cover the fee');
-            } else {
-                this.setState({
-                    transaction_being_sent: true,
-                });
-                var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
-                var source = e.target.public_key.value;
-                var amount = e.target.amount.value;
-                var fee = e.target.fee.value;
-                console.log('the fee ' + e.target.fee.value)
-                var destination = e.target.destination.value;
 
+        if (this.state.send_coin === 'safex') {
+
+            this.setState({
+                transaction_being_sent: true,
+            });
+            var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
+            var source = e.target.public_key.value;
+            var amount = e.target.amount.value;
+            var fee = e.target.fee.value;
+            console.log('the fee ' + e.target.fee.value)
+            var destination = e.target.destination.value;
+
+            try {
+                var address = bitcore.Address.fromString(destination);
+                var address2 = bitcore.Address.fromString(source);
                 try {
-                    var address = bitcore.Address.fromString(destination);
-                    var address2 = bitcore.Address.fromString(source);
-                    try {
-                        fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
-                            .then(resp => resp.json())
-                            .then((resp) => {
-                                console.log(resp)
-                                this.formSafexTransaction(resp, amount, parseFloat((fee * 100000000).toFixed(0)), destination, keys, source);
-                            });
-                    } catch (e) {
-                        alert('network communication error, please try again later');
-                    }
+                    fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
+                        .then(resp => resp.json())
+                        .then((resp) => {
+                            console.log(resp)
+                            this.formSafexTransaction(resp, amount, parseFloat((fee * 100000000).toFixed(0)), destination, keys, source);
+                        });
                 } catch (e) {
-                    alert('invalid destination address');
+                    alert('network communication error, please try again later');
                 }
-                //send safex
+            } catch (e) {
+                alert('invalid destination address');
             }
+            //send safex
 
 
         } else {
-            if (this.state.send_total > keys_obj['btc_bal']) {
-                alert('you do not have enough BTC to cover the fee');
-            } else {
-                this.setState({
-                    transaction_being_sent: true,
-                });
-                var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
-                var source = e.target.public_key.value;
-                var amount = e.target.amount.value;
-                var fee = e.target.fee.value;
-                var destination = e.target.destination.value;
+            this.setState({
+                transaction_being_sent: true,
+            });
+            var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
+            var source = e.target.public_key.value;
+            var amount = e.target.amount.value;
+            var fee = e.target.fee.value;
+            var destination = e.target.destination.value;
+            try {
+                var address = bitcore.Address.fromString(destination);
+                var address2 = bitcore.Address.fromString(source);
                 try {
-                    var address = bitcore.Address.fromString(destination);
-                    var address2 = bitcore.Address.fromString(source);
-                    try {
-                        fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
-                            .then(resp => resp.json())
-                            .then((resp) => {
-                                this.formBitcoinTransaction(resp, parseFloat((amount * 100000000).toFixed(0)), parseFloat((fee * 100000000).toFixed(0)), destination, keys, source);
-                            });
-                    } catch (e) {
-                        alert('network communication error, please try again later');
-                    }
+                    fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
+                        .then(resp => resp.json())
+                        .then((resp) => {
+                            this.formBitcoinTransaction(resp, parseFloat((amount * 100000000).toFixed(0)), parseFloat((fee * 100000000).toFixed(0)), destination, keys, source);
+                        });
                 } catch (e) {
-                    alert('invalid destination address');
+                    alert('network communication error, please try again later');
                 }
-
+            } catch (e) {
+                alert('invalid destination address');
             }
+
+
         }
 
     }
@@ -612,20 +601,38 @@ export default class Wallet extends React.Component {
     //Activates send_overflow_active state which opens Modal screen displaying transaction pre-confirmation information
     openCoinModal(e) {
         e.preventDefault();
+        var key_btc_bal = 0;
+        var key_safex_bal = 0;
+        this.state.keys.map(key => {
+            if (key.public_key === e.target.public_key.value) {
+                key_btc_bal = key.btc_bal;
+                key_safex_bal = key.safex_bal;
+            }
 
-        //todo add error message and validation for public keys (address) here as valid destination
-        if (e.target.destination.value === '') {
-
-        } else {
-            this.setState({
-                send_overflow_active: true,
-                send_to: e.target.destination.value,
-                send_keys: {
-                    public_key: e.target.public_key.value,
-                    private_key: e.target.private_key.value
+        });
+        if ((this.state.send_coin === 'safex' & this.state.send_fee > key_btc_bal) | (this.state.send_coin === 'btc' & this.state.send_total > key_btc_bal)) {
+            alert('you do not have enough BTC to cover the fee');
+        } else if (this.state.send_coin === 'safex' & this.state.send_amount > key_safex_bal) {
+            alert('you do not have enough SAFEX to cover this transaction');
+        } else if (e.target.destination.value === '') {
+                alert('destination field is empty');
+            } else {
+                try {
+                    bitcore.Address.fromString(e.target.destination.value)
+                    this.setState({
+                        send_overflow_active: true,
+                        send_to: e.target.destination.value,
+                        send_keys: {
+                            public_key: e.target.public_key.value,
+                            private_key: e.target.private_key.value
+                        }
+                    })
+                } catch (e) {
+                    alert('destination address is invalid');
                 }
-            })
-        }
+
+            }
+
     }
 
 
@@ -679,7 +686,7 @@ export default class Wallet extends React.Component {
             send_total = parseInt(e.target.value);
             this.setState({
                 send_amount: parseInt(e.target.value),
-                send_total: send_total
+                send_total: parseInt(send_total)
             });
         } else {
             send_total = parseFloat(e.target.value) + parseFloat(send_fee);
@@ -868,9 +875,6 @@ export default class Wallet extends React.Component {
                                 <label htmlFor="fee">Fee(BTC):</label>
                                 <input type="number" name="fee" onChange={this.sendFeeOnChange}
                                        onBlur={this.sendFeeOnBlur} value={this.state.send_fee}/>
-                            </div>
-                            <div className="form-group">
-                                <p>Insufficient BTC for Safex transaction</p>
                             </div>
                             <div className="form-group fee-buttons">
                                 <span className={this.state.active_fee === 'slow'
