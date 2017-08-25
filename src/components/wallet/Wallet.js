@@ -882,8 +882,11 @@ export default class Wallet extends React.Component {
                                     : ''} onClick={this.feeChange.bind(this, 'med')}>Med</span>
                                 <span className={this.state.active_fee === 'fast'
                                     ? 'active'
+<<<<<<< Updated upstream
                                     : ''} onClick={this.feeChange.bind(this, 'fast')}>Fast</span>
 =======
+=======
+>>>>>>> Stashed changes
                                     : ''} onClick={this.feeChange.bind(this, 'slow')}>Slow
                                 </button>
                                 <button className={this.state.active_fee === 'med'
@@ -894,6 +897,9 @@ export default class Wallet extends React.Component {
                                     ? 'active'
                                     : ''} onClick={this.feeChange.bind(this, 'fast')}>Fast
                                 </button>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
                             </div>
                             <div className="form-group">
