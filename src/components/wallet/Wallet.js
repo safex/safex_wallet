@@ -78,6 +78,11 @@ export default class Wallet extends React.Component {
         this.openSettingsModal = this.openSettingsModal.bind(this);
         this.closeSettingsModal = this.closeSettingsModal.bind(this);
         this.changePassword = this.changePassword.bind(this);
+        this.logout = this.logout.bind(this);
+    }
+
+    logout() {
+
     }
 
 
@@ -664,6 +669,17 @@ export default class Wallet extends React.Component {
     }
 
     changePassword(e) {
+
+        e.preventDefault();
+        var now_pass = e.target.old_pass.value;
+        var new_pass = e.target.new_pass.value;
+        var repeat_pass = e.target.repeat_pass.value;
+
+        if (new_pass > 0 && new_pass === repeat_pass) {
+
+
+            localStorage.setItem('password', new_pass);
+        }
         //decrypt
         //encrypt
     }
@@ -1119,16 +1135,16 @@ export default class Wallet extends React.Component {
                             <div className="col-xs-10 col-xs-offset-1">
                                 <form className="col-xs-12 col-sm-6" onSubmit={this.changePassword}>
                                     <div className="form-group">
-                                        <label htmlFor="old-pass">Old Password:</label>
-                                        <input name="old-pass"/>
+                                        <label htmlFor="old_pass">Old Password:</label>
+                                        <input name="old_pass"/>
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="new-pass">New Password:</label>
-                                        <input name="new-pass"/>
+                                        <label htmlFor="new_pass">New Password:</label>
+                                        <input name="new_pass"/>
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="repeat-pass">Repeat New Password:</label>
-                                        <input name="repeat-pass"/>
+                                        <label htmlFor="repeat_pass">Repeat New Password:</label>
+                                        <input name="repeat_pass"/>
                                     </div>
                                     <div className="col-xs-12">
                                         <div className="row">
@@ -1139,6 +1155,7 @@ export default class Wallet extends React.Component {
                                 <div className="col-xs-12 col-sm-6">
                                     <button onClick={this.exportEncryptedWallet}>Export Encrypted Wallet</button>
                                     <button onClick={this.exportUnencryptedWallet}>Export Unencrypted Wallet</button>
+                                    <button onClick={this.logout}>Logout</button>
                                 </div>
                             </div>
                         </div>
