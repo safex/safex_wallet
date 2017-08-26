@@ -556,9 +556,15 @@ export default class Wallet extends React.Component {
         alert("This will create a file where you can see your private keys. It is a very sensitive file Be responsible with it." +
             "You can not import this file directly into a new wallet. You can open this file and see the sensitive private keys" +
             "which allow you to import them using the 'import key' feature in another wallet.")
-        var wallet_data = localStorage.getItem('wallet');
+        var wallet_data = JSON.parse(localStorage.getItem('wallet'));
+        var nice_keys = "";
+        var keys = wallet_data['keys'];
+        keys.map((key) => {
+            nice_keys += "private key: " + key.private_key + '\n';
+            nice_keys += "public key: " + key.public_key + '\n';
+        });
         var date = Date.now();
-        fileDownload(wallet_data, date + 'unsafex.txt');
+        fileDownload(nice_keys, date + 'unsafex.txt');
 
     }
 
