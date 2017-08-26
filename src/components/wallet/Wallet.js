@@ -82,7 +82,8 @@ export default class Wallet extends React.Component {
     }
 
     logout() {
-
+        //localstorage clear
+        this.context.router.push('/');
     }
 
 
@@ -107,15 +108,13 @@ export default class Wallet extends React.Component {
     }
 
     componentWillMount() {
-        //todo documentation and refactor
         try {
             var json = JSON.parse(localStorage.getItem('wallet'));
             this.setState({wallet: json, keys: json['keys']});
         } catch (e) {
-            console.log(e);
+            alert('failed to parse wallet')
+            this.context.router.push('/');
         }
-
-
     }
 
     componentDidMount() {
@@ -133,6 +132,14 @@ export default class Wallet extends React.Component {
             .then(resp => resp.text())
             .then((resp) => {
                 this.setState({average_fee: resp, send_fee: resp});
+            })
+            .catch(e => {
+                alert('unable to fetch average fee')
+                this.setState({
+                    btc_sync: false,
+                    safex_sync: false,
+                    status_text: 'Synchronization error, try refreshing later'
+                });
             });
     }
 
@@ -536,7 +543,8 @@ export default class Wallet extends React.Component {
             "You can not import this file directly into a new wallet. You can open this file and see the sensitive private keys" +
             "which allow you to import them using the 'import key' feature in another wallet.")
         var wallet_data = localStorage.getItem('wallet');
-        fileDownload(wallet_data, 'safex.txt');
+        var date = Date.now();
+        fileDownload(wallet_data, date + 'unsafex.txt');
 
     }
 
@@ -680,10 +688,16 @@ export default class Wallet extends React.Component {
 
         //overwrite the file with new password
 
-        if (new_pass > 0 && new_pass === repeat_pass) {
+        console.log('now ' + now_pass)
+        console.log('new ' + new_pass)
+        console.log('repeat ' + repeat_pass)
 
+        console.log(new_pass.length > 0)
+        console.log(new_pass === repeat_pass)
+        if (new_pass.length > 0 && new_pass === repeat_pass) {
+            console.log('got through')
 
-            fs.readFile(this.state.path, (err, fd) => {
+            fs.readFile(localStorage.getItem('wallet_path'), (err, fd) => {
                 if (err) {
                     //if the error is that No File exists, let's step through and make the file
                     if (err.code === 'ENOENT') {
@@ -695,18 +709,28 @@ export default class Wallet extends React.Component {
                         algorithm = 'aes-256-ctr',
                         password = now_pass;
 
-
-
-
-                    var decrypted_wallet = decrypt(fd, algorithm, password);
-                    const hash = crypto.createHash('sha256');
+                    var decrypted_wallet = decrypt(fd.toString(), algorithm, password);
+                    const hash1 = crypto.createHash('sha256');
                     const hash2 = crypto.createHash('sha256');
-                    hash.update(decrypted_wallet);
+
+
+                    hash1.update(decrypted_wallet);
                     hash2.update(localStorage.getItem('wallet'));
-                    if (hash === hash2) {
-                        console.log(hash)
-                        console.log(hash2)
-                        alert('wallet match');
+                    if (hash1.toString() === hash2.toString()) {
+                        var password = new_pass;
+
+                        var encrypted_wallet = encrypt(decrypted_wallet, algorithm, password);
+                        fs.writeFile(localStorage.getItem('wallet_path'), encrypted_wallet, (err) => {
+                            if (err) {
+                                console.log(err)
+                            } else {
+
+                                localStorage.setItem('password', new_pass);
+                                localStorage.setItem('wallet', decrypted_wallet);
+
+                                alert('password has been changed')
+                            }
+                        });
                     }
 
 
@@ -1202,4 +1226,9 @@ export default class Wallet extends React.Component {
             </div>
         );
     }
+}
+
+
+Wallet.contextTypes = {
+    router: React.PropTypes.object.isRequired
 }
