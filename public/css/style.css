@@ -690,3 +690,14 @@ input::-webkit-inner-spin-button {
 .settingsModal .form-group{
   width:100%;
 }
+.overflow.sendModal.settingsModal button{
+  display:block;
+  margin:auto;
+  margin-bottom:10px;
+}
+.settingsModal label{
+  min-width: 130px;
+}
+.settingsModal .col-xs-12{
+  text-align: center;
+}
