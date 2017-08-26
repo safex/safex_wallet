@@ -47,6 +47,7 @@
     "react-dom": "^15.4.2",
     "react-file-download": "^0.3.4",
     "react-file-input": "^0.2.5",
+    "react-number-format": "^2.0.3",
     "react-router": "^3.0.4"
   },
   "main": "src/electron-wallet.js",

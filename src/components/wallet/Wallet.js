@@ -8,6 +8,7 @@ var bitcoin = window.require('bitcoinjs-lib');
 var bitcore = window.require('bitcore-lib');
 import {toHexString, encrypt, safexPayload, decrypt} from '../../utils/utils';
 import QRCode from 'qrcode.react';
+import NumberFormat from 'react-number-format';
 
 //todo settings icon with export encrypted and unencrypted, also change password feature
 
@@ -943,8 +944,8 @@ export default class Wallet extends React.Component {
                 <div className="col-xs-12">
                     <div className="row amounts">
                         <span
-                            className="col-xs-6 amount">Safex: <span>{keys[key].pending_safex_bal < 0 ? (parseFloat(keys[key].safex_bal) + parseFloat(keys[key].pending_safex_bal)) : keys[key].safex_bal}
-                            {keys[key].pending_safex_bal > 0 | keys[key].pending_safex_bal < 0 ? '(pending ' + keys[key].pending_safex_bal + ')' : ''}</span></span>
+                            className="col-xs-6 amount">Safex: <span>{keys[key].pending_safex_bal < 0 ? (parseFloat(keys[key].safex_bal) + parseFloat(keys[key].pending_safex_bal)) : <NumberFormat value={keys[key].safex_bal} displayType={'text'} thousandSeparator={true} />}
+                            {keys[key].pending_safex_bal > 0 | keys[key].pending_safex_bal < 0 ? '(pending ' + <NumberFormat value={keys[key].pending_safex_bal} displayType={'text'} thousandSeparator={true} /> + ')' : ''}</span></span>
                         <span
                             className="col-xs-6 amount">Bitcoin: <span>{keys[key].pending_btc_bal < 0 ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)).toFixed(8) : keys[key].btc_bal}
                             {keys[key].pending_btc_bal > 0 | keys[key].pending_btc_bal < 0 ? '(pending ' + keys[key].pending_btc_bal + ')' : ''}</span></span>
