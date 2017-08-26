@@ -6,7 +6,7 @@ var os = window.require('os');
 var bs58 = require('bs58');
 var bitcoin = window.require('bitcoinjs-lib');
 var bitcore = window.require('bitcore-lib');
-import {toHexString, encrypt, safexPayload} from '../../utils/utils';
+import {toHexString, encrypt, safexPayload, decrypt} from '../../utils/utils';
 import QRCode from 'qrcode.react';
 
 //todo settings icon with export encrypted and unencrypted, also change password feature
@@ -549,12 +549,10 @@ export default class Wallet extends React.Component {
                 //if the error is that No File exists, let's step through and make the file
                 if (err.code === 'ENOENT') {
                     console.log('error');
-                    this.setState({walletExists: false});
-
                 }
             } else {
-
-                fileDownload(fd, 'safex.dat');
+                var date = Date.now();
+                fileDownload(fd, date + 'safex.dat');
             }
 
         });
@@ -671,11 +669,51 @@ export default class Wallet extends React.Component {
     changePassword(e) {
 
         e.preventDefault();
+        console.log('change password');
         var now_pass = e.target.old_pass.value;
         var new_pass = e.target.new_pass.value;
         var repeat_pass = e.target.repeat_pass.value;
 
+        //check the password is valid
+
+        //decrypt the file
+
+        //overwrite the file with new password
+
         if (new_pass > 0 && new_pass === repeat_pass) {
+
+
+            fs.readFile(this.state.path, (err, fd) => {
+                if (err) {
+                    //if the error is that No File exists, let's step through and make the file
+                    if (err.code === 'ENOENT') {
+                        alert('no wallet was found');
+                    }
+                } else {
+                    //decrypt here...
+                    var crypto = require('crypto'),
+                        algorithm = 'aes-256-ctr',
+                        password = now_pass;
+
+
+
+
+                    var decrypted_wallet = decrypt(fd, algorithm, password);
+                    const hash = crypto.createHash('sha256');
+                    const hash2 = crypto.createHash('sha256');
+                    hash.update(decrypted_wallet);
+                    hash2.update(localStorage.getItem('wallet'));
+                    if (hash === hash2) {
+                        console.log(hash)
+                        console.log(hash2)
+                        alert('wallet match');
+                    }
+
+
+                }
+
+            });
+
 
 
             localStorage.setItem('password', new_pass);
