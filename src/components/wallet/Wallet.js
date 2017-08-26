@@ -955,6 +955,13 @@ export default class Wallet extends React.Component {
                       className={this.state.collapse_open.send_open && this.state.collapse_open.key === key
                           ? 'col-xs-12 form-inline form-send active'
                           : 'col-xs-12 form-inline form-send'}>
+                          <div className="row">
+                              <div className="col-xs-12 sendCloseButton">
+                                  <div onClick={this.openSendReceive.bind(this, key, 'send')} className="close text-right">
+                                      X
+                                  </div>
+                              </div>
+                          </div>
                     <div className="row">
                         <div className="col-xs-8 send-left">
                             <label htmlFor="which">Currency</label>
@@ -1010,6 +1017,13 @@ export default class Wallet extends React.Component {
                 <div className={this.state.collapse_open.receive_open && this.state.collapse_open.key === key
                     ? 'col-xs-12 receive active'
                     : 'col-xs-12 receive'}>
+                    <div className="row">
+                        <div className="col-xs-12 sendCloseButton">
+                            <div onClick={this.openSendReceive.bind(this, key, 'receive')} className="close text-right">
+                                X
+                            </div>
+                        </div>
+                    </div>
                     <div className="col-xs-12">
                         <label htmlFor="receive-address">Address:</label>
                         <input name="receive-address" value={keys[key].public_key}/>
