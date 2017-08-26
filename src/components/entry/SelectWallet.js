@@ -52,33 +52,39 @@ export default class SelectWallet extends React.Component {
 
         });
     }
+    //This happens when you click wallet reset on the main screen
     walletResetStep0() {
         alert('Blah blah blah');
         this.setState({
             walletResetModal1: true
         })
     }
+    //This happens when you click skip on the first modal
     walletResetStep1() {
         this.setState({
             walletResetModal2: true
         })
     }
+    //This happens when you click proceed on the first modal
     walletResetStep1un() {
         this.setState({
             walletResetModal2un: true
         })
     }
+    //This is the step 2 for the encrypted wallet
     walletResetStep2() {
         this.setState({
             walletResetModal3: true
         })
     }
+    //This is the step 2 for the encrypted wallet(password entered here)
     walletResetStep2un(e) {
         e.preventDefault();
         this.setState({
             walletResetModal3: true
         })
     }
+    //This closes every modal
     walletResetClose() {
         this.setState({
             walletResetModal1: false,
