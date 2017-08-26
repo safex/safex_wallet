@@ -116,7 +116,7 @@ export default class Navigation extends React.Component {
                 <div className="collapse navbar-collapse" id="navbar-collapse">
                     <ul className="nav navbar-nav navbar-right">
                         <li>
-                            <Link to="/wallet" activeClassName="activeLink" onlyActiveOnIndex>Wallet <img
+                            <Link to="" activeClassName="activeLink" onlyActiveOnIndex>Wallet <img
                                 src="images/create.png" alt="Create"/></Link>
                         </li>
                     </ul>

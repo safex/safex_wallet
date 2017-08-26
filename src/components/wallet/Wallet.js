@@ -83,7 +83,7 @@ export default class Wallet extends React.Component {
     }
 
     logout() {
-        //localstorage clear
+        localStorage.clear();
         this.context.router.push('/');
     }
 
@@ -129,7 +129,7 @@ export default class Wallet extends React.Component {
 
 
     getFee() {
-        fetch('http://omni.safex.io:3001/getfee')
+        fetch('http://localhost:3001/getfee')
             .then(resp => resp.text())
             .then((resp) => {
                 this.setState({average_fee: resp, send_fee: resp});
@@ -147,12 +147,10 @@ export default class Wallet extends React.Component {
 
     prepareDisplay() {
         var promises = [];
-        console.log(this.state.keys);
-
         this.state.keys.forEach((key) => {
             var json = {};
             json['address'] = key.public_key;
-            promises.push(fetch('http://omni.safex.io:3001/balance', {
+            promises.push(fetch('http://localhost:3001/balance', {
                 method: "POST",
                 body: JSON.stringify(json)
             })
@@ -170,7 +168,7 @@ export default class Wallet extends React.Component {
                 .then((resp) => {
                     return resp
                 }));
-            promises.push(fetch('http://omni.safex.io:3001/unconfirmed', {
+            promises.push(fetch('http://localhost:3001/unconfirmed', {
                 method: "POST",
                 body: JSON.stringify(json)
             })
@@ -179,9 +177,6 @@ export default class Wallet extends React.Component {
                     return resp
                 }));
         });
-        console.log(promises.length);
-
-
         Promise.all(promises).then(values => {
             var hold_keys = this.state.keys;
             var internal_index = 0;
@@ -216,66 +211,84 @@ export default class Wallet extends React.Component {
 
     sendCoins(e) {
         e.preventDefault();
-
+        //check whether Bitcoin or Safex is selected
         if (this.state.send_coin === 'safex') {
-
+            //open the modal by setting transaction_being_sent
             this.setState({
                 transaction_being_sent: true,
             });
+
+            //set the signing key for the transaction
             var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
+            //set the source of the transaction
             var source = e.target.public_key.value;
+            //set the amount provided by the user
             var amount = e.target.amount.value;
+            //set the fee provided by the user
             var fee = e.target.fee.value;
-            console.log('the fee ' + e.target.fee.value)
+            //set the destination provided by the user
             var destination = e.target.destination.value;
 
+            //here we will check to make sure that the destination is a valid bitcoin address
             try {
                 var address = bitcore.Address.fromString(destination);
                 var address2 = bitcore.Address.fromString(source);
+                //here we try to get the unspent transactions from the source we send from
                 try {
                     fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
                         .then(resp => resp.json())
                         .then((resp) => {
-                            console.log(resp)
+                            //enter into the safex transaction method
                             this.formSafexTransaction(resp, amount, parseFloat((fee * 100000000).toFixed(0)), destination, keys, source);
                         });
                 } catch (e) {
+                    //if the fetch fails then we have a network problem and can't get unspent transaction history
                     alert('network communication error, please try again later');
                 }
             } catch (e) {
+                //this is triggered if the destination address is not a valid bitcoin address
                 alert('invalid destination address');
             }
-            //send safex
 
-
+        //if safex is not selected then it must be Bitcoin
         } else {
+            //open the modal by setting transaction_being_sent
             this.setState({
                 transaction_being_sent: true,
             });
+
+            //set the signing key for the transaction
             var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
+            //set the source of the transaction
             var source = e.target.public_key.value;
+            //set the amount provided by the user
             var amount = e.target.amount.value;
+            //set the fee provided by the user
             var fee = e.target.fee.value;
+            //set the destination provided by the user
             var destination = e.target.destination.value;
+
+            //here we will check to make sure that the destination is a valid bitcoin address
             try {
                 var address = bitcore.Address.fromString(destination);
                 var address2 = bitcore.Address.fromString(source);
+                //here we try to get the unspent transactions from the source we send from
                 try {
                     fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
                         .then(resp => resp.json())
                         .then((resp) => {
+                            //enter into the bitcoin transaction method
                             this.formBitcoinTransaction(resp, parseFloat((amount * 100000000).toFixed(0)), parseFloat((fee * 100000000).toFixed(0)), destination, keys, source);
                         });
                 } catch (e) {
+                    //if the fetch fails then we have a network problem and can't get unspent transaction history
                     alert('network communication error, please try again later');
                 }
             } catch (e) {
+                //this is triggered if the destination address is not a valid bitcoin address
                 alert('invalid destination address');
             }
-
-
         }
-
     }
 
     formBitcoinTransaction(utxos, amount, fee, destination, key, source) {
@@ -307,7 +320,7 @@ export default class Wallet extends React.Component {
 
         var json = {};
         json['rawtx'] = tx.build().toHex();
-        fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
+        fetch('http://localhost:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
             .then(resp => resp.text())
             .then((resp) => {
                 console.log(resp);
@@ -340,7 +353,7 @@ export default class Wallet extends React.Component {
         var SafexTransaction = {};
         SafexTransaction['incomplete_tx'] = tx.buildIncomplete().toHex();
         SafexTransaction['amount'] = amount;
-        fetch('http://omni.safex.io:3001/getsafextxn', {method: "POST", body: JSON.stringify(SafexTransaction)})
+        fetch('http://localhost:3001/getsafextxn', {method: "POST", body: JSON.stringify(SafexTransaction)})
             .then(resp => resp.text())
             .then((resp) => {
                 var decoded_txn = bitcoin.Transaction.fromHex(resp);
@@ -370,7 +383,7 @@ export default class Wallet extends React.Component {
                     var json = {};
                     json['rawtx'] = txn.build().toHex();
 
-                    fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
+                    fetch('http://localhost:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
                         .then(resp => resp.text())
                         .then((resp) => {
 
@@ -568,7 +581,6 @@ export default class Wallet extends React.Component {
     }
 
 
-
     amountChange(receive_amount) {
         this.setState({
             receive_amount: receive_amount.value
@@ -683,68 +695,80 @@ export default class Wallet extends React.Component {
         var new_pass = e.target.new_pass.value;
         var repeat_pass = e.target.repeat_pass.value;
 
-        //check the password is valid
-
-        //decrypt the file
-
-        //overwrite the file with new password
-
-        console.log('now ' + now_pass)
-        console.log('new ' + new_pass)
-        console.log('repeat ' + repeat_pass)
-
-        console.log(new_pass.length > 0)
-        console.log(new_pass === repeat_pass)
-        if (new_pass.length > 0 && new_pass === repeat_pass) {
-            console.log('got through')
-
-            fs.readFile(localStorage.getItem('wallet_path'), (err, fd) => {
-                if (err) {
-                    //if the error is that No File exists, let's step through and make the file
-                    if (err.code === 'ENOENT') {
-                        alert('no wallet was found');
-                    }
-                } else {
-                    //decrypt here...
-                    var crypto = require('crypto'),
-                        algorithm = 'aes-256-ctr',
-                        password = now_pass;
-
-                    var decrypted_wallet = decrypt(fd.toString(), algorithm, password);
-                    const hash1 = crypto.createHash('sha256');
-                    const hash2 = crypto.createHash('sha256');
 
 
-                    hash1.update(decrypted_wallet);
-                    hash2.update(localStorage.getItem('wallet'));
-                    if (hash1.toString() === hash2.toString()) {
-                        var password = new_pass;
+        //check if the new password field is full
+        if (new_pass.length > 0) {
+            //check that the new password matches the repeated password
+            if (new_pass === repeat_pass) {
 
-                        var encrypted_wallet = encrypt(decrypted_wallet, algorithm, password);
-                        fs.writeFile(localStorage.getItem('wallet_path'), encrypted_wallet, (err) => {
-                            if (err) {
-                                console.log(err)
+                //read from the expected path the encrypted wallet
+                fs.readFile(localStorage.getItem('wallet_path'), (err, fd) => {
+                    if (err) {
+                        //if the error is that No File exists, let's step through and make the file
+                        if (err.code === 'ENOENT') {
+                            alert('no wallet was found');
+                        }
+                    } else {
+
+                        //prepare to decrypt the wallet file from the path
+                        var crypto = require('crypto'),
+                            algorithm = 'aes-256-ctr',
+                            password = now_pass;
+
+                        //decrypt the wallet
+                        var decrypted_wallet = decrypt(fd.toString(), algorithm, password);
+
+                        //try to parse the decrypted wallet that it is valid
+                        try {
+
+                            var parse_wallet = JSON.parse(decrypted_wallet);
+
+                            //check the version number of the wallet
+                            if (parse_wallet['version'] === '1') {
+
+                                const hash1 = crypto.createHash('sha256');
+                                const hash2 = crypto.createHash('sha256');
+
+                                //hash the wallet on the path
+                                hash1.update(decrypted_wallet);
+
+                                //hash the wallet in localstorage
+                                hash2.update(localStorage.getItem('wallet'));
+
+                                //check that both hashes the active wallet and encrypted wallet are identical
+                                if (hash1.toString() === hash2.toString()) {
+                                    var password = new_pass;
+
+                                    //encrypt the wallet data with the new password
+                                    var encrypted_wallet = encrypt(decrypted_wallet, algorithm, password);
+
+                                    //write the new file to the path
+                                    fs.writeFile(localStorage.getItem('wallet_path'), encrypted_wallet, (err) => {
+                                        if (err) {
+                                            console.log(err)
+                                        } else {
+                                            //set the active password and wallet to the new file
+                                            localStorage.setItem('password', new_pass);
+                                            localStorage.setItem('wallet', decrypted_wallet);
+                                            alert('password has been changed')
+                                        }
+                                    });
+                                }
                             } else {
-
-                                localStorage.setItem('password', new_pass);
-                                localStorage.setItem('wallet', decrypted_wallet);
-
-                                alert('password has been changed')
+                                alert('wrong password')
                             }
-                        });
+                        } catch (e) {
+                            alert('wrong password');
+                        }
                     }
-
-
-                }
-
-            });
-
-
-
-            localStorage.setItem('password', new_pass);
+                });
+            } else {
+                alert('new password does not match repeated password')
+            }
+        } else {
+            alert('new password field is empty')
         }
-        //decrypt
-        //encrypt
     }
 
 
@@ -944,8 +968,11 @@ export default class Wallet extends React.Component {
                 <div className="col-xs-12">
                     <div className="row amounts">
                         <span
-                            className="col-xs-6 amount">Safex: <span>{keys[key].pending_safex_bal < 0 ? (parseFloat(keys[key].safex_bal) + parseFloat(keys[key].pending_safex_bal)) : <NumberFormat value={keys[key].safex_bal} displayType={'text'} thousandSeparator={true} />}
-                            {keys[key].pending_safex_bal > 0 | keys[key].pending_safex_bal < 0 ? '(pending ' + <NumberFormat value={keys[key].pending_safex_bal} displayType={'text'} thousandSeparator={true} /> + ')' : ''}</span></span>
+                            className="col-xs-6 amount">Safex: <span>{keys[key].pending_safex_bal < 0 ? (parseFloat(keys[key].safex_bal) + parseFloat(keys[key].pending_safex_bal)) :
+                            <NumberFormat value={keys[key].safex_bal} displayType={'text'} thousandSeparator={true}/>}
+                            {keys[key].pending_safex_bal > 0 | keys[key].pending_safex_bal < 0 ? '(pending ' +
+                                <NumberFormat value={keys[key].pending_safex_bal} displayType={'text'}
+                                              thousandSeparator={true}/> + ')' : ''}</span></span>
                         <span
                             className="col-xs-6 amount">Bitcoin: <span>{keys[key].pending_btc_bal < 0 ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)).toFixed(8) : keys[key].btc_bal}
                             {keys[key].pending_btc_bal > 0 | keys[key].pending_btc_bal < 0 ? '(pending ' + keys[key].pending_btc_bal + ')' : ''}</span></span>
