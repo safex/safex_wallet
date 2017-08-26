@@ -732,3 +732,14 @@ input::-webkit-inner-spin-button {
 .overflow.sendModal.walletResetModal form input{
   text-align: center;
 }
+.sendCloseButton{
+  padding-bottom:5px;
+}
+.sendCloseButton .close{
+  color:#fff;
+  opacity: 1;
+  font-size:15px;
+}
+.sendCloseButton .close:hover{
+  color:#327A9B;
+}
