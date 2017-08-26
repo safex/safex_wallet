@@ -109,6 +109,7 @@ export default class Navigation extends React.Component {
                     </button>
                     <span className="navbar-brand" href="#">
                         <img src="images/logo.png" alt="Logo"/>
+                        <span>v0.0.2</span>
                     </span>
                 </div>
 

@@ -206,6 +206,10 @@ body{
 .navbar-default .navbar-brand img{
   height:40px;
 }
+.navbar-default .navbar-brand span{
+  margin-top:5px;
+  color:#fff;
+}
 .navbar-default .navbar-nav>li>a, .navbar-default .navbar-nav>li{
   color:#fff;
   text-transform: uppercase;
@@ -697,7 +701,4 @@ input::-webkit-inner-spin-button {
 }
 .settingsModal label{
   min-width: 130px;
-}
-.settingsModal .col-xs-12{
-  text-align: center;
 }

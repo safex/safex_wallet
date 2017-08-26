@@ -1171,7 +1171,7 @@ export default class Wallet extends React.Component {
                         <div className="col-xs-12">
                             <h3>Settings <span className="close" onClick={this.closeSettingsModal}>X</span></h3>
                             <div className="col-xs-10 col-xs-offset-1">
-                                <form className="col-xs-12" onSubmit={this.changePassword}>
+                                <form className="col-xs-12 col-sm-6" onSubmit={this.changePassword}>
                                     <div className="form-group">
                                         <label htmlFor="old_pass">Old Password:</label>
                                         <input name="old_pass"/>
@@ -1190,7 +1190,7 @@ export default class Wallet extends React.Component {
                                         </div>
                                     </div>
                                 </form>
-                                <div className="col-xs-12">
+                                <div className="col-xs-12 col-sm-6">
                                     <button onClick={this.exportEncryptedWallet}>Export Encrypted Wallet</button>
                                     <button onClick={this.exportUnencryptedWallet}>Export Unencrypted Wallet</button>
                                     <button onClick={this.logout}>Logout</button>
