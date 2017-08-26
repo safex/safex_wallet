@@ -598,6 +598,7 @@ input::-webkit-inner-spin-button {
   background-repeat: no-repeat;
   background-position: left center;
   padding:0px 5px;
+  cursor: pointer;
 }
 .back-button:hover{
   color:#fff;
@@ -701,4 +702,30 @@ input::-webkit-inner-spin-button {
 }
 .settingsModal label{
   min-width: 130px;
+}
+.overflow.sendModal.walletResetModal{
+  background:none;
+}
+.overflow.sendModal.walletResetModal .container{
+  background:rgba(1, 30, 44, 1);
+}
+.overflow.sendModal.walletResetModal p{
+  background:none;
+  border:none;
+}
+.overflow.sendModal.walletResetModal h3{
+  text-align:center;
+  border-bottom:1px solid #4D5D66;
+  color:#fff;
+  text-transform: uppercase;
+}
+.overflow.sendModal.walletResetModal h3 .close{
+  color:#fff;
+  opacity: 1;
+}
+.overflow.sendModal.walletResetModal form button{
+  margin-top:10px;
+}
+.overflow.sendModal.walletResetModal form input{
+  text-align: center;
 }
