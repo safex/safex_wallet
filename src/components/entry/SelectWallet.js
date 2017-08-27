@@ -147,9 +147,9 @@ export default class SelectWallet extends React.Component {
                         alert('there was an issue resetting the wallet')
                     } else {
                         this.setState({
-                            walletResetModalDone: true
+                            walletResetModalDone: true,
+                            walletExists: false
                         })
-                        this.context.router.push('/')
                     }
                 })
             }
@@ -158,15 +158,14 @@ export default class SelectWallet extends React.Component {
     }
     //This closes every modal
     walletResetClose() {
-
-        this.context.router.push('/')
         this.setState({
             walletResetModal1: false,
             walletResetModal2: false,
             walletResetModal2unencrypted: false,
             walletResetModalDone: false,
             walletResetModalDlEncrypted: false,
-            walletResetModalDlUnencrypted: false
+            walletResetModalDlUnencrypted: false,
+            walletExists: false
         })
     }
 
