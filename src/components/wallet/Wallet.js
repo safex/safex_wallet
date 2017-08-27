@@ -250,7 +250,7 @@ export default class Wallet extends React.Component {
                 alert('invalid destination address');
             }
 
-        //if safex is not selected then it must be Bitcoin
+            //if safex is not selected then it must be Bitcoin
         } else {
             //open the modal by setting transaction_being_sent
             this.setState({
@@ -562,9 +562,10 @@ export default class Wallet extends React.Component {
         keys.map((key) => {
             nice_keys += "private key: " + key.private_key + '\n';
             nice_keys += "public key: " + key.public_key + '\n';
+            nice_keys += '\n';
         });
         var date = Date.now();
-        fileDownload(nice_keys, date + 'unsafex.txt');
+        console.log(fileDownload(nice_keys, date + 'unsafex.txt'));
 
     }
 
@@ -582,7 +583,6 @@ export default class Wallet extends React.Component {
                 var date = Date.now();
                 fileDownload(fd, date + 'safexwallet.dat');
             }
-
         });
     }
 
@@ -700,7 +700,6 @@ export default class Wallet extends React.Component {
         var now_pass = e.target.old_pass.value;
         var new_pass = e.target.new_pass.value;
         var repeat_pass = e.target.repeat_pass.value;
-
 
 
         //check if the new password field is full
@@ -988,13 +987,13 @@ export default class Wallet extends React.Component {
                       className={this.state.collapse_open.send_open && this.state.collapse_open.key === key
                           ? 'col-xs-12 form-inline form-send active'
                           : 'col-xs-12 form-inline form-send'}>
-                          <div className="row">
-                              <div className="col-xs-12 sendCloseButton">
-                                  <div onClick={this.openSendReceive.bind(this, key, 'send')} className="close text-right">
-                                      X
-                                  </div>
-                              </div>
-                          </div>
+                    <div className="row">
+                        <div className="col-xs-12 sendCloseButton">
+                            <div onClick={this.openSendReceive.bind(this, key, 'send')} className="close text-right">
+                                X
+                            </div>
+                        </div>
+                    </div>
                     <div className="row">
                         <div className="col-xs-8 send-left">
                             <label htmlFor="which">Currency</label>

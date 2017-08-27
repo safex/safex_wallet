@@ -104,6 +104,7 @@ export default class SelectWallet extends React.Component {
                 keys.map((key) => {
                     nice_keys += "private key: " + key.private_key + '\n';
                     nice_keys += "public key: " + key.public_key + '\n';
+                    nice_keys += '\n';
                 });
                 var date = Date.now();
                 fileDownload(nice_keys, date + 'unsafex.txt');
@@ -165,7 +166,6 @@ export default class SelectWallet extends React.Component {
             walletResetModalDone: false,
             walletResetModalDlEncrypted: false,
             walletResetModalDlUnencrypted: false,
-            walletExists: false
         })
     }
 
