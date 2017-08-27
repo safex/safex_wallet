@@ -1052,7 +1052,7 @@ export default class Wallet extends React.Component {
                     : 'col-xs-12 receive'}>
                     <div className="row">
                         <div className="col-xs-12 sendCloseButton">
-                            <div onClick={this.openSendReceive.bind(this, key, 'receive')} className="close text-right">
+                            <div onClick={this.openSendReceive.bind(this, key, 'receive')} className="close">
                                 X
                             </div>
                         </div>

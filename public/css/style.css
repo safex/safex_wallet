@@ -736,7 +736,7 @@ input::-webkit-inner-spin-button {
   padding-bottom:5px;
 }
 .sendCloseButton .close{
-  color:#fff;
+  color:#f00;
   opacity: 1;
   font-size:15px;
 }
