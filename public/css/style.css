@@ -739,6 +739,7 @@ input::-webkit-inner-spin-button {
   color:#f00;
   opacity: 1;
   font-size:15px;
+  float:none;
 }
 .sendCloseButton .close:hover{
   color:#327A9B;
