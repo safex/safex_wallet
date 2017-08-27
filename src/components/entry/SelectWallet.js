@@ -133,7 +133,8 @@ export default class SelectWallet extends React.Component {
     }
 
     //This leads to Done page in both routes
-    walletResetStep2() {
+    walletResetStep2(e) {
+        e.preventDefault();
         var home_dir = os.homedir();
         fs.readFile(home_dir + '/safexwallet.dat', (err, fd) => {
             if (err) {
@@ -294,12 +295,14 @@ export default class SelectWallet extends React.Component {
                                         <span onClick={this.walletResetClose} className="close">X</span>
                                     </h3>
                                     <p>During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists.</p>
-                                    <div className="col-xs-12 text-center">
-                                        <label><input type="checkbox" /> I agree</label>
-                                    </div>
-                                    <div className="col-xs-12 text-center">
-                                        <button onClick={this.walletResetDlEncrypted}>Proceed</button>
-                                    </div>
+                                    <form className="row" onSubmit={this.walletResetDlEncrypted}>
+                                        <div className="col-xs-12 text-center">
+                                            <label><input name="checkbox" type="checkbox" /> I agree</label>
+                                        </div>
+                                        <div className="col-xs-12 text-center">
+                                            <button type="submit">Proceed</button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -312,12 +315,14 @@ export default class SelectWallet extends React.Component {
                                         <span onClick={this.walletResetClose} className="close">X</span>
                                     </h3>
                                     <p>During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists.</p>
-                                    <div className="col-xs-12 text-center">
-                                        <label><input type="checkbox" /> I agree</label>
-                                    </div>
-                                    <div className="col-xs-12 text-center">
-                                        <button onClick={this.walletResetStep2}>Proceed</button>
-                                    </div>
+                                    <form className="row" onSubmit={this.walletResetStep2}>
+                                        <div className="col-xs-12 text-center">
+                                            <label><input name="checkbox" type="checkbox" /> I agree</label>
+                                        </div>
+                                        <div className="col-xs-12 text-center">
+                                            <button type="submit">Proceed</button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
