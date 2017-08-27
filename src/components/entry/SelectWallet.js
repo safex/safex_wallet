@@ -59,6 +59,7 @@ export default class SelectWallet extends React.Component {
     }
     //This happens when you click wallet reset on the main screen
     walletResetStart() {
+        alert('PROCEED WITH CAUTION THIS PROCESS WILL DELETE YOUR EXISTING WALLET');
         alert('This procedure will reset the wallet. It will take you through steps to backup the existing wallet.' +
             'Then the existing wallet will be deleted to make room for a new one. PROCEED WITH CAUTION!!');
         this.setState({
@@ -68,7 +69,7 @@ export default class SelectWallet extends React.Component {
     //This happens when you click skip on the first modal
     walletResetStep1Skip() {
         this.setState({
-            walletResetModalDlEncrypted: true
+            walletResetModalDlUnencrypted: true
         })
     }
     //This happens when you click proceed on the first modal
@@ -126,38 +127,44 @@ export default class SelectWallet extends React.Component {
 
     }
     //This is the step2 of the encrypted and step3 of the unencrypted route
-    walletResetDlEncrypted() {
-        this.setState({
-            walletResetModalDlEncrypted: true
-        })
+    walletResetDlEncrypted(e) {
+        e.preventDefault();
+        if (e.target.checkbox.checked) {
+            this.setState({
+                walletResetModalDlEncrypted: true
+            })
+        }
     }
 
     //This leads to Done page in both routes
     walletResetStep2(e) {
         e.preventDefault();
-        var home_dir = os.homedir();
-        fs.readFile(home_dir + '/safexwallet.dat', (err, fd) => {
-            if (err) {
-                //if the error is that No File exists, let's step through and make the file
-                if (err.code === 'ENOENT') {
-                    console.log('error');
-                }
-            } else {
-                var date = Date.now();
-                fileDownload(fd, date + 'safexwallet.dat');
-                fs.unlink(home_dir + '/safexwallet.dat', (err) => {
-                    if (err) {
-                        alert('there was an issue resetting the wallet')
-                    } else {
-                        this.setState({
-                            walletResetModalDone: true,
-                            walletExists: false
-                        })
+        if (e.target.checkbox.checked) {
+            var home_dir = os.homedir();
+            fs.readFile(home_dir + '/safexwallet.dat', (err, fd) => {
+                if (err) {
+                    //if the error is that No File exists, let's step through and make the file
+                    if (err.code === 'ENOENT') {
+                        console.log('error');
                     }
-                })
-            }
+                } else {
+                    var date = Date.now();
+                    fileDownload(fd, date + 'safexwallet.dat');
+                    fs.unlink(home_dir + '/safexwallet.dat', (err) => {
+                        if (err) {
+                            alert('there was an issue resetting the wallet')
+                        } else {
+                            this.setState({
+                                walletResetModalDone: true,
+                                walletExists: false
+                            })
+                        }
+                    })
+                }
 
-        });
+            });
+        }
+
     }
     //This closes every modal
     walletResetClose() {
@@ -297,7 +304,7 @@ export default class SelectWallet extends React.Component {
                                     <p>During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists.</p>
                                     <form className="row" onSubmit={this.walletResetDlEncrypted}>
                                         <div className="col-xs-12 text-center">
-                                            <label><input name="checkbox" type="checkbox" /> I agree</label>
+                                            <label><input name="checkbox" type="checkbox" /> I understand that this is my last chance to backup my wallet file after this it will be deleted</label>
                                         </div>
                                         <div className="col-xs-12 text-center">
                                             <button type="submit">Proceed</button>
@@ -317,7 +324,7 @@ export default class SelectWallet extends React.Component {
                                     <p>During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists.</p>
                                     <form className="row" onSubmit={this.walletResetStep2}>
                                         <div className="col-xs-12 text-center">
-                                            <label><input name="checkbox" type="checkbox" /> I agree</label>
+                                            <label><input name="checkbox" type="checkbox" /> I understand that this is my last chance to backup my wallet file after this it will be deleted</label>
                                         </div>
                                         <div className="col-xs-12 text-center">
                                             <button type="submit">Proceed</button>
