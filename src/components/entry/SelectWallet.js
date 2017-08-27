@@ -7,6 +7,7 @@ var fileDownload = require('react-file-download');
 import { decrypt } from '../../utils/utils';
 
 
+
 export default class SelectWallet extends React.Component {
 
     constructor(props) {
@@ -294,6 +295,9 @@ export default class SelectWallet extends React.Component {
                                     </h3>
                                     <p>During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists.</p>
                                     <div className="col-xs-12 text-center">
+                                        <label><input type="checkbox" /> I agree</label>
+                                    </div>
+                                    <div className="col-xs-12 text-center">
                                         <button onClick={this.walletResetDlEncrypted}>Proceed</button>
                                     </div>
                                 </div>
@@ -308,6 +312,9 @@ export default class SelectWallet extends React.Component {
                                         <span onClick={this.walletResetClose} className="close">X</span>
                                     </h3>
                                     <p>During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists.</p>
+                                    <div className="col-xs-12 text-center">
+                                        <label><input type="checkbox" /> I agree</label>
+                                    </div>
                                     <div className="col-xs-12 text-center">
                                         <button onClick={this.walletResetStep2}>Proceed</button>
                                     </div>
