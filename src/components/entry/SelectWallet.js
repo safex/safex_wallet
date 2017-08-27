@@ -3,6 +3,8 @@ import {Link} from 'react-router';
 
 var fs = window.require('fs');
 var os = window.require('os');
+var fileDownload = require('react-file-download');
+import { decrypt } from '../../utils/utils';
 
 
 export default class SelectWallet extends React.Component {
@@ -56,7 +58,8 @@ export default class SelectWallet extends React.Component {
     }
     //This happens when you click wallet reset on the main screen
     walletResetStart() {
-        alert('Blah blah blah');
+        alert('This procedure will reset the wallet. It will take you through steps to backup the existing wallet.' +
+            'Then the existing wallet will be deleted to make room for a new one. PROCEED WITH CAUTION!!');
         this.setState({
             walletResetModal1: true
         })
@@ -73,18 +76,52 @@ export default class SelectWallet extends React.Component {
             walletResetModal2unencrypted: true
         })
     }
-    //This leads to Done page in both routes
-    walletResetStep2() {
-        this.setState({
-            walletResetModalDone: true
-        })
-    }
+
     //This happens when you click proceed under the password entry for the unencrypted wallet
     walletResetDlUnencrypted(e) {
         e.preventDefault();
-        this.setState({
-            walletResetModalDlUnencrypted: true
-        })
+
+        var crypto = require('crypto'),
+            algorithm = 'aes-256-ctr',
+            password = e.target.password.value;
+
+        localStorage.setItem('password', e.target.password.value);
+
+        var cipher_text = localStorage.getItem('encrypted_wallet');
+
+
+        var decrypted_wallet = decrypt(cipher_text, algorithm, password);
+
+        try {
+            var parse_wallet = JSON.parse(decrypted_wallet);
+
+            if (parse_wallet['version'] === '1') {
+                localStorage.setItem('wallet', decrypted_wallet);
+
+                var wallet_data = JSON.parse(localStorage.getItem('wallet'));
+                var nice_keys = "";
+                var keys = wallet_data['keys'];
+                keys.map((key) => {
+                    nice_keys += "private key: " + key.private_key + '\n';
+                    nice_keys += "public key: " + key.public_key + '\n';
+                });
+                var date = Date.now();
+                fileDownload(nice_keys, date + 'unsafex.txt');
+
+                this.setState({
+                    walletResetModalDlUnencrypted: true
+                })
+            } else {
+
+                console.log('wrong password');
+            }
+
+        } catch (e) {
+            alert('wrong password');
+            console.log('error parsing wallet');
+        }
+
+
     }
     //This is the step2 of the encrypted and step3 of the unencrypted route
     walletResetDlEncrypted() {
@@ -92,8 +129,37 @@ export default class SelectWallet extends React.Component {
             walletResetModalDlEncrypted: true
         })
     }
+
+    //This leads to Done page in both routes
+    walletResetStep2() {
+        var home_dir = os.homedir();
+        fs.readFile(home_dir + '/safexwallet.dat', (err, fd) => {
+            if (err) {
+                //if the error is that No File exists, let's step through and make the file
+                if (err.code === 'ENOENT') {
+                    console.log('error');
+                }
+            } else {
+                var date = Date.now();
+                fileDownload(fd, date + 'safexwallet.dat');
+                fs.unlink(home_dir + '/safexwallet.dat', (err) => {
+                    if (err) {
+                        alert('there was an issue resetting the wallet')
+                    } else {
+                        this.setState({
+                            walletResetModalDone: true
+                        })
+                        this.context.router.push('/')
+                    }
+                })
+            }
+
+        });
+    }
     //This closes every modal
     walletResetClose() {
+
+        this.context.router.push('/')
         this.setState({
             walletResetModal1: false,
             walletResetModal2: false,
@@ -170,7 +236,7 @@ export default class SelectWallet extends React.Component {
                                     <span className="btn btn-default">Import Wallet <img src="images/import.png"
                                                                                          alt="Import"/></span>
                                 </div>
-                                <p>Import a safexwallet file</p>
+                                <p>Import a safexwallet .dat file</p>
                             </Link>
                         </div>
                     </div>
@@ -191,7 +257,7 @@ export default class SelectWallet extends React.Component {
                             : 'overflow sendModal walletResetModal'}>
                             <div className="container">
                                 <div className="col-xs-12">
-                                    <h3>Wallet Reset Step 1
+                                    <h3>Wallet Reset Back Up Unencrypted Keys
                                         <span onClick={this.walletResetClose} className="close">X</span>
                                     </h3>
                                     <p>If you have your password and want to backup your keys unencrypted press proceed, otherwise press skip</p>
@@ -224,10 +290,10 @@ export default class SelectWallet extends React.Component {
                             : 'overflow sendModal walletResetModal'}>
                             <div className="container">
                                 <div className="col-xs-12">
-                                    <h3>Downloading Unencrypted Wallet
+                                    <h3>Download Encrypted Wallet
                                         <span onClick={this.walletResetClose} className="close">X</span>
                                     </h3>
-                                    <p>Blah Blah Blah</p>
+                                    <p>During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists.</p>
                                     <div className="col-xs-12 text-center">
                                         <button onClick={this.walletResetDlEncrypted}>Proceed</button>
                                     </div>
@@ -242,7 +308,7 @@ export default class SelectWallet extends React.Component {
                                     <h3>Downloading Encrypted Wallet
                                         <span onClick={this.walletResetClose} className="close">X</span>
                                     </h3>
-                                    <p>Blah Blah Blah</p>
+                                    <p>During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists.</p>
                                     <div className="col-xs-12 text-center">
                                         <button onClick={this.walletResetStep2}>Proceed</button>
                                     </div>
@@ -257,7 +323,7 @@ export default class SelectWallet extends React.Component {
                                     <h3>Wallet Reset Done
                                         <span onClick={this.walletResetClose} className="close">X</span>
                                     </h3>
-                                    <p>Blah Blah Blah</p>
+                                    <p>Your wallet reset is done. You've been given a chance to back up your keys/wallet file and it has been deleted from view of the Safex Wallet so you can start a fresh instance.</p>
                                     <div className="col-xs-12 text-center">
                                         <button onClick={this.walletResetClose}>Done</button>
                                     </div>
@@ -267,7 +333,11 @@ export default class SelectWallet extends React.Component {
                     </div>
         );
     }
+}
 
+
+SelectWallet.contextTypes = {
+    router: React.PropTypes.object.isRequired
 }
 
 

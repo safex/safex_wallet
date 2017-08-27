@@ -580,7 +580,7 @@ export default class Wallet extends React.Component {
                 }
             } else {
                 var date = Date.now();
-                fileDownload(fd, date + 'safex.dat');
+                fileDownload(fd, date + 'safexwallet.dat');
             }
 
         });
