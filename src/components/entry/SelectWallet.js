@@ -15,15 +15,17 @@ export default class SelectWallet extends React.Component {
             isLoading: true,
             walletExists: false,
             walletResetModal1: false,
-            walletResetModal2: false,
-            walletResetModal2un: false,
-            walletResetModal3: false
+            walletResetModal2unencrypted: false,
+            walletResetModalDone: false,
+            walletResetModalDlUnencrypted: false,
+            walletResetModalDlEncrypted: false
         };
-        this.walletResetStep0 = this.walletResetStep0.bind(this);
-        this.walletResetStep1 = this.walletResetStep1.bind(this);
-        this.walletResetStep1un = this.walletResetStep1un.bind(this);
+        this.walletResetStart = this.walletResetStart.bind(this);
+        this.walletResetStep1Skip = this.walletResetStep1Skip.bind(this);
+        this.walletResetStep1Proceed = this.walletResetStep1Proceed.bind(this);
         this.walletResetStep2 = this.walletResetStep2.bind(this);
-        this.walletResetStep2un = this.walletResetStep2un.bind(this);
+        this.walletResetDlUnencrypted = this.walletResetDlUnencrypted.bind(this);
+        this.walletResetDlEncrypted = this.walletResetDlEncrypted.bind(this);
         this.walletResetClose = this.walletResetClose.bind(this);
     }
 
@@ -53,35 +55,41 @@ export default class SelectWallet extends React.Component {
         });
     }
     //This happens when you click wallet reset on the main screen
-    walletResetStep0() {
+    walletResetStart() {
         alert('Blah blah blah');
         this.setState({
             walletResetModal1: true
         })
     }
     //This happens when you click skip on the first modal
-    walletResetStep1() {
+    walletResetStep1Skip() {
         this.setState({
-            walletResetModal2: true
+            walletResetModalDlEncrypted: true
         })
     }
     //This happens when you click proceed on the first modal
-    walletResetStep1un() {
+    walletResetStep1Proceed() {
         this.setState({
-            walletResetModal2un: true
+            walletResetModal2unencrypted: true
         })
     }
-    //This is the step 2 for the encrypted wallet
+    //This leads to Done page in both routes
     walletResetStep2() {
         this.setState({
-            walletResetModal3: true
+            walletResetModalDone: true
         })
     }
-    //This is the step 2 for the encrypted wallet(password entered here)
-    walletResetStep2un(e) {
+    //This happens when you click proceed under the password entry for the unencrypted wallet
+    walletResetDlUnencrypted(e) {
         e.preventDefault();
         this.setState({
-            walletResetModal3: true
+            walletResetModalDlUnencrypted: true
+        })
+    }
+    //This is the step2 of the encrypted and step3 of the unencrypted route
+    walletResetDlEncrypted() {
+        this.setState({
+            walletResetModalDlEncrypted: true
         })
     }
     //This closes every modal
@@ -89,8 +97,10 @@ export default class SelectWallet extends React.Component {
         this.setState({
             walletResetModal1: false,
             walletResetModal2: false,
-            walletResetModal2un: false,
-            walletResetModal3: false
+            walletResetModal2unencrypted: false,
+            walletResetModalDone: false,
+            walletResetModalDlEncrypted: false,
+            walletResetModalDlUnencrypted: false
         })
     }
 
@@ -103,7 +113,7 @@ export default class SelectWallet extends React.Component {
               <div className="container">
                   <div className="col-xs-12 Login-logo">
                       <img src="images/logo.png" alt="Logo"/>
-                      <span className="pul-right back-button wallet-reset-button" onClick={this.walletResetStep0}>Wallet Reset</span>
+                      <span className="pul-right back-button wallet-reset-button" onClick={this.walletResetStart}>Wallet Reset</span>
                   </div>
                   <div className="col-xs-12 App-intro">
                     <div className="row text-center">
@@ -186,18 +196,50 @@ export default class SelectWallet extends React.Component {
                                     </h3>
                                     <p>If you have your password and want to backup your keys unencrypted press proceed, otherwise press skip</p>
                                     <div className="col-xs-12 text-center">
-                                        <button onClick={this.walletResetStep1}>Skip</button>
-                                        <button onClick={this.walletResetStep1un}>Proceed</button>
+                                        <button onClick={this.walletResetStep1Skip}>Skip</button>
+                                        <button onClick={this.walletResetStep1Proceed}>Proceed</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div className={this.state.walletResetModal2
+                        <div className={this.state.walletResetModal2unencrypted
                             ? 'overflow sendModal walletResetModal active'
                             : 'overflow sendModal walletResetModal'}>
                             <div className="container">
                                 <div className="col-xs-12">
                                     <h3>Wallet Reset Step 2
+                                        <span onClick={this.walletResetClose} className="close">X</span>
+                                    </h3>
+                                    <div className="col-xs-4 col-xs-offset-4 text-center">
+                                        <form className="form-group" onSubmit={this.walletResetDlUnencrypted}>
+                                           <input className="form-control text-center" type="password" name="password" placeholder="Enter Password" />
+                                           <button className="btn btn-default" type="submit">Proceed</button>
+                                       </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className={this.state.walletResetModalDlUnencrypted
+                            ? 'overflow sendModal walletResetModal active'
+                            : 'overflow sendModal walletResetModal'}>
+                            <div className="container">
+                                <div className="col-xs-12">
+                                    <h3>Downloading Unencrypted Wallet
+                                        <span onClick={this.walletResetClose} className="close">X</span>
+                                    </h3>
+                                    <p>Blah Blah Blah</p>
+                                    <div className="col-xs-12 text-center">
+                                        <button onClick={this.walletResetDlEncrypted}>Proceed</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className={this.state.walletResetModalDlEncrypted
+                            ? 'overflow sendModal walletResetModal active'
+                            : 'overflow sendModal walletResetModal'}>
+                            <div className="container">
+                                <div className="col-xs-12">
+                                    <h3>Downloading Encrypted Wallet
                                         <span onClick={this.walletResetClose} className="close">X</span>
                                     </h3>
                                     <p>Blah Blah Blah</p>
@@ -207,24 +249,7 @@ export default class SelectWallet extends React.Component {
                                 </div>
                             </div>
                         </div>
-                        <div className={this.state.walletResetModal2un
-                            ? 'overflow sendModal walletResetModal active'
-                            : 'overflow sendModal walletResetModal'}>
-                            <div className="container">
-                                <div className="col-xs-12">
-                                    <h3>Wallet Reset Step 2
-                                        <span onClick={this.walletResetClose} className="close">X</span>
-                                    </h3>
-                                    <div className="col-xs-4 col-xs-offset-4 text-center">
-                                        <form className="form-group" onSubmit={this.walletResetStep2un}>
-                                           <input className="form-control text-center" type="password" name="password" placeholder="Enter Password" />
-                                           <button className="btn btn-default" type="submit">Proceed</button>
-                                       </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className={this.state.walletResetModal3
+                        <div className={this.state.walletResetModalDone
                             ? 'overflow sendModal walletResetModal active'
                             : 'overflow sendModal walletResetModal'}>
                             <div className="container">
