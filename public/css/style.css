@@ -25,7 +25,7 @@
 
 textarea, input:focus, button { outline-color: transparent;
   outline-style: none; box-shadow: none !important;}
-html, body, body #root, body #root > div, body #root > div > div.container{
+html, body, body #root, body #root > div{
   height:100%;
 }
 html{
