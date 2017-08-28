@@ -321,7 +321,10 @@ export default class SelectWallet extends React.Component {
                                     <h3>Downloading Encrypted Wallet
                                         <span onClick={this.walletResetClose} className="close">X</span>
                                     </h3>
-                                    <p>During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists.</p>
+                                    <p>This is second confirmation. When you check the box and proceed you will be able to backup your encrypted wallet. After this there is no turning back
+                                        your wallet will be deleted so that you can make a new one. In this step you'll backup your encrypted wallet that was already in the wallet.
+                                        During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists.
+                                    AFTER THIS THERE IS NO TURNING BACK, YOUR WALLET WILL BE DELETED HIT THE "X" TO GET OUT OF THIS</p>
                                     <form className="row" onSubmit={this.walletResetStep2}>
                                         <div className="col-xs-12 text-center">
                                             <label><input name="checkbox" type="checkbox" /> I understand that this is my last chance to backup my wallet file after this it will be deleted</label>
@@ -341,7 +344,7 @@ export default class SelectWallet extends React.Component {
                                     <h3>Wallet Reset Done
                                         <span onClick={this.walletResetClose} className="close">X</span>
                                     </h3>
-                                    <p>Your wallet reset is done. You've been given a chance to back up your keys/wallet file and it has been deleted from view of the Safex Wallet so you can start a fresh instance.</p>
+                                    <p>Your wallet reset is done. Now you can make a new wallet.</p>
                                     <div className="col-xs-12 text-center">
                                         <button onClick={this.walletResetClose}>Done</button>
                                     </div>

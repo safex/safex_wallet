@@ -244,6 +244,9 @@ export default class Wallet extends React.Component {
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
                     alert('network communication error, please try again later');
+                    this.setState({
+                        transaction_being_sent: false,
+                    });
                 }
             } catch (e) {
                 //this is triggered if the destination address is not a valid bitcoin address
@@ -283,6 +286,9 @@ export default class Wallet extends React.Component {
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
                     alert('network communication error, please try again later');
+                    this.setState({
+                        transaction_being_sent: false,
+                    });
                 }
             } catch (e) {
                 //this is triggered if the destination address is not a valid bitcoin address
@@ -296,11 +302,11 @@ export default class Wallet extends React.Component {
         var tx = new bitcoin.TransactionBuilder();
         var inputs_num = 0;
         utxos.forEach(txn => {
-            console.log(txn.confirmations > 0);
+
             if (!txn.confirmations > 0) {
-                console.log(false)
+
             } else {
-                console.log(true)
+
                 if (running_total < (amount + fee)) {
                     running_total += txn.satoshis;
                     tx.addInput(txn.txid, txn.vout);
@@ -313,7 +319,6 @@ export default class Wallet extends React.Component {
         if ((running_total - (amount + fee)) > 0) {
             tx.addOutput(source, (running_total - (amount + fee)));
         }
-        console.log(tx);
         for (var i = 0; i < inputs_num; i++) {
             tx.sign(i, key);
         }
@@ -323,7 +328,6 @@ export default class Wallet extends React.Component {
         fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
             .then(resp => resp.text())
             .then((resp) => {
-                console.log(resp);
                 this.setState({
                     transaction_sent: true,
                     transaction_being_sent: false,
@@ -337,7 +341,7 @@ export default class Wallet extends React.Component {
         var tx = new bitcoin.TransactionBuilder();
         var inputs_num = 0;
         utxos.forEach(txn => {
-            console.log(txn);
+
             if (running_total < (2730 + fee)) {
                 running_total += txn.satoshis;
                 tx.addInput(txn.txid, txn.vout);
@@ -349,7 +353,7 @@ export default class Wallet extends React.Component {
         if ((running_total - (2730 + fee)) > 0) {
             tx.addOutput(source, (running_total - (2730 + fee)));
         }
-        console.log(tx.buildIncomplete().toHex())
+
         var SafexTransaction = {};
         SafexTransaction['incomplete_tx'] = tx.buildIncomplete().toHex();
         SafexTransaction['amount'] = amount;
@@ -359,7 +363,7 @@ export default class Wallet extends React.Component {
                 var decoded_txn = bitcoin.Transaction.fromHex(resp);
                 var txn = bitcoin.TransactionBuilder.fromTransaction(decoded_txn);
                 var check = 0;
-                console.log(txn.tx.outs);
+
                 txn.tx.outs.forEach(out => {
                     if (check === 0) {
                         var pubkey = bitcoin.address.fromOutputScript(out.script, bitcoin.networks.livenet);
@@ -378,7 +382,7 @@ export default class Wallet extends React.Component {
                     for (var i = 0; i < inputs_num; i++) {
                         txn.sign(i, key);
                     }
-                    console.log(txn.build().toHex())
+
 
                     var json = {};
                     json['rawtx'] = txn.build().toHex();
@@ -392,7 +396,7 @@ export default class Wallet extends React.Component {
                                 transaction_being_sent: false,
                                 txid: resp
                             });
-                        });
+                        })
                 } else {
                     alert("error with transaction")
                 }
@@ -442,7 +446,7 @@ export default class Wallet extends React.Component {
         try {
             var json = JSON.parse(localStorage.getItem('wallet'));
         } catch (e) {
-            console.log(e);
+            alert('error parsing the wallet data')
         }
 
 
@@ -458,7 +462,7 @@ export default class Wallet extends React.Component {
 
         fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
             if (err) {
-                console.log(err)
+                alert('problem communicating to the wallet file')
             } else {
                 localStorage.setItem('wallet', JSON.stringify(json));
                 try {
@@ -467,7 +471,7 @@ export default class Wallet extends React.Component {
                     this.prepareDisplay();
                     alert('key added to wallet')
                 } catch (e) {
-                    console.log(e);
+                    alert('an error adding a key to the wallet contact team@safex.io')
                 }
 
             }
@@ -509,7 +513,6 @@ export default class Wallet extends React.Component {
                 if (key_exists === false) {
 
                     json['keys'].push(key_json);
-                    console.log(json);
 
                     var crypto = require('crypto'),
                         algorithm = 'aes-256-ctr',
@@ -546,7 +549,6 @@ export default class Wallet extends React.Component {
             }
         } catch (e) {
             alert('invalid private key')
-            console.log(e);
         }
 
 
@@ -565,7 +567,7 @@ export default class Wallet extends React.Component {
             nice_keys += '\n';
         });
         var date = Date.now();
-        console.log(fileDownload(nice_keys, date + 'unsafex.txt'));
+        fileDownload(nice_keys, date + 'unsafex.txt');
 
     }
 
@@ -696,7 +698,6 @@ export default class Wallet extends React.Component {
     changePassword(e) {
 
         e.preventDefault();
-        console.log('change password');
         var now_pass = e.target.old_pass.value;
         var new_pass = e.target.new_pass.value;
         var repeat_pass = e.target.repeat_pass.value;
@@ -751,7 +752,7 @@ export default class Wallet extends React.Component {
                                     //write the new file to the path
                                     fs.writeFile(localStorage.getItem('wallet_path'), encrypted_wallet, (err) => {
                                         if (err) {
-                                            console.log(err)
+                                            alert('there was a problem writing the new encrypted file to disk')
                                         } else {
                                             //set the active password and wallet to the new file
                                             localStorage.setItem('password', new_pass);
@@ -894,10 +895,10 @@ export default class Wallet extends React.Component {
                 active_fee: 'fast'
             });
         } else {
-            var send_total = parseFloat(this.state.average_fee) / 2 + 0.00001;
+            var send_total = parseFloat(this.state.average_fee) / 4 + 0.00001;
             this.setState({
                 send_amount: 0.00001.toFixed(8),
-                send_fee: parseFloat(parseFloat(this.state.average_fee) / 2).toFixed(8),
+                send_fee: parseFloat(parseFloat(this.state.average_fee) / 4).toFixed(8),
                 send_total: send_total.toFixed(8),
                 active_fee: 'fast'
             });
@@ -922,7 +923,7 @@ export default class Wallet extends React.Component {
             }
             if (speed === 'slow') {
                 this.setState({
-                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 3).toFixed(8),
+                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 4).toFixed(8),
                     active_fee: speed
                 });
             }
@@ -930,15 +931,15 @@ export default class Wallet extends React.Component {
         if (coin === 'btc') {
             if (speed === 'fast') {
                 this.setState({
-                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 2).toFixed(8),
-                    send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.average_fee) / 2).toFixed(8),
+                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 4).toFixed(8),
+                    send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.average_fee) / 4).toFixed(8),
                     active_fee: speed
                 });
             }
             if (speed === 'med') {
                 this.setState({
-                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 4).toFixed(8),
-                    send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.average_fee) / 4).toFixed(8),
+                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 6).toFixed(8),
+                    send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.average_fee) / 6).toFixed(8),
                     active_fee: speed
                 });
             }
@@ -975,12 +976,11 @@ export default class Wallet extends React.Component {
                         <span
                             className="col-xs-6 amount">Safex: <span>{keys[key].pending_safex_bal < 0 ? (parseFloat(keys[key].safex_bal) + parseFloat(keys[key].pending_safex_bal)) :
                             <NumberFormat value={keys[key].safex_bal} displayType={'text'} thousandSeparator={true}/>}
-                            {keys[key].pending_safex_bal > 0 | keys[key].pending_safex_bal < 0 ? '(pending ' +
-                                <NumberFormat value={keys[key].pending_safex_bal} displayType={'text'}
-                                              thousandSeparator={true}/> + ')' : ''}</span></span>
+                            {keys[key].pending_safex_bal > 0 | keys[key].pending_safex_bal < 0 ? ' (pending ' +
+                                keys[key].pending_safex_bal + ')' : ''}</span></span>
                         <span
                             className="col-xs-6 amount">Bitcoin: <span>{keys[key].pending_btc_bal < 0 ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)).toFixed(8) : keys[key].btc_bal}
-                            {keys[key].pending_btc_bal > 0 | keys[key].pending_btc_bal < 0 ? '(pending ' + keys[key].pending_btc_bal + ')' : ''}</span></span>
+                            {keys[key].pending_btc_bal > 0 | keys[key].pending_btc_bal < 0 ? ' (pending ' + keys[key].pending_btc_bal + ')' : ''}</span></span>
                     </div>
                 </div>
                 <form onSubmit={this.openCoinModal}
@@ -1167,7 +1167,7 @@ export default class Wallet extends React.Component {
                                         <label htmlFor="total">Total:</label>
                                         <input readOnly name="total" value={this.state.send_total}></input>
                                     </div>
-                                    <button className='' type="submit">CONFIRM</button>
+                                    <button className='' type="submit"> {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}</button>
                                 </div>
                             </div>
                         </div>
@@ -1245,15 +1245,15 @@ export default class Wallet extends React.Component {
                                 <form className="col-xs-12 col-sm-6" onSubmit={this.changePassword}>
                                     <div className="form-group">
                                         <label htmlFor="old_pass">Old Password:</label>
-                                        <input name="old_pass"/>
+                                        <input type="password" name="old_pass"/>
                                     </div>
                                     <div className="form-group">
                                         <label htmlFor="new_pass">New Password:</label>
-                                        <input name="new_pass"/>
+                                        <input type="password" name="new_pass"/>
                                     </div>
                                     <div className="form-group">
                                         <label htmlFor="repeat_pass">Repeat Password:</label>
-                                        <input name="repeat_pass"/>
+                                        <input type="password" name="repeat_pass"/>
                                     </div>
                                     <div className="col-xs-12">
                                         <div className="row">
