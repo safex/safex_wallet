@@ -189,6 +189,7 @@ export default class SelectWallet extends React.Component {
                       <img src="images/logo.png" alt="Logo"/>
                       <span className="pul-right back-button wallet-reset-button" onClick={this.walletResetStart}>Wallet Reset</span>
                   </div>
+                  <div className="col-xs-12 version-number"><p className="text-center">v0.0.2</p></div>
                   <div className="col-xs-12 App-intro">
                     <div className="row text-center">
                         <div className="col-xs-6">
@@ -225,6 +226,7 @@ export default class SelectWallet extends React.Component {
                   <div className="col-xs-12 Login-logo">
                       <img src="images/logo.png" alt="Logo"/>
                   </div>
+                  <div className="col-xs-12 version-number"><p className="text-center">v0.0.2</p></div>
                   <div className="col-xs-12 App-intro">
                     <div className="row text-center">
                         <div className="col-xs-6">

@@ -25,7 +25,7 @@
 
 textarea, input:focus, button { outline-color: transparent;
   outline-style: none; box-shadow: none !important;}
-html, body, body #root, body #root > div{
+html, body, body #root, body #root > div, body #root > div > div.container{
   height:100%;
 }
 html{
@@ -747,4 +747,7 @@ input::-webkit-inner-spin-button {
 }
 .sendCloseButton .close:hover{
   color:#327A9B;
+}
+.version-number{
+  color:#fff;
 }
