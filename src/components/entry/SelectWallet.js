@@ -65,6 +65,7 @@ export default class SelectWallet extends React.Component {
         alert('PROCEED WITH CAUTION THIS PROCESS WILL DELETE YOUR EXISTING WALLET');
         alert('This procedure will reset the wallet. It will take you through steps to backup the existing wallet.' +
             'Then the existing wallet will be deleted to make room for a new one. PROCEED WITH CAUTION!!');
+        alert('If you pushed this by mistake you will see a white "x" in the top right in a following screen.');
         this.setState({
             walletResetModal1: true
         })
@@ -273,7 +274,8 @@ export default class SelectWallet extends React.Component {
                                     <h3>Wallet Reset Back Up Unencrypted Keys
                                         <span onClick={this.walletResetClose} className="close">X</span>
                                     </h3>
-                                    <p>If you have your password and want to backup your keys unencrypted press proceed, otherwise press skip</p>
+                                    <p>You do not need to do this for upgrading wallet versions.
+                                        If you have your password and want to backup your keys unencrypted press proceed, otherwise press skip</p>
                                     <div className="col-xs-12 text-center">
                                         <button onClick={this.walletResetStep1Skip}>Skip</button>
                                         <button onClick={this.walletResetStep1Proceed}>Proceed</button>
