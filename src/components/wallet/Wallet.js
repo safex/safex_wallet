@@ -129,7 +129,7 @@ export default class Wallet extends React.Component {
 
 
     getFee() {
-        fetch('http://localhost:3001/getfee')
+        fetch('http://omni.safex.io:3001/getfee')
             .then(resp => resp.text())
             .then((resp) => {
                 this.setState({average_fee: resp, send_fee: resp});
@@ -150,7 +150,7 @@ export default class Wallet extends React.Component {
         this.state.keys.forEach((key) => {
             var json = {};
             json['address'] = key.public_key;
-            promises.push(fetch('http://localhost:3001/balance', {
+            promises.push(fetch('http://omni.safex.io:3001/balance', {
                 method: "POST",
                 body: JSON.stringify(json)
             })
@@ -168,7 +168,7 @@ export default class Wallet extends React.Component {
                 .then((resp) => {
                     return resp
                 }));
-            promises.push(fetch('http://localhost:3001/unconfirmed', {
+            promises.push(fetch('http://omni.safex.io:3001/unconfirmed', {
                 method: "POST",
                 body: JSON.stringify(json)
             })
@@ -320,7 +320,7 @@ export default class Wallet extends React.Component {
 
         var json = {};
         json['rawtx'] = tx.build().toHex();
-        fetch('http://localhost:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
+        fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
             .then(resp => resp.text())
             .then((resp) => {
                 console.log(resp);
@@ -353,7 +353,7 @@ export default class Wallet extends React.Component {
         var SafexTransaction = {};
         SafexTransaction['incomplete_tx'] = tx.buildIncomplete().toHex();
         SafexTransaction['amount'] = amount;
-        fetch('http://localhost:3001/getsafextxn', {method: "POST", body: JSON.stringify(SafexTransaction)})
+        fetch('http://omni.safex.io:3001/getsafextxn', {method: "POST", body: JSON.stringify(SafexTransaction)})
             .then(resp => resp.text())
             .then((resp) => {
                 var decoded_txn = bitcoin.Transaction.fromHex(resp);
@@ -383,7 +383,7 @@ export default class Wallet extends React.Component {
                     var json = {};
                     json['rawtx'] = txn.build().toHex();
 
-                    fetch('http://localhost:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
+                    fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
                         .then(resp => resp.text())
                         .then((resp) => {
 
