@@ -76,6 +76,7 @@ export default class ImportWallet extends React.Component {
                       <Link className="pul-left back-button" to="/"><img src="images/back.png" /> Back</Link>
                         <img src="images/logo.png" />
                     </div>
+               <div className="col-xs-12 version-number"><p className="text-center">v0.0.2</p></div>
                     <div className="col-xs-12 Login-form Import-wallet">
                       <form className="form-group" onSubmit={this.handleSubmit}>
                        <FileInput name="fileInput" accept=".dat" placeholder="wallet.dat" className="inputClass" onChange={this.handleChange} />

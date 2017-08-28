@@ -556,8 +556,8 @@ export default class Wallet extends React.Component {
 
     exportUnencryptedWallet() {
         alert("This will create a file where you can see your private keys. It is a very sensitive file Be responsible with it." +
-            "You can not import this file directly into a new wallet. You can open this file and see the sensitive private keys" +
-            "which allow you to import them using the 'import key' feature in another wallet.")
+            "This file is not for importing. It is for showing you the private keys which you can bring into a new wallet." +
+            "You import keys using the 'import key' feature in another wallet.")
         var wallet_data = JSON.parse(localStorage.getItem('wallet'));
         var nice_keys = "";
         var keys = wallet_data['keys'];
@@ -1262,8 +1262,8 @@ export default class Wallet extends React.Component {
                                     </div>
                                 </form>
                                 <div className="col-xs-12 col-sm-6">
-                                    <button onClick={this.exportEncryptedWallet}>Export Encrypted Wallet</button>
-                                    <button onClick={this.exportUnencryptedWallet}>Export Unencrypted Wallet</button>
+                                    <button onClick={this.exportEncryptedWallet}>Export Encrypted Wallet (.dat)</button>
+                                    <button onClick={this.exportUnencryptedWallet}>Export Unencrypted Keys</button>
                                     <button onClick={this.logout}>Logout</button>
                                 </div>
                             </div>
