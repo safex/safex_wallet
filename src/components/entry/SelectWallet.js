@@ -59,6 +59,9 @@ export default class SelectWallet extends React.Component {
     }
     //This happens when you click wallet reset on the main screen
     walletResetStart() {
+        alert('This feature is only if you want to delete a wallet and start over. This is not for upgrading ' +
+            'wallet versions.');
+        alert('This is not necessary for upgrading wallet versions.');
         alert('PROCEED WITH CAUTION THIS PROCESS WILL DELETE YOUR EXISTING WALLET');
         alert('This procedure will reset the wallet. It will take you through steps to backup the existing wallet.' +
             'Then the existing wallet will be deleted to make room for a new one. PROCEED WITH CAUTION!!');
