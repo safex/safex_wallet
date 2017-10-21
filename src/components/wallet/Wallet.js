@@ -973,13 +973,16 @@ export default class Wallet extends React.Component {
                 </div>
                 <div className="col-xs-12">
                     <div className="row amounts">
+                        <span className="col-xs-2 archive-button">
+                            <span>TO ARCHIVE</span>
+                        </span>
                         <span
-                            className="col-xs-6 amount">Safex: <span>{keys[key].pending_safex_bal < 0 ? (parseFloat(keys[key].safex_bal) + parseFloat(keys[key].pending_safex_bal)) :
+                            className="col-xs-4 amount">Safex: <span>{keys[key].pending_safex_bal < 0 ? (parseFloat(keys[key].safex_bal) + parseFloat(keys[key].pending_safex_bal)) :
                             <NumberFormat value={keys[key].safex_bal} displayType={'text'} thousandSeparator={true}/>}
                             {keys[key].pending_safex_bal > 0 | keys[key].pending_safex_bal < 0 ? ' (pending ' +
                                 keys[key].pending_safex_bal + ')' : ''}</span></span>
                         <span
-                            className="col-xs-6 amount">Bitcoin: <span>{keys[key].pending_btc_bal < 0 ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)).toFixed(8) : keys[key].btc_bal}
+                            className="col-xs-4 amount">Bitcoin: <span>{keys[key].pending_btc_bal < 0 ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)).toFixed(8) : keys[key].btc_bal}
                             {keys[key].pending_btc_bal > 0 | keys[key].pending_btc_bal < 0 ? ' (pending ' + keys[key].pending_btc_bal + ')' : ''}</span></span>
                     </div>
                 </div>
@@ -1107,6 +1110,18 @@ export default class Wallet extends React.Component {
                                 ? 'refresh-button'
                                 : 'refresh-button disabled'} onClick={this.refreshWallet}><img
                                 src="images/refresh.png"/><span>{this.state.refreshTimer + 's'}</span></button>
+                        </div>
+                    </div>
+                </div>
+                <div className="container">
+                    <div className="row wallet-tabs">
+                        <div className="col-xs-12">
+                          <div className="btn btn-default">
+                            Starred
+                          </div>
+                          <div className="btn btn-default pull-right">
+                            Archive
+                          </div>
                         </div>
                     </div>
                 </div>

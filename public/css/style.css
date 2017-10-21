@@ -284,6 +284,15 @@ body{
   margin-bottom:5px;
   padding-left:5px;
 }
+.single-key .amounts > span.archive-button{
+  background: none;
+}
+.single-key .amounts > span.archive-button > span{
+  background:url('../images/btn-bg.png');
+  background-size:100% 100%;
+  border:1px solid #327A9B;
+  padding:5px;
+}
 .single-key .amounts > span > span{
   color:#00d1ff;
 }
@@ -439,6 +448,20 @@ body{
   display:inline-block;
   margin-left:5px;
   height:20px;
+}
+.wallet-tabs .btn{
+  background:url('../images/btn-bg.png');
+  background-size:100% 100%;
+  border:1px solid #327A9B;
+  padding:8px 15px;
+  border-radius: 0;
+  text-shadow: none;
+  color:#fff;
+  text-transform: uppercase;
+  margin-bottom:10px;
+}
+.wallet-tabs .btn.active{
+  color:#00d1ff;
 }
 .explorer{
   color:#fff;
