@@ -24,6 +24,7 @@ export default class Wallet extends React.Component {
             keys: [],
             wallet: {},
             import_key: '',
+            archive_active: false,
 
             //transaction
             send_coin: 'safex',
@@ -422,7 +423,7 @@ export default class Wallet extends React.Component {
         key_json['btc_bal'] = 0;
         key_json['pending_safex_bal'] = 0;
         key_json['pending_btc_bal'] = 0;
-        key_json['archived'] = false;
+        key_json['archived'] = 0;
 
         try {
             var json = JSON.parse(localStorage.getItem('wallet'));
@@ -478,7 +479,6 @@ export default class Wallet extends React.Component {
             key_json['btc_bal'] = 0;
             key_json['pending_safex_bal'] = 0;
             key_json['pending_btc_bal'] = 0;
-            key_json['archived'] = false;
 
 
             try {
@@ -943,11 +943,13 @@ export default class Wallet extends React.Component {
 
 
     render() {
-        const {keys} = this.state;
+        const {keys, archive_active} = this.state;
 
         var table = Object.keys(keys).map((key) => {
 
-            return <div className="col-xs-12 single-key" key={key}>
+            return <div className={keys[key].archive === archive_active
+                ? 'col-xs-12 single-key'
+                : 'col-xs-12 single-key hidden-xs hidden-sm hidden-md hidden-lg'} key={key} >
                 <div className="col-xs-7">
                     <div className="key">{keys[key].public_key}</div>
                 </div>
