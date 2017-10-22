@@ -1,4 +1,6 @@
 import crypto from 'crypto';
+var bitcoin = window.require('bitcoinjs-lib');
+var bs58 = require('bs58');
 
 module.exports = {
     bytesToHex: function (bytes) {
@@ -26,6 +28,6 @@ module.exports = {
         var dec = decipher.update(text, 'hex', 'utf8')
         dec += decipher.final('utf8');
         return dec;
-    }
+    },
 
 }

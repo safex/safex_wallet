@@ -6,11 +6,11 @@ var os = window.require('os');
 var bs58 = require('bs58');
 var bitcoin = window.require('bitcoinjs-lib');
 var bitcore = window.require('bitcore-lib');
-import {toHexString, encrypt, safexPayload, decrypt} from '../../utils/utils';
+import { toHexString, encrypt, safexPayload, decrypt} from '../../utils/utils';
+import { genkey} from '../../utils/keys';
 import QRCode from 'qrcode.react';
 import NumberFormat from 'react-number-format';
 
-//todo settings icon with export encrypted and unencrypted, also change password feature
 
 import Navigation from '../Navigation';
 
@@ -409,34 +409,14 @@ export default class Wallet extends React.Component {
     createKey() {
         this.setState({is_loading: true});
 
-        var random_array = new Uint8Array(32);
-        window.crypto.getRandomValues(random_array);
-        var priv_key_bytes = [];
-
-        for (var i = 0; i < random_array.length; ++i) {
-            priv_key_bytes[i] = random_array[i];
-        }
-
-        var hex_string = toHexString(priv_key_bytes).toUpperCase();
-
-        var priv_key_and_version = "80" + hex_string;
-        var first_bytes = Buffer.from(priv_key_and_version, 'hex');
-        var first_sha = bitcoin.crypto.sha256(first_bytes);
-        var second_sha = bitcoin.crypto.sha256(first_sha);
-        var checksum = toHexString(second_sha).substr(0, 8).toUpperCase();
-        var key_with_checksum = priv_key_and_version + checksum;
-
-        var final_bytes = Buffer.from(key_with_checksum, 'hex');
-        var priv_key_wif = bs58.encode(final_bytes);
-
-        var key_pair = bitcoin.ECPair.fromWIF(priv_key_wif);
+        var key_pair = genkey();
 
         var address = key_pair.getAddress();
-
+        console.log(key_pair.toWIF())
 
         var key_json = {};
         key_json['public_key'] = address;
-        key_json['private_key'] = priv_key_wif;
+        key_json['private_key'] = key_pair.toWIF();
         key_json['safex_bal'] = 0;
         key_json['btc_bal'] = 0;
         key_json['pending_safex_bal'] = 0;

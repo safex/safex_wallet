@@ -4,7 +4,8 @@ var fs = window.require('fs');
 var os = window.require('os');
 var bs58 = require('bs58');
 var bitcoin = window.require('bitcoinjs-lib');
-import { toHexString, encrypt } from '../../utils/utils';
+import { encrypt} from '../../utils/utils';
+import { genkey } from '../../utils/keys';
 import {Link} from 'react-router';
 
 
@@ -21,39 +22,18 @@ export default class CreateWallet extends React.Component {
 
     //here we create the wallet file in the default location after prompting for a password and creating the encrypted file.
 
-
-    //todo require setting a password
     handleSubmit(e) {
         e.preventDefault();
 
         if (e.target.password1.value.length > 0 && e.target.password1.value === e.target.password2.value) {
-            var random_array = new Uint8Array(32);
-            window.crypto.getRandomValues(random_array);
-            var priv_key_bytes = [];
-
-            for (var i = 0; i < random_array.length; ++i) {
-                priv_key_bytes[i] = random_array[i];
-            }
-
-            var hex_string = toHexString(priv_key_bytes).toUpperCase();
-
-            var priv_key_and_version = "80" + hex_string;
-            var first_bytes = Buffer.from(priv_key_and_version, 'hex');
-            var first_sha = bitcoin.crypto.sha256(first_bytes);
-            var second_sha = bitcoin.crypto.sha256(first_sha);
-            var checksum = toHexString(second_sha).substr(0, 8).toUpperCase();
-            var key_with_checksum = priv_key_and_version + checksum;
-
-            var final_bytes = Buffer.from(key_with_checksum, 'hex');
-            var priv_key_wif = bs58.encode(final_bytes);
-
-            var key_pair = bitcoin.ECPair.fromWIF(priv_key_wif);
+            var key_pair = genkey();
 
             var address = key_pair.getAddress();
 
+
             var key_json = {};
             key_json['public_key'] = address;
-            key_json['private_key'] = priv_key_wif;
+            key_json['private_key'] = key_pair.toWIF();
             key_json['safex_bal'] = 0;
             key_json['btc_bal'] = 0;
             key_json['pending_safex_bal'] = 0;
