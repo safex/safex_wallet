@@ -80,6 +80,7 @@ export default class Wallet extends React.Component {
         this.closeSettingsModal = this.closeSettingsModal.bind(this);
         this.changePassword = this.changePassword.bind(this);
         this.logout = this.logout.bind(this);
+        this.sendToArchive = this.sendToArchive.bind(this);
     }
 
     logout() {
@@ -93,7 +94,7 @@ export default class Wallet extends React.Component {
             this.prepareDisplay();
             let interval = setInterval(this.refreshWalletTimer, 1000);
             this.setState({
-                refreshTimer: 180,
+                refreshTimer: 120,
                 refreshInterval: interval
             });
         }
@@ -421,7 +422,7 @@ export default class Wallet extends React.Component {
         key_json['btc_bal'] = 0;
         key_json['pending_safex_bal'] = 0;
         key_json['pending_btc_bal'] = 0;
-
+        key_json['archived'] = 0;
 
         try {
             var json = JSON.parse(localStorage.getItem('wallet'));
@@ -933,6 +934,13 @@ export default class Wallet extends React.Component {
         }
     }
 
+
+    sendToArchive(others) {
+        console.log(others)
+        console.log("we're all set here")
+    }
+
+
     render() {
         const {keys} = this.state;
 
@@ -951,11 +959,17 @@ export default class Wallet extends React.Component {
                     <button onClick={this.openSendReceive.bind(this, key, 'receive')}>RECEIVE <img
                         src="images/import.png" alt="Receive"/></button>
                 </div>
+
+
                 <div className="col-xs-12">
                     <div className="row amounts">
-                        <span className="col-xs-2 archive-button">
+
+                        <button onClick={() => this.sendToArchive(key)}
+                                className="col-xs-2 archive-button">
                             <span>TO ARCHIVE</span>
-                        </span>
+                        </button>
+
+
                         <span
                             className="col-xs-4 amount">Safex: <span>{keys[key].pending_safex_bal < 0 ? (parseFloat(keys[key].safex_bal) + parseFloat(keys[key].pending_safex_bal)) :
                             <NumberFormat value={keys[key].safex_bal} displayType={'text'} thousandSeparator={true}/>}
@@ -966,6 +980,8 @@ export default class Wallet extends React.Component {
                             {keys[key].pending_btc_bal > 0 | keys[key].pending_btc_bal < 0 ? ' (pending ' + keys[key].pending_btc_bal + ')' : ''}</span></span>
                     </div>
                 </div>
+
+
                 <form onSubmit={this.openCoinModal}
                       className={this.state.collapse_open.send_open && this.state.collapse_open.key === key
                           ? 'col-xs-12 form-inline form-send active'
