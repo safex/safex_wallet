@@ -940,7 +940,7 @@ export default class Wallet extends React.Component {
     }
 
 
-    sendToArchive(others) {
+    sendToArchive(index) {
 
         //take the target add the field, rewrite history
 
@@ -955,20 +955,68 @@ export default class Wallet extends React.Component {
             alert('error parsing the wallet data')
         }
 
-        console.log(json.keys[others])
 
-        var add_field = {};
-        add_field = json.keys[others];
+        var json_index = {};
+        json_index = json.keys[index];
 
-        add_field.archived = true;
+        json_index.archived = true;
 
         console.log(typeof json.keys)
 
-        json.keys.push(others, add_field);
+        json.keys[index] = json_index;
 
-        console.log(json)
 
             //need to remove the previous one
+
+
+        //1. modify the line and remove the previous one
+        //2. encrypt
+        //3. overwrite the file with new parameters
+        //4. if true unrender it
+
+        var crypto = require('crypto'),
+            algorithm = 'aes-256-ctr',
+            password = localStorage.getItem('password');
+
+        var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
+
+
+        fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
+            if (err) {
+                alert('problem communicating to the wallet file')
+            } else {
+                localStorage.setItem('wallet', JSON.stringify(json));
+                try {
+                    var json2 = JSON.parse(localStorage.getItem('wallet'));
+                    this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
+                    this.prepareDisplay();
+                } catch (e) {
+                    alert('an error adding a key to the wallet contact team@safex.io')
+                }
+
+            }
+        });
+    }
+
+    remove_from_archive(index) {
+        try {
+            var json = JSON.parse(localStorage.getItem('wallet'));
+        } catch (e) {
+            alert('error parsing the wallet data')
+        }
+
+
+        var json_index = {};
+        json_index = json.keys[index];
+
+        json_key.archived = false
+
+        console.log(typeof json.keys)
+
+        json.keys[index] = json_index;
+
+
+        //need to remove the previous one
 
 
         //1. modify the line and remove the previous one
