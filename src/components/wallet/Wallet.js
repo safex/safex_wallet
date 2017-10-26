@@ -6,8 +6,8 @@ var os = window.require('os');
 var bs58 = require('bs58');
 var bitcoin = window.require('bitcoinjs-lib');
 var bitcore = window.require('bitcore-lib');
-import { toHexString, encrypt, safexPayload, decrypt} from '../../utils/utils';
-import { genkey} from '../../utils/keys';
+import {toHexString, encrypt, safexPayload, decrypt} from '../../utils/utils';
+import {genkey} from '../../utils/keys';
 import QRCode from 'qrcode.react';
 import NumberFormat from 'react-number-format';
 
@@ -153,6 +153,7 @@ export default class Wallet extends React.Component {
         var promises = [];
         this.state.keys.forEach((key) => {
             var json = {};
+            console.log(key.public_key)
             json['address'] = key.public_key;
             promises.push(fetch('http://omni.safex.io:3001/balance', {
                 method: "POST",
@@ -425,7 +426,7 @@ export default class Wallet extends React.Component {
         key_json['btc_bal'] = 0;
         key_json['pending_safex_bal'] = 0;
         key_json['pending_btc_bal'] = 0;
-        key_json['archived'] = 0;
+        key_json['archived'] = false;
 
         try {
             var json = JSON.parse(localStorage.getItem('wallet'));
@@ -940,6 +941,62 @@ export default class Wallet extends React.Component {
 
     sendToArchive(others) {
 
+        //take the target add the field, rewrite history
+
+        //target state
+        //target localstorage
+        //target savedfile
+
+
+        try {
+            var json = JSON.parse(localStorage.getItem('wallet'));
+        } catch (e) {
+            alert('error parsing the wallet data')
+        }
+
+        console.log(json.keys[others])
+
+        var add_field = {};
+        add_field = json.keys[others];
+
+        add_field.archived = true;
+
+        console.log(typeof json.keys)
+
+        json.keys.push(others, add_field);
+
+        console.log(json)
+
+            //need to remove the previous one
+
+
+        //1. modify the line and remove the previous one
+        //2. encrypt
+        //3. overwrite the file with new parameters
+        //4. if true unrender it
+
+        var crypto = require('crypto'),
+            algorithm = 'aes-256-ctr',
+            password = localStorage.getItem('password');
+
+        var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
+
+
+        fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
+            if (err) {
+                alert('problem communicating to the wallet file')
+            } else {
+                localStorage.setItem('wallet', JSON.stringify(json));
+                try {
+                    var json2 = JSON.parse(localStorage.getItem('wallet'));
+                    this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
+                    this.prepareDisplay();
+                } catch (e) {
+                    alert('an error adding a key to the wallet contact team@safex.io')
+                }
+
+            }
+        });
     }
 
     setArchiveView() {
@@ -957,9 +1014,9 @@ export default class Wallet extends React.Component {
         var table = Object.keys(keys).map((key) => {
 
             return <div className={keys[key].archived === archive_active
-                | (!keys[key].hasOwnProperty('archived') && archive_active === false)
+            | (!keys[key].hasOwnProperty('archived') && archive_active === false)
                 ? 'col-xs-12 single-key'
-                : 'col-xs-12 single-key hidden-xs hidden-sm hidden-md hidden-lg'} key={key} >
+                : 'col-xs-12 single-key hidden-xs hidden-sm hidden-md hidden-lg'} key={key}>
                 <div className="col-xs-7">
                     <div className="key">{keys[key].public_key}</div>
                 </div>
@@ -984,13 +1041,19 @@ export default class Wallet extends React.Component {
 
 
                         <span
-                            className="col-xs-4 amount">Safex: <span>{keys[key].pending_safex_bal < 0 ? (parseFloat(keys[key].safex_bal) + parseFloat(keys[key].pending_safex_bal)) :
+                            className="col-xs-4 amount">Safex: <span>{keys[key].pending_safex_bal < 0 ? (parseFloat(keys[key].safex_bal)
+                            + parseFloat(keys[key].pending_safex_bal)) :
                             <NumberFormat value={keys[key].safex_bal} displayType={'text'} thousandSeparator={true}/>}
                             {keys[key].pending_safex_bal > 0 | keys[key].pending_safex_bal < 0 ? ' (pending ' +
                                 keys[key].pending_safex_bal + ')' : ''}</span></span>
                         <span
-                            className="col-xs-4 amount">Bitcoin: <span>{keys[key].pending_btc_bal < 0 ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)).toFixed(8) : keys[key].btc_bal}
-                            {keys[key].pending_btc_bal > 0 | keys[key].pending_btc_bal < 0 ? ' (pending ' + keys[key].pending_btc_bal + ')' : ''}</span></span>
+                            className="col-xs-4 amount">Bitcoin: <span>{keys[key].pending_btc_bal < 0 ? (parseFloat(keys[key].btc_bal)
+                            + parseFloat(keys[key].pending_btc_bal)).toFixed(8) : keys[key].btc_bal}
+                            {
+                                keys[key].pending_btc_bal > 0 | keys[key].pending_btc_bal < 0
+                                    ? ' (pending ' + keys[key].pending_btc_bal + ')' : ''
+                            }
+                            </span></span>
                     </div>
                 </div>
 
@@ -1125,12 +1188,12 @@ export default class Wallet extends React.Component {
                 <div className="container">
                     <div className="row wallet-tabs">
                         <div className="col-xs-12">
-                          <div onClick={this.setHomeView} className="btn btn-default">
-                            Starred
-                          </div>
-                          <div onClick={this.setArchiveView} className="btn btn-default pull-right">
-                            Archive
-                          </div>
+                            <div onClick={this.setHomeView} className="btn btn-default">
+                                Starred
+                            </div>
+                            <div onClick={this.setArchiveView} className="btn btn-default pull-right">
+                                Archive
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1191,7 +1254,8 @@ export default class Wallet extends React.Component {
                                         <label htmlFor="total">Total:</label>
                                         <input readOnly name="total" value={this.state.send_total}></input>
                                     </div>
-                                    <button className='' type="submit"> {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}</button>
+                                    <button className=''
+                                            type="submit"> {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}</button>
                                 </div>
                             </div>
                         </div>
