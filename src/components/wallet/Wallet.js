@@ -84,6 +84,7 @@ export default class Wallet extends React.Component {
         this.sendToArchive = this.sendToArchive.bind(this);
         this.setArchiveView = this.setArchiveView.bind(this);
         this.setHomeView = this.setHomeView.bind(this);
+        this.remove_from_archive = this.remove_from_archive.bind(this);
     }
 
     logout() {
@@ -961,8 +962,6 @@ export default class Wallet extends React.Component {
 
         json_index.archived = true;
 
-        console.log(typeof json.keys)
-
         json.keys[index] = json_index;
 
 
@@ -1009,9 +1008,7 @@ export default class Wallet extends React.Component {
         var json_index = {};
         json_index = json.keys[index];
 
-        json_key.archived = false
-
-        console.log(typeof json.keys)
+        json_index.archived = false
 
         json.keys[index] = json_index;
 
