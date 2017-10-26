@@ -482,6 +482,7 @@ export default class Wallet extends React.Component {
             key_json['btc_bal'] = 0;
             key_json['pending_safex_bal'] = 0;
             key_json['pending_btc_bal'] = 0;
+            key_json['archived'] = false;
 
 
             try {
