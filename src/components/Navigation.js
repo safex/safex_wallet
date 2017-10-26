@@ -46,8 +46,10 @@ export default class Navigation extends React.Component {
                         // look for the entry with a matching `code` value
                         if (resp[i].symbol === 'SAFEX') {
                             safex = resp[i].price_usd
+                            localStorage.setItem('safex_price', safex);
                         } else if (resp[i].symbol === 'BTC') {
                             btc = resp[i].price_usd
+                            localStorage.setItem('btc_price', btc);
                         }
                     }
 
