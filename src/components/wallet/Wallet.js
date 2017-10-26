@@ -82,6 +82,8 @@ export default class Wallet extends React.Component {
         this.changePassword = this.changePassword.bind(this);
         this.logout = this.logout.bind(this);
         this.sendToArchive = this.sendToArchive.bind(this);
+        this.setArchiveView = this.setArchiveView.bind(this);
+        this.setHomeView = this.setHomeView.bind(this);
     }
 
     logout() {
@@ -938,8 +940,15 @@ export default class Wallet extends React.Component {
 
 
     sendToArchive(others) {
-        console.log(others)
-        console.log("we're all set here")
+
+    }
+
+    setArchiveView() {
+        this.setState({archive_active: true});
+    }
+
+    setHomeView() {
+        this.setState({archive_active: false});
     }
 
 
@@ -948,7 +957,8 @@ export default class Wallet extends React.Component {
 
         var table = Object.keys(keys).map((key) => {
 
-            return <div className={keys[key].archive === archive_active
+            return <div className={keys[key].archived === archive_active
+                | (!keys[key].hasOwnProperty('archived') && archive_active === false)
                 ? 'col-xs-12 single-key'
                 : 'col-xs-12 single-key hidden-xs hidden-sm hidden-md hidden-lg'} key={key} >
                 <div className="col-xs-7">
@@ -1116,10 +1126,10 @@ export default class Wallet extends React.Component {
                 <div className="container">
                     <div className="row wallet-tabs">
                         <div className="col-xs-12">
-                          <div className="btn btn-default">
+                          <div onClick={this.setHomeView} className="btn btn-default">
                             Starred
                           </div>
-                          <div className="btn btn-default pull-right">
+                          <div onClick={this.setArchiveView} className="btn btn-default pull-right">
                             Archive
                           </div>
                         </div>
