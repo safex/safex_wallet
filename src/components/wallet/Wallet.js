@@ -84,7 +84,7 @@ export default class Wallet extends React.Component {
         this.sendToArchive = this.sendToArchive.bind(this);
         this.setArchiveView = this.setArchiveView.bind(this);
         this.setHomeView = this.setHomeView.bind(this);
-        this.remove_from_archive = this.remove_from_archive.bind(this);
+        this.removeFromArchive = this.removeFromArchive.bind(this);
     }
 
     logout() {
@@ -982,7 +982,7 @@ export default class Wallet extends React.Component {
 
     }
 
-    remove_from_archive(index) {
+    removeFromArchive(index) {
         try {
             var json = JSON.parse(localStorage.getItem('wallet'));
 
@@ -1058,8 +1058,19 @@ export default class Wallet extends React.Component {
                     <div className="row amounts">
 
                         <button onClick={() => this.sendToArchive(key)}
-                                className="col-xs-2 archive-button">
+                                className={keys[key].archived === false
+                                | (!keys[key].hasOwnProperty('archived') && archive_active === false)
+                                    ? 'col-xs-2 archive-button'
+                                    : 'col-xs-2 archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
                             <span>TO ARCHIVE</span>
+                        </button>
+
+                        <button onClick={() => this.removeFromArchive(key)}
+                          className={keys[key].archived === true
+                          | (!keys[key].hasOwnProperty('archived') && archive_active === true)
+                              ? 'col-xs-2 archive-button'
+                              : 'col-xs-2 archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
+                            <span>TO HOME</span>
                         </button>
 
 
@@ -1212,7 +1223,7 @@ export default class Wallet extends React.Component {
                     <div className="row wallet-tabs">
                         <div className="col-xs-12">
                             <div onClick={this.setHomeView} className="btn btn-default">
-                                Starred
+                                Home
                             </div>
                             <div onClick={this.setArchiveView} className="btn btn-default pull-right">
                                 Archive
