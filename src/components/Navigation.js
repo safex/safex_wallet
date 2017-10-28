@@ -11,8 +11,6 @@ export default class Navigation extends React.Component {
             safex_price: 0,
             bitcoin_price: 0,
         }
-        this.getSafexPrice = this.getSafexPrice.bind(this);
-        this.getBitcoinPrice = this.getBitcoinPrice.bind(this);
         this.getPrices = this.getPrices.bind(this);
 
     }
@@ -58,41 +56,6 @@ export default class Navigation extends React.Component {
                     console.log(e);
                 }
             });
-    }
-
-
-    getSafexPrice() {
-        axios.get('https://api.coinmarketcap.com/v1/ticker/').then(res => {
-            console.log(res);
-            try {
-                for (var i = 0; i < res.data.length; i++) {
-                    // look for the entry with a matching `code` value
-                    if (res.data[i].symbol === 'SAFEX') {
-                        this.setState({safex_price: res.data[i].price_usd});
-                    }
-                }
-            } catch (e) {
-                console.log(e);
-            }
-        });
-        //get latest price of safex
-    }
-
-    getBitcoinPrice() {
-        axios.get('https://api.coinmarketcap.com/v1/ticker/').then(res => {
-            console.log(res);
-            try {
-                for (var i = 0; i < res.data.length; i++) {
-                    // look for the entry with a matching `code` value
-                    if (res.data[i].symbol === 'BTC') {
-                        this.setState({bitcoin_price: res.data[i].price_usd});
-                    }
-                }
-            } catch (e) {
-                console.log(e);
-            }
-        });
-        //get the current price of bitcoin
     }
 
 

@@ -42,6 +42,8 @@ export default class Wallet extends React.Component {
             txid: "",
             average_fee: 0,
             active_fee: 'fast',
+            safex_price: 0,
+            btc_price: 0,
 
             //UI state
             btc_sync: false,
@@ -99,7 +101,7 @@ export default class Wallet extends React.Component {
             let interval = setInterval(this.refreshWalletTimer, 1000);
             this.setState({
                 refreshTimer: 120,
-                refreshInterval: interval
+                refreshInterval: interval,
             });
         }
     }
@@ -204,7 +206,14 @@ export default class Wallet extends React.Component {
                 }
 
             }
-            this.setState({keys: hold_keys, btc_sync: true, safex_sync: true, status_text: 'Synchronized'});
+            this.setState({
+                keys: hold_keys,
+                btc_sync: true,
+                safex_sync: true,
+                status_text: 'Synchronized',
+                safex_price: localStorage.getItem('safex_price'),
+                btc_price: localStorage.getItem('btc_price'),
+            });
         }).catch(e => {
             this.setState({
                 btc_sync: false,
@@ -979,7 +988,6 @@ export default class Wallet extends React.Component {
         }
 
 
-
     }
 
     removeFromArchive(index) {
@@ -1066,28 +1074,47 @@ export default class Wallet extends React.Component {
                         </button>
 
                         <button onClick={() => this.removeFromArchive(key)}
-                          className={keys[key].archived === true
-                          | (!keys[key].hasOwnProperty('archived') && archive_active === true)
-                              ? 'col-xs-2 archive-button'
-                              : 'col-xs-2 archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
+                                className={keys[key].archived === true
+                                | (!keys[key].hasOwnProperty('archived') && archive_active === true)
+                                    ? 'col-xs-2 archive-button'
+                                    : 'col-xs-2 archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
                             <span>TO HOME</span>
                         </button>
 
 
-                        <span
-                            className="col-xs-4 amount">Safex: <span>{keys[key].pending_safex_bal < 0 ? (parseFloat(keys[key].safex_bal)
-                            + parseFloat(keys[key].pending_safex_bal)) :
-                            <NumberFormat value={keys[key].safex_bal} displayType={'text'} thousandSeparator={true}/>}
-                            {keys[key].pending_safex_bal > 0 | keys[key].pending_safex_bal < 0 ? ' (pending ' +
-                                keys[key].pending_safex_bal + ')' : ''}</span></span>
-                        <span
-                            className="col-xs-4 amount">Bitcoin: <span>{keys[key].pending_btc_bal < 0 ? (parseFloat(keys[key].btc_bal)
-                            + parseFloat(keys[key].pending_btc_bal)).toFixed(8) : keys[key].btc_bal}
-                            {
-                                keys[key].pending_btc_bal > 0 | keys[key].pending_btc_bal < 0
-                                    ? ' (pending ' + keys[key].pending_btc_bal + ')' : ''
-                            }
-                            </span></span>
+                        <span className="col-xs-4 amount">
+                            Safex:
+                            <span>
+                                {
+                                    keys[key].pending_safex_bal < 0
+                                        ? (parseFloat(keys[key].safex_bal) + parseFloat(keys[key].pending_safex_bal))
+                                        : <NumberFormat value={keys[key].safex_bal} displayType={'text'}
+                                                        thousandSeparator={true}/>
+                                }
+                                {
+                                    keys[key].pending_safex_bal > 0
+                                    | keys[key].pending_safex_bal < 0
+                                        ? ' (pending ' + keys[key].pending_safex_bal + ')'
+                                        : ''
+                                }
+                            </span>
+                        </span>
+                        <span className="col-xs-4 amount">
+                            Bitcoin:
+                            <span>
+                                {
+                                    keys[key].pending_btc_bal < 0
+                                        ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)).toFixed(8)
+                                        : keys[key].btc_bal
+                                }
+                                {
+                                    keys[key].pending_btc_bal > 0
+                                    | keys[key].pending_btc_bal < 0
+                                        ? ' (pending ' + keys[key].pending_btc_bal + ')'
+                                        : ''
+                                }
+                            </span>
+                        </span>
                     </div>
                 </div>
 
