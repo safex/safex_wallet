@@ -1082,39 +1082,43 @@ export default class Wallet extends React.Component {
                         </button>
 
 
-                        <span className="col-xs-4 amount">
-                            Safex:
-                            <span>
-                                {
-                                    keys[key].pending_safex_bal < 0
-                                        ? (parseFloat(keys[key].safex_bal) + parseFloat(keys[key].pending_safex_bal))
-                                        : <NumberFormat value={keys[key].safex_bal} displayType={'text'}
-                                                        thousandSeparator={true}/>
-                                }
-                                {
-                                    keys[key].pending_safex_bal > 0
-                                    | keys[key].pending_safex_bal < 0
-                                        ? ' (pending ' + keys[key].pending_safex_bal + ')'
-                                        : ''
-                                }
+                        <div className="col-xs-10 amounts">
+                            <span className="col-xs-4 amount">
+                                Safex:
+                                <span>
+                                    {
+                                        keys[key].pending_safex_bal < 0
+                                            ? (parseFloat(keys[key].safex_bal) + parseFloat(keys[key].pending_safex_bal))
+                                            : <NumberFormat value={keys[key].safex_bal} displayType={'text'}
+                                                            thousandSeparator={true}/>
+                                    }
+                                    {
+                                        keys[key].pending_safex_bal > 0
+                                        | keys[key].pending_safex_bal < 0
+                                            ? ' (pending ' + keys[key].pending_safex_bal + ')'
+                                            : ''
+                                    }
+                                </span>
                             </span>
-                        </span>
-                        <span className="col-xs-4 amount">
-                            Bitcoin:
-                            <span>
-                                {
-                                    keys[key].pending_btc_bal < 0
-                                        ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)).toFixed(8)
-                                        : keys[key].btc_bal
-                                }
-                                {
-                                    keys[key].pending_btc_bal > 0
-                                    | keys[key].pending_btc_bal < 0
-                                        ? ' (pending ' + keys[key].pending_btc_bal + ')'
-                                        : ''
-                                }
+                        </div>
+                        <div className="col-xs-10 amounts">
+                            <span className="col-xs-4 amount">
+                                Bitcoin:
+                                <span>
+                                    {
+                                        keys[key].pending_btc_bal < 0
+                                            ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)).toFixed(8)
+                                            : keys[key].btc_bal
+                                    }
+                                    {
+                                        keys[key].pending_btc_bal > 0
+                                        | keys[key].pending_btc_bal < 0
+                                            ? ' (pending ' + keys[key].pending_btc_bal + ')'
+                                            : ''
+                                    }
+                                </span>
                             </span>
-                        </span>
+                        </div>
                     </div>
                 </div>
 
