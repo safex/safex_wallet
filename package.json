@@ -1,7 +1,7 @@
 {
   "name": "SafexWallet",
   "description": "Safex Community Wallet",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "homepage": ".",
   "repository": {
     "type": "git",
@@ -9,7 +9,8 @@
   },
   "author": {
     "name": "Safex Developers",
-    "url": "https://safex.io"
+    "url": "https://safex.io",
+    "email": "team@safex.io"
   },
   "maintainers": [
     {
@@ -81,15 +82,14 @@
    },
    "win": {
      "target": "nsis",
-     "icon": "public/images/icons/wallet-icon.ico",
-     "certificateFile": "",
-     "certificatePassword": ""
+     "icon": "public/images/icons/wallet-icon.ico"
    },
    "linux": {
      "target": [
-       "deb",
-       "rpm"
-     ]
+       "deb"
+     ],
+     "category": "Utility",
+     "icon": "public/images/icons/"
    }
  }
 
