@@ -277,10 +277,7 @@ body{
   text-transform: uppercase;
 }
 .single-key .amounts > span{
-  display:block;
-  background:url('../images/prelaz.png');
-  background-repeat: no-repeat;
-  background-position: left center;
+  display:flex;
   margin-bottom:5px;
   padding-left:5px;
 }
@@ -299,6 +296,20 @@ body{
 }
 .single-key .amounts > span > span{
   color:#00d1ff;
+  width: calc(50% - 30px);
+}
+.single-key .amounts > span > span:first-child{
+  text-align: right;
+}
+.single-key .amounts > span > span.coin-name{
+  color: #fff;
+  background: url('../images/prelaz.png');
+  margin-left: 10px;
+  margin-right: 10px;
+  padding-left: 5px;
+  padding-right: 5px;
+  width:80px;
+  text-align:center;
 }
 .single-key .pull-right button, .key-buttons button, .form-send button, .form-send .fee-buttons span, .overflow.sendModal button, .overflow.sendModal p{
   border:1px solid #327A9B;

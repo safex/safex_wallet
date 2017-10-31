@@ -1081,8 +1081,7 @@ export default class Wallet extends React.Component {
 
 
                         <div className="col-xs-10 amounts">
-                            <span className="col-xs-4 amount">
-                                $500.00 Safex:&nbsp;
+                            <span className="col-xs-12 amount">
                                 <span>
                                     {
                                         parseFloat(keys[key].safex_bal)
@@ -1094,11 +1093,14 @@ export default class Wallet extends React.Component {
                                             : ''
                                     }
                                 </span>
+                                <span className="coin-name">Safex</span>
+                                <span>
+                                    $500.00
+                                </span>
                             </span>
                         </div>
                         <div className="col-xs-10 amounts">
-                            <span className="col-xs-10 amount">
-                                $500.00 Bitcoin:&nbsp;
+                            <span className="col-xs-12 amount">
                                 <span>
                                     {
                                         keys[key].pending_btc_bal < 0
@@ -1112,6 +1114,11 @@ export default class Wallet extends React.Component {
                                             : ''
                                     }
                                 </span>
+                                <span className="coin-name">Bitcoin</span>
+                                <span>
+                                    $500.00
+                                </span>
+
                             </span>
                         </div>
                     </div>
