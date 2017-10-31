@@ -611,8 +611,7 @@ input::-webkit-inner-spin-button {
 }
 .keys-container{
   overflow-y: scroll;
-	height: calc(100% - 169px);
-  padding-bottom:100px;
+	height: calc(100% - 270px);
 }
 .wallet-page{
   overflow:hidden;
