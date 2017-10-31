@@ -1038,7 +1038,7 @@ export default class Wallet extends React.Component {
 
 
     render() {
-        const {keys, archive_active} = this.state;
+        const {keys, archive_active, safex_price, btc_price} = this.state;
 
         var table = Object.keys(keys).map((key) => {
 
@@ -1095,7 +1095,7 @@ export default class Wallet extends React.Component {
                                 </span>
                                 <span className="coin-name">Safex</span>
                                 <span>
-                                    $500.00
+                                    ${(keys[key].safex_bal * safex_price).toFixed(2)}
                                 </span>
                             </span>
                         </div>
@@ -1116,7 +1116,7 @@ export default class Wallet extends React.Component {
                                 </span>
                                 <span className="coin-name">Bitcoin</span>
                                 <span>
-                                    $500.00
+                                    ${(keys[key].btc_bal * btc_price).toFixed(2)}
                                 </span>
 
                             </span>
