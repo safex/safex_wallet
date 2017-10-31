@@ -612,9 +612,7 @@ input::-webkit-inner-spin-button {
 .keys-container{
   overflow-y: scroll;
 	height: calc(100% - 169px);
-}
-.keys-container .col-xs-12.single-key:last-child{
-  margin-bottom:100px;
+  padding-bottom:100px;
 }
 .wallet-page{
   overflow:hidden;
