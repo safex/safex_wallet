@@ -1255,10 +1255,10 @@ export default class Wallet extends React.Component {
                 <div className="container">
                     <div className="row wallet-tabs">
                         <div className="col-xs-12">
-                            <div onClick={this.setHomeView} className="btn btn-default">
+                            <div onClick={this.setHomeView} className={archive_active === false ? 'btn btn-default active' : 'btn btn-default'}>
                                 Home
                             </div>
-                            <div onClick={this.setArchiveView} className="btn btn-default pull-right">
+                            <div onClick={this.setArchiveView} className={archive_active === true ? 'btn btn-default active' : 'btn btn-default'}>
                                 Archive
                             </div>
                         </div>

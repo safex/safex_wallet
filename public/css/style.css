@@ -465,15 +465,16 @@ body{
   height:20px;
 }
 .wallet-tabs .btn{
-  background:url('../images/btn-bg.png');
+  background:url('../images/btn-bg.png') !important;
   background-size:100% 100%;
-  border:1px solid #327A9B;
+  border:1px solid #327A9B !important;
   padding:8px 15px;
   border-radius: 0;
   text-shadow: none;
   color:#fff;
   text-transform: uppercase;
   margin-bottom:10px;
+  margin-right:10px;
 }
 .wallet-tabs .btn.active{
   color:#00d1ff;
