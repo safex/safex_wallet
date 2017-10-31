@@ -976,7 +976,6 @@ export default class Wallet extends React.Component {
                     try {
                         var json2 = JSON.parse(localStorage.getItem('wallet'));
                         this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
-                        this.prepareDisplay();
                     } catch (e) {
                         alert('an error adding a key to the wallet contact team@safex.io')
                     }
@@ -1016,7 +1015,6 @@ export default class Wallet extends React.Component {
                     try {
                         var json2 = JSON.parse(localStorage.getItem('wallet'));
                         this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
-                        this.prepareDisplay();
                     } catch (e) {
                         alert('an error adding a key to the wallet contact team@safex.io')
                     }
