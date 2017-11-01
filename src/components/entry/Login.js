@@ -54,7 +54,7 @@ export default class Login extends React.Component {
                        <Link className="pul-left back-button" to="/"><img src="images/back.png" /> Back</Link>
                        <img src="images/logo.png" alt="Logo" />
                    </div>
-              <div className="col-xs-12 version-number"><p className="text-center">v0.0.2</p></div>
+              <div className="col-xs-12 version-number"><p className="text-center">v0.0.3</p></div>
                    <div className="col-xs-12 Login-form">
                      <form className="form-group" onSubmit={this.handleSubmit}>
                          <input className="form-control" type="password" name="password" placeholder="Enter Password" />
