@@ -476,8 +476,9 @@ body{
   margin-bottom:10px;
   margin-right:10px;
 }
-.wallet-tabs .btn.active{
+.wallet-tabs .btn.active, .wallet-tabs .btn:active{
   color:#00d1ff;
+  background:url('../images/button-hover.png.png') !important;
 }
 .explorer{
   color:#fff;
