@@ -156,7 +156,6 @@ export default class Wallet extends React.Component {
         var promises = [];
         this.state.keys.forEach((key) => {
             var json = {};
-            console.log(key.public_key)
             json['address'] = key.public_key;
             promises.push(fetch('http://omni.safex.io:3001/balance', {
                 method: "POST",
@@ -229,23 +228,24 @@ export default class Wallet extends React.Component {
         //check whether Bitcoin or Safex is selected
         if (this.state.send_coin === 'safex') {
             //open the modal by setting transaction_being_sent
-            this.setState({
-                transaction_being_sent: true,
-            });
-
-            //set the signing key for the transaction
-            var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
-            //set the source of the transaction
-            var source = e.target.public_key.value;
-            //set the amount provided by the user
-            var amount = e.target.amount.value;
-            //set the fee provided by the user
-            var fee = e.target.fee.value;
-            //set the destination provided by the user
-            var destination = e.target.destination.value;
-
-            //here we will check to make sure that the destination is a valid bitcoin address
             try {
+                this.setState({
+                    transaction_being_sent: true,
+                });
+
+                //set the signing key for the transaction
+                var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
+                //set the source of the transaction
+                var source = e.target.public_key.value;
+                //set the amount provided by the user
+                var amount = e.target.amount.value;
+                //set the fee provided by the user
+                var fee = e.target.fee.value;
+                //set the destination provided by the user
+                var destination = e.target.destination.value;
+
+                //here we will check to make sure that the destination is a valid bitcoin address
+
                 var address = bitcore.Address.fromString(destination);
                 var address2 = bitcore.Address.fromString(source);
                 //here we try to get the unspent transactions from the source we send from
@@ -254,7 +254,12 @@ export default class Wallet extends React.Component {
                         .then(resp => resp.json())
                         .then((resp) => {
                             //enter into the safex transaction method
-                            this.formSafexTransaction(resp, amount, parseFloat((fee * 100000000).toFixed(0)), destination, keys, source);
+                            this.formSafexTransaction(resp,
+                                amount,
+                                parseFloat((fee * 100000000).toFixed(0)),
+                                destination,
+                                keys,
+                                source);
                         });
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
@@ -270,24 +275,24 @@ export default class Wallet extends React.Component {
 
             //if safex is not selected then it must be Bitcoin
         } else {
-            //open the modal by setting transaction_being_sent
-            this.setState({
-                transaction_being_sent: true,
-            });
+            try {  //open the modal by setting transaction_being_sent
+                this.setState({
+                    transaction_being_sent: true,
+                });
 
-            //set the signing key for the transaction
-            var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
-            //set the source of the transaction
-            var source = e.target.public_key.value;
-            //set the amount provided by the user
-            var amount = e.target.amount.value;
-            //set the fee provided by the user
-            var fee = e.target.fee.value;
-            //set the destination provided by the user
-            var destination = e.target.destination.value;
+                //set the signing key for the transaction
+                var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
+                //set the source of the transaction
+                var source = e.target.public_key.value;
+                //set the amount provided by the user
+                var amount = e.target.amount.value;
+                //set the fee provided by the user
+                var fee = e.target.fee.value;
+                //set the destination provided by the user
+                var destination = e.target.destination.value;
 
-            //here we will check to make sure that the destination is a valid bitcoin address
-            try {
+                //here we will check to make sure that the destination is a valid bitcoin address
+
                 var address = bitcore.Address.fromString(destination);
                 var address2 = bitcore.Address.fromString(source);
                 //here we try to get the unspent transactions from the source we send from
@@ -296,7 +301,12 @@ export default class Wallet extends React.Component {
                         .then(resp => resp.json())
                         .then((resp) => {
                             //enter into the bitcoin transaction method
-                            this.formBitcoinTransaction(resp, parseFloat((amount * 100000000).toFixed(0)), parseFloat((fee * 100000000).toFixed(0)), destination, keys, source);
+                            this.formBitcoinTransaction(resp,
+                                parseFloat((amount * 100000000).toFixed(0)),
+                                parseFloat((fee * 100000000).toFixed(0)),
+                                destination,
+                                keys,
+                                source);
                         });
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
@@ -427,7 +437,6 @@ export default class Wallet extends React.Component {
         var key_pair = genkey();
 
         var address = key_pair.getAddress();
-        console.log(key_pair.toWIF())
 
         var key_json = {};
         key_json['public_key'] = address;
@@ -830,7 +839,7 @@ export default class Wallet extends React.Component {
             send_total = parseFloat(e.target.value) + parseFloat(send_fee);
             this.setState({
                 send_amount: e.target.value,
-                send_total: send_total
+                send_total: send_total.toFixed(8)
             });
         }
     }
@@ -1255,10 +1264,12 @@ export default class Wallet extends React.Component {
                 <div className="container">
                     <div className="row wallet-tabs">
                         <div className="col-xs-12">
-                            <div onClick={this.setHomeView} className={archive_active === false ? 'btn btn-default active' : 'btn btn-default'}>
+                            <div onClick={this.setHomeView}
+                                 className={archive_active === false ? 'btn btn-default active' : 'btn btn-default'}>
                                 Home
                             </div>
-                            <div onClick={this.setArchiveView} className={archive_active === true ? 'btn btn-default active' : 'btn btn-default'}>
+                            <div onClick={this.setArchiveView}
+                                 className={archive_active === true ? 'btn btn-default active' : 'btn btn-default'}>
                                 Archive
                             </div>
                         </div>
