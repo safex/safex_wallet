@@ -80,7 +80,9 @@
    },
    "win": {
      "target": "nsis",
-     "icon": "public/images/icons/wallet-icon.ico"
+     "icon": "public/images/icons/wallet-icon.ico",
+     "certificateFile": "../../../safexDevelopersCertificate.p12",
+     "certificatePassword": ""
    },
    "linux": {
      "target": [
