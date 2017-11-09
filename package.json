@@ -62,9 +62,9 @@
     "dev": "nf start -p 3000",
     "dist": "build",
     "make-mac-installer": "npm run build && electron-builder build -m",
-    "make-win-installer": "npm run build && electron-builder build -w",
+    "make-win-installer": "npm run build && electron-builder build -w --x64 --ia32",
     "make-linux-installer": "npm run build && electron-builder build -l",
-    "make-all-installers": "npm run build && electron-builder build -mwl"
+    "make-all-installers": "npm run build && electron-builder build -ml && electron-builder build -w --x64 --ia32"
   },
   "build": {
    "appId": "com.electron.safex_wallet",
