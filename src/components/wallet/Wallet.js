@@ -1027,6 +1027,7 @@ export default class Wallet extends React.Component {
                                 key['pending_btc_bal'] = this.state.keys[currentIndex].pending_btc_bal;
                             }
                         });
+
                         this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
                     } catch (e) {
                         alert('an error adding a key to the wallet contact team@safex.io')
@@ -1064,7 +1065,17 @@ export default class Wallet extends React.Component {
                     localStorage.setItem('wallet', JSON.stringify(json));
                     try {
                         var json2 = JSON.parse(localStorage.getItem('wallet'));
+                        json2['keys'].forEach((key) => {
+                            if (key.archived === false) {
+                                var currentIndex = this.state.keys.findIndex(i => i.public_key === key['public_key'])
+                                key['safex_bal'] = this.state.keys[currentIndex].safex_bal;
+                                key['btc_bal'] = this.state.keys[currentIndex].btc_bal;
+                                key['pending_safex_bal'] = this.state.keys[currentIndex].pending_safex_bal;
+                                key['pending_btc_bal'] = this.state.keys[currentIndex].pending_btc_bal;
+                            }
+                        });
                         this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
+                        this.prepareDisplay(json.keys[index]);
                     } catch (e) {
                         alert('an error adding a key to the wallet contact team@safex.io')
                     }
