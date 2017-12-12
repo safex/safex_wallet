@@ -101,7 +101,7 @@ export default class Wallet extends React.Component {
             this.prepareDisplay();
             let interval = setInterval(this.refreshWalletTimer, 1000);
             this.setState({
-                refreshTimer: 120,
+                refreshTimer: 90,
                 refreshInterval: interval,
             });
             this.prepareDisplayPendingTx()
