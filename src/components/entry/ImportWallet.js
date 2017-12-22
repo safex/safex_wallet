@@ -9,8 +9,16 @@ export default class ImportWallet extends React.Component {
     constructor(props) {
         super(props);
 
+        var file = 'N/A'
+        fs.stat('safexwallet.dat', function(err, stats) {
+            if(err == null) {
+                file = 'safexwallet.dat'
+                console.log('Wallet file exists');
+            }
+        })
+
         this.state = {
-            filename: 'safexwallet.dat',
+            filename: file,
             path: ''
         }
 

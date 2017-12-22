@@ -66,6 +66,7 @@ export default class Wallet extends React.Component {
         this.importKeyChange = this.importKeyChange.bind(this);
         this.sendCoins = this.sendCoins.bind(this);
         this.prepareDisplay = this.prepareDisplay.bind(this);
+        this.prepareDisplayPendingTx = this.prepareDisplayPendingTx.bind(this);
         this.openCoinModal = this.openCoinModal.bind(this);
         this.closeCoinModal = this.closeCoinModal.bind(this);
         this.sendAmountOnChange = this.sendAmountOnChange.bind(this);
@@ -100,9 +101,10 @@ export default class Wallet extends React.Component {
             this.prepareDisplay();
             let interval = setInterval(this.refreshWalletTimer, 1000);
             this.setState({
-                refreshTimer: 120,
+                refreshTimer: 90,
                 refreshInterval: interval,
             });
+            this.prepareDisplayPendingTx()
         }
     }
 
@@ -151,10 +153,54 @@ export default class Wallet extends React.Component {
             });
     }
 
-
-    prepareDisplay() {
+    prepareDisplayPendingTx(keys = null) {
         var promises = [];
-        this.state.keys.forEach((key) => {
+        if (keys === null) {
+            keys = this.state.keys.filter(function(item) {
+                return item.archived == false
+            })
+        }
+
+        if (!Array.isArray(keys)) {
+            keys = [keys]
+        }
+
+        keys.forEach((key) => {
+            var json = {};
+            json['address'] = key.public_key;
+            promises.push(fetch('http://omni.safex.io:3001/unconfirmed', {
+                method: "POST",
+                body: JSON.stringify(json)
+            })
+                .then(resp => resp.json())
+                .then((resp) => {
+                    return resp
+            }));
+        });
+
+        Promise.all(promises).then(values => {
+            var iteration = 0;
+            for (var x = 0; x < values.length; x++) {
+                var currentIndex = this.state.keys.findIndex(i => i.public_key === keys[iteration]['public_key']);
+                this.state.keys[currentIndex].pending_safex_bal = values[iteration]
+                iteration += 1;
+            }
+        });
+    }
+
+    prepareDisplay(keys = null) {
+        var promises = [];
+        if (keys === null) {
+            keys = this.state.keys.filter(function(item) {
+                return item.archived == false
+            })
+        }
+
+        if (!Array.isArray(keys)) {
+            keys = [keys]
+        }
+
+        keys.forEach((key) => {
             var json = {};
             json['address'] = key.public_key;
             promises.push(fetch('http://omni.safex.io:3001/balance', {
@@ -175,38 +221,26 @@ export default class Wallet extends React.Component {
                 .then((resp) => {
                     return resp
                 }));
-            promises.push(fetch('http://omni.safex.io:3001/unconfirmed', {
-                method: "POST",
-                body: JSON.stringify(json)
-            })
-                .then(resp => resp.json())
-                .then((resp) => {
-                    return resp
-                }));
         });
         Promise.all(promises).then(values => {
-            var hold_keys = this.state.keys;
             var internal_index = 0;
             var iteration = 0;
             for (var x = 0; x < values.length; x++) {
+                var currentIndex = this.state.keys.findIndex(i => i.public_key === keys[internal_index]['public_key']);
                 if (iteration === 0) {
-                    hold_keys[internal_index].safex_bal = values[x].balance;
+                    this.state.keys[currentIndex].safex_bal = values[x].balance;
                     iteration += 1;
                 } else if (iteration === 1) {
-                    hold_keys[internal_index].btc_bal = (values[x] / 100000000).toFixed(8);
+                    this.state.keys[currentIndex].btc_bal = (values[x] / 100000000).toFixed(8);
                     iteration += 1;
                 } else if (iteration === 2) {
-                    hold_keys[internal_index].pending_btc_bal = (values[x] / 100000000).toFixed(8);
-                    iteration += 1;
-                } else if (iteration === 3) {
-                    hold_keys[internal_index].pending_safex_bal = values[x];
+                    this.state.keys[currentIndex].pending_btc_bal = (values[x] / 100000000).toFixed(8);
                     iteration = 0;
                     internal_index += 1;
                 }
-
             }
             this.setState({
-                keys: hold_keys,
+                keys: this.state.keys,
                 btc_sync: true,
                 safex_sync: true,
                 status_text: 'Synchronized',
@@ -214,6 +248,7 @@ export default class Wallet extends React.Component {
                 btc_price: localStorage.getItem('btc_price'),
             });
         }).catch(e => {
+            console.log(e)
             this.setState({
                 btc_sync: false,
                 safex_sync: false,
@@ -976,7 +1011,6 @@ export default class Wallet extends React.Component {
 
             var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
 
-
             fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
                 if (err) {
                     alert('problem communicating to the wallet file')
@@ -984,6 +1018,16 @@ export default class Wallet extends React.Component {
                     localStorage.setItem('wallet', JSON.stringify(json));
                     try {
                         var json2 = JSON.parse(localStorage.getItem('wallet'));
+                        json2['keys'].forEach((key) => {
+                            if (key.archived === false) {
+                                var currentIndex = this.state.keys.findIndex(i => i.public_key === key['public_key'])
+                                key['safex_bal'] = this.state.keys[currentIndex].safex_bal;
+                                key['btc_bal'] = this.state.keys[currentIndex].btc_bal;
+                                key['pending_safex_bal'] = this.state.keys[currentIndex].pending_safex_bal;
+                                key['pending_btc_bal'] = this.state.keys[currentIndex].pending_btc_bal;
+                            }
+                        });
+
                         this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
                     } catch (e) {
                         alert('an error adding a key to the wallet contact team@safex.io')
@@ -994,8 +1038,6 @@ export default class Wallet extends React.Component {
         } catch (e) {
             alert('error parsing the wallet data')
         }
-
-
     }
 
     removeFromArchive(index) {
@@ -1023,11 +1065,20 @@ export default class Wallet extends React.Component {
                     localStorage.setItem('wallet', JSON.stringify(json));
                     try {
                         var json2 = JSON.parse(localStorage.getItem('wallet'));
+                        json2['keys'].forEach((key) => {
+                            if (key.archived === false) {
+                                var currentIndex = this.state.keys.findIndex(i => i.public_key === key['public_key'])
+                                key['safex_bal'] = this.state.keys[currentIndex].safex_bal;
+                                key['btc_bal'] = this.state.keys[currentIndex].btc_bal;
+                                key['pending_safex_bal'] = this.state.keys[currentIndex].pending_safex_bal;
+                                key['pending_btc_bal'] = this.state.keys[currentIndex].pending_btc_bal;
+                            }
+                        });
                         this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
+                        this.prepareDisplay(json.keys[index]);
                     } catch (e) {
                         alert('an error adding a key to the wallet contact team@safex.io')
                     }
-
                 }
             });
         } catch (e) {
