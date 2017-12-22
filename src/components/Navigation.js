@@ -1,6 +1,5 @@
 import React from 'react';
 import {Link} from 'react-router';
-import axios from 'axios';
 
 export default class Navigation extends React.Component {
 
@@ -33,29 +32,35 @@ export default class Navigation extends React.Component {
     }
 
     getPrices() {
-
-        fetch('https://api.coinmarketcap.com/v1/ticker/', {method: "GET"})
-            .then(resp => resp.json())
-            .then((resp) => {
-                try {
-                    var btc = 0;
-                    var safex = 0;
-                    for (var i = 0; i < resp.length; i++) {
-                        // look for the entry with a matching `code` value
-                        if (resp[i].symbol === 'SAFEX') {
-                            safex = resp[i].price_usd
-                            localStorage.setItem('safex_price', safex);
-                        } else if (resp[i].symbol === 'BTC') {
-                            btc = resp[i].price_usd
-                            localStorage.setItem('btc_price', btc);
-                        }
-                    }
-
-                    this.setState({safex_price: safex, bitcoin_price: btc});
-                } catch (e) {
-                    console.log(e);
+        fetch('https://api.coinmarketcap.com/v1/ticker/safe-exchange-coin/', {method: "GET"})
+        .then(resp => resp.json())
+        .then((resp) => {
+            try {
+                var safex = 0.02; // current price while not defined by coinmarketcap
+                if (resp[0].symbol === 'SAFEX' && resp[0].price_usd !== null) {
+                    safex = parseFloat(resp[0].price_usd);
                 }
-            });
+                localStorage.setItem('safex_price', safex);
+            } catch (e) {
+                console.log(e);
+            }
+        });
+
+        fetch('https://api.coinmarketcap.com/v1/ticker/bitcoin/', {method: "GET"})
+        .then(resp => resp.json())
+        .then((resp) => {
+            try {
+                var btc = 0;
+                if (resp[0].symbol === 'BTC') {
+                    btc = resp[0].price_usd
+                    localStorage.setItem('btc_price', btc);
+                }
+            } catch (e) {
+                console.log(e);
+            }
+        });
+
+        this.setState({bitcoin_price: localStorage.getItem('btc_price'), safex_price: localStorage.getItem('safex_price')});
     }
 
 
