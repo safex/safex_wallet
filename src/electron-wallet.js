@@ -11,9 +11,9 @@ const {app, Menu} = require('electron')
 const BrowserWindow = electron.BrowserWindow;
 
 var template = [{
-    label: "Application",
+    label: "Safex Wallet 0.0.5",
     submenu: [
-        { label: "About Application", selector: "orderFrontStandardAboutPanel:" },
+        { label: "About Safex Wallet v0.0.5", selector: "orderFrontStandardAboutPanel:" },
         { type: "separator" },
         { label: "Quit", accelerator: "Command+Q", click: function() { app.quit(); }}
     ]}, {
@@ -65,9 +65,9 @@ function createWindow() {
         mainWindow = null
     });
     var template = [{
-        label: "Application",
+        label: "Safex Wallet 0.0.5",
         submenu: [
-            { label: "About Application", selector: "orderFrontStandardAboutPanel:" },
+            { label: "About Safex Wallet v0.0.5", selector: "orderFrontStandardAboutPanel:" },
             { type: "separator" },
             { label: "Quit", accelerator: "Command+Q", click: function() { app.quit(); }}
         ]}, {

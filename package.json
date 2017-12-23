@@ -1,7 +1,7 @@
 {
   "name": "SafexWallet",
   "description": "Safex Community Wallet",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "homepage": ".",
   "repository": {
     "type": "git",
@@ -67,30 +67,37 @@
     "make-all-installers": "npm run build && electron-builder build -ml && electron-builder build -w --x64 --ia32"
   },
   "build": {
-   "appId": "com.electron.safex_wallet",
-   "extends": null,
-   "files": ["**/*", "build/*.*", "build/css/*.*", "build/fonts/*.*", "build/images/*.*", "build/static/css/*.*", "build/static/js/*.*"],
-   "mac": {
-     "category": "public.app-category.business",
-     "icon": "public/images/icons/wallet-icon.icns",
-     "type": "distribution",
-     "target": [
+    "appId": "com.electron.safex_wallet",
+    "extends": null,
+    "files": [
+      "**/*",
+      "build/*.*",
+      "build/css/*.*",
+      "build/fonts/*.*",
+      "build/images/*.*",
+      "build/static/css/*.*",
+      "build/static/js/*.*"
+    ],
+    "mac": {
+      "category": "public.app-category.business",
+      "icon": "public/images/icons/wallet-icon.icns",
+      "type": "distribution",
+      "target": [
         "dmg"
       ]
-   },
-   "win": {
-     "target": "nsis",
-     "icon": "public/images/icons/wallet-icon.ico",
-     "certificateFile": "../../../safexDevelopersCertificate.p12",
-     "certificatePassword": ""
-   },
-   "linux": {
-     "target": [
-       "deb"
-     ],
-     "category": "Utility",
-     "icon": "public/images/icons/"
-   }
- }
-
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "public/images/icons/wallet-icon.ico",
+      "certificateFile": "../../../safexDevelopersCertificate.p12",
+      "certificatePassword": ""
+    },
+    "linux": {
+      "target": [
+        "deb"
+      ],
+      "category": "Utility",
+      "icon": "public/images/icons/"
+    }
+  }
 }
