@@ -39,6 +39,7 @@ export default class Navigation extends React.Component {
                 var safex = 0.02; // current price while not defined by coinmarketcap
                 if (resp[0].symbol === 'SAFEX' && resp[0].price_usd !== null) {
                     safex = parseFloat(resp[0].price_usd);
+                    this.setState({safex_price: safex});
                 }
                 localStorage.setItem('safex_price', safex);
             } catch (e) {
@@ -54,13 +55,13 @@ export default class Navigation extends React.Component {
                 if (resp[0].symbol === 'BTC') {
                     btc = resp[0].price_usd
                     localStorage.setItem('btc_price', btc);
+                    this.setState({bitcoin_price: btc});
                 }
             } catch (e) {
                 console.log(e);
             }
         });
 
-        this.setState({bitcoin_price: localStorage.getItem('btc_price'), safex_price: localStorage.getItem('safex_price')});
     }
 
 
