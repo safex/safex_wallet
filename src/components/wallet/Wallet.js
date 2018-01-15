@@ -157,7 +157,7 @@ export default class Wallet extends React.Component {
         var promises = [];
         if (keys === null) {
             keys = this.state.keys.filter(function(item) {
-                return item.archived == false
+                return (item.archived == false || !item.hasOwnProperty("archived"))
             })
         }
 
@@ -192,7 +192,7 @@ export default class Wallet extends React.Component {
         var promises = [];
         if (keys === null) {
             keys = this.state.keys.filter(function(item) {
-                return item.archived == false
+                return (item.archived == false || !item.hasOwnProperty("archived"))
             })
         }
 
