@@ -897,10 +897,11 @@ export default class Wallet extends React.Component {
 
     //This is protection against way too small fees
     sendFeeOnBlur(e) {
-        if (this.state.send_fee <= 0.00005) {
-            var send_fee = 0.00005;
+        var send_fee;
+        if (this.state.send_fee <= 0.00001) {
+            send_fee = 0.00001;
         } else {
-            var send_fee = this.state.send_fee;
+            send_fee = this.state.send_fee;
         }
         this.setState({
             send_fee: send_fee
