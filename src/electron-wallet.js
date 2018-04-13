@@ -10,27 +10,6 @@ const {app, Menu} = require('electron')
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
 
-var template = [{
-    label: "Safex Wallet 0.0.6",
-    submenu: [
-        { label: "About Safex Wallet v0.0.6", selector: "orderFrontStandardAboutPanel:" },
-        { type: "separator" },
-        { label: "Quit", accelerator: "Command+Q", click: function() { app.quit(); }}
-    ]}, {
-    label: "Edit",
-    submenu: [
-        { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
-        { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
-        { type: "separator" },
-        { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
-        { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
-        { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
-        { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
-    ]}
-];
-const menu = Menu.buildFromTemplate(template);
-Menu.setApplicationMenu(menu);
-
 const path = require('path');
 const url = require('url');
 
@@ -89,7 +68,20 @@ function createWindow() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+
+require('electron-context-menu')({
+	prepend: (params, browserWindow) => [{
+        label: 'Safex Wallet',
+    }],
+    shouldShowMenu: (event, params) => params.mediaType!=='image',
+    showInspectElement: false,
+});
+
+let win;
+
+app.on('ready', createWindow, () => {
+	win = new BrowserWindow();
+});
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
