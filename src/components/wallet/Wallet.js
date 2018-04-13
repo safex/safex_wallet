@@ -1,10 +1,11 @@
 import React from 'react';
+import axios from 'axios';
 
 var fileDownload = require('react-file-download');
 var fs = window.require('fs');
 var os = window.require('os');
 var bs58 = require('bs58');
-var bitcoin = window.require('bitcoinjs-lib');
+var bitcoin = require('bitcoinjs-lib');
 var bitcore = window.require('bitcore-lib');
 import {toHexString, encrypt, safexPayload, decrypt} from '../../utils/utils';
 import {genkey} from '../../utils/keys';
@@ -32,6 +33,8 @@ export default class Wallet extends React.Component {
             send_fee: 0.0001,
             send_total: 1,
             send_overflow_active: false,
+            history_overflow_active: false,
+            history_key: '',
             send_to: '',
             send_keys: {
                 public_key: '',
@@ -69,6 +72,8 @@ export default class Wallet extends React.Component {
         this.prepareDisplayPendingTx = this.prepareDisplayPendingTx.bind(this);
         this.openCoinModal = this.openCoinModal.bind(this);
         this.closeCoinModal = this.closeCoinModal.bind(this);
+        this.openHistoryModal = this.openHistoryModal.bind(this);
+        this.closeHistoryModal = this.closeHistoryModal.bind(this);
         this.sendAmountOnChange = this.sendAmountOnChange.bind(this);
         this.sendFeeOnChange = this.sendFeeOnChange.bind(this);
         this.sendFeeOnBlur = this.sendFeeOnBlur.bind(this);
@@ -84,6 +89,7 @@ export default class Wallet extends React.Component {
         this.closeSettingsModal = this.closeSettingsModal.bind(this);
         this.changePassword = this.changePassword.bind(this);
         this.logout = this.logout.bind(this);
+        this.listTransactions = this.listTransactions.bind(this);
         this.sendToArchive = this.sendToArchive.bind(this);
         this.setArchiveView = this.setArchiveView.bind(this);
         this.setHomeView = this.setHomeView.bind(this);
@@ -396,6 +402,7 @@ export default class Wallet extends React.Component {
             });
     }
 
+
     formSafexTransaction(utxos, amount, fee, destination, key, source) {
         var running_total = 0;
         var tx = new bitcoin.TransactionBuilder();
@@ -671,7 +678,6 @@ export default class Wallet extends React.Component {
                     send_public_key: ''
                 });
             }
-
         }
         if (sendreceive === 'receive') {
             if (!this.state.collapse_open.receive_open && this.state.collapse_open.key !== key || this.state.collapse_open.receive_open && this.state.collapse_open.key !== key) {
@@ -695,6 +701,13 @@ export default class Wallet extends React.Component {
         }
     }
 
+    openHistoryModal(e) {
+        document.getElementById("history_txs").innerHTML = "loading...";
+        this.setState({
+            history_overflow_active: true,
+        })
+        this.listTransactions(this.state.keys[e].public_key);
+    }
 
     //Activates send_overflow_active state which opens Modal screen displaying transaction pre-confirmation information
     openCoinModal(e) {
@@ -826,6 +839,13 @@ export default class Wallet extends React.Component {
                 public_key: '',
                 private_key: ''
             }
+        })
+    }
+
+    closeHistoryModal() {
+        this.setState({
+            history_overflow_active: false,
+            history_key: ''
         })
     }
 
@@ -994,6 +1014,45 @@ export default class Wallet extends React.Component {
         }
     }
 
+    listTransactions(key) {
+        var render = '';
+        var bodyFormData = new FormData();
+        bodyFormData.set('addr', key);
+
+        axios({
+            method: 'post',
+            url: 'https://api.omniexplorer.info/v1/transaction/address/0',
+            data: bodyFormData,
+            config: { 
+                headers: {'Content-Type': 'multipart/form-data', 'origin': '', 'referrer': '', 'referer': ''}
+            }
+        })
+          .then(function (response) {
+            localStorage.setItem("history_txs", JSON.stringify(response.data.transactions));
+            var history = JSON.stringify(response.data.transactions);
+            var render = '';
+                JSON.parse(history).forEach((tx) => {
+                    var direction = tx['referenceaddress'] === key ? "Received🔸" : "SENT🔻";
+                    var dateTime = new Date(tx['blocktime'] * 1000);
+                    var confirmations = tx['confirmations'] > 15 ? "(16/16)" : "("+ tx['confirmations'] + "/16)"
+                    render +=`
+                        <div className="col-xs-10 history" style="min-width:650px;margin-left:70px;">
+                            <span className="coin-name">SAFEX</span> `+ direction +` <pre class="date">` + dateTime + `</pre><br />
+                            <pre class="address"><b>TX</b> `+ tx['txid'] +`</pre><br /> 
+                            <pre class="address">`+ tx['sendingaddress'] +`</pre> ➡ <pre class="address">`+ tx['referenceaddress'] +`</pre>
+                        </div>
+                        <div className="col-xs-2">
+                            `+ tx['amount'] +` safex <br />
+                            `+ confirmations +` confirmations
+                        </div>`;
+                });
+                document.getElementById("history_txs").innerHTML = render; 
+            })
+          .catch(function (error) {
+            console.log(error);
+            alert("Could not fetch tx history...");
+          });
+    }
 
     sendToArchive(index) {
         try {
@@ -1121,25 +1180,32 @@ export default class Wallet extends React.Component {
 
                 <div className="col-xs-12">
                     <div className="row amounts">
-
-                        <button onClick={() => this.sendToArchive(key)}
-                                className={keys[key].archived === false
-                                | (!keys[key].hasOwnProperty('archived') && archive_active === false)
-                                    ? 'col-xs-2 archive-button'
-                                    : 'col-xs-2 archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
-                            <span>TO ARCHIVE</span>
-                        </button>
-
-                        <button onClick={() => this.removeFromArchive(key)}
-                                className={keys[key].archived === true
-                                | (!keys[key].hasOwnProperty('archived') && archive_active === true)
-                                    ? 'col-xs-2 archive-button'
-                                    : 'col-xs-2 archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
-                            <span>TO HOME</span>
-                        </button>
+                        
+                        <div className="row amounts">
+                            <button onClick={() => this.sendToArchive(key)}
+                                    className={keys[key].archived === false
+                                    | (!keys[key].hasOwnProperty('archived') && archive_active === false)
+                                        ? 'archive-button'
+                                        : 'archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
+                                <span>TO ARCHIVE</span>
+                            </button>
+                            <button onClick={() => this.openHistoryModal(key)}
+                                    className='archive-button history-button'>
+                                <span>HISTORY</span>
+                            </button>
 
 
-                        <div className="col-xs-10 amounts">
+                            <button onClick={() => this.removeFromArchive(key)}
+                                    className={keys[key].archived === true
+                                    | (!keys[key].hasOwnProperty('archived') && archive_active === true)
+                                        ? 'archive-button'
+                                        : 'archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
+                                <span>TO HOME</span>
+                            </button>
+                        </div>
+
+
+                        <div className="col-xs-12 amounts">
                             <span className="col-xs-12 amount">
                                 <span>
                                     {
@@ -1158,7 +1224,7 @@ export default class Wallet extends React.Component {
                                 </span>
                             </span>
                         </div>
-                        <div className="col-xs-10 amounts">
+                        <div className="col-xs-12 amounts">
                             <span className="col-xs-12 amount">
                                 <span>
                                     {
@@ -1332,6 +1398,17 @@ export default class Wallet extends React.Component {
                         </div>
                     </div>
                 </div>
+                <div className={this.state.history_overflow_active
+                    ? 'overflow historyModal active'
+                    : 'overflow historyModal'}>
+                    <div className="col-xs-12">
+                        <h3>History <span className="close" onClick={this.closeHistoryModal}>X</span></h3>
+                            <div className="col-xs-12" id="history_txs">
+                            loading...
+                            </div>
+                    </div>
+                </div>
+
                 <div className={this.state.send_overflow_active
                     ? 'overflow sendModal active'
                     : 'overflow sendModal'}>
