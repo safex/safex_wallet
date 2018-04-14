@@ -35,7 +35,7 @@
     "electron-packager": "^8.7.2",
     "electron-winstaller": "^2.6.3",
     "foreman": "^2.0.0",
-    "react-scripts": "0.8.5"
+    "react-scripts": "^0.8.5"
   },
   "dependencies": {
     "axios": "^0.16.2",
@@ -46,11 +46,11 @@
     "electron-context-menu": "^0.9.1",
     "qrcode.react": "^0.7.1",
     "react": "^15.4.2",
-    "react-dom": "^15.4.2",
+    "react-dom": "^15.6.2",
     "react-file-download": "^0.3.4",
     "react-file-input": "^0.2.5",
     "react-number-format": "^2.0.3",
-    "react-router": "^3.0.4"
+    "react-router": "^3.2.1"
   },
   "main": "src/electron-wallet.js",
   "scripts": {

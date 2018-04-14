@@ -73,6 +73,7 @@ export default class Wallet extends React.Component {
         this.openCoinModal = this.openCoinModal.bind(this);
         this.closeCoinModal = this.closeCoinModal.bind(this);
         this.openHistoryModal = this.openHistoryModal.bind(this);
+        this.showPrivateModal = this.showPrivateModal.bind(this);
         this.closeHistoryModal = this.closeHistoryModal.bind(this);
         this.sendAmountOnChange = this.sendAmountOnChange.bind(this);
         this.sendFeeOnChange = this.sendFeeOnChange.bind(this);
@@ -407,18 +408,23 @@ export default class Wallet extends React.Component {
         var running_total = 0;
         var tx = new bitcoin.TransactionBuilder();
         var inputs_num = 0;
-        utxos.forEach(txn => {
+        var check = 0;
+        var checks = [source, destination];
 
-            if (running_total < (2730 + fee)) {
+        utxos.forEach(txn => {
+            if (running_total < (700 + fee)) {
                 running_total += txn.satoshis;
                 tx.addInput(txn.txid, txn.vout);
                 inputs_num += 1;
             }
         });
-        tx.addOutput(destination, 2730);
+        tx.addOutput(destination, 700);
 
-        if ((running_total - (2730 + fee)) > 0) {
-            tx.addOutput(source, (running_total - (2730 + fee)));
+        if ((running_total - (700 + fee)) > 0) {
+            tx.addOutput(source, (running_total - (700 + fee)));
+        } else {
+            check++; // no need check for source
+            checks = [destination]; 
         }
 
         var SafexTransaction = {};
@@ -429,35 +435,29 @@ export default class Wallet extends React.Component {
             .then((resp) => {
                 var decoded_txn = bitcoin.Transaction.fromHex(resp);
                 var txn = bitcoin.TransactionBuilder.fromTransaction(decoded_txn);
-                var check = 0;
-
-                txn.tx.outs.forEach(out => {
-                    if (check === 0) {
-                        var pubkey = bitcoin.address.fromOutputScript(out.script, bitcoin.networks.livenet);
-                        if (pubkey === destination) {
-                            check += 1;
+                checks.forEach(function(item) {
+                    txn.tx.outs.some(out => {
+                        try {
+                            var pubkey = bitcoin.address.fromOutputScript(out.script, bitcoin.networks.livenet);
+                        } catch (e) {
+                            console.log(e);
                         }
-                    } else if (check === 1) {
-                        var pubkey = bitcoin.address.fromOutputScript(out.script, bitcoin.networks.livenet);
-                        if (pubkey === source) {
+                        if (pubkey === item) {
                             check += 1;
+                            return;
                         }
-                    }
+                    });
                 });
 
                 if (check === 2) {
                     for (var i = 0; i < inputs_num; i++) {
                         txn.sign(i, key);
                     }
-
-
                     var json = {};
                     json['rawtx'] = txn.build().toHex();
-
                     fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
                         .then(resp => resp.text())
                         .then((resp) => {
-
                             this.setState({
                                 transaction_sent: true,
                                 transaction_being_sent: false,
@@ -467,11 +467,58 @@ export default class Wallet extends React.Component {
                 } else {
                     alert("error with transaction")
                 }
-
             });
-
     }
 
+    //TODO: needs more testing - safex not sent
+    formSafexTransactionBeta(utxos, amount, fee, destination, key, source) {
+        var running_total = 0;
+        var tx = new bitcoin.TransactionBuilder();
+        var inputs_num = 0;
+
+        // here we list btc tx from our wallet, remove 700sats, put back (the rest - fee) to ourself
+        utxos.forEach(txn => {
+            if (running_total < (700 + fee)) {
+                running_total += txn.satoshis;
+                tx.addInput(txn.txid, txn.vout);
+                inputs_num += 1;
+            }
+        });
+        tx.addOutput(destination, 700);
+
+        var btc_remaining = (running_total - (700 + fee));
+        if (btc_remaining > 0) {
+            tx.addOutput(source, btc_remaining);
+        }
+
+        var btc = require('bitcoinjs-lib');
+        if (amount <= 0.1) {
+            alert("Transaction not processed - Amount is too low. ")
+            return;
+        }
+
+        // payload omni tx
+        var data = new Buffer("0000000000000056" + String("0000000000000000" + amount).slice(-16));
+        var dataScript = btc.script.nullData.output.encode(data);
+        tx.addOutput(dataScript, 1000)
+
+        for (var i = 0; i < inputs_num; i++) {
+            tx.sign(i, key);
+        }
+        var json = {};
+        json['rawtx'] = tx.build().toHex();
+        fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
+            .then(resp => resp.text())
+            .then((resp) => {
+
+                this.setState({
+                    transaction_sent: true,
+                    transaction_being_sent: false,
+                    txid: resp
+                });
+            });
+        }
+    
 
     createKey() {
         this.setState({is_loading: true});
@@ -699,6 +746,10 @@ export default class Wallet extends React.Component {
                 });
             }
         }
+    }
+
+    showPrivateModal(e) {
+        alert("Keep your private key for yourself only!" + '\n' + '\n' + this.state.keys[e].private_key);
     }
 
     openHistoryModal(e) {
@@ -1192,6 +1243,10 @@ export default class Wallet extends React.Component {
                             <button onClick={() => this.openHistoryModal(key)}
                                     className='archive-button history-button'>
                                 <span>HISTORY</span>
+                            </button>
+                            <button onClick={() => this.showPrivateModal(key)}
+                                    className='archive-button history-button'>
+                                <span>show key</span>
                             </button>
 
 
