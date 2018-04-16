@@ -5,7 +5,7 @@ var fileDownload = require('react-file-download');
 var fs = window.require('fs');
 var os = window.require('os');
 var bs58 = require('bs58');
-var bitcoin = require('bitcoinjs-lib');
+var bitcoin = window.require('bitcoinjs-lib');
 var bitcore = window.require('bitcore-lib');
 import {toHexString, encrypt, safexPayload, decrypt} from '../../utils/utils';
 import {genkey} from '../../utils/keys';
