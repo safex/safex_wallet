@@ -458,6 +458,9 @@ export default class Wallet extends React.Component {
                     fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
                         .then(resp => resp.text())
                         .then((resp) => {
+                            if (resp=="") {
+                                throw "There was an error with the transaction.";
+                            }
                             this.setState({
                                 transaction_sent: true,
                                 transaction_being_sent: false,
