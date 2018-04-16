@@ -32,13 +32,14 @@ export default class Navigation extends React.Component {
     }
 
     getPrices() {
-        fetch('https://api.coinmarketcap.com/v1/ticker/safe-exchange-coin/', {method: "GET"})
+        fetch('https://safex.io/api/price/', {method: "POST"})
         .then(resp => resp.json())
         .then((resp) => {
             try {
-                var safex = 0.02; // current price while not defined by coinmarketcap
-                if (resp[0].symbol === 'SAFEX' && resp[0].price_usd !== null) {
-                    safex = parseFloat(resp[0].price_usd);
+                console.log(resp.price_usd)
+                var safex = 0.02;
+                if (resp.price_usd !== null) {
+                    safex = parseFloat(resp.price_usd).toFixed(5);
                     this.setState({safex_price: safex});
                 }
                 localStorage.setItem('safex_price', safex);
