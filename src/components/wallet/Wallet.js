@@ -752,6 +752,7 @@ export default class Wallet extends React.Component {
     }
 
     showPrivateModal(e) {
+        alert("The following key is to control your coins, do not share it.")
         alert("Keep your private key for yourself only!" + '\n' + '\n' + this.state.keys[e].private_key);
     }
 
@@ -1249,7 +1250,7 @@ export default class Wallet extends React.Component {
                             </button>
                             <button onClick={() => this.showPrivateModal(key)}
                                     className='archive-button history-button'>
-                                <span>show key</span>
+                                <span>show private</span>
                             </button>
 
 
