@@ -8,6 +8,27 @@ You can download [SAFEX Wallet](https://github.com/safex/safex_wallet/releases) 
 
 Available for Mac, Windows (64, 32) and Linux.
 
+## Development
+
+Electron app consists of main (backend) and renderer (frontend) processes. Frontend is based on [create-react-app](https://github.com/facebook/create-react-app). You'll want to start both in development mode at the same time.
+
+#### Backend:
+
+To start Safex Wallet backend, run this:
+
+```
+ELECTRON_START_URL=http://localhost:3000 ELECTRON_DEV=yes npm run electron
+```
+
+To run with a debugger, you'll want to set node interpreter to `node_modules/electron/cli.js`. Electron should be started referencing the ***project directory***, not the entry file directly. In Webstorm, you can set node parameters to "`./`", javascript file to anything (eg. `src/electron-wallet.js`) and working directory to the directory where you cloned this project.
+
+#### Frontend:
+
+```
+npm start
+```
+
+This will start webpack dev server and open a browser window. You will not be able to develop frontend in the browser, as it will lack some of electron's native API-s. So you can close that browser tab and instead debug frontend directly in the electron window you have started as described above.
 
 ## License
 
