@@ -1,48 +1,31 @@
 import React from 'react';
-import crypto from 'crypto';
-var fs = window.require('fs');
-import { decrypt } from '../../utils/utils';
 import {Link} from 'react-router';
 
-export default class Login extends React.Component {
+import { decryptWalletData } from '../../utils/wallet';
 
+export default class Login extends React.Component {
     constructor(props) {
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
-
     }
-
 
     handleSubmit(e) {
         e.preventDefault();
-        var crypto = require('crypto'),
-            algorithm = 'aes-256-ctr',
-            password = e.target.password.value;
-
-        localStorage.setItem('password', password);
-
-        var cipher_text = localStorage.getItem('encrypted_wallet');
-
-
-            var decrypted_wallet = decrypt(cipher_text, algorithm, password);
-
+        
+        localStorage.setItem('password', e.target.password.value);
+    
+        let wallet;
         try {
-            var parse_wallet = JSON.parse(decrypted_wallet);
-
-            if (parse_wallet['version'] === '1') {
-                localStorage.setItem('wallet', decrypted_wallet);
-
-                this.context.router.push('/wallet');
-            } else {
-
-                console.log('wrong password');
-            }
-
-        } catch (e) {
-            alert('wrong password');
-            console.log('error parsing wallet');
+            wallet = decryptWalletData();
         }
-
+        catch (err) {
+            console.error(err);
+            alert(err.message);
+            return;
+        }
+    
+        localStorage.setItem('wallet', wallet);
+        this.context.router.push('/wallet');
     }
 
     //here we load up the wallet into the local storage and move on with life.
@@ -69,7 +52,6 @@ export default class Login extends React.Component {
     }
 }
 
-
 Login.contextTypes = {
     router: React.PropTypes.object.isRequired
-}
+};

@@ -5,8 +5,7 @@ const fs = window.require('fs');
 const os = window.require('os');
 const fileDownload = require('react-file-download');
 
-import {decrypt} from '../../utils/utils';
-import {DEFAULT_WALLET_PATH, downloadWallet} from '../../utils/wallet';
+import {DEFAULT_WALLET_PATH, downloadWallet, decryptWalletData} from '../../utils/wallet';
 
 export default class SelectWallet extends React.Component {
 
@@ -87,49 +86,33 @@ export default class SelectWallet extends React.Component {
     walletResetDlUnencrypted(e) {
         e.preventDefault();
 
-        var crypto = require('crypto'),
-            algorithm = 'aes-256-ctr',
-            password = e.target.password.value;
-
         localStorage.setItem('password', e.target.password.value);
-
-        var cipher_text = localStorage.getItem('encrypted_wallet');
-
-
-        var decrypted_wallet = decrypt(cipher_text, algorithm, password);
-
+    
+        let wallet;
         try {
-            var parse_wallet = JSON.parse(decrypted_wallet);
-
-            if (parse_wallet['version'] === '1') {
-                localStorage.setItem('wallet', decrypted_wallet);
-
-                var wallet_data = JSON.parse(localStorage.getItem('wallet'));
-                var nice_keys = "";
-                var keys = wallet_data['keys'];
-                keys.map((key) => {
-                    nice_keys += "private key: " + key.private_key + '\n';
-                    nice_keys += "public key: " + key.public_key + '\n';
-                    nice_keys += '\n';
-                });
-                var date = Date.now();
-                fileDownload(nice_keys, date + 'unsafex.txt');
-
-                this.setState({
-                    walletResetModalDlUnencrypted: true
-                })
-            } else {
-
-                console.log('wrong password');
-            }
-
-        } catch (e) {
-            alert('wrong password');
-            console.log('error parsing wallet');
+            wallet = decryptWalletData();
         }
-
-
+        catch (err) {
+            console.error(err);
+            alert(err.message);
+            return;
+        }
+    
+        let niceKeys = '';
+        const keys = wallet['keys'];
+        keys.map((key) => {
+            niceKeys += "private key: " + key.private_key + '\n';
+            niceKeys += "public key: " + key.public_key + '\n';
+            niceKeys += '\n';
+        });
+        const date = Date.now();
+        fileDownload(niceKeys, date + '_unsafex.txt');
+        
+        this.setState({
+            walletResetModalDlUnencrypted: true
+        });
     }
+    
     //This is the step2 of the encrypted and step3 of the unencrypted route
     walletResetDlEncrypted(e) {
         e.preventDefault();

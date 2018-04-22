@@ -10,7 +10,7 @@ import QRCode from 'qrcode.react';
 
 import {toHexString, encrypt, safexPayload, decrypt} from '../../utils/utils';
 import {genkey} from '../../utils/keys';
-import {downloadWallet} from '../../utils/wallet';
+import { decryptWalletData, downloadWallet } from '../../utils/wallet';
 
 import Navigation from '../Navigation';
 
@@ -814,56 +814,47 @@ export default class Wallet extends React.Component {
                             alert('no wallet was found');
                         }
                     } else {
-
-                        //prepare to decrypt the wallet file from the path
-                        var crypto = require('crypto'),
-                            algorithm = 'aes-256-ctr',
-                            password = now_pass;
-
-                        //decrypt the wallet
-                        var decrypted_wallet = decrypt(fd.toString(), algorithm, password);
-
-                        //try to parse the decrypted wallet that it is valid
+                        let decrypted_wallet;
                         try {
-
-                            var parse_wallet = JSON.parse(decrypted_wallet);
-
-                            //check the version number of the wallet
-                            if (parse_wallet['version'] === '1') {
-
-                                const hash1 = crypto.createHash('sha256');
-                                const hash2 = crypto.createHash('sha256');
-
-                                //hash the wallet on the path
-                                hash1.update(decrypted_wallet);
-
-                                //hash the wallet in localstorage
-                                hash2.update(localStorage.getItem('wallet'));
-
-                                //check that both hashes the active wallet and encrypted wallet are identical
-                                if (hash1.toString() === hash2.toString()) {
-                                    var password = new_pass;
-
-                                    //encrypt the wallet data with the new password
-                                    var encrypted_wallet = encrypt(decrypted_wallet, algorithm, password);
-
-                                    //write the new file to the path
-                                    fs.writeFile(localStorage.getItem('wallet_path'), encrypted_wallet, (err) => {
-                                        if (err) {
-                                            alert('there was a problem writing the new encrypted file to disk')
-                                        } else {
-                                            //set the active password and wallet to the new file
-                                            localStorage.setItem('password', new_pass);
-                                            localStorage.setItem('wallet', decrypted_wallet);
-                                            alert('password has been changed')
-                                        }
-                                    });
-                                }
-                            } else {
-                                alert('wrong password')
+                            decrypted_wallet = decryptWalletData(fd.toString(), now_pass);
+                        }
+                        catch (err) {
+                            console.error(err);
+                            alert(err.message);
+                        }
+                        
+                        if (decrypted_wallet) {
+                            //TODO: Switch to early exit style?
+    
+                            const crypto = require('crypto');
+                            const hash1 = crypto.createHash('sha256');
+                            const hash2 = crypto.createHash('sha256');
+    
+                            //hash the wallet on the path
+                            hash1.update(decrypted_wallet);
+    
+                            //hash the wallet in localstorage
+                            hash2.update(localStorage.getItem('wallet'));
+    
+                            //check that both hashes the active wallet and encrypted wallet are identical
+                            if (hash1.toString() === hash2.toString()) {
+                                //encrypt the wallet data with the new password
+                                const algorithm = 'aes-256-ctr';
+                                const password = new_pass;
+                                const encrypted_wallet = encrypt(decrypted_wallet, algorithm, password);
+        
+                                //write the new file to the path
+                                fs.writeFile(localStorage.getItem('wallet_path'), encrypted_wallet, (err) => {
+                                    if (err) {
+                                        alert('there was a problem writing the new encrypted file to disk')
+                                    } else {
+                                        //set the active password and wallet to the new file
+                                        localStorage.setItem('password', new_pass);
+                                        localStorage.setItem('wallet', decrypted_wallet);
+                                        alert('password has been changed')
+                                    }
+                                });
                             }
-                        } catch (e) {
-                            alert('wrong password');
                         }
                     }
                 });

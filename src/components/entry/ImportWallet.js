@@ -3,7 +3,7 @@ const fs = window.require('fs');
 import FileInput from 'react-file-input';
 import {Link} from 'react-router';
 
-import { decrypt } from '../../utils/utils';
+import { decryptWalletData } from '../../utils/wallet';
 
 export default class ImportWallet extends React.Component {
     constructor(props) {
@@ -32,36 +32,25 @@ export default class ImportWallet extends React.Component {
             if (err) {
                 console.error(err);
                 alert(`Failed to read file ${this.state.path}: ${err.message}`);
-            } else {
-                localStorage.setItem('encrypted_wallet', fd);
-                localStorage.setItem('wallet_path', this.state.path);
-                localStorage.setItem('password', password);
-
-                const cipher_text = localStorage.getItem('encrypted_wallet');
-    
-                const algorithm = 'aes-256-ctr';
-                const password = e.target.password.value;
-                const decryptedWallet = decrypt(cipher_text, algorithm, password);
-
-                let parsedWallet;
-                try {
-                    parsedWallet = JSON.parse(decryptedWallet);
-                }
-                catch (e) {
-                    // This means we got an invalid JSON. Wrong password or corrupted file (no way to know?)
-                    alert(`Invalid password or corrupted wallet file`);
-                    return;
-                }
-
-                if (!parsedWallet || parsedWallet['version'] !== '1') {
-                    // We got correct decrypt, but wallet is in some unsupported format
-                    alert(`Invalid wallet format`);
-                    return;
-                }
-                
-                localStorage.setItem('wallet', decryptedWallet);
-                this.context.router.push('/wallet');
+                return;
             }
+            
+            localStorage.setItem('encrypted_wallet', fd);
+            localStorage.setItem('wallet_path', this.state.path);
+            localStorage.setItem('password', e.target.password.value);
+            
+            let wallet;
+            try {
+                wallet = decryptWalletData();
+            }
+            catch (err) {
+                console.error(err);
+                alert(err.message);
+                return;
+            }
+
+            localStorage.setItem('wallet', wallet);
+            this.context.router.push('/wallet');
         });
     }
 
