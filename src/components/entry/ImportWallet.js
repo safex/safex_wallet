@@ -43,38 +43,38 @@ export default class ImportWallet extends React.Component {
             if (err) {
                 //if the error is that No File exists, let's step through and make the file
                 if (err.code === 'ENOENT') {
-                    console.log('error');
-
+                    console.error('error');
+                    // TODO: Nothing happens here?
                 }
             } else {
                 localStorage.setItem('encrypted_wallet', fd);
                 localStorage.setItem('wallet_path', this.state.path);
                 localStorage.setItem('password', password);
 
-                var cipher_text = localStorage.getItem('encrypted_wallet');
+                const cipher_text = localStorage.getItem('encrypted_wallet');
 
-                var decrypted_wallet = decrypt(cipher_text, algorithm, password);
+                const decryptedWallet = decrypt(cipher_text, algorithm, password);
 
-
+                let parsedWallet;
                 try {
-                    var parse_wallet = JSON.parse(decrypted_wallet);
-
-
-                    if (parse_wallet['version'] === '1') {
-                        localStorage.setItem('wallet', decrypted_wallet);
-                        this.context.router.push('/wallet');
-                    } else {
-                        console.log('wrong password');
-                    }
-
-                } catch (e) {
-                    console.log(e);
+                    parsedWallet = JSON.parse(decryptedWallet);
                 }
+                catch (e) {
+                    // This means we got an invalid JSON. Wrong password or corrupted file (no way to know?)
+                    alert(`Invalid password or corrupted wallet file`);
+                    return;
+                }
+
+                if (!parsedWallet || parsedWallet['version'] !== '1') {
+                    // We got correct decrypt, but wallet is in some unsupported format
+                    alert(`Invalid wallet format`);
+                    return;
+                }
+                
+                localStorage.setItem('wallet', decryptedWallet);
+                this.context.router.push('/wallet');
             }
-
         });
-
-
     }
 
     render() {

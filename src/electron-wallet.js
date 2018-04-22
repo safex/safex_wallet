@@ -1,12 +1,13 @@
 //handle setupevents as quickly as possible
-const setupEvents = require('./setupWinEvents')
+const setupEvents = require('./setupWinEvents');
 if (setupEvents.handleSquirrelEvent()) {
    // squirrel event handled and app will exit in 1000ms, so don't do anything else
    return;
 }
+
 const electron = require('electron');
 // Module to control application life.
-const {app, Menu} = require('electron')
+const {app, Menu} = require('electron');
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
 
@@ -33,8 +34,11 @@ function createWindow() {
             slashes: true
         });
     mainWindow.loadURL(startUrl);
+    
     // Open the DevTools.
-    // mainWindow.webContents.openDevTools();
+    if (process.env.ELECTRON_DEV) {
+        mainWindow.webContents.openDevTools();
+    }
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
@@ -43,7 +47,8 @@ function createWindow() {
         // when you should delete the corresponding element.
         mainWindow = null
     });
-    var template = [{
+    
+    const template = [{
         label: "Safex Wallet 0.0.6",
         submenu: [
             { label: "About Safex Wallet v0.0.6", selector: "orderFrontStandardAboutPanel:" },
@@ -89,10 +94,8 @@ app.on('window-all-closed', function () {
     // to stay active until the user quits explicitly with Cmd + Q
 
     //if (process.platform !== 'darwin') {
-        app.quit()
+    app.quit();
     //}
-
-
 });
 
 app.on('activate', function () {
