@@ -1,20 +1,18 @@
 import React from 'react';
 import axios from 'axios';
 
-var fileDownload = require('react-file-download');
-var fs = window.require('fs');
-var os = window.require('os');
-var bs58 = require('bs58');
-var bitcoin = window.require('bitcoinjs-lib');
-var bitcore = window.require('bitcore-lib');
+const fileDownload = require('react-file-download');
+const fs = window.require('fs');
+const os = window.require('os');
+const bitcoin = window.require('bitcoinjs-lib');
+const bitcore = window.require('bitcore-lib');
+import QRCode from 'qrcode.react';
+
 import {toHexString, encrypt, safexPayload, decrypt} from '../../utils/utils';
 import {genkey} from '../../utils/keys';
-import QRCode from 'qrcode.react';
-import NumberFormat from 'react-number-format';
-
+import {downloadWallet} from '../../utils/wallet';
 
 import Navigation from '../Navigation';
-
 
 export default class Wallet extends React.Component {
     constructor(props) {
@@ -62,7 +60,7 @@ export default class Wallet extends React.Component {
             refreshTimer: 0,
             refreshInterval: '',
             status_text: 'Loading...'
-        }
+        };
 
         this.createKey = this.createKey.bind(this);
         this.importKey = this.importKey.bind(this);
@@ -122,14 +120,14 @@ export default class Wallet extends React.Component {
         else {
             clearInterval(this.state.refreshInterval);
         }
-    }
+    };
 
     componentWillMount() {
         try {
             var json = JSON.parse(localStorage.getItem('wallet'));
             this.setState({wallet: json, keys: json['keys']});
         } catch (e) {
-            alert('failed to parse wallet')
+            alert('failed to parse wallet');
             this.context.router.push('/');
         }
     }
@@ -669,29 +667,21 @@ export default class Wallet extends React.Component {
     }
 
     exportEncryptedWallet() {
-        alert("This will create an encrypted file that is your Safex Wallet. You use this file to import it into another wallet for use" +
-            "It requires a password, and if you lose the password your precious coins may be irrecoverable.")
+        alert("This will create an encrypted file that is your Safex Wallet. You use this file to import it into another wallet for use. " +
+            "It requires a password, and if you lose the password your precious coins may be irrecoverable.");
 
-        fs.readFile(localStorage.getItem('wallet_path'), (err, fd) => {
+        return downloadWallet(localStorage.getItem('wallet_path'), err => {
             if (err) {
-                //if the error is that No File exists, let's step through and make the file
-                if (err.code === 'ENOENT') {
-                    console.log('error');
-                }
-            } else {
-                var date = Date.now();
-                fileDownload(fd, date + 'safexwallet.dat');
+                alert(err.message);
             }
         });
     }
-
 
     amountChange(receive_amount) {
         this.setState({
             receive_amount: receive_amount.value
         });
     }
-
 
     //This function is connected to Send expansion button and receive expansion button
     openSendReceive(key, sendreceive) {

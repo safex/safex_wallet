@@ -1,12 +1,12 @@
 import React from 'react';
 import {Link} from 'react-router';
 
-var fs = window.require('fs');
-var os = window.require('os');
-var fileDownload = require('react-file-download');
-import { decrypt } from '../../utils/utils';
+const fs = window.require('fs');
+const os = window.require('os');
+const fileDownload = require('react-file-download');
 
-
+import {decrypt} from '../../utils/utils';
+import {DEFAULT_WALLET_PATH, downloadWallet} from '../../utils/wallet';
 
 export default class SelectWallet extends React.Component {
 
@@ -32,31 +32,31 @@ export default class SelectWallet extends React.Component {
         this.walletResetClose = this.walletResetClose.bind(this);
     }
 
-
-    //check the filesystem for default location of the safexwallet.dat file
-    //if not make it
-    componentDidMount() {
-
-    }
-
     componentWillMount() {
-        var home_dir = os.homedir();
-        fs.readFile(home_dir + '/safexwallet.dat', (err, fd) => {
+        this.tryLoadWalletFromDisk();
+    }
+    
+    tryLoadWalletFromDisk() {
+        const walletPath = DEFAULT_WALLET_PATH;
+        fs.readFile(walletPath, (err, fd) => {
             if (err) {
-                //if the error is that No File exists, let's step through and make the file
                 if (err.code === 'ENOENT') {
-                    console.log('error');
+                    // If the error is that No File exists, let's step through and make the file
                     this.setState({walletExists: false});
-
+                } else {
+                    // Some other error, eg. disk is not readable
+                    console.error(err);
+                    alert(`Failed to read wallet from ${walletPath}: ${err.message}`);
                 }
-            } else {
-                localStorage.setItem('encrypted_wallet', fd);
-                localStorage.setItem('wallet_path', home_dir + '/safexwallet.dat');
-                this.setState({walletExists: true});
+                return;
             }
-
+        
+            localStorage.setItem('encrypted_wallet', fd);
+            localStorage.setItem('wallet_path', walletPath);
+            this.setState({walletExists: true});
         });
     }
+    
     //This happens when you click wallet reset on the main screen
     walletResetStart() {
         alert('This feature is only if you want to delete a wallet and start over. This is not for upgrading ' +
@@ -143,33 +143,29 @@ export default class SelectWallet extends React.Component {
     //This leads to Done page in both routes
     walletResetStep2(e) {
         e.preventDefault();
+        
         if (e.target.checkbox.checked) {
-            var home_dir = os.homedir();
-            fs.readFile(home_dir + '/safexwallet.dat', (err, fd) => {
+            const walletPath = DEFAULT_WALLET_PATH;
+            downloadWallet(walletPath, (err) => {
                 if (err) {
-                    //if the error is that No File exists, let's step through and make the file
-                    if (err.code === 'ENOENT') {
-                        console.log('error');
-                    }
+                    alert(err.message);
                 } else {
-                    var date = Date.now();
-                    fileDownload(fd, date + 'safexwallet.dat');
-                    fs.unlink(home_dir + '/safexwallet.dat', (err) => {
+                    fs.unlink(DEFAULT_WALLET_PATH, (err) => {
                         if (err) {
-                            alert('there was an issue resetting the wallet')
+                            alert('There was an issue resetting the wallet');
+                            console.error(err);
                         } else {
                             this.setState({
                                 walletResetModalDone: true,
                                 walletExists: false
-                            })
+                            });
                         }
-                    })
+                    });
                 }
-
             });
         }
-
     }
+    
     //This closes every modal
     walletResetClose() {
         this.setState({

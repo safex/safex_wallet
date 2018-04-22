@@ -1,26 +1,18 @@
 import React from 'react';
-import crypto from 'crypto';
-var fs = window.require('fs');
+const fs = window.require('fs');
 import FileInput from 'react-file-input';
-import { decrypt } from '../../utils/utils';
 import {Link} from 'react-router';
+
+import { decrypt } from '../../utils/utils';
 
 export default class ImportWallet extends React.Component {
     constructor(props) {
         super(props);
 
-        var file = 'N/A'
-        fs.stat('safexwallet.dat', function(err, stats) {
-            if(err == null) {
-                file = 'safexwallet.dat'
-                console.log('Wallet file exists');
-            }
-        })
-
         this.state = {
-            filename: file,
+            filename: 'N/A',
             path: ''
-        }
+        };
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -35,24 +27,20 @@ export default class ImportWallet extends React.Component {
 
     handleSubmit(e) {
         e.preventDefault();
-        var crypto = require('crypto'),
-            algorithm = 'aes-256-ctr',
-            password = e.target.password.value;
 
         fs.readFile(this.state.path, (err, fd) => {
             if (err) {
-                //if the error is that No File exists, let's step through and make the file
-                if (err.code === 'ENOENT') {
-                    console.error('error');
-                    // TODO: Nothing happens here?
-                }
+                console.error(err);
+                alert(`Failed to read file ${this.state.path}: ${err.message}`);
             } else {
                 localStorage.setItem('encrypted_wallet', fd);
                 localStorage.setItem('wallet_path', this.state.path);
                 localStorage.setItem('password', password);
 
                 const cipher_text = localStorage.getItem('encrypted_wallet');
-
+    
+                const algorithm = 'aes-256-ctr';
+                const password = e.target.password.value;
                 const decryptedWallet = decrypt(cipher_text, algorithm, password);
 
                 let parsedWallet;
@@ -107,11 +95,8 @@ export default class ImportWallet extends React.Component {
                 </div>
         );
     }
-
-
-
 }
 
 ImportWallet.contextTypes = {
     router: React.PropTypes.object.isRequired
-}
+};
