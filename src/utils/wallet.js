@@ -61,9 +61,62 @@ function decryptWalletData(encryptedWallet = null, password = null) {
     return parsedWallet;
 }
 
+/**
+ * If file is not found, it will return null.
+ * If it fails to load wallet, it will call back with error
+ * @param walletPath
+ * @param {function(err:Error, res:string?)} callback
+ */
+function loadWalletFromFile(walletPath, callback) {
+    fs.readFile(walletPath, (err, fd) => {
+        if (err) {
+            if (err.code === 'ENOENT') {
+                // No wallet file is found. Return null.
+                return callback(null, null);
+            }
+    
+            // Some other error, eg. disk is not readable
+            return callback(new Error(`Failed to read wallet from ${walletPath}: ${err.message}`));
+        }
+        
+        return callback(null, fd.toString());
+    });
+}
+
+/**
+ * If file is not found, it will return null.
+ * If it fails to load or decrypt wallet, it will call back with error
+ * @param walletPath
+ * @param password
+ * @param {function(Error, {encrypted, decrypted}|null)} callback
+ */
+function loadAndDecryptWalletFromFile(walletPath, password, callback) {
+    return loadWalletFromFile(walletPath, (err, encrypted) => {
+        if (err) {
+            return callback(err);
+        }
+        
+        if (!encrypted) {
+            return callback(null, null);
+        }
+    
+        let decrypted;
+        try {
+            decrypted = decryptWalletData(encrypted, password);
+        }
+        catch (err) {
+            return callback(err);
+        }
+    
+        return callback(null, {decrypted, encrypted});
+    });
+}
+
 module.exports = {
     WALLET_FILENAME,
     DEFAULT_WALLET_PATH,
     downloadWallet,
-    decryptWalletData
+    decryptWalletData,
+    loadWalletFromFile,
+    loadAndDecryptWalletFromFile
 };

@@ -24,7 +24,7 @@ export default class Login extends React.Component {
             return;
         }
     
-        localStorage.setItem('wallet', wallet);
+        localStorage.setItem('wallet', JSON.stringify(wallet));
         this.context.router.push('/wallet');
     }
 

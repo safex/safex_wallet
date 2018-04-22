@@ -5,7 +5,7 @@ const fs = window.require('fs');
 const os = window.require('os');
 const fileDownload = require('react-file-download');
 
-import {DEFAULT_WALLET_PATH, downloadWallet, decryptWalletData} from '../../utils/wallet';
+import { DEFAULT_WALLET_PATH, downloadWallet, decryptWalletData, loadWalletFromFile } from '../../utils/wallet';
 
 export default class SelectWallet extends React.Component {
 
@@ -37,20 +37,20 @@ export default class SelectWallet extends React.Component {
     
     tryLoadWalletFromDisk() {
         const walletPath = DEFAULT_WALLET_PATH;
-        fs.readFile(walletPath, (err, fd) => {
+        
+        loadWalletFromFile(walletPath, (err, encrypted) => {
             if (err) {
-                if (err.code === 'ENOENT') {
-                    // If the error is that No File exists, let's step through and make the file
-                    this.setState({walletExists: false});
-                } else {
-                    // Some other error, eg. disk is not readable
-                    console.error(err);
-                    alert(`Failed to read wallet from ${walletPath}: ${err.message}`);
-                }
+                console.error(err);
+                alert(err.message);
                 return;
             }
-        
-            localStorage.setItem('encrypted_wallet', fd);
+            
+            if (!encrypted) {
+                this.setState({walletExists: false});
+                return;
+            }
+            
+            localStorage.setItem('encrypted_wallet', encrypted);
             localStorage.setItem('wallet_path', walletPath);
             this.setState({walletExists: true});
         });
