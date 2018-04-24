@@ -84,6 +84,7 @@ body{
   text-transform: uppercase;
   letter-spacing: 4px;
   margin-bottom: 0;
+  margin-top: 30px;
 }
 .Login-logo h3 {
   display: inline-block;
@@ -101,7 +102,7 @@ body{
 }
 .Login-form form{
   background: url(../images/login-bg.png);
-  background-size: 100% 100%;
+  background-size: contain;
   background-repeat: repeat-x;
   display: block;
   max-width: 440px;
@@ -138,11 +139,11 @@ body{
 }
 .App-intro .col-xs-6 a > div {
   padding-top: 55px;
-  padding-bottom: 25px;
+  padding-bottom: 35px;
   margin-bottom: 10px;
   border-bottom-left-radius: 15px;
   border-bottom-right-radius: 15px;
-  min-height: 377px;
+  min-height: 389px;
 }
 .App-intro .col-xs-6 a > div > img{
   height: 190px;
@@ -206,7 +207,7 @@ body{
 }
 .Import-wallet form {
   background: url(../images/importwallet-bg.png);
-  background-size: 100% 100%;
+  background-size: contain;
   background-repeat: repeat-x;
   display: block;
   max-width: 440px;
@@ -311,7 +312,7 @@ body{
   margin-bottom: 10px;
   border-radius: 10px;
   text-align: center;
-  border: 1px solid #002F42;
+  border: 1px solid transparent;
   background: url(../images/clipboard.png);
   background-size: 100% 100%;
   padding: 20px 15px;

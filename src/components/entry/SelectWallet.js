@@ -32,7 +32,6 @@ export default class SelectWallet extends React.Component {
         this.walletResetClose = this.walletResetClose.bind(this);
     }
 
-
     //check the filesystem for default location of the safexwallet.dat file
     //if not make it
     componentDidMount() {
@@ -57,6 +56,7 @@ export default class SelectWallet extends React.Component {
 
         });
     }
+
     //This happens when you click wallet reset on the main screen
     walletResetStart() {
         alert('This feature is only if you want to delete a wallet and start over. This is not for upgrading ' +
@@ -70,12 +70,14 @@ export default class SelectWallet extends React.Component {
             walletResetModal1: true
         })
     }
+
     //This happens when you click skip on the first modal
     walletResetStep1Skip() {
         this.setState({
             walletResetModalDlUnencrypted: true
         })
     }
+
     //This happens when you click proceed on the first modal
     walletResetStep1Proceed() {
         this.setState({
@@ -127,9 +129,8 @@ export default class SelectWallet extends React.Component {
             alert('wrong password');
             console.log('error parsing wallet');
         }
-
-
     }
+
     //This is the step2 of the encrypted and step3 of the unencrypted route
     walletResetDlEncrypted(e) {
         e.preventDefault();
@@ -168,8 +169,8 @@ export default class SelectWallet extends React.Component {
 
             });
         }
-
     }
+
     //This closes every modal
     walletResetClose() {
         this.setState({
@@ -192,7 +193,7 @@ export default class SelectWallet extends React.Component {
                     <div className="col-xs-12 Login-logo">
                         <h2>Safex</h2>
                         <h3>Wallet</h3>
-                        <button className="pul-right back-button wallet-reset-button" onClick={this.walletResetStart}>Wallet Reset</button>
+                        <button className="back-button wallet-reset-button" onClick={this.walletResetStart}>Wallet Reset</button>
                     </div>
                     <div className="col-xs-8 col-xs-offset-2 App-intro">
                         <div className="row text-center">
@@ -228,7 +229,7 @@ export default class SelectWallet extends React.Component {
                     <div className="col-xs-12 Login-logo">
                         <h2>Safex</h2>
                         <h3>Wallet</h3>
-                        <button className="pul-right back-button wallet-reset-button" onClick={this.walletResetStart}>Wallet Reset</button>
+                        <button className="back-button wallet-reset-button" onClick={this.walletResetStart}>Wallet Reset</button>
                     </div>
                     <div className="col-xs-8 col-xs-offset-2 App-intro">
                         <div className="row text-center">
