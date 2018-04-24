@@ -159,6 +159,12 @@ body{
   z-index:999999 !important;
   padding:50px !important;
 }
+.Import-wallet .currentwallet{
+	margin-top: 10px;
+}
+.Import-wallet .currentwallet p{
+	margin-bottom: 5px;
+}
 .Login-form > form{
   max-width: 440px;
   margin:auto;

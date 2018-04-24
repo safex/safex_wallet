@@ -34,8 +34,13 @@ function downloadWallet(walletPath, callback) {
  * @param [password]
  */
 function decryptWalletData(encryptedWallet = null, password = null) {
-    encryptedWallet = encryptedWallet || localStorage.getItem('encrypted_wallet');
-    password = password || localStorage.getItem('password');
+    if (encryptedWallet === null || encryptedWallet === undefined) {
+        encryptedWallet = localStorage.getItem('encrypted_wallet');
+    }
+    
+    if (password === null || password === undefined) {
+        password = localStorage.getItem('password');
+    }
     
     if (!encryptedWallet) {
         throw new Error(`Empty wallet data`);

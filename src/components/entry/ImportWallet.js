@@ -3,7 +3,7 @@ import FileInput from 'react-file-input';
 import {Link} from 'react-router';
 const fs = window.require('fs');
 
-import {loadAndDecryptWalletFromFile} from '../../utils/wallet';
+import {loadWalletFromFile, loadAndDecryptWalletFromFile, decryptWalletData, DEFAULT_WALLET_PATH} from '../../utils/wallet';
 
 export default class ImportWallet extends React.Component {
     constructor(props) {
@@ -12,22 +12,26 @@ export default class ImportWallet extends React.Component {
         this.state = {
             filename: 'N/A',
             path: '',
-            hasWallet: false
+            existingEncryptedWallet: null
         };
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
     
-    /*componentDidMount() {
-        fs.readFile(DEFAULT_WALLET_PATH, (err, fd) => {
+    componentDidMount() {
+        return loadWalletFromFile(DEFAULT_WALLET_PATH, (err, existingEncryptedWallet) => {
             if (err) {
-                if (err.code !== 'ENOENT') {
-                    alert()
-                }
+                console.error(err);
+                alert(err.message);
+                return;
             }
+            
+            this.setState({
+                existingEncryptedWallet
+            });
         });
-    }*/
+    }
 
     handleChange(e) {
         this.setState({
@@ -40,6 +44,12 @@ export default class ImportWallet extends React.Component {
         e.preventDefault();
         
         const targetPassword = e.target.password.value;
+        const currentPassword = e.target.current_password && e.target.current_password.value;
+        
+        if (!targetPassword || (this.state.existingEncryptedWallet && !currentPassword)) {
+            alert(`You must enter password`);
+            return;
+        }
         
         return loadAndDecryptWalletFromFile(this.state.path, targetPassword, (err, targetWallet) => {
             if (!err && !targetWallet) {
@@ -49,6 +59,14 @@ export default class ImportWallet extends React.Component {
                 console.error(err);
                 alert(err.message);
                 return;
+            }
+    
+            if (this.state.existingEncryptedWallet) {
+                // We will load the keys from the target wallet into existing wallet, and log the user in
+                // TODO
+            } else {
+                // We will copy the target wallet to our wallet storage destination.
+                // TODO
             }
     
             localStorage.setItem('encrypted_wallet', targetWallet.encrypted);
@@ -61,6 +79,13 @@ export default class ImportWallet extends React.Component {
     }
     
     render() {
+        const currentWalletPass = this.state.existingEncryptedWallet && (
+            <div className="col-xs-12 fileandpass currentwallet">
+                <p>Login for your current wallet:</p>
+                <input type="password" name="current_password" placeholder="Enter Password"/>
+            </div>
+        );
+        
         return (
             <div className="container">
                 <div className="col-xs-12 Login-logo">
@@ -78,9 +103,9 @@ export default class ImportWallet extends React.Component {
                             <p className="filename">{this.state.filename}</p>
                             <input type="password" name="password" placeholder="Enter Password"/>
                         </div>
-                        <div className="col-xs-12 fileandpass">
-                            <input type="password" name="password" placeholder="Password for your target wallet"/>
-                        </div>
+                        
+                        {currentWalletPass}
+                        
                         <button className="btn btn-default" type="submit">IMPORT <img src="images/import.png"/></button>
                     </form>
                     <p className="text-center">
