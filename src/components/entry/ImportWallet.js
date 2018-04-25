@@ -94,7 +94,7 @@ export default class ImportWallet extends React.Component {
                             <p className="filename">{this.state.filename}</p>
                             <input type="password" name="password" placeholder="Enter Password" />
                         </div>
-                        <button className="btn btn-default button-shine" type="submit">IMPORT </button>
+                        <button className="btn btn-default button-neon-green" type="submit">IMPORT </button>
                     </form>
                     <p className="text-center">
                         Write password down and <br />

@@ -12,7 +12,6 @@ export default class Login extends React.Component {
 
     }
 
-
     handleSubmit(e) {
         e.preventDefault();
         var crypto = require('crypto'),
@@ -47,7 +46,6 @@ export default class Login extends React.Component {
 
     //here we load up the wallet into the local storage and move on with life.
     render() {
-
         return (
           <div className="container">
                <div className="col-xs-12 Login-logo">
@@ -58,7 +56,7 @@ export default class Login extends React.Component {
                <div className="col-xs-12 Login-form">
                     <form className="form-group" onSubmit={this.handleSubmit}>
                         <input className="form-control" type="password" name="password" placeholder="Enter Password" />
-                        <button className="btn btn-default button-shine" type="submit">LOGIN </button>
+                        <button className="btn btn-default button-neon-blue" type="submit">Proceed </button>
                     </form>
                </div>
                <div className="col-xs-12 text-center Intro-footer">
