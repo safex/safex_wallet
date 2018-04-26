@@ -1266,7 +1266,7 @@ export default class Wallet extends React.Component {
                     }
                 </div>
 
-                <div className="col-xs-9">
+                <div className={this.state.settings_active === true ? 'col-xs-12' : 'col-xs-9'}>
                     <div className="row amounts">
                         
                         <div className="row amounts">

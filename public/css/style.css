@@ -351,7 +351,7 @@ body{
 }
 
 .wallet-nav {
-  margin-right: 150px;
+  margin-right: 160px;
 }
 .navbar-default {
   height: 85px;
@@ -364,7 +364,7 @@ body{
 }
 .navbar-default .coin-amounts {
   padding-bottom: 5px;
-  margin-right: -35px;
+  margin-right: -25px;
 }
 .navbar-default .navbar-brand img {
   height: 40px;
@@ -749,7 +749,7 @@ body{
 .wallet-tabs {
   position: absolute;
   top: 6px;
-  right: 30px;
+  right: 45px;
 }
 .wallet-tabs .btn {
   background: transparent;
