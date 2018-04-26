@@ -102,7 +102,6 @@ export default class Wallet extends React.Component {
         this.context.router.push('/');
     }
 
-
     refreshWallet() {
         if (this.state.refreshTimer === 0) {
             this.prepareDisplay();
@@ -155,7 +154,7 @@ export default class Wallet extends React.Component {
                 this.setState({
                     btc_sync: false,
                     safex_sync: false,
-                    status_text: 'Synchronization error, try refreshing later'
+                    status_text: 'Sync error, try refreshing later'
                 });
             });
     }
@@ -1106,7 +1105,7 @@ export default class Wallet extends React.Component {
           .catch(function (error) {
             console.log(error);
             alert("Could not fetch tx history...");
-          });
+        });
     }
 
     sendToArchive(index) {
@@ -1222,88 +1221,122 @@ export default class Wallet extends React.Component {
                 <div className="col-xs-7">
                     <div className="key">{keys[key].public_key}</div>
                 </div>
-                <div className="pull-right">
-                    <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0
-                        ? ''
-                        : 'disabled'} onClick={this.openSendReceive.bind(this, key, 'send')}>SEND <img
-                        src="images/send.png"
-                        alt="Send"/></button>
-                    <button onClick={this.openSendReceive.bind(this, key, 'receive')}>RECEIVE <img
-                        src="images/import.png" alt="Receive"/></button>
+                <div className="pull-right single-key-btns-wrap">
+                    {
+                        this.state.collapse_open.send_open
+                        ?
+                            <div className="inner-btns-wrap">
+                                <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
+                                        onClick={this.openSendReceive.bind(this, key, 'send')} className="send-btn button-shine active">
+                                    <img src="images/outbox-white.png" alt="Outbox Logo"/>
+                                    <span>SEND</span>
+                                </button>
+                                <button className="receive-btn button-shine disabled" onClick={this.openSendReceive.bind(this, key, 'receive')}>
+                                    <img src="images/receive-gray.png" alt="Receive"/>
+                                    <span>RECEIVE</span>
+                                </button>
+                            </div>
+
+                        :
+                            <div className="inner-btns-wrap">
+                                <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
+                                        onClick={this.openSendReceive.bind(this, key, 'send')} className={this.state.collapse_open.receive_open ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
+                                    {
+                                        this.state.collapse_open.receive_open
+                                        ?
+                                            <img src="images/outbox-gray.png" alt="Outbox Logo"/>
+                                        :
+                                            <img src="images/outbox-blue.png" alt="Outbox Logo"/>
+
+                                    }
+                                    <span>SEND</span>
+                                </button>
+                                <button className="receive-btn button-shine" onClick={this.openSendReceive.bind(this, key, 'receive')}>
+                                    {
+                                        this.state.collapse_open.receive_open
+                                        ?
+                                            <img src="images/receive-white.png" alt="Inbox Logo"/>
+                                        :
+                                            <img src="images/receive-blue.png" alt="Inbox Logo"/>
+
+                                    }
+                                    <span>RECEIVE</span>
+                                </button>
+                            </div>
+                    }
                 </div>
 
-
-                <div className="col-xs-12">
+                <div className="col-xs-9">
                     <div className="row amounts">
                         
                         <div className="row amounts">
-                            <button onClick={() => this.sendToArchive(key)}
-                                    className={keys[key].archived === false
-                                    | (!keys[key].hasOwnProperty('archived') && archive_active === false)
-                                        ? 'archive-button'
-                                        : 'archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
-                                <span>TO ARCHIVE</span>
-                            </button>
-                            <button onClick={() => this.openHistoryModal(key)}
-                                    className='archive-button history-button'>
-                                <span>HISTORY</span>
-                            </button>
-                            <button onClick={() => this.showPrivateModal(key)}
-                                    className='archive-button history-button'>
-                                <span>show private</span>
-                            </button>
+                            <div className="col-xs-5 amount-btns-wrap">
+                                <button onClick={() => this.sendToArchive(key)}
+                                        className={keys[key].archived === false
+                                        | (!keys[key].hasOwnProperty('archived') && archive_active === false)
+                                            ? 'archive-button button-shine'
+                                            : 'archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
+                                    <span>TO ARCHIVE</span>
+                                </button>
+                                <button onClick={() => this.openHistoryModal(key)}
+                                        className='archive-button history-button button-shine'>
+                                    <span>HISTORY</span>
+                                </button>
+                                <button onClick={() => this.showPrivateModal(key)}
+                                        className='archive-button show-private-button button-shine'>
+                                    <span>show private</span>
+                                </button>
 
 
-                            <button onClick={() => this.removeFromArchive(key)}
-                                    className={keys[key].archived === true
-                                    | (!keys[key].hasOwnProperty('archived') && archive_active === true)
-                                        ? 'archive-button'
-                                        : 'archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
-                                <span>TO HOME</span>
-                            </button>
-                        </div>
-
-
-                        <div className="col-xs-12 amounts">
-                            <span className="col-xs-12 amount">
-                                <span>
-                                    {
-                                        parseFloat(keys[key].safex_bal)
-                                    }
-                                    {
-                                        keys[key].pending_safex_bal > 0
-                                        | keys[key].pending_safex_bal < 0
-                                            ? ' (pending ' + keys[key].pending_safex_bal + ')'
-                                            : ''
-                                    }
+                                <button onClick={() => this.removeFromArchive(key)}
+                                        className={keys[key].archived === true
+                                        | (!keys[key].hasOwnProperty('archived') && archive_active === true)
+                                            ? 'archive-button'
+                                            : 'archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
+                                    <span>TO HOME</span>
+                                </button>
+                            </div>
+                            <div className="col-xs-3 amounts">
+                                <span className="col-xs-12 amount">
+                                    <span>
+                                        {
+                                            parseFloat(keys[key].safex_bal)
+                                        }
+                                        {
+                                            keys[key].pending_safex_bal > 0
+                                            | keys[key].pending_safex_bal < 0
+                                                ? ' (pending ' + keys[key].pending_safex_bal + ')'
+                                                : ''
+                                        }
+                                    </span>
+                                    <span className="coin-name">Safex</span>
+                                    <span>
+                                        ${(keys[key].safex_bal * safex_price).toFixed(2)}
+                                    </span>
                                 </span>
-                                <span className="coin-name">Safex</span>
-                                <span>
-                                    ${(keys[key].safex_bal * safex_price).toFixed(2)}
-                                </span>
-                            </span>
-                        </div>
-                        <div className="col-xs-12 amounts">
-                            <span className="col-xs-12 amount">
-                                <span>
-                                    {
-                                        keys[key].pending_btc_bal < 0
-                                            ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)).toFixed(8)
-                                            : keys[key].btc_bal
-                                    }
-                                    {
-                                        keys[key].pending_btc_bal > 0
-                                        | keys[key].pending_btc_bal < 0
-                                            ? ' (pending ' + keys[key].pending_btc_bal + ')'
-                                            : ''
-                                    }
-                                </span>
-                                <span className="coin-name">Bitcoin</span>
-                                <span>
-                                    ${(keys[key].btc_bal * btc_price).toFixed(2)}
-                                </span>
+                            </div>
+                            <div className="col-xs-4 amounts">
+                                <span className="col-xs-12 amount">
+                                    <span>
+                                        {
+                                            keys[key].pending_btc_bal < 0
+                                                ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)).toFixed(8)
+                                                : keys[key].btc_bal
+                                        }
+                                        {
+                                            keys[key].pending_btc_bal > 0
+                                            | keys[key].pending_btc_bal < 0
+                                                ? ' (pending ' + keys[key].pending_btc_bal + ')'
+                                                : ''
+                                        }
+                                    </span>
+                                    <span className="coin-name">Bitcoin</span>
+                                    <span>
+                                        ${(keys[key].btc_bal * btc_price).toFixed(2)}
+                                    </span>
 
-                            </span>
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1313,19 +1346,17 @@ export default class Wallet extends React.Component {
                       className={this.state.collapse_open.send_open && this.state.collapse_open.key === key
                           ? 'col-xs-12 form-inline form-send active'
                           : 'col-xs-12 form-inline form-send'}>
-                    <div className="row">
-                        <div className="col-xs-12 sendCloseButton">
-                            <div onClick={this.openSendReceive.bind(this, key, 'send')} className="close text-right">
-                                X
-                            </div>
+                    <div className="col-xs-12 sendCloseButton" onClick={this.openSendReceive.bind(this, key, 'send')}>
+                        <div className="close text-right">
+                            X
                         </div>
                     </div>
                     <div className="row">
-                        <div className="col-xs-8 send-left">
-                            <label htmlFor="which">Currency</label>
+                        <div className="col-xs-7 send-left">
+                            <label htmlFor="which">Currency:</label>
                             <img className={this.state.send_coin === 'safex'
                                 ? 'coin active'
-                                : 'coin'} onClick={this.sendCoinChoose.bind(this, 'safex')} src="images/safex-coin.png"
+                                : 'coin'} onClick={this.sendCoinChoose.bind(this, 'safex')} src="images/coin-white.png"
                                  alt="Safex Coin"/>
                             <img className={this.state.send_coin === 'btc'
                                 ? 'coin active'
@@ -1335,12 +1366,17 @@ export default class Wallet extends React.Component {
                             <input type="hidden" name="private_key" readOnly value={keys[key].private_key}></input>
                             <input type="hidden" name="public_key" readOnly value={keys[key].public_key}></input>
                             <div className="input-group">
-                                <span className="input-group-addon" id="basic-addon1">TO:</span>
+                                <span className="input-group-addon" id="basic-addon1">From:</span>
+                                <input name="from" type="text" className="form-control" placeholder="From"
+                                       aria-describedby="From" value={keys[key].public_key}/>
+                            </div>
+                            <div className="input-group">
+                                <span className="input-group-addon" id="basic-addon1">To:</span>
                                 <input name="destination" type="text" className="form-control" placeholder="Address"
                                        aria-describedby="basic-addon1"/>
                             </div>
                         </div>
-                        <div className="col-xs-4">
+                        <div className="col-xs-5">
                             <div className="form-group">
                                 <label htmlFor="amount">Amount<span className={this.state.send_coin === "safex"
                                     ? ''
@@ -1355,31 +1391,32 @@ export default class Wallet extends React.Component {
                             </div>
                             <div className="form-group fee-buttons">
                                 <span className={this.state.active_fee === 'slow'
-                                    ? 'active'
-                                    : ''} onClick={this.feeChange.bind(this, 'slow')}>Slow</span>
+                                    ? 'slow slow-btn button-shine active'
+                                    : 'slow-btn button-shine'} onClick={this.feeChange.bind(this, 'slow')}>Slow</span>
                                 <span className={this.state.active_fee === 'med'
-                                    ? 'active'
-                                    : ''} onClick={this.feeChange.bind(this, 'med')}>Med</span>
+                                    ? 'medium medium-btn button-shine active'
+                                    : 'medium-btn button-shine'} onClick={this.feeChange.bind(this, 'med')}>Med</span>
                                 <span className={this.state.active_fee === 'fast'
-                                    ? 'active'
-                                    : ''} onClick={this.feeChange.bind(this, 'fast')}>Fast</span>
+                                    ? 'fast fast-btn button-shine active'
+                                    : 'fast-btn button-shine'} onClick={this.feeChange.bind(this, 'fast')}>Fast</span>
                             </div>
                             <div className="form-group">
                                 <label htmlFor="total">Total:</label>
                                 <input type="number" name="total" readOnly value={this.state.send_total}></input>
                             </div>
-                            <button type="submit">Send</button>
+                            <button type="submit" className="form-send-submit button-shine">
+                                <img src="images/outgoing.png" alt="Outgoing Icon"/>
+                                Send
+                            </button>
                         </div>
                     </div>
                 </form>
                 <div className={this.state.collapse_open.receive_open && this.state.collapse_open.key === key
                     ? 'col-xs-12 receive active'
                     : 'col-xs-12 receive'}>
-                    <div className="row">
-                        <div className="col-xs-12 sendCloseButton">
-                            <div onClick={this.openSendReceive.bind(this, key, 'receive')} className="close">
-                                X
-                            </div>
+                    <div className="col-xs-12 sendCloseButton" onClick={this.openSendReceive.bind(this, key, 'receive')}>
+                        <div className="close">
+                            X
                         </div>
                     </div>
                     <div className="col-xs-12">
@@ -1406,52 +1443,18 @@ export default class Wallet extends React.Component {
         return (
             <div className="wallet-page">
                 <Navigation/>
-                <div className="container key-buttons status">
-                    <button disabled>Status:
-                        <span className={this.state.btc_sync
-                            ? 'status-green'
-                            : 'status-red'}>BTC</span>
-                        <span className={this.state.safex_sync
-                            ? 'status-green'
-                            : 'status-red'}>SAFEX</span>
-                    </button>
-                    <button disabled>
-                        {this.state.status_text}
-                    </button>
-                </div>
-                <div className="container key-buttons">
-                    <div className="row">
-                        <div className="col-xs-12">
-                            <button onClick={this.createKey}>Create key</button>
-                            <form onChange={this.importKeyChange} onSubmit={this.importKey}>
-                                <input name="key" value={this.state.import_key}></input>
-                                <button type="submit">Import key</button>
-                            </form>
-                            <button className="settings" onClick={this.openSettingsModal}><img
-                                src="images/settings.png"/></button>
-                            <button className={this.state.refreshTimer === 0
-                                ? 'refresh-button'
-                                : 'refresh-button disabled'} onClick={this.refreshWallet}><img
-                                src="images/refresh.png"/><span>{this.state.refreshTimer + 's'}</span></button>
-                        </div>
+                <div className="wallet-tabs">
+                    <div onClick={this.setHomeView}
+                         className={archive_active === false ? 'btn btn-default button-shine active' : 'btn btn-default button-shine'}>
+                        Home
+                    </div>
+                    <div onClick={this.setArchiveView}
+                         className={archive_active === true ? 'btn btn-default button-shine active' : 'btn btn-default button-shine'}>
+                        Archive
                     </div>
                 </div>
-                <div className="container">
-                    <div className="row wallet-tabs">
-                        <div className="col-xs-12">
-                            <div onClick={this.setHomeView}
-                                 className={archive_active === false ? 'btn btn-default active' : 'btn btn-default'}>
-                                Home
-                            </div>
-                            <div onClick={this.setArchiveView}
-                                 className={archive_active === true ? 'btn btn-default active' : 'btn btn-default'}>
-                                Archive
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="container keys-container">
-                    <div className="col-xs-12">
+                <div className='container keys-container'>
+                    <div className={this.state.settings_active === true ? 'col-xs-12 sidebar-opened' : 'col-xs-12'}>
                         <div className="row">
                             {table}
                         </div>
@@ -1463,7 +1466,7 @@ export default class Wallet extends React.Component {
                     <div className="col-xs-12">
                         <h3>History <span className="close" onClick={this.closeHistoryModal}>X</span></h3>
                             <div className="col-xs-12" id="history_txs">
-                            loading...
+                                loading...
                             </div>
                     </div>
                 </div>
@@ -1594,7 +1597,7 @@ export default class Wallet extends React.Component {
                         <div className="col-xs-12">
                             <h3>Settings <span className="close" onClick={this.closeSettingsModal}>X</span></h3>
                             <div className="col-xs-10 col-xs-offset-1">
-                                <form className="col-xs-12 col-sm-6" onSubmit={this.changePassword}>
+                                <form className="col-xs-12" onSubmit={this.changePassword}>
                                     <div className="form-group">
                                         <label htmlFor="old_pass">Old Password:</label>
                                         <input type="password" name="old_pass"/>
@@ -1613,7 +1616,7 @@ export default class Wallet extends React.Component {
                                         </div>
                                     </div>
                                 </form>
-                                <div className="col-xs-12 col-sm-6">
+                                <div className="col-xs-12">
                                     <button onClick={this.exportEncryptedWallet}>Export Encrypted Wallet (.dat)</button>
                                     <button onClick={this.exportUnencryptedWallet}>Export Unencrypted Keys</button>
                                     <button onClick={this.logout}>Logout</button>
@@ -1622,11 +1625,61 @@ export default class Wallet extends React.Component {
                         </div>
                     </form>
                 </div>
+                <div className="container key-buttons status">
+                    <div className="status-left-wrap">
+                        <span>Status:</span>
+                        <span className={this.state.safex_sync
+                            ? 'status-green'
+                            : 'status-red'}>SAFEX</span>
+                        <span className={this.state.btc_sync
+                            ? 'status-green'
+                            : 'status-red'}>BTC</span><br />
+                        <img src="images/transfer.png" alt="Transfer Icon"/>
+                        <span className="sync-span">{this.state.status_text}</span>
+                    </div>
+                    <div className="import-form-wrap">
+                        <form onChange={this.importKeyChange} onSubmit={this.importKey}>
+                            <input name="key" value={this.state.import_key}></input>
+                            <button type="submit" className="button-shine" title="Import Key">Import</button>
+                        </form>
+                        <button onClick={this.createKey} className="create-btn button-shine" title="Create New Key">
+                            <img src="images/plus.png"/>
+                        </button>
+                    </div>
+                    <div className="right-options">
+                        {/*<button className="button-shine">*/}
+                            {/*<img src="images/plus.png"/>*/}
+                        {/*</button>*/}
+                        <button className="button-shine" title="">
+                            <img src="images/world.png"/>
+                        </button>
+                        <button className="button-shine" title="Dividends calculator">
+                            <img src="images/calculator.png"/>
+                        </button>
+                        {
+                            this.state.settings_active === true
+                            ?
+                                <button className="settings button-shine" onClick={this.closeSettingsModal} title="Settings">
+                                    <img src="images/mixer.png"/>
+                                </button>
+                            :
+                                <button className="settings button-shine" onClick={this.openSettingsModal} title="Settings">
+                                    <img src="images/mixer.png"/>
+                                </button>
+                        }
+
+                        <button className={this.state.refreshTimer === 0
+                            ? 'refresh-button button-shine'
+                            : 'refresh-button button-shine disabled'} onClick={this.refreshWallet} title="Refresh">
+                            <img src="images/refresh.png"/>
+                            <span><p>{this.state.refreshTimer + 's'}</p></span>
+                        </button>
+                    </div>
+                </div>
             </div>
         );
     }
 }
-
 
 Wallet.contextTypes = {
     router: React.PropTypes.object.isRequired
