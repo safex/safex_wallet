@@ -79,28 +79,29 @@ export default class CreateWallet extends React.Component {
 
     render() {
         return (
-          <div className="container">
-              <div className="col-xs-12 Login-logo">
-                <Link className="pul-left back-button" to="/"><img src="images/back.png" /> Back</Link>
-                  <img src="images/logo.png" alt="Logo" />
-              </div>
-              <div className="col-xs-12 version-number"><p className="text-center">v0.0.6</p></div>
-              <div className="col-xs-12 Login-form">
-                <form className="form-group" onSubmit={this.handleSubmit}>
-                    <input className="form-control" type="password" name="password1" placeholder="Enter Password" />
-                    <input className="form-control" type="password" name="password2" placeholder="Repeat Password" />
-                    <button className="btn btn-default" type="submit">CREATE <img src="images/create.png" alt="Create" /></button>
-                </form>
-                <p className="text-center">
-                    If you lose your password<br />
-                    There is no recovery. <br />
-                    Write it down, keep it safe. <br />
-                </p>
-              </div>
-              <div className="col-xs-12 text-center Intro-footer">
-                  <p className="text-center">2014-2017 All Rights Reserved Safe Exchange Developers &copy;</p>
-              </div>
-          </div>
+            <div className="container">
+                <div className="col-xs-12 Login-logo">
+                    <h2>Safex</h2>
+                    <h3>Wallet</h3>
+                    <Link className="back-button" to="/"><img src="images/back.png" /> Back</Link>
+                </div>
+                <div className="col-xs-12 Login-form Create-wallet-form">
+                    <form className="form-group" onSubmit={this.handleSubmit}>
+                        <input className="form-control" type="password" name="password1" placeholder="Enter Password" />
+                        <input className="form-control" type="password" name="password2" placeholder="Repeat Password" />
+                        <button className="btn btn-default button-neon-blue" type="submit">CREATE </button>
+                    </form>
+                    <p className="text-center">
+                        If you lose your password<br />
+                        There is no recovery. <br />
+                        Write it down, keep it safe. <br />
+                    </p>
+                </div>
+                <div className="col-xs-12 text-center Intro-footer">
+                    <img src="images/footer-logo.png" alt="Safex Icon Footer"/>
+                    <p className="text-center">2014-2018 All Rights Reserved Safe Exchange Developers &copy;</p>
+                </div>
+            </div>
         );
     }
 

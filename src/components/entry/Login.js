@@ -12,7 +12,6 @@ export default class Login extends React.Component {
 
     }
 
-
     handleSubmit(e) {
         e.preventDefault();
         var crypto = require('crypto'),
@@ -47,24 +46,24 @@ export default class Login extends React.Component {
 
     //here we load up the wallet into the local storage and move on with life.
     render() {
-
         return (
           <div className="container">
-                   <div className="col-xs-12 Login-logo">
-                       <Link className="pul-left back-button" to="/"><img src="images/back.png" /> Back</Link>
-                       <img src="images/logo.png" alt="Logo" />
-                   </div>
-              <div className="col-xs-12 version-number"><p className="text-center">v0.0.6</p></div>
-                   <div className="col-xs-12 Login-form">
-                     <form className="form-group" onSubmit={this.handleSubmit}>
-                         <input className="form-control" type="password" name="password" placeholder="Enter Password" />
-                         <button className="btn btn-default" type="submit">LOGIN <img src="images/create.png" alt="Create" /></button>
-                     </form>
-                   </div>
-                   <div className="col-xs-12 text-center Intro-footer">
-                       <p className="text-center">2014-2017 All Rights Reserved Safe Exchange Developers &copy;</p>
-                   </div>
+               <div className="col-xs-12 Login-logo">
+                   <h2>Safex</h2>
+                   <h3>Wallet</h3>
+                   <Link className="back-button" to="/"><img src="images/back.png" /> Back</Link>
                </div>
+               <div className="col-xs-12 Login-form">
+                    <form className="form-group" onSubmit={this.handleSubmit}>
+                        <input className="form-control" type="password" name="password" placeholder="Enter Password" />
+                        <button className="btn btn-default button-neon-blue" type="submit">Proceed </button>
+                    </form>
+               </div>
+               <div className="col-xs-12 text-center Intro-footer">
+                   <img src="images/footer-logo.png" alt="Safex Icon Footer"/>
+                   <p className="text-center">2014-2018 All Rights Reserved Safe Exchange Developers &copy;</p>
+               </div>
+          </div>
         );
     }
 }

@@ -32,7 +32,6 @@ export default class SelectWallet extends React.Component {
         this.walletResetClose = this.walletResetClose.bind(this);
     }
 
-
     //check the filesystem for default location of the safexwallet.dat file
     //if not make it
     componentDidMount() {
@@ -57,6 +56,7 @@ export default class SelectWallet extends React.Component {
 
         });
     }
+
     //This happens when you click wallet reset on the main screen
     walletResetStart() {
         alert('This feature is only if you want to delete a wallet and start over. This is not for upgrading ' +
@@ -70,12 +70,14 @@ export default class SelectWallet extends React.Component {
             walletResetModal1: true
         })
     }
+
     //This happens when you click skip on the first modal
     walletResetStep1Skip() {
         this.setState({
             walletResetModalDlUnencrypted: true
         })
     }
+
     //This happens when you click proceed on the first modal
     walletResetStep1Proceed() {
         this.setState({
@@ -127,9 +129,8 @@ export default class SelectWallet extends React.Component {
             alert('wrong password');
             console.log('error parsing wallet');
         }
-
-
     }
+
     //This is the step2 of the encrypted and step3 of the unencrypted route
     walletResetDlEncrypted(e) {
         e.preventDefault();
@@ -168,8 +169,8 @@ export default class SelectWallet extends React.Component {
 
             });
         }
-
     }
+
     //This closes every modal
     walletResetClose() {
         this.setState({
@@ -188,177 +189,174 @@ export default class SelectWallet extends React.Component {
 
         if (wallet_exists) {
             show_options = (
-              <div className="container">
-                  <div className="col-xs-12 Login-logo">
-                      <img src="images/logo.png" alt="Logo"/>
-                      <span className="pul-right back-button wallet-reset-button" onClick={this.walletResetStart}>Wallet Reset</span>
-                  </div>
-                  <div className="col-xs-12 version-number"><p className="text-center">v0.0.6</p></div>
-                  <div className="col-xs-12 App-intro">
-                    <div className="row text-center">
-                        <div className="col-xs-6">
-                            <Link to="/login">
-                                <div className="col-xs-12">
-                                    <img src="images/safex-icon-circle.png" alt="Safex Icon Circle"/>
-                                    <span className="btn btn-default">Login <img src="images/create.png"
-                                                                                 alt="Create"/></span>
-                                </div>
-                                <p>Enter your password</p>
-                            </Link>
-                        </div>
-                        <div className="col-xs-6">
-                            <Link to="/importwallet">
-                                <div className="col-xs-12">
-                                    <img src="images/import-main.png" alt="Safex Icon Circle"/>
-                                    <span className="btn btn-default">Import Wallet <img src="images/import.png"
-                                                                                         alt="Import"/></span>
-                                </div>
-                                <p>Import a safexwallet file</p>
-                            </Link>
+                <div className="container">
+                    <div className="col-xs-12 Login-logo">
+                        <h2>Safex</h2>
+                        <h3>Wallet</h3>
+                        <button className="back-button wallet-reset-button" onClick={this.walletResetStart}>Wallet Reset</button>
+                    </div>
+                    <div className="col-xs-8 col-xs-offset-2 App-intro">
+                        <div className="row text-center">
+                            <div className="col-xs-6 login-wrap">
+                                <Link to="/login">
+                                    <div className="col-xs-12">
+                                        <img src="images/safex-icon-circle.png" alt="Safex Icon Circle"/>
+                                        <button className="btn btn-default button-neon-blue">Login</button>
+                                        <p>Enter your password</p>
+                                    </div>
+                                </Link>
+                            </div>
+                            <div className="col-xs-6 importwallet-wrap">
+                                <Link to="/importwallet">
+                                    <div className="col-xs-12">
+                                        <img src="images/import-main.png" alt="Safex Icon Circle"/>
+                                        <button className="btn btn-default button-neon-green">Import</button>
+                                        <p>Import your wallet or recover from backup file</p>
+                                    </div>
+                                </Link>
+                            </div>
                         </div>
                     </div>
-                  </div>
-                  <div className="col-xs-12 text-center Intro-footer">
-                      <p className="text-center">2014-2017 All Rights Reserved Safe Exchange Developers &copy;</p>
-                  </div>
-              </div>
-
+                    <div className="col-xs-12 text-center Intro-footer">
+                        <img src="images/footer-logo.png" alt="Safex Icon Footer"/>
+                        <p className="text-center">2014-2018 All Rights Reserved Safe Exchange Developers &copy;</p>
+                    </div>
+                </div>
             );
         } else {
             show_options = (
-              <div className="container">
-                  <div className="col-xs-12 Login-logo">
-                      <img src="images/logo.png" alt="Logo"/>
-                  </div>
-                  <div className="col-xs-12 version-number"><p className="text-center">v0.0.6</p></div>
-                  <div className="col-xs-12 App-intro">
-                    <div className="row text-center">
-                        <div className="col-xs-6">
-                            <Link to="/createwallet">
-                                <div className="col-xs-12">
-                                    <img src="images/safex-icon-circle.png" alt="Safex Icon Circle"/>
-                                    <span className="btn btn-default">New Wallet <img src="images/create.png"
-                                                                                      alt="Create"/></span>
-                                </div>
-                                <p>Create a new Wallet</p>
-                            </Link>
-                        </div>
-                        <div className="col-xs-6">
-                            <Link to="/importwallet">
-                                <div className="col-xs-12">
-                                    <img src="images/import-main.png" alt="Safex Icon Circle"/>
-                                    <span className="btn btn-default">Import Wallet <img src="images/import.png"
-                                                                                         alt="Import"/></span>
-                                </div>
-                                <p>Import a safexwallet .dat file</p>
-                            </Link>
+                <div className="container">
+                    <div className="col-xs-12 Login-logo">
+                        <h2>Safex</h2>
+                        <h3>Wallet</h3>
+                        <button className="back-button wallet-reset-button" onClick={this.walletResetStart}>Wallet Reset</button>
+                    </div>
+                    <div className="col-xs-8 col-xs-offset-2 App-intro">
+                        <div className="row text-center">
+                            <div className="col-xs-6 login-wrap">
+                                <Link to="/createwallet">
+                                    <div className="col-xs-12">
+                                        <img src="images/safex-icon-circle.png" alt="Safex Icon Circle"/>
+                                        <button className="btn btn-default button-neon-blue">New Wallet </button>
+                                        <p>Create a new Wallet</p>
+                                    </div>
+                                </Link>
+                            </div>
+                            <div className="col-xs-6 importwallet-wrap">
+                                <Link to="/importwallet">
+                                    <div className="col-xs-12">
+                                        <img src="images/import-main.png" alt="Safex Icon Circle"/>
+                                        <button className="btn btn-default button-neon-green">Import </button>
+                                        <p>Import a safexwallet .dat file</p>
+                                    </div>
+                                </Link>
+                            </div>
                         </div>
                     </div>
-                  </div>
-                  <div className="col-xs-12 text-center Intro-footer">
-                      <p className="text-center">2014-2017 All Rights Reserved Safe Exchange Developers &copy;</p>
-                  </div>
-              </div>
+                    <div className="col-xs-12 text-center Intro-footer">
+                        <img src="images/footer-logo.png" alt="Safex Icon Footer"/>
+                        <p className="text-center">2014-2018 All Rights Reserved Safe Exchange Developers &copy;</p>
+                    </div>
+                </div>
             );
         }
 
-
         return (
-                    <div>
-                        {show_options}
-                        <div className={this.state.walletResetModal1
-                            ? 'overflow sendModal walletResetModal active'
-                            : 'overflow sendModal walletResetModal'}>
-                            <div className="container">
-                                <div className="col-xs-12">
-                                    <h3>Wallet Reset Back Up Unencrypted Keys
-                                        <span onClick={this.walletResetClose} className="close">X</span>
-                                    </h3>
-                                    <p>You do not need to do this for upgrading wallet versions.
-                                        If you have your password and want to backup your keys unencrypted press proceed, otherwise press skip</p>
-                                    <div className="col-xs-12 text-center">
-                                        <button onClick={this.walletResetStep1Skip}>Skip</button>
-                                        <button onClick={this.walletResetStep1Proceed}>Proceed</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className={this.state.walletResetModal2unencrypted
-                            ? 'overflow sendModal walletResetModal active'
-                            : 'overflow sendModal walletResetModal'}>
-                            <div className="container">
-                                <div className="col-xs-12">
-                                    <h3>Wallet Reset Step 2
-                                        <span onClick={this.walletResetClose} className="close">X</span>
-                                    </h3>
-                                    <div className="col-xs-4 col-xs-offset-4 text-center">
-                                        <form className="form-group" onSubmit={this.walletResetDlUnencrypted}>
-                                           <input className="form-control text-center" type="password" name="password" placeholder="Enter Password" />
-                                           <button className="btn btn-default" type="submit">Proceed</button>
-                                       </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className={this.state.walletResetModalDlUnencrypted
-                            ? 'overflow sendModal walletResetModal active'
-                            : 'overflow sendModal walletResetModal'}>
-                            <div className="container">
-                                <div className="col-xs-12">
-                                    <h3>Download Encrypted Wallet
-                                        <span onClick={this.walletResetClose} className="close">X</span>
-                                    </h3>
-                                    <p>During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists.</p>
-                                    <form className="row" onSubmit={this.walletResetDlEncrypted}>
-                                        <div className="col-xs-12 text-center">
-                                            <label><input name="checkbox" type="checkbox" /> I understand that this is my last chance to backup my wallet file after this it will be deleted</label>
-                                        </div>
-                                        <div className="col-xs-12 text-center">
-                                            <button type="submit">Proceed</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        <div className={this.state.walletResetModalDlEncrypted
-                            ? 'overflow sendModal walletResetModal active'
-                            : 'overflow sendModal walletResetModal'}>
-                            <div className="container">
-                                <div className="col-xs-12">
-                                    <h3>Downloading Encrypted Wallet
-                                        <span onClick={this.walletResetClose} className="close">X</span>
-                                    </h3>
-                                    <p>This is second confirmation. When you check the box and proceed you will be able to backup your encrypted wallet. After this there is no turning back
-                                        your wallet will be deleted so that you can make a new one. In this step you'll backup your encrypted wallet that was already in the wallet.
-                                        During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists.
-                                    AFTER THIS THERE IS NO TURNING BACK, YOUR WALLET WILL BE DELETED HIT THE "X" TO GET OUT OF THIS</p>
-                                    <form className="row" onSubmit={this.walletResetStep2}>
-                                        <div className="col-xs-12 text-center">
-                                            <label><input name="checkbox" type="checkbox" /> I understand that this is my last chance to backup my wallet file after this it will be deleted</label>
-                                        </div>
-                                        <div className="col-xs-12 text-center">
-                                            <button type="submit">Proceed</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        <div className={this.state.walletResetModalDone
-                            ? 'overflow sendModal walletResetModal active'
-                            : 'overflow sendModal walletResetModal'}>
-                            <div className="container">
-                                <div className="col-xs-12">
-                                    <h3>Wallet Reset Done
-                                        <span onClick={this.walletResetClose} className="close">X</span>
-                                    </h3>
-                                    <p>Your wallet reset is done. Now you can make a new wallet.</p>
-                                    <div className="col-xs-12 text-center">
-                                        <button onClick={this.walletResetClose}>Done</button>
-                                    </div>
-                                </div>
+            <div>
+                {show_options}
+                <div className={this.state.walletResetModal1
+                    ? 'overflow sendModal walletResetModal active'
+                    : 'overflow sendModal walletResetModal'}>
+                    <div className="container">
+                        <div className="col-xs-12">
+                            <h3>Wallet Reset Back Up Unencrypted Keys
+                                <span onClick={this.walletResetClose} className="close">X</span>
+                            </h3>
+                            <p>You do not need to do this for upgrading wallet versions.
+                                If you have your password and want to backup your keys unencrypted press proceed, otherwise press skip</p>
+                            <div className="col-xs-12 text-center">
+                                <button onClick={this.walletResetStep1Skip}>Skip</button>
+                                <button onClick={this.walletResetStep1Proceed}>Proceed</button>
                             </div>
                         </div>
                     </div>
+                </div>
+                <div className={this.state.walletResetModal2unencrypted
+                    ? 'overflow sendModal walletResetModal active'
+                    : 'overflow sendModal walletResetModal'}>
+                    <div className="container">
+                        <div className="col-xs-12">
+                            <h3>Wallet Reset Step 2
+                                <span onClick={this.walletResetClose} className="close">X</span>
+                            </h3>
+                            <div className="col-xs-4 col-xs-offset-4 text-center">
+                                <form className="form-group" onSubmit={this.walletResetDlUnencrypted}>
+                                   <input className="form-control text-center" type="password" name="password" placeholder="Enter Password" />
+                                   <button className="btn btn-default" type="submit">Proceed</button>
+                               </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className={this.state.walletResetModalDlUnencrypted
+                    ? 'overflow sendModal walletResetModal active'
+                    : 'overflow sendModal walletResetModal'}>
+                    <div className="container">
+                        <div className="col-xs-12">
+                            <h3>Download Encrypted Wallet
+                                <span onClick={this.walletResetClose} className="close">X</span>
+                            </h3>
+                            <p>During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists.</p>
+                            <form className="row" onSubmit={this.walletResetDlEncrypted}>
+                                <div className="col-xs-12 text-center">
+                                    <label><input name="checkbox" type="checkbox" /> I understand that this is my last chance to backup my wallet file after this it will be deleted</label>
+                                </div>
+                                <div className="col-xs-12 text-center">
+                                    <button type="submit">Proceed</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div className={this.state.walletResetModalDlEncrypted
+                    ? 'overflow sendModal walletResetModal active'
+                    : 'overflow sendModal walletResetModal'}>
+                    <div className="container">
+                        <div className="col-xs-12">
+                            <h3>Downloading Encrypted Wallet
+                                <span onClick={this.walletResetClose} className="close">X</span>
+                            </h3>
+                            <p>This is second confirmation. When you check the box and proceed you will be able to backup your encrypted wallet. After this there is no turning back
+                                your wallet will be deleted so that you can make a new one. In this step you'll backup your encrypted wallet that was already in the wallet.
+                                During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists.
+                            AFTER THIS THERE IS NO TURNING BACK, YOUR WALLET WILL BE DELETED HIT THE "X" TO GET OUT OF THIS</p>
+                            <form className="row" onSubmit={this.walletResetStep2}>
+                                <div className="col-xs-12 text-center">
+                                    <label><input name="checkbox" type="checkbox" /> I understand that this is my last chance to backup my wallet file after this it will be deleted</label>
+                                </div>
+                                <div className="col-xs-12 text-center">
+                                    <button type="submit">Proceed</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div className={this.state.walletResetModalDone
+                    ? 'overflow sendModal walletResetModal active'
+                    : 'overflow sendModal walletResetModal'}>
+                    <div className="container">
+                        <div className="col-xs-12">
+                            <h3>Wallet Reset Done
+                                <span onClick={this.walletResetClose} className="close">X</span>
+                            </h3>
+                            <p>Your wallet reset is done. Now you can make a new wallet.</p>
+                            <div className="col-xs-12 text-center">
+                                <button onClick={this.walletResetClose}>Done</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         );
     }
 }
