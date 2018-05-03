@@ -142,7 +142,6 @@ export default class Wallet extends React.Component {
         clearInterval(this.timerID);
     }
 
-
     getFee() {
         fetch('http://omni.safex.io:3001/getfee')
             .then(resp => resp.text())
@@ -154,7 +153,7 @@ export default class Wallet extends React.Component {
                 this.setState({
                     btc_sync: false,
                     safex_sync: false,
-                    status_text: 'Sync error, try refreshing later'
+                    status_text: 'Sync error, please refresh again'
                 });
             });
     }
@@ -263,7 +262,6 @@ export default class Wallet extends React.Component {
         });
     }
 
-
     sendCoins(e) {
         e.preventDefault();
         //check whether Bitcoin or Safex is selected
@@ -272,6 +270,7 @@ export default class Wallet extends React.Component {
             try {
                 this.setState({
                     transaction_being_sent: true,
+                    settings_active: false,
                 });
 
                 //set the signing key for the transaction
@@ -401,7 +400,6 @@ export default class Wallet extends React.Component {
                 });
             });
     }
-
 
     formSafexTransaction(utxos, amount, fee, destination, key, source) {
         var running_total = 0;
@@ -646,8 +644,6 @@ export default class Wallet extends React.Component {
         } catch (e) {
             alert('invalid private key')
         }
-
-
     }
 
     exportUnencryptedWallet() {
@@ -761,6 +757,9 @@ export default class Wallet extends React.Component {
             history_overflow_active: true,
         })
         this.listTransactions(this.state.keys[e].public_key);
+        this.closeCoinModal();
+        this.closeSuccessModal();
+        this.closeSettingsModal();
     }
 
     //Activates send_overflow_active state which opens Modal screen displaying transaction pre-confirmation information
@@ -799,11 +798,10 @@ export default class Wallet extends React.Component {
             }
 
         }
-
+        this.closeHistoryModal();
     }
 
     changePassword(e) {
-
         e.preventDefault();
         var now_pass = e.target.old_pass.value;
         var new_pass = e.target.new_pass.value;
@@ -884,7 +882,6 @@ export default class Wallet extends React.Component {
         }
     }
 
-
     closeCoinModal() {
         this.setState({
             send_overflow_active: false,
@@ -903,8 +900,7 @@ export default class Wallet extends React.Component {
         })
     }
 
-    closeSuccessModal(e) {
-        e.preventDefault();
+    closeSuccessModal() {
         this.setState({
             transaction_sent: false,
             send_overflow_active: false,
@@ -925,7 +921,9 @@ export default class Wallet extends React.Component {
         this.setState({
             settings_active: true
         });
-
+        this.closeHistoryModal();
+        this.closeCoinModal();
+        this.closeSuccessModal();
     }
 
     closeSettingsModal() {
@@ -1090,8 +1088,8 @@ export default class Wallet extends React.Component {
                     var dateTime = new Date(tx['blocktime'] * 1000);
                     var confirmations = tx['confirmations'] > 15 ? "(16/16)" : "("+ tx['confirmations'] + "/16)"
                     render +=`
-                        <div className="col-xs-10 history" style="min-width:650px;margin-left:70px;">
-                            <span className="coin-name">SAFEX</span> `+ direction +` <pre class="date">` + dateTime + `</pre><br />
+                        <div className="history">
+                            <span className="coin-name">SAFEX</span> ` + direction + ` <br /><pre class="date">` + dateTime + `</pre><br />
                             <pre class="address"><b>TX</b> `+ tx['txid'] +`</pre><br /> 
                             <pre class="address">`+ tx['sendingaddress'] +`</pre> ➡ <pre class="address">`+ tx['referenceaddress'] +`</pre>
                         </div>
@@ -1104,7 +1102,7 @@ export default class Wallet extends React.Component {
             })
           .catch(function (error) {
             console.log(error);
-            alert("Could not fetch tx history...");
+            alert("Could not fetch transaction history...");
         });
     }
 
@@ -1220,6 +1218,22 @@ export default class Wallet extends React.Component {
                 : 'col-xs-12 single-key hidden-xs hidden-sm hidden-md hidden-lg'} key={key}>
                 <div className="col-xs-7">
                     <div className="key">{keys[key].public_key}</div>
+                    <span>
+                        {
+                            keys[key].pending_safex_bal > 0
+                            | keys[key].pending_safex_bal < 0
+                                ? ' (safex: pending ' + keys[key].pending_safex_bal + ')'
+                                : ''
+                        }
+                    </span>
+                    <span>
+                        {
+                            keys[key].pending_btc_bal > 0
+                            | keys[key].pending_btc_bal < 0
+                                ? ' (bitcoin: pending ' + keys[key].pending_btc_bal + ')'
+                                : ''
+                        }
+                    </span>
                 </div>
                 <div className="pull-right single-key-btns-wrap">
                     {
@@ -1266,7 +1280,7 @@ export default class Wallet extends React.Component {
                     }
                 </div>
 
-                <div className={this.state.settings_active === true ? 'col-xs-12' : 'col-xs-9'}>
+                <div className="col-xs-12">
                     <div className="row amounts">
                         
                         <div className="row amounts">
@@ -1278,12 +1292,22 @@ export default class Wallet extends React.Component {
                                             : 'archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
                                     <span>TO ARCHIVE</span>
                                 </button>
-                                <button onClick={() => this.openHistoryModal(key)}
-                                        className='archive-button history-button button-shine'>
-                                    <span>HISTORY</span>
-                                </button>
+                                {
+                                    this.state.history_overflow_active
+                                    ?
+                                        <button onClick={this.closeHistoryModal}
+                                            className='archive-button history-button button-shine'>
+                                            <span>HISTORY</span>
+                                        </button>
+                                    :
+                                        <button onClick={() => this.openHistoryModal(key)}
+                                            className='archive-button history-button button-shine'>
+                                            <span>HISTORY</span>
+                                        </button>
+                                }
+
                                 <button onClick={() => this.showPrivateModal(key)}
-                                        className='archive-button show-private-button button-shine'>
+                                    className='archive-button show-private-button button-shine'>
                                     <span>show private</span>
                                 </button>
 
@@ -1296,18 +1320,18 @@ export default class Wallet extends React.Component {
                                     <span>TO HOME</span>
                                 </button>
                             </div>
-                            <div className="col-xs-3 amounts">
+                            <div className="amounts safex-amounts">
                                 <span className="col-xs-12 amount">
                                     <span>
                                         {
                                             parseFloat(keys[key].safex_bal)
                                         }
-                                        {
-                                            keys[key].pending_safex_bal > 0
-                                            | keys[key].pending_safex_bal < 0
-                                                ? ' (pending ' + keys[key].pending_safex_bal + ')'
-                                                : ''
-                                        }
+                                        {/*{*/}
+                                            {/*keys[key].pending_safex_bal > 0*/}
+                                            {/*| keys[key].pending_safex_bal < 0*/}
+                                                {/*? ' (pending ' + keys[key].pending_safex_bal + ')'*/}
+                                                {/*: ''*/}
+                                        {/*}*/}
                                     </span>
                                     <span className="coin-name">Safex</span>
                                     <span>
@@ -1315,7 +1339,7 @@ export default class Wallet extends React.Component {
                                     </span>
                                 </span>
                             </div>
-                            <div className="col-xs-4 amounts">
+                            <div className="amounts bitcoin-amounts">
                                 <span className="col-xs-12 amount">
                                     <span>
                                         {
@@ -1323,12 +1347,12 @@ export default class Wallet extends React.Component {
                                                 ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)).toFixed(8)
                                                 : keys[key].btc_bal
                                         }
-                                        {
-                                            keys[key].pending_btc_bal > 0
-                                            | keys[key].pending_btc_bal < 0
-                                                ? ' (pending ' + keys[key].pending_btc_bal + ')'
-                                                : ''
-                                        }
+                                        {/*{*/}
+                                            {/*keys[key].pending_btc_bal > 0*/}
+                                            {/*| keys[key].pending_btc_bal < 0*/}
+                                                {/*? ' (pending ' + keys[key].pending_btc_bal + ')'*/}
+                                                {/*: ''*/}
+                                        {/*}*/}
                                     </span>
                                     <span className="coin-name">Bitcoin</span>
                                     <span>
@@ -1340,7 +1364,6 @@ export default class Wallet extends React.Component {
                         </div>
                     </div>
                 </div>
-
 
                 <form onSubmit={this.openCoinModal}
                       className={this.state.collapse_open.send_open && this.state.collapse_open.key === key
@@ -1362,32 +1385,32 @@ export default class Wallet extends React.Component {
                                 ? 'coin active'
                                 : 'coin'} onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
                                  alt="Bitcoin Coin"/>
-                            <input type="hidden" name="which" readOnly value={this.state.send_coin}></input>
-                            <input type="hidden" name="private_key" readOnly value={keys[key].private_key}></input>
-                            <input type="hidden" name="public_key" readOnly value={keys[key].public_key}></input>
+                            <input type="hidden" name="which" readOnly value={this.state.send_coin} />
+                            <input type="hidden" name="private_key" readOnly value={keys[key].private_key} />
+                            <input type="hidden" name="public_key" readOnly value={keys[key].public_key} />
                             <div className="input-group">
                                 <span className="input-group-addon" id="basic-addon1">From:</span>
                                 <input name="from" type="text" className="form-control" placeholder="From"
-                                       aria-describedby="From" value={keys[key].public_key}/>
+                                    aria-describedby="From" value={keys[key].public_key}/>
                             </div>
                             <div className="input-group">
                                 <span className="input-group-addon" id="basic-addon1">To:</span>
                                 <input name="destination" type="text" className="form-control" placeholder="Address"
-                                       aria-describedby="basic-addon1"/>
+                                    aria-describedby="basic-addon1"/>
                             </div>
                         </div>
-                        <div className="col-xs-5">
+                        <div className="col-xs-5 send-right">
                             <div className="form-group">
                                 <label htmlFor="amount">Amount<span className={this.state.send_coin === "safex"
                                     ? ''
                                     : 'hidden-xs hidden-sm hidden-md hidden-lg'}>(Safex)</span>:</label>
                                 <input type="number" name="amount" onChange={this.sendAmountOnChange}
-                                       value={this.state.send_amount}/>
+                                    value={this.state.send_amount}/>
                             </div>
                             <div className="form-group">
                                 <label htmlFor="fee">Fee(BTC):</label>
                                 <input type="number" name="fee" onChange={this.sendFeeOnChange}
-                                       onBlur={this.sendFeeOnBlur} value={this.state.send_fee}/>
+                                    onBlur={this.sendFeeOnBlur} value={this.state.send_fee}/>
                             </div>
                             <div className="form-group fee-buttons">
                                 <span className={this.state.active_fee === 'slow'
@@ -1402,9 +1425,9 @@ export default class Wallet extends React.Component {
                             </div>
                             <div className="form-group">
                                 <label htmlFor="total">Total:</label>
-                                <input type="number" name="total" readOnly value={this.state.send_total}></input>
+                                <input className="total-input" type="number" name="total" readOnly value={this.state.send_total} />
                             </div>
-                            <button type="submit" className="form-send-submit button-shine">
+                            <button type="submit" className="form-send-submit button-shine" onClick={this.closeSettingsModal}>
                                 <img src="images/outgoing.png" alt="Outgoing Icon"/>
                                 Send
                             </button>
@@ -1426,7 +1449,7 @@ export default class Wallet extends React.Component {
                     <div className="col-xs-8">
                         <label htmlFor="amount">Amount:</label>
                         <input type="amount" placeholder="1" onChange={this.amountChange.bind(this)}
-                               value={this.state.receive_amount}/>
+                           value={this.state.receive_amount}/>
                     </div>
                     <div className="col-xs-4">
                         <div className="row">
@@ -1445,16 +1468,16 @@ export default class Wallet extends React.Component {
                 <Navigation/>
                 <div className="wallet-tabs">
                     <div onClick={this.setHomeView}
-                         className={archive_active === false ? 'btn btn-default button-shine active' : 'btn btn-default button-shine'}>
+                        className={archive_active === false ? 'btn btn-default button-shine active' : 'btn btn-default button-shine'}>
                         Home
                     </div>
                     <div onClick={this.setArchiveView}
-                         className={archive_active === true ? 'btn btn-default button-shine active' : 'btn btn-default button-shine'}>
+                        className={archive_active === true ? 'btn btn-default button-shine active' : 'btn btn-default button-shine'}>
                         Archive
                     </div>
                 </div>
                 <div className='container keys-container'>
-                    <div className={this.state.settings_active === true ? 'col-xs-12 sidebar-opened' : 'col-xs-12'}>
+                    <div className={this.state.settings_active === true || this.state.send_overflow_active === true || this.state.history_overflow_active === true ? 'col-xs-12 sidebar-opened keys-wrap' : 'col-xs-12 keys-wrap'}>
                         <div className="row">
                             {table}
                         </div>
@@ -1463,166 +1486,152 @@ export default class Wallet extends React.Component {
                 <div className={this.state.history_overflow_active
                     ? 'overflow historyModal active'
                     : 'overflow historyModal'}>
-                    <div className="col-xs-12">
+                    <div className="col-xs-12 history-inner">
                         <h3>History <span className="close" onClick={this.closeHistoryModal}>X</span></h3>
-                            <div className="col-xs-12" id="history_txs">
-                                loading...
-                            </div>
+                        <div id="history_txs">
+                            loading...
+                        </div>
                     </div>
                 </div>
 
-                <div className={this.state.send_overflow_active
+                <div className={this.state.send_overflow_active && this.state.transaction_sent === false
                     ? 'overflow sendModal active'
                     : 'overflow sendModal'}>
                     <form className="container" onSubmit={this.sendCoins}>
-                        <div className="col-xs-12">
-                            <h3>Sending <span className="close" onClick={this.closeCoinModal}>X</span></h3>
-                            <div className="col-xs-10 col-xs-offset-1">
-                                <div className="col-xs-12">
-                                    <div className="currency">
-                                        Currency: <img className={this.state.send_coin === 'safex'
-                                        ? 'coin'
-                                        : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                                       onClick={this.sendCoinChoose.bind(this, 'safex')}
-                                                       src="images/safex-coin.png" alt="Safex Coin"/>
-                                        <img className={this.state.send_coin === 'btc'
-                                            ? 'coin'
-                                            : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                             onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
-                                             alt="Bitcoin Coin"/>
-                                    </div>
-                                </div>
-                                <div className="input-group">
-                                    <span className="input-group-addon" id="basic-addon1">FROM:</span>
-                                    <input name="from" type="text" className="form-control" readOnly
-                                           value={this.state.send_keys.public_key} placeholder="Address"
-                                           aria-describedby="basic-addon1"/>
-                                </div>
-                                <div className="input-group">
-                                    <span className="input-group-addon" id="basic-addon1">TO:</span>
-                                    <input name="destination" type="text" className="form-control" readOnly
-                                           value={this.state.send_to} placeholder="Address"
-                                           aria-describedby="basic-addon1"/>
-                                </div>
-                                <input type="hidden" readOnly name="private_key"
-                                       value={this.state.send_keys.private_key}></input>
-                                <input type="hidden" readOnly name="public_key"
-                                       value={this.state.send_keys.public_key}></input>
-                                <div className="col-xs-6 col-xs-offset-3">
-                                    <div className="form-group">
-                                        <label htmlFor="amount">Amount:</label>
-                                        <input readOnly name="amount" value={this.state.send_amount}/>
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="fee">Fee(BTC):</label>
-                                        <input readOnly name="fee" value={this.state.send_fee}/>
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="total">Total:</label>
-                                        <input readOnly name="total" value={this.state.send_total}></input>
-                                    </div>
-                                    <button className=''
-                                            type="submit"> {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}</button>
-                                </div>
-                            </div>
+                        <h3>Sending <span className="close" onClick={this.closeCoinModal}>X</span></h3>
+                        <div className="currency">
+                            <span>Currency:</span>
+                            <img className={this.state.send_coin === 'safex'
+                                ? 'coin'
+                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
+                                    onClick={this.sendCoinChoose.bind(this, 'safex')}
+                                    src="images/safex-coin.png" alt="Safex Coin"/>
+                            <img className={this.state.send_coin === 'btc'
+                                ? 'coin'
+                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
+                                    onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
+                                    alt="Bitcoin Coin"/>
                         </div>
+                        <div className="input-group">
+                            <label for="from">From:</label>
+                            <input name="from" type="text" className="form-control" readOnly
+                                value={this.state.send_keys.public_key} placeholder="Address"
+                                aria-describedby="basic-addon1"/>
+                        </div>
+                        <div className="input-group">
+                            <label for="destination">To:</label>
+                            <input name="destination" type="text" className="form-control" readOnly
+                                value={this.state.send_to} placeholder="Address"
+                                aria-describedby="basic-addon1"/>
+                        </div>
+                        <input type="hidden" readOnly name="private_key"
+                            value={this.state.send_keys.private_key} />
+                        <input type="hidden" readOnly name="public_key"
+                            value={this.state.send_keys.public_key} />
+                        <div className="form-group">
+                            <label for="amount">Amount:</label>
+                            <input readOnly name="amount" value={this.state.send_amount}/>
+                        </div>
+                        <div className="form-group">
+                            <label for="fee">Fee(BTC):</label>
+                            <input readOnly name="fee" value={this.state.send_fee}/>
+                        </div>
+                        <div className="form-group">
+                            <label for="total">Total:</label>
+                            <input readOnly name="total" value={this.state.send_total} />
+                        </div>
+                        <button className="confirm-btn button-shine"
+                            type="submit"> {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}</button>
                     </form>
                 </div>
                 <div className={this.state.transaction_sent
                     ? 'overflow sendModal active'
                     : 'overflow sendModal'}>
                     <form className="container" onSubmit={this.closeSuccessModal}>
-                        <div className="col-xs-12">
-                            <h3>Sent <span className="close" onClick={this.closeSuccessModal}>X</span></h3>
-                            <div className="col-xs-10 col-xs-offset-1">
-                                <div className="col-xs-12">
-                                    <div className="currency">
-                                        Currency: <img className={this.state.send_coin === 'safex'
-                                        ? 'coin'
-                                        : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                                       onClick={this.sendCoinChoose.bind(this, 'safex')}
-                                                       src="images/safex-coin.png" alt="Safex Coin"/>
-                                        <img className={this.state.send_coin === 'btc'
-                                            ? 'coin'
-                                            : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                             onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
-                                             alt="Bitcoin Coin"/>
-                                    </div>
-                                </div>
-                                <div className="input-group">
-                                    <span className="input-group-addon" id="basic-addon1">FROM:</span>
-                                    <input name="from" type="text" className="form-control" readOnly
-                                           value={this.state.send_keys.public_key} placeholder="Address"
-                                           aria-describedby="basic-addon1"/>
-                                </div>
-                                <div className="input-group">
-                                    <span className="input-group-addon" id="basic-addon1">TO:</span>
-                                    <input name="destination" type="text" className="form-control" readOnly
-                                           value={this.state.send_to} placeholder="Address"
-                                           aria-describedby="basic-addon1"/>
-                                </div>
-                                <div className="input-group">
-                                    <span className="input-group-addon" id="basic-addon1">TX ID:</span>
-                                    <input name="destination" type="text" className="form-control" readOnly
-                                           value={this.state.txid} placeholder="Address"
-                                           aria-describedby="basic-addon1"/>
-                                </div>
-                                <input type="hidden" readOnly name="private_key"
-                                       value={this.state.send_keys.private_key}></input>
-                                <input type="hidden" readOnly name="public_key"
-                                       value={this.state.send_keys.public_key}></input>
-                                <div className="col-xs-6 col-xs-offset-3">
-                                    <div className="form-group">
-                                        <label htmlFor="amount">Amount:</label>
-                                        <input readOnly name="amount" value={this.state.send_amount}/>
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="fee">Fee(BTC):</label>
-                                        <input readOnly name="fee" value={this.state.send_fee}/>
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="total">Total:</label>
-                                        <input readOnly name="total" value={this.state.send_total}></input>
-                                    </div>
-                                    <button type="submit">Close X</button>
-                                </div>
-                            </div>
+                        <h3>Sent <span className="close" onClick={this.closeSuccessModal}>X</span></h3>
+                        <div className="currency">
+                            Currency: <img className={this.state.send_coin === 'safex'
+                            ? 'coin'
+                            : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
+                                onClick={this.sendCoinChoose.bind(this, 'safex')}
+                                src="images/safex-coin.png" alt="Safex Coin"/>
+                            <img className={this.state.send_coin === 'btc'
+                                ? 'coin'
+                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
+                                    onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
+                                    alt="Bitcoin Coin"/>
                         </div>
+                        <div className="input-group">
+                            <label for="from">From:</label>
+                            <input name="from" type="text" className="form-control" readOnly
+                                value={this.state.send_keys.public_key} placeholder="Address"
+                                aria-describedby="basic-addon1"/>
+                        </div>
+                        <div className="input-group">
+                            <label for="destination">To:</label>
+                            <input name="destination" type="text" className="form-control" readOnly
+                                value={this.state.send_to} placeholder="Address"
+                                aria-describedby="basic-addon1"/>
+                        </div>
+                        <div className="input-group">
+                            <label for="txid">TX ID:</label>
+                            <input name="txid" type="text" className="form-control" readOnly
+                                value={this.state.txid} placeholder="Address"
+                                aria-describedby="basic-addon1"/>
+                        </div>
+                        <input type="hidden" readOnly name="private_key"
+                            value={this.state.send_keys.private_key} />
+                        <input type="hidden" readOnly name="public_key"
+                            value={this.state.send_keys.public_key} />
+                        <div className="form-group">
+                            <label htmlFor="amount">Amount:</label>
+                            <input readOnly name="amount" value={this.state.send_amount}/>
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="fee">Fee(BTC):</label>
+                            <input readOnly name="fee" value={this.state.send_fee}/>
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="total">Total:</label>
+                            <input readOnly name="total" value={this.state.send_total}></input>
+                        </div>
+                        <button type="submit" className="sent-close button-shine">Close</button>
                     </form>
                 </div>
-                <div className={this.state.settings_active
+                <div className={this.state.settings_active && this.state.send_overflow_active === false
                     ? 'overflow sendModal settingsModal active'
                     : 'overflow sendModal settingsModal'}>
                     <form className="container" onSubmit={this.closeSettingsModal}>
-                        <div className="col-xs-12">
-                            <h3>Settings <span className="close" onClick={this.closeSettingsModal}>X</span></h3>
-                            <div className="col-xs-10 col-xs-offset-1">
-                                <form className="col-xs-12" onSubmit={this.changePassword}>
-                                    <div className="form-group">
-                                        <label htmlFor="old_pass">Old Password:</label>
-                                        <input type="password" name="old_pass"/>
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="new_pass">New Password:</label>
-                                        <input type="password" name="new_pass"/>
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="repeat_pass">Repeat Password:</label>
-                                        <input type="password" name="repeat_pass"/>
-                                    </div>
-                                    <div className="col-xs-12">
-                                        <div className="row">
-                                            <button type="submit">Submit</button>
-                                        </div>
-                                    </div>
-                                </form>
-                                <div className="col-xs-12">
-                                    <button onClick={this.exportEncryptedWallet}>Export Encrypted Wallet (.dat)</button>
-                                    <button onClick={this.exportUnencryptedWallet}>Export Unencrypted Keys</button>
-                                    <button onClick={this.logout}>Logout</button>
+                        <div className="settings-head">
+                            <h3>
+                                User<br />
+                                Settings
+                            </h3>
+                            <img src="images/mixer.png" alt="Transfer Icon"/>
+                        </div>
+
+                        <form onSubmit={this.changePassword}>
+                            <div className="form-group">
+                                <label htmlFor="old_pass">Old Password:</label>
+                                <input type="password" name="old_pass"/>
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="new_pass">New Password:</label>
+                                <input type="password" name="new_pass"/>
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="repeat_pass">Repeat Password:</label>
+                                <input type="password" name="repeat_pass"/>
+                            </div>
+                            <div className="col-xs-12">
+                                <div className="row">
+                                    <button className="submit-btn button-shine" type="submit">Submit</button>
                                 </div>
                             </div>
-                        </div>
+                        </form>
+                        <button className="keys-btn button-shine" onClick={this.exportEncryptedWallet}>Export Encrypted Wallet <span className="blue-text">(.dat)</span></button>
+                        <button className="keys-btn button-shine" onClick={this.exportUnencryptedWallet}>Export Unencrypted Keys</button>
+                        <button className="submit-btn button-shine" onClick={this.logout}>Logout</button>
                     </form>
                 </div>
                 <div className="container key-buttons status">
@@ -1647,9 +1656,6 @@ export default class Wallet extends React.Component {
                         </button>
                     </div>
                     <div className="right-options">
-                        {/*<button className="button-shine">*/}
-                            {/*<img src="images/plus.png"/>*/}
-                        {/*</button>*/}
                         <button className="button-shine" title="">
                             <img src="images/world.png"/>
                         </button>
@@ -1659,8 +1665,8 @@ export default class Wallet extends React.Component {
                         {
                             this.state.settings_active === true
                             ?
-                                <button className="settings button-shine" onClick={this.closeSettingsModal} title="Settings">
-                                    <img src="images/mixer.png"/>
+                                <button className="settings button-shine settings-button-active" onClick={this.closeSettingsModal} title="Settings">
+                                    <img src="images/mixer-blue.png"/>
                                 </button>
                             :
                                 <button className="settings button-shine" onClick={this.openSettingsModal} title="Settings">
