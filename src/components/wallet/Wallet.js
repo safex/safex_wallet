@@ -310,7 +310,7 @@ export default class Wallet extends React.Component {
                 }
             } catch (e) {
                 //this is triggered if the destination address is not a valid bitcoin address
-                alert('invalid destination address');
+                alert('Invalid destination address');
             }
 
             //if safex is not selected then it must be Bitcoin
@@ -350,14 +350,14 @@ export default class Wallet extends React.Component {
                         });
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
-                    alert('network communication error, please try again later');
+                    alert('Network communication error, please try again later');
                     this.setState({
                         transaction_being_sent: false,
                     });
                 }
             } catch (e) {
                 //this is triggered if the destination address is not a valid bitcoin address
-                alert('invalid destination address');
+                alert('Invalid destination address');
             }
         }
     }
@@ -686,7 +686,6 @@ export default class Wallet extends React.Component {
             receive_amount: receive_amount.value
         });
     }
-
 
     //This function is connected to Send expansion button and receive expansion button
     openSendReceive(key, sendreceive) {
@@ -1079,28 +1078,47 @@ export default class Wallet extends React.Component {
                 headers: {'Content-Type': 'multipart/form-data', 'origin': '', 'referrer': '', 'referer': ''}
             }
         })
-          .then(function (response) {
+        .then(function (response) {
             localStorage.setItem("history_txs", JSON.stringify(response.data.transactions));
             var history = JSON.stringify(response.data.transactions);
             var render = '';
-                JSON.parse(history).forEach((tx) => {
-                    var direction = tx['referenceaddress'] === key ? "Received🔸" : "SENT🔻";
-                    var dateTime = new Date(tx['blocktime'] * 1000);
-                    var confirmations = tx['confirmations'] > 15 ? "(16/16)" : "("+ tx['confirmations'] + "/16)"
+            JSON.parse(history).forEach((tx) => {
+                var direction = tx['referenceaddress'] === key ? "Received" : "Sent";
+                var dateTime = new Date(tx['blocktime'] * 1000);
+                var confirmations = tx['confirmations'] > 15 ? "(16/16)" : "("+ tx['confirmations'] + "/16)";
+
+                if (direction === "Received") {
                     render +=`
-                        <div className="history">
-                            <span className="coin-name">SAFEX</span> ` + direction + ` <br /><pre class="date">` + dateTime + `</pre><br />
-                            <pre class="address"><b>TX</b> `+ tx['txid'] +`</pre><br /> 
-                            <pre class="address">`+ tx['sendingaddress'] +`</pre> ➡ <pre class="address">`+ tx['referenceaddress'] +`</pre>
-                        </div>
-                        <div className="col-xs-2">
-                            `+ tx['amount'] +` safex <br />
-                            `+ confirmations +` confirmations
-                        </div>`;
-                });
-                document.getElementById("history_txs").innerHTML = render; 
-            })
-          .catch(function (error) {
+                    <div className="history">
+                        <p class="coin-name">SAFEX</p><br /> ` + direction + ` <br />
+                        <img class="coin-logo" src="images/coin-white.png" alt="Safex Coin">
+                        <p class="date">` + dateTime + `</p><br />
+                        <p class="address"><b>TX: </b> `+ tx['txid'] +`</p><br />
+                        <p class="address address-green">`+ tx['sendingaddress'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-green">`+ tx['referenceaddress'] +`</p>
+                    </div>
+                    <div className="col-xs-2">
+                        `+ tx['amount'] +` safex <br />
+                        `+ confirmations +` confirmations
+                    </div>`;
+                } else {
+                    render +=`
+                    <div class="history">
+                        <p class="coin-name">SAFEX</p><br /> ` + direction + ` <br />
+                        <img class="coin-logo" src="images/coin-white.png" alt="Safex Coin">
+                        <!--<img class="coin-logo" src="images/btc-coin.png" alt="Bitcoin Logo">-->
+                        <p class="date">` + dateTime + `</p><br />
+                        <p class="address"><b>TX: </b> `+ tx['txid'] +`</p><br />
+                        <p class="address address-blue">`+ tx['sendingaddress'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-blue">`+ tx['referenceaddress'] +`</p>
+                    </div>
+                    <div className="col-xs-2">
+                        `+ tx['amount'] +` safex <br />
+                        `+ confirmations +` confirmations
+                    </div>`;
+                }
+            });
+            document.getElementById("history_txs").innerHTML = render;
+        })
+        .catch(function (error) {
             console.log(error);
             alert("Could not fetch transaction history...");
         });
@@ -1194,18 +1212,27 @@ export default class Wallet extends React.Component {
         } catch (e) {
             alert('error parsing the wallet data')
         }
-
-
     }
 
     setArchiveView() {
-        this.setState({archive_active: true});
+        this.setState({
+            archive_active: true
+        });
+        this.closeHistoryModal();
+        this.closeCoinModal();
+        this.closeSettingsModal();
+        this.closeSuccessModal();
     }
 
     setHomeView() {
-        this.setState({archive_active: false});
+        this.setState({
+            archive_active: false
+        });
+        this.closeHistoryModal();
+        this.closeCoinModal();
+        this.closeSettingsModal();
+        this.closeSuccessModal();
     }
-
 
     render() {
         const {keys, archive_active, safex_price, btc_price} = this.state;
@@ -1241,7 +1268,7 @@ export default class Wallet extends React.Component {
                         ?
                             <div className="inner-btns-wrap">
                                 <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
-                                        onClick={this.openSendReceive.bind(this, key, 'send')} className="send-btn button-shine active">
+                                    onClick={this.openSendReceive.bind(this, key, 'send')} className="send-btn button-shine active">
                                     <img src="images/outbox-white.png" alt="Outbox Logo"/>
                                     <span>SEND</span>
                                 </button>
@@ -1254,7 +1281,7 @@ export default class Wallet extends React.Component {
                         :
                             <div className="inner-btns-wrap">
                                 <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
-                                        onClick={this.openSendReceive.bind(this, key, 'send')} className={this.state.collapse_open.receive_open ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
+                                    onClick={this.openSendReceive.bind(this, key, 'send')} className={this.state.collapse_open.receive_open ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
                                     {
                                         this.state.collapse_open.receive_open
                                         ?
@@ -1326,12 +1353,6 @@ export default class Wallet extends React.Component {
                                         {
                                             parseFloat(keys[key].safex_bal)
                                         }
-                                        {/*{*/}
-                                            {/*keys[key].pending_safex_bal > 0*/}
-                                            {/*| keys[key].pending_safex_bal < 0*/}
-                                                {/*? ' (pending ' + keys[key].pending_safex_bal + ')'*/}
-                                                {/*: ''*/}
-                                        {/*}*/}
                                     </span>
                                     <span className="coin-name">Safex</span>
                                     <span>
@@ -1347,12 +1368,6 @@ export default class Wallet extends React.Component {
                                                 ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)).toFixed(8)
                                                 : keys[key].btc_bal
                                         }
-                                        {/*{*/}
-                                            {/*keys[key].pending_btc_bal > 0*/}
-                                            {/*| keys[key].pending_btc_bal < 0*/}
-                                                {/*? ' (pending ' + keys[key].pending_btc_bal + ')'*/}
-                                                {/*: ''*/}
-                                        {/*}*/}
                                     </span>
                                     <span className="coin-name">Bitcoin</span>
                                     <span>
@@ -1477,14 +1492,14 @@ export default class Wallet extends React.Component {
                     </div>
                 </div>
                 <div className='container keys-container'>
-                    <div className={this.state.settings_active === true || this.state.send_overflow_active === true || this.state.history_overflow_active === true ? 'col-xs-12 sidebar-opened keys-wrap' : 'col-xs-12 keys-wrap'}>
+                    <div className={this.state.settings_active === true || this.state.send_overflow_active === true ? 'col-xs-12 sidebar-opened keys-wrap' : 'col-xs-12 keys-wrap'}>
                         <div className="row">
                             {table}
                         </div>
                     </div>
                 </div>
                 <div className={this.state.history_overflow_active
-                    ? 'overflow historyModal active'
+                    ? 'overflow historyModal fadeIn active'
                     : 'overflow historyModal'}>
                     <div className="col-xs-12 history-inner">
                         <h3>History <span className="close" onClick={this.closeHistoryModal}>X</span></h3>
@@ -1505,7 +1520,7 @@ export default class Wallet extends React.Component {
                                 ? 'coin'
                                 : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
                                     onClick={this.sendCoinChoose.bind(this, 'safex')}
-                                    src="images/safex-coin.png" alt="Safex Coin"/>
+                                    src="images/coin-white.png" alt="Safex Coin"/>
                             <img className={this.state.send_coin === 'btc'
                                 ? 'coin'
                                 : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
@@ -1550,11 +1565,12 @@ export default class Wallet extends React.Component {
                     <form className="container" onSubmit={this.closeSuccessModal}>
                         <h3>Sent <span className="close" onClick={this.closeSuccessModal}>X</span></h3>
                         <div className="currency">
-                            Currency: <img className={this.state.send_coin === 'safex'
+                            <span>Currency:</span>
+                            <img className={this.state.send_coin === 'safex'
                             ? 'coin'
                             : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
                                 onClick={this.sendCoinChoose.bind(this, 'safex')}
-                                src="images/safex-coin.png" alt="Safex Coin"/>
+                                src="images/coin-white.png" alt="Safex Coin"/>
                             <img className={this.state.send_coin === 'btc'
                                 ? 'coin'
                                 : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
@@ -1656,10 +1672,10 @@ export default class Wallet extends React.Component {
                         </button>
                     </div>
                     <div className="right-options">
-                        <button className="button-shine" title="">
+                        <button className="button-shine" title="Affiliate System">
                             <img src="images/world.png"/>
                         </button>
-                        <button className="button-shine" title="Dividends calculator">
+                        <button className="button-shine" title="Dividends Calculator">
                             <img src="images/calculator.png"/>
                         </button>
                         {
