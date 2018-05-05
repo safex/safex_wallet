@@ -1351,7 +1351,7 @@ export default class Wallet extends React.Component {
                             </div>
                     }
                 </div>
-
+                
                 <div className="col-xs-12">
                     <div className="row amounts">
                         <div className="row amounts">
@@ -1534,8 +1534,8 @@ export default class Wallet extends React.Component {
                 </div>
                 <div className='container keys-container'>
                     <div className={this.state.settings_active || this.state.send_overflow_active || this.state.dividend_active || this.state.affiliate_active
-                        ? 'col-xs-12 sidebar-opened keys-wrap'
-                        : 'col-xs-12 keys-wrap'}>
+                        ? 'col-xs-12 sidebar-opened keys-wrap fadeIn'
+                        : 'col-xs-12 keys-wrap fadeIn'}>
                         <div className="row">
                             {table}
                         </div>
@@ -1714,7 +1714,7 @@ export default class Wallet extends React.Component {
                         </h3>
                     </form>
                 </div>
-                <div className="container key-buttons status">
+                <div className="container key-buttons status bounceInUp">
                     <div className="status-left-wrap">
                         <span>Status:</span>
                         <span className={this.state.safex_sync

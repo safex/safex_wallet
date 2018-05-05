@@ -68,7 +68,7 @@ export default class Navigation extends React.Component {
 
     render() {
 
-        return (<nav className="navbar navbar-default">
+        return (<nav className="navbar navbar-default bounceInDown">
             <div className="container">
                 <div className="navbar-header">
                     <button type="button" className="navbar-toggle collapsed" data-toggle="collapse"

@@ -21,7 +21,7 @@ export default class SelectWallet extends React.Component {
             walletResetModal2unencrypted: false,
             walletResetModalDone: false,
             walletResetModalDlUnencrypted: false,
-            walletResetModalDlEncrypted: false
+            walletResetModalDlEncrypted: false,
         };
         this.walletResetStart = this.walletResetStart.bind(this);
         this.walletResetStep1Skip = this.walletResetStep1Skip.bind(this);
@@ -197,7 +197,7 @@ export default class SelectWallet extends React.Component {
                     </div>
                     <div className="col-xs-8 col-xs-offset-2 App-intro">
                         <div className="row text-center">
-                            <div className="col-xs-6 login-wrap">
+                            <div className="col-xs-6 login-wrap fadeInDown">
                                 <Link to="/login">
                                     <div className="col-xs-12">
                                         <img src="images/safex-icon-circle.png" alt="Safex Icon Circle"/>
@@ -206,7 +206,7 @@ export default class SelectWallet extends React.Component {
                                     </div>
                                 </Link>
                             </div>
-                            <div className="col-xs-6 importwallet-wrap">
+                            <div className="col-xs-6 importwallet-wrap fadeInDown">
                                 <Link to="/importwallet">
                                     <div className="col-xs-12">
                                         <img src="images/import-main.png" alt="Safex Icon Circle"/>

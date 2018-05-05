@@ -112,11 +112,20 @@ body{
   text-align: center;
   border-radius: 15px;
 }
+.login-wrap {
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
 .login-wrap .col-xs-12 {
   background: url('../images/login-bg.png');
   background-size: 100% 100%;
   display: block;
   padding-bottom: 20px;
+}
+.importwallet-wrap {
+  animation-duration: 1s;
+  animation-delay: 1s;
+  animation-fill-mode: both;
 }
 .importwallet-wrap .col-xs-12 {
   background: url('../images/importwallet-bg.png');
@@ -324,6 +333,8 @@ body{
   height: 60px;
   font-size: 18px;
   color: #fff;
+  animation-duration: 1s;
+  animation-fill-mode: both;
 }
 .Login-form input:focus {
   outline: 0px none;
@@ -361,6 +372,8 @@ body{
   border: none;
   border-radius: 0px;
   padding-bottom: 10px;
+  animation-duration: 1s;
+  animation-fill-mode: both;
 }
 .navbar-default .coin-amounts {
   padding-bottom: 5px;
@@ -433,12 +446,15 @@ body{
   border-top: 1px solid rgba(0, 126, 162, .52);
   border-right: 1px solid rgba(0, 126, 162, .52);
   border-bottom: 1px solid rgba(0, 126, 162, .52);
+  transition: all ease 0.2s;
+  -o-transition: all ease 0.2s;
+  -moz-transition: all ease 0.2s;
+  -webkit-transition: all ease 0.2s;
 }
 .single-key .col-xs-7 {
   padding-left: 0;
 }
 .single-key .col-xs-7 span {
-  /*margin: 0 0 0 10px;*/
   position: relative;
   bottom: 4px;
   left: 10px;
@@ -895,7 +911,6 @@ body{
   width: 252px;
   height: 100%;
   display: flex;
-  transition: all .3s;
   opacity: 0;
   z-index: -9999;
 }
@@ -903,6 +918,10 @@ body{
   right: 0px;
   opacity: 1;
   z-index: 9999;
+  transition: all ease 0.3s;
+  -o-transition: all ease 0.3s;
+  -moz-transition: all ease 0.3s;
+  -webkit-transition: all ease 0.3s;
 }
 .overflow.sendModal > form {
   min-width: 100%;
@@ -930,7 +949,11 @@ body{
 .overflow.sendModal .currency {
   color: #fff;
   margin: 0px auto;
-  text-align: center;
+  height: 70px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 .overflow.sendModal .currency span {
   margin-right: 20px;
@@ -1080,17 +1103,20 @@ input::-webkit-inner-spin-button {
   overflow-y: auto;
   overflow-x: hidden;
   height: 100%;
-  animation-duration: .3s;
+  animation-duration: 1s;
+  animation-delay: 1s;
   animation-fill-mode: both;
   -webkit-transition: width .3s;
   transition: width .3s;
 }
+.keys-container .keys-wrap .row:hover .single-key {
+  opacity: .75;
+}
+.keys-container .keys-wrap .row:hover .single-key:hover{
+  opacity: 1;
+}
 .keys-container .sidebar-opened {
   width: 710px;
-  /*animation-duration: .15s;*/
-  /*animation-fill-mode: both;*/
-  /*-webkit-transition: width .15s;*/
-  /*transition: width .15s;*/
 }
 .wallet-page {
   overflow: hidden;
@@ -1146,6 +1172,9 @@ input::-webkit-inner-spin-button {
   bottom: 0;
   width: 100%;
   z-index: 10000;
+  animation-duration: 1s;
+  animation-delay: 1.4s;
+  animation-fill-mode: both;
 }
 .status .status-left-wrap {
   text-align: left;
@@ -1647,17 +1676,110 @@ input::-webkit-inner-spin-button {
 .fadeInLeft {
   animation-name: fadeInLeft;
 }
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -10%, 0)
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.fadeInDown {
+  animation-name: fadeInDown;
+}
 @keyframes fadeOutRight {
   0% {
-    opacity: 1
+    opacity: 1;
   }
   to {
     opacity: 0;
-    transform: translate3d(100%, 0, 0)
+    transform: translate3d(100%, 0, 0);
   }
 }
 .fadeOutRight {
-  animation-name: fadeOutRight
+  animation-name: fadeOutRight;
+}
+@keyframes bounceInUp {
+  0%,
+  60%,
+  75%,
+  90%,
+  to {
+    animation-timing-function: cubic-bezier(.215, .61, .355, 1);
+  }
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 3000px, 0);
+  }
+  60% {
+    opacity: 1;
+    transform: translate3d(0, -20px, 0);
+  }
+  75% {
+    transform: translate3d(0, 10px, 0);
+  }
+  90% {
+    transform: translate3d(0, -5px, 0);
+  }
+  to {
+    transform: translateZ(0);
+  }
+}
+.bounceInUp {
+  animation-name: bounceInUp;
+}
+@keyframes bounceInDown {
+  0%,
+  60%,
+  75%,
+  90%,
+  to {
+    animation-timing-function: cubic-bezier(.215, .61, .355, 1);
+  }
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -3000px, 0);
+  }
+  60% {
+    opacity: 1;
+    transform: translate3d(0, 25px, 0);
+  }
+  75% {
+    transform: translate3d(0, -10px, 0);
+  }
+  90% {
+    transform: translate3d(0, 5px, 0);
+  }
+  to {
+    transform: none;
+  }
+}
+.bounceInDown {
+  animation-name: bounceInDown;
+}
+@keyframes shake {
+  0%,
+  to {
+    transform: translateZ(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translate3d(-10px, 0, 0);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translate3d(10px, 0, 0);
+  }
+}
+.shake {
+  animation-name: shake
 }
 @keyframes neon-blue {
   from {
