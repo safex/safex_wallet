@@ -12,9 +12,7 @@ import {genkey} from '../../utils/keys';
 import QRCode from 'qrcode.react';
 import NumberFormat from 'react-number-format';
 
-
 import Navigation from '../Navigation';
-
 
 export default class Wallet extends React.Component {
     constructor(props) {
@@ -61,7 +59,8 @@ export default class Wallet extends React.Component {
             settings_active: false,
             refreshTimer: 0,
             refreshInterval: '',
-            status_text: 'Loading...'
+            status_text: 'Loading...',
+            dividend_active: false
         }
 
         this.createKey = this.createKey.bind(this);
@@ -80,6 +79,8 @@ export default class Wallet extends React.Component {
         this.sendFeeOnBlur = this.sendFeeOnBlur.bind(this);
         this.sendTotalAdjustCoinChange = this.sendTotalAdjustCoinChange.bind(this);
         this.closeSuccessModal = this.closeSuccessModal.bind(this);
+        this.openDividendModal = this.openDividendModal.bind(this);
+        this.closeDividendModal = this.closeDividendModal.bind(this);
 
         this.exportUnencryptedWallet = this.exportUnencryptedWallet.bind(this);
         this.exportEncryptedWallet = this.exportEncryptedWallet.bind(this);
@@ -162,7 +163,7 @@ export default class Wallet extends React.Component {
         var promises = [];
         if (keys === null) {
             keys = this.state.keys.filter(function(item) {
-                return (item.archived == false || !item.hasOwnProperty("archived"))
+                return (item.archived === false || !item.hasOwnProperty("archived"))
             })
         }
 
@@ -187,7 +188,7 @@ export default class Wallet extends React.Component {
             var iteration = 0;
             for (var x = 0; x < values.length; x++) {
                 var currentIndex = this.state.keys.findIndex(i => i.public_key === keys[iteration]['public_key']);
-                this.state.keys[currentIndex].pending_safex_bal = values[iteration]
+                this.state.keys[currentIndex].pending_safex_bal = values[iteration];
                 iteration += 1;
             }
         });
@@ -197,7 +198,7 @@ export default class Wallet extends React.Component {
         var promises = [];
         if (keys === null) {
             keys = this.state.keys.filter(function(item) {
-                return (item.archived == false || !item.hasOwnProperty("archived"))
+                return (item.archived === false || !item.hasOwnProperty("archived"))
             })
         }
 
@@ -455,7 +456,7 @@ export default class Wallet extends React.Component {
                     fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
                         .then(resp => resp.text())
                         .then((resp) => {
-                            if (resp=="") {
+                            if (resp === "") {
                                 throw "There was an error with the transaction.";
                             }
                             this.setState({
@@ -518,7 +519,6 @@ export default class Wallet extends React.Component {
                 });
             });
         }
-    
 
     createKey() {
         this.setState({is_loading: true});
@@ -680,7 +680,6 @@ export default class Wallet extends React.Component {
         });
     }
 
-
     amountChange(receive_amount) {
         this.setState({
             receive_amount: receive_amount.value
@@ -759,6 +758,7 @@ export default class Wallet extends React.Component {
         this.closeCoinModal();
         this.closeSuccessModal();
         this.closeSettingsModal();
+        this.closeDividendModal();
     }
 
     //Activates send_overflow_active state which opens Modal screen displaying transaction pre-confirmation information
@@ -790,14 +790,14 @@ export default class Wallet extends React.Component {
                     send_keys: {
                         public_key: e.target.public_key.value,
                         private_key: e.target.private_key.value
-                    }
+                    },
+                    dividend_active: false
                 })
             } catch (e) {
                 alert('destination address is invalid');
             }
-
         }
-        this.closeHistoryModal();
+        // this.closeDividendModal();
     }
 
     changePassword(e) {
@@ -923,6 +923,7 @@ export default class Wallet extends React.Component {
         this.closeHistoryModal();
         this.closeCoinModal();
         this.closeSuccessModal();
+        this.closeDividendModal();
     }
 
     closeSettingsModal() {
@@ -1222,6 +1223,7 @@ export default class Wallet extends React.Component {
         this.closeCoinModal();
         this.closeSettingsModal();
         this.closeSuccessModal();
+        this.closeDividendModal();
     }
 
     setHomeView() {
@@ -1232,6 +1234,26 @@ export default class Wallet extends React.Component {
         this.closeCoinModal();
         this.closeSettingsModal();
         this.closeSuccessModal();
+        this.closeDividendModal();
+    }
+
+    openDividendModal(e) {
+        e.preventDefault();
+        this.setState({
+            dividend_active: true
+        });
+        this.closeHistoryModal();
+        this.closeCoinModal();
+        this.closeSuccessModal();
+        this.closeSettingsModal();
+        console.log(this.state.dividend_active);
+    }
+
+    closeDividendModal() {
+        this.setState({
+            dividend_active: false
+        });
+        console.log(this.state.dividend_active)
     }
 
     render() {
@@ -1309,14 +1331,13 @@ export default class Wallet extends React.Component {
 
                 <div className="col-xs-12">
                     <div className="row amounts">
-                        
                         <div className="row amounts">
                             <div className="col-xs-5 amount-btns-wrap">
                                 <button onClick={() => this.sendToArchive(key)}
-                                        className={keys[key].archived === false
-                                        | (!keys[key].hasOwnProperty('archived') && archive_active === false)
-                                            ? 'archive-button button-shine'
-                                            : 'archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
+                                    className={keys[key].archived === false
+                                    | (!keys[key].hasOwnProperty('archived') && archive_active === false)
+                                        ? 'archive-button button-shine'
+                                        : 'archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
                                     <span>TO ARCHIVE</span>
                                 </button>
                                 {
@@ -1338,12 +1359,11 @@ export default class Wallet extends React.Component {
                                     <span>show private</span>
                                 </button>
 
-
                                 <button onClick={() => this.removeFromArchive(key)}
-                                        className={keys[key].archived === true
-                                        | (!keys[key].hasOwnProperty('archived') && archive_active === true)
-                                            ? 'archive-button'
-                                            : 'archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
+                                    className={keys[key].archived === true
+                                    | (!keys[key].hasOwnProperty('archived') && archive_active === true)
+                                        ? 'archive-button'
+                                        : 'archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
                                     <span>TO HOME</span>
                                 </button>
                             </div>
@@ -1394,12 +1414,10 @@ export default class Wallet extends React.Component {
                             <label htmlFor="which">Currency:</label>
                             <img className={this.state.send_coin === 'safex'
                                 ? 'coin active'
-                                : 'coin'} onClick={this.sendCoinChoose.bind(this, 'safex')} src="images/coin-white.png"
-                                 alt="Safex Coin"/>
+                                : 'coin'} onClick={this.sendCoinChoose.bind(this, 'safex')} src="images/coin-white.png"  alt="Safex Coin"/>
                             <img className={this.state.send_coin === 'btc'
                                 ? 'coin active'
-                                : 'coin'} onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
-                                 alt="Bitcoin Coin"/>
+                                : 'coin'} onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png" alt="Bitcoin Coin"/>
                             <input type="hidden" name="which" readOnly value={this.state.send_coin} />
                             <input type="hidden" name="private_key" readOnly value={keys[key].private_key} />
                             <input type="hidden" name="public_key" readOnly value={keys[key].public_key} />
@@ -1492,7 +1510,9 @@ export default class Wallet extends React.Component {
                     </div>
                 </div>
                 <div className='container keys-container'>
-                    <div className={this.state.settings_active === true || this.state.send_overflow_active === true ? 'col-xs-12 sidebar-opened keys-wrap' : 'col-xs-12 keys-wrap'}>
+                    <div className={this.state.settings_active === true || this.state.send_overflow_active === true || this.state.dividend_active === true
+                        ? 'col-xs-12 sidebar-opened keys-wrap'
+                        : 'col-xs-12 keys-wrap'}>
                         <div className="row">
                             {table}
                         </div>
@@ -1529,15 +1549,13 @@ export default class Wallet extends React.Component {
                         </div>
                         <div className="input-group">
                             <label for="from">From:</label>
-                            <input name="from" type="text" className="form-control" readOnly
-                                value={this.state.send_keys.public_key} placeholder="Address"
-                                aria-describedby="basic-addon1"/>
+                            <textarea name="from" className="form-control" readOnly aria-describedby="basic-addon1" value={this.state.send_keys.public_key}>
+                            </textarea>
                         </div>
                         <div className="input-group">
                             <label for="destination">To:</label>
-                            <input name="destination" type="text" className="form-control" readOnly
-                                value={this.state.send_to} placeholder="Address"
-                                aria-describedby="basic-addon1"/>
+                            <textarea name="destination" className="form-control" readOnly aria-describedby="basic-addon1" value={this.state.send_to}>
+                            </textarea>
                         </div>
                         <input type="hidden" readOnly name="private_key"
                             value={this.state.send_keys.private_key} />
@@ -1579,21 +1597,24 @@ export default class Wallet extends React.Component {
                         </div>
                         <div className="input-group">
                             <label for="from">From:</label>
-                            <input name="from" type="text" className="form-control" readOnly
-                                value={this.state.send_keys.public_key} placeholder="Address"
-                                aria-describedby="basic-addon1"/>
+                            <textarea name="from" className="form-control" readOnly
+                                  value={this.state.send_keys.public_key} placeholder="Address"
+                                  aria-describedby="basic-addon1">
+                            </textarea>
                         </div>
                         <div className="input-group">
                             <label for="destination">To:</label>
-                            <input name="destination" type="text" className="form-control" readOnly
-                                value={this.state.send_to} placeholder="Address"
-                                aria-describedby="basic-addon1"/>
+                            <textarea name="destination" className="form-control" readOnly
+                                  value={this.state.send_to} placeholder="Address"
+                                  aria-describedby="basic-addon1">
+                            </textarea>
                         </div>
                         <div className="input-group">
                             <label for="txid">TX ID:</label>
-                            <input name="txid" type="text" className="form-control" readOnly
-                                value={this.state.txid} placeholder="Address"
-                                aria-describedby="basic-addon1"/>
+                            <textarea name="txid" className="form-control" readOnly
+                                  value={this.state.txid}  placeholder="Address"
+                                  aria-describedby="basic-addon1" rows="4">
+                            </textarea>
                         </div>
                         <input type="hidden" readOnly name="private_key"
                             value={this.state.send_keys.private_key} />
@@ -1601,15 +1622,15 @@ export default class Wallet extends React.Component {
                             value={this.state.send_keys.public_key} />
                         <div className="form-group">
                             <label htmlFor="amount">Amount:</label>
-                            <input readOnly name="amount" value={this.state.send_amount}/>
+                            <input readOnly name="amount" value={this.state.send_amount} />
                         </div>
                         <div className="form-group">
                             <label htmlFor="fee">Fee(BTC):</label>
-                            <input readOnly name="fee" value={this.state.send_fee}/>
+                            <input readOnly name="fee" value={this.state.send_fee} />
                         </div>
                         <div className="form-group">
                             <label htmlFor="total">Total:</label>
-                            <input readOnly name="total" value={this.state.send_total}></input>
+                            <input readOnly name="total" value={this.state.send_total} />
                         </div>
                         <button type="submit" className="sent-close button-shine">Close</button>
                     </form>
@@ -1650,6 +1671,16 @@ export default class Wallet extends React.Component {
                         <button className="submit-btn button-shine" onClick={this.logout}>Logout</button>
                     </form>
                 </div>
+                <div className={this.state.dividend_active
+                    ? 'overflow sendModal dividendModal active'
+                    : 'overflow sendModal dividendModal'}>
+                    <form>
+                        <h3>
+                            Dividend<br />
+                            Calculator
+                        </h3>
+                    </form>
+                </div>
                 <div className="container key-buttons status">
                     <div className="status-left-wrap">
                         <span>Status:</span>
@@ -1675,9 +1706,18 @@ export default class Wallet extends React.Component {
                         <button className="button-shine" title="Affiliate System">
                             <img src="images/world.png"/>
                         </button>
-                        <button className="button-shine" title="Dividends Calculator">
-                            <img src="images/calculator.png"/>
-                        </button>
+                        {
+                            this.state.dividend_active === true
+                            ?
+                                <button className="button-shine" title="Dividends Calculator" onClick={this.closeDividendModal}>
+                                    <img src="images/calculator.png"/>
+                                </button>
+                            :
+                                <button className="button-shine" title="Dividends Calculator" onClick={this.openDividendModal}>
+                                    <img src="images/calculator.png"/>
+                                </button>
+                        }
+
                         {
                             this.state.settings_active === true
                             ?
