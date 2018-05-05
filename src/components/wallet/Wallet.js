@@ -60,7 +60,8 @@ export default class Wallet extends React.Component {
             refreshTimer: 0,
             refreshInterval: '',
             status_text: 'Loading...',
-            dividend_active: false
+            dividend_active: false,
+            affiliate_active: false
         }
 
         this.createKey = this.createKey.bind(this);
@@ -81,6 +82,8 @@ export default class Wallet extends React.Component {
         this.closeSuccessModal = this.closeSuccessModal.bind(this);
         this.openDividendModal = this.openDividendModal.bind(this);
         this.closeDividendModal = this.closeDividendModal.bind(this);
+        this.openAffiliateModal = this.openAffiliateModal.bind(this);
+        this.closeAffiliateModal = this.closeAffiliateModal.bind(this);
 
         this.exportUnencryptedWallet = this.exportUnencryptedWallet.bind(this);
         this.exportEncryptedWallet = this.exportEncryptedWallet.bind(this);
@@ -791,13 +794,13 @@ export default class Wallet extends React.Component {
                         public_key: e.target.public_key.value,
                         private_key: e.target.private_key.value
                     },
-                    dividend_active: false
+                    dividend_active: false,
+                    affiliate_active: false
                 })
             } catch (e) {
                 alert('destination address is invalid');
             }
         }
-        // this.closeDividendModal();
     }
 
     changePassword(e) {
@@ -924,6 +927,7 @@ export default class Wallet extends React.Component {
         this.closeCoinModal();
         this.closeSuccessModal();
         this.closeDividendModal();
+        this.closeAffiliateModal();
     }
 
     closeSettingsModal() {
@@ -1224,6 +1228,7 @@ export default class Wallet extends React.Component {
         this.closeSettingsModal();
         this.closeSuccessModal();
         this.closeDividendModal();
+        this.closeAffiliateModal();
     }
 
     setHomeView() {
@@ -1235,6 +1240,7 @@ export default class Wallet extends React.Component {
         this.closeSettingsModal();
         this.closeSuccessModal();
         this.closeDividendModal();
+        this.closeAffiliateModal();
     }
 
     openDividendModal(e) {
@@ -1246,14 +1252,31 @@ export default class Wallet extends React.Component {
         this.closeCoinModal();
         this.closeSuccessModal();
         this.closeSettingsModal();
-        console.log(this.state.dividend_active);
+        this.closeAffiliateModal();
     }
 
     closeDividendModal() {
         this.setState({
             dividend_active: false
         });
-        console.log(this.state.dividend_active)
+    }
+
+    openAffiliateModal(e) {
+        e.preventDefault();
+        this.setState({
+            affiliate_active: true
+        });
+        this.closeHistoryModal();
+        this.closeCoinModal();
+        this.closeSuccessModal();
+        this.closeSettingsModal();
+        this.closeDividendModal();
+    }
+
+    closeAffiliateModal() {
+        this.setState({
+            affiliate_active: false
+        });
     }
 
     render() {
@@ -1510,7 +1533,7 @@ export default class Wallet extends React.Component {
                     </div>
                 </div>
                 <div className='container keys-container'>
-                    <div className={this.state.settings_active === true || this.state.send_overflow_active === true || this.state.dividend_active === true
+                    <div className={this.state.settings_active || this.state.send_overflow_active || this.state.dividend_active || this.state.affiliate_active
                         ? 'col-xs-12 sidebar-opened keys-wrap'
                         : 'col-xs-12 keys-wrap'}>
                         <div className="row">
@@ -1681,6 +1704,16 @@ export default class Wallet extends React.Component {
                         </h3>
                     </form>
                 </div>
+                <div className={this.state.affiliate_active
+                    ? 'overflow sendModal affiliateModal active'
+                    : 'overflow sendModal affiliateModal'}>
+                    <form>
+                        <h3>
+                            Affiliate<br />
+                            System
+                        </h3>
+                    </form>
+                </div>
                 <div className="container key-buttons status">
                     <div className="status-left-wrap">
                         <span>Status:</span>
@@ -1703,11 +1736,20 @@ export default class Wallet extends React.Component {
                         </button>
                     </div>
                     <div className="right-options">
-                        <button className="button-shine" title="Affiliate System">
-                            <img src="images/world.png"/>
-                        </button>
                         {
-                            this.state.dividend_active === true
+                            this.state.affiliate_active
+                            ?
+                                <button className="button-shine" title="Affiliate System" onClick={this.closeAffiliateModal}>
+                                    <img src="images/world.png"/>
+                                </button>
+                            :
+                                <button className="button-shine" title="Affiliate System" onClick={this.openAffiliateModal}>
+                                    <img src="images/world.png"/>
+                                </button>
+                        }
+
+                        {
+                            this.state.dividend_active
                             ?
                                 <button className="button-shine" title="Dividends Calculator" onClick={this.closeDividendModal}>
                                     <img src="images/calculator.png"/>
@@ -1719,7 +1761,7 @@ export default class Wallet extends React.Component {
                         }
 
                         {
-                            this.state.settings_active === true
+                            this.state.settings_active
                             ?
                                 <button className="settings button-shine settings-button-active" onClick={this.closeSettingsModal} title="Settings">
                                     <img src="images/mixer-blue.png"/>
