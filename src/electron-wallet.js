@@ -34,7 +34,9 @@ function createWindow() {
             slashes: true
         });
     mainWindow.loadURL(startUrl);
-    
+
+    mainWindow.webContents.openDevTools();
+
     // Open the DevTools.
     if (process.env.ELECTRON_DEV) {
         mainWindow.webContents.openDevTools();

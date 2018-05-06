@@ -172,8 +172,9 @@ export default class ImportWallet extends React.Component {
         return (
             <div className="container">
                 <div className="col-xs-12 Login-logo">
-                    <Link className="pul-left back-button" to="/"><img src="images/back.png"/> Back</Link>
-                    <img src="images/logo.png"/>
+                    <h2>Safex</h2>
+                    <h3>Wallet</h3>
+                    <Link className="back-button" to="/"><img src="images/back.png" /> Back</Link>
                 </div>
                 <div className="col-xs-12 version-number"><p className="text-center">v0.0.6</p></div>
                 <div className="col-xs-12 Login-form Import-wallet">
@@ -189,15 +190,16 @@ export default class ImportWallet extends React.Component {
                         
                         {currentWalletPass}
                         
-                        <button className="btn btn-default" type="submit">IMPORT <img src="images/import.png"/></button>
+                        <button className="btn btn-default button-neon-green" type="submit">IMPORT <img src="images/import.png"/></button>
                     </form>
                     <p className="text-center">
-                        Write password down and <br/>
+                        Write password down and <br />
                         NEVER lose it.
                     </p>
                 </div>
                 <div className="col-xs-12 text-center Intro-footer">
-                    <p className="text-center">2014-2017 All Rights Reserved Safe Exchange Developers &copy;</p>
+                    <img src="images/footer-logo.png" alt="Safex Icon Footer"/>
+                    <p className="text-center">2014-2018 All Rights Reserved Safe Exchange Developers &copy;</p>
                 </div>
             </div>
         );

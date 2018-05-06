@@ -86,17 +86,24 @@ export default class Navigation extends React.Component {
                 </div>
 
                 <div className="collapse navbar-collapse" id="navbar-collapse">
-                    <ul className="nav navbar-nav navbar-right">
+                    <ul className="nav navbar-nav navbar-right wallet-nav">
                         <li>
-                            <Link to="/wallet" activeClassName="activeLink" onlyActiveOnIndex>Wallet <span>0.0.6</span><img
-                                src="images/create.png" alt="Create"/></Link>
+                            <Link to="/wallet" activeClassName="activeLink" onlyActiveOnIndex>Wallet</Link>
                         </li>
                     </ul>
+                    {/*<div onClick={this.setHomeView}*/}
+                         {/*className={archive_active === false ? 'btn btn-default active' : 'btn btn-default'}>*/}
+                        {/*Home*/}
+                    {/*</div>*/}
+                    {/*<div onClick={this.setArchiveView}*/}
+                         {/*className={archive_active === true ? 'btn btn-default active' : 'btn btn-default'}>*/}
+                        {/*Archive*/}
+                    {/*</div>*/}
                 </div>
                 <div className="collapse navbar-collapse" id="navbar-collapse">
                     <ul className="nav navbar-nav navbar-right coin-amounts">
-                        <li>SAFEX <span className="amount">${this.state.safex_price}</span></li>
-                        <li>BTC <span className="amount">${this.state.bitcoin_price}</span></li>
+                        <li><span className="currency">SAFEX</span> <span className="amount">${this.state.safex_price}</span></li>
+                        <li><span className="currency">BTC</span> <span className="amount">${this.state.bitcoin_price}</span></li>
                     </ul>
                 </div>
             </div>
