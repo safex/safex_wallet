@@ -608,7 +608,7 @@ body{
   float: right;
   margin-top: 10px;
   margin-right: 0;
-  padding: 6px 15px 5px;
+  padding: 7px 10px 6px;
   border: 1px solid rgba(0, 231, 255, .44);
   border-radius: 8px;
 }
@@ -1171,6 +1171,7 @@ input::-webkit-inner-spin-button {
   position: absolute;
   bottom: 0;
   width: 100%;
+  height: 89px;
   z-index: 10000;
   animation-duration: 1s;
   animation-delay: 1.4s;
@@ -1192,6 +1193,7 @@ input::-webkit-inner-spin-button {
 .status span {
   padding-right: 5px;
   letter-spacing: 2px;
+  font-size: 12px;
 }
 .status span:first-child {
   padding-left: 0;
@@ -1205,7 +1207,7 @@ input::-webkit-inner-spin-button {
   content:"\2b24";
   color: #f00;
   position: relative;
-  top: -3px;
+  top: 0px;
   font-size:12px;
   margin-left: 5px;
 }
@@ -1213,14 +1215,15 @@ input::-webkit-inner-spin-button {
   content:"\2b24";
   color: #0ec884;
   position: relative;
-  top: -3px;
+  top: 0px;
   font-size: 12px;
   margin-left: 5px;
 }
 .status .sync-span {
   padding-left: 8px;
   position: relative;
-  top: 3px;
+  top: 1px;
+  font-size: 12px;
 }
 .status .import-form-wrap {
   width: 480px;

@@ -261,7 +261,7 @@ export default class Wallet extends React.Component {
             this.setState({
                 btc_sync: false,
                 safex_sync: false,
-                status_text: 'Synchronization error, try refreshing later'
+                status_text: 'Sync error, please refresh again'
             });
         });
     }
