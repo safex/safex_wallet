@@ -1329,6 +1329,9 @@ input::-webkit-inner-spin-button {
   position: relative;
   left: 2px;
 }
+.status .right-options .refresh-btn.disabled:hover {
+  background-color: transparent;
+}
 
 .form-send .fee-buttons span {
   background: transparent;

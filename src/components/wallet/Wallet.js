@@ -1772,12 +1772,18 @@ export default class Wallet extends React.Component {
                                 </button>
                         }
 
-                        <button className={this.state.refreshTimer === 0
-                            ? 'refresh-btn button-shine'
-                            : 'refresh-btn button-shine disabled'} onClick={this.refreshWallet} title="Refresh">
-                            <img src="images/refresh.png"/>
-                            <span><p>{this.state.refreshTimer + 's'}</p></span>
-                        </button>
+                        {
+                            this.state.refreshTimer === 0
+                            ?
+                                <button className="refresh-btn button-shine"  onClick={this.refreshWallet} title="Refresh">
+                                    <img src="images/refresh.png"/>
+                                </button>
+                            :
+                                <button className="refresh-btn button-shine disabled"  onClick={this.refreshWallet} title="Refresh">
+                                    <img src="images/refresh-blue.png"/>
+                                    <span><p>{this.state.refreshTimer + 's'}</p></span>
+                                </button>
+                        }
                     </div>
                 </div>
             </div>
