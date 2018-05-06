@@ -1522,7 +1522,7 @@ export default class Wallet extends React.Component {
         return (
             <div className="wallet-page">
                 <Navigation/>
-                <div className="wallet-tabs">
+                <div className="wallet-tabs fadeIn">
                     <div onClick={this.setHomeView}
                         className={archive_active === false ? 'btn btn-default button-shine active' : 'btn btn-default button-shine'}>
                         Home

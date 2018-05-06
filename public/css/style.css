@@ -787,6 +787,9 @@ body{
   position: absolute;
   top: 6px;
   right: 45px;
+  animation-duration: 1s;
+  animation-delay: 2.5s;
+  animation-fill-mode: both;
 }
 .wallet-tabs .btn {
   background: transparent;
@@ -1104,7 +1107,7 @@ input::-webkit-inner-spin-button {
   overflow-x: hidden;
   height: 100%;
   animation-duration: 1s;
-  animation-delay: 1s;
+  animation-delay: 1.9s;
   animation-fill-mode: both;
   -webkit-transition: width .3s;
   transition: width .3s;
@@ -1174,7 +1177,7 @@ input::-webkit-inner-spin-button {
   height: 89px;
   z-index: 10000;
   animation-duration: 1s;
-  animation-delay: 1.4s;
+  animation-delay: .8s;
   animation-fill-mode: both;
 }
 .status .status-left-wrap {
