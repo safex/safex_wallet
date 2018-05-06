@@ -564,7 +564,8 @@ body{
   background: rgba(190, 190, 190, .44);
 }
 .single-key .pull-right button:disabled {
-  opacity: 0.5;
+  opacity: 0.8;
+  background: rgba(190, 190, 190, .44);
 }
 .single-key .pull-right button img {
   display: inline-block;
