@@ -913,15 +913,15 @@ body{
   display: flex;
   opacity: 0;
   z-index: -9999;
+  transition: all ease 0.3s;
+  -o-transition: all ease 0.3s;
+  -moz-transition: all ease 0.3s;
+  -webkit-transition: all ease 0.3s;
 }
 .overflow.sendModal.active {
   right: 0px;
   opacity: 1;
   z-index: 9999;
-  transition: all ease 0.3s;
-  -o-transition: all ease 0.3s;
-  -moz-transition: all ease 0.3s;
-  -webkit-transition: all ease 0.3s;
 }
 .overflow.sendModal > form {
   min-width: 100%;
@@ -1299,18 +1299,20 @@ input::-webkit-inner-spin-button {
 .status .right-options button:hover {
   background-color: rgba(18, 190, 221, 1);
 }
-.status .right-options .settings-button-active:hover {
+.status .right-options .settings-btn-active:hover,
+.status .right-options .aff-btn-active:hover,
+.status .right-options .dividend-btn-active:hover{
   background-color: transparent;
 }
-.status .right-options .refresh-button img,
+.status .right-options .refresh-btn img,
 .settings img {
   max-width: 30px;
   height: auto;
 }
-.status .right-options .refresh-button span {
+.status .right-options .refresh-btn span {
   display: none;
 }
-.status .right-options .refresh-button.disabled span {
+.status .right-options .refresh-btn.disabled span {
   display: block;
   position: absolute;
   width: 100%;
@@ -1321,7 +1323,7 @@ input::-webkit-inner-spin-button {
   padding-right: 0px;
   border-radius: 5px;
 }
-.status .right-options .refresh-button.disabled span p {
+.status .right-options .refresh-btn.disabled span p {
   line-height: 44px;
   margin: 0;
   position: relative;
