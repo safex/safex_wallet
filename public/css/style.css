@@ -470,18 +470,25 @@ body{
   padding-left: 0;
 }
 .single-key .safex-amounts {
-  width: 150px;
+  width: 180px;
   display: inline-block;
   float: left;
 }
 .single-key .bitcoin-amounts {
-  width: 260px;
+  width: 240px;
   display: inline-block;
   float: left;
+}
+.single-key .bitcoin-amounts .amount span:first-child {
+  width: 100px;
+}
+.single-key .bitcoin-amounts .amount span:last-child {
+  width: 70px;
 }
 .single-key .amounts > span {
   display: flex;
   padding-left: 0;
+  padding-right: 0;
 }
 .single-key .amounts button.archive-button {
   background: none;
@@ -511,7 +518,7 @@ body{
 }
 .single-key .amounts > span > span {
   color: #00d1ff;
-  width: calc(50% - 30px);
+  width: 50%;
 }
 .single-key .amounts > span > span:first-child {
   text-align: right;
