@@ -678,6 +678,10 @@ body{
   padding-left: 5px;
   margin-left: 10px;
   font-size: 14px;
+  transition: all ease 0.2s;
+  -o-transition: all ease 0.2s;
+  -moz-transition: all ease 0.2s;
+  -webkit-transition: all ease 0.2s;
 }
 .form-send .send-left input:focus {
   border-bottom: 1px solid #54C4F8;
@@ -1795,49 +1799,49 @@ input::-webkit-inner-spin-button {
 }
 @keyframes neon-blue {
   from {
-    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #228DFF, 0 0 25px #228DFF, 0 0 30px #228DFF, 0 0 35px #228DFF, 0 0 40px #228DFF;
+    text-shadow: 0 0 3px #fff, 0 0 6px #fff, 0 0 9px #fff, 0 0 12px #228DFF, 0 0 15px #228DFF, 0 0 18px #228DFF, 0 0 21px #228DFF, 0 0 24px #228DFF;
   }
   to {
-    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #228DFF, 0 0 25px #228DFF, 0 0 30px #228DFF, 0 0 35px #228DFF, 0 0 40px #228DFF;
+    text-shadow: 0 0 3px #fff, 0 0 6px #fff, 0 0 9px #fff, 0 0 12px #228DFF, 0 0 15px #228DFF, 0 0 18px #228DFF, 0 0 21px #228DFF, 0 0 24px #228DFF;
   }
 }
 @-moz-keyframes neon-blue {
   from {
-    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #228DFF, 0 0 25px #228DFF, 0 0 30px #228DFF, 0 0 35px #228DFF, 0 0 40px #228DFF;
+    text-shadow: 0 0 3px #fff, 0 0 6px #fff, 0 0 9px #fff, 0 0 12px #228DFF, 0 0 15px #228DFF, 0 0 18px #228DFF, 0 0 21px #228DFF, 0 0 24px #228DFF;
   }
   to {
-    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #228DFF, 0 0 25px #228DFF, 0 0 30px #228DFF, 0 0 35px #228DFF, 0 0 40px #228DFF;
+    text-shadow: 0 0 3px #fff, 0 0 6px #fff, 0 0 9px #fff, 0 0 12px #228DFF, 0 0 15px #228DFF, 0 0 18px #228DFF, 0 0 21px #228DFF, 0 0 24px #228DFF;
   }
 }
 @-webkit-keyframes neon-blue {
   from {
-    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #228DFF, 0 0 25px #228DFF, 0 0 30px #228DFF, 0 0 35px #228DFF, 0 0 40px #228DFF;
+    text-shadow: 0 0 3px #fff, 0 0 6px #fff, 0 0 9px #fff, 0 0 12px #228DFF, 0 0 15px #228DFF, 0 0 18px #228DFF, 0 0 21px #228DFF, 0 0 24px #228DFF;
   }
   to {
-    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #228DFF, 0 0 25px #228DFF, 0 0 30px #228DFF, 0 0 35px #228DFF, 0 0 40px #228DFF;
+    text-shadow: 0 0 3px #fff, 0 0 6px #fff, 0 0 9px #fff, 0 0 12px #228DFF, 0 0 15px #228DFF, 0 0 18px #228DFF, 0 0 21px #228DFF, 0 0 24px #228DFF;
   }
 }
 @keyframes neon-green {
   from {
-    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #0ec8c1, 0 0 25px #0ec8c1, 0 0 30px #0ec8c1, 0 0 35px #0ec8c1, 0 0 40px #0ec8c1;
+    text-shadow: 0 0 3px #fff, 0 0 6px #fff, 0 0 9px #fff, 0 0 12px #0ec8c1, 0 0 15px #0ec8c1, 0 0 18px #0ec8c1, 0 0 21px #0ec8c1, 0 0 24px #0ec8c1;
   }
   to {
-    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #0ec8c1, 0 0 25px #0ec8c1, 0 0 30px #0ec8c1, 0 0 35px #0ec8c1, 0 0 40px #0ec8c1;
+    text-shadow: 0 0 3px #fff, 0 0 6px #fff, 0 0 9px #fff, 0 0 12px #0ec8c1, 0 0 15px #0ec8c1, 0 0 18px #0ec8c1, 0 0 21px #0ec8c1, 0 0 24px #0ec8c1;
   }
 }
 @-moz-keyframes neon-green {
   from {
-    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #0ec8c1, 0 0 25px #0ec8c1, 0 0 30px #0ec8c1, 0 0 35px #0ec8c1, 0 0 40px #0ec8c1;
+    text-shadow: 0 0 3px #fff, 0 0 6px #fff, 0 0 9px #fff, 0 0 12px #0ec8c1, 0 0 15px #0ec8c1, 0 0 18px #0ec8c1, 0 0 21px #0ec8c1, 0 0 24px #0ec8c1;
   }
   to {
-    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #0ec8c1, 0 0 25px #0ec8c1, 0 0 30px #0ec8c1, 0 0 35px #0ec8c1, 0 0 40px #0ec8c1;
+    text-shadow: 0 0 3px #fff, 0 0 6px #fff, 0 0 9px #fff, 0 0 12px #0ec8c1, 0 0 15px #0ec8c1, 0 0 18px #0ec8c1, 0 0 21px #0ec8c1, 0 0 24px #0ec8c1;
   }
 }
 @-webkit-keyframes neon-green {
   from {
-    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #0ec8c1, 0 0 25px #0ec8c1, 0 0 30px #0ec8c1, 0 0 35px #0ec8c1, 0 0 40px #0ec8c1;
+    text-shadow: 0 0 3px #fff, 0 0 6px #fff, 0 0 9px #fff, 0 0 12px #0ec8c1, 0 0 15px #0ec8c1, 0 0 18px #0ec8c1, 0 0 21px #0ec8c1, 0 0 24px #0ec8c1;
   }
   to {
-    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #0ec8c1, 0 0 25px #0ec8c1, 0 0 30px #0ec8c1, 0 0 35px #0ec8c1, 0 0 40px #0ec8c1;
+    text-shadow: 0 0 3px #fff, 0 0 6px #fff, 0 0 9px #fff, 0 0 12px #0ec8c1, 0 0 15px #0ec8c1, 0 0 18px #0ec8c1, 0 0 21px #0ec8c1, 0 0 24px #0ec8c1;
   }
 }
