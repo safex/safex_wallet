@@ -46,6 +46,20 @@ export default class Wallet extends React.Component {
             safex_price: 0,
             btc_price: 0,
 
+            //Dividend calculator
+            totalTradeVolume: 500000000,
+            marketplaceFee: 5,
+            marketplaceEarnings: 0,
+            safexMarketCap: 0,
+            safexDividendYield: 0,
+            safexDividendInfo: false,
+            safexHoldingsInfo: false,
+            safexHolding: 100000,
+            holdingsByMarket: 0,
+            holdingsYield: 0,
+            safexPrice: 0,
+            selectedAmount: 0,
+
             //UI state
             btc_sync: false,
             safex_sync: false,
@@ -128,6 +142,25 @@ export default class Wallet extends React.Component {
     }
 
     componentWillMount() {
+        axios({method: 'post', url: 'https://safex.io/api/price/'}).then(res => {
+
+            var safex_price = parseFloat(res.data.price_usd);
+            var safex_dividend = (parseFloat(this.state.totalTradeVolume) *
+                (parseFloat(this.state.marketplaceFee) / 100) /
+                parseFloat(safex_price * 2147483647)) * 100;
+
+            var dividend_yield = (safex_price * 100000 * (safex_dividend / 100)).toFixed(2);
+            var holdings_market = safex_price * 100000;
+
+            this.setState({
+                holdingsYield: dividend_yield,
+                holdingsByMarket: holdings_market.toFixed(2),
+                safexPrice: safex_price, safexMarketCap: (safex_price * 2147483647).toFixed(0),
+                safexDividendYield: safex_dividend.toFixed(2)
+            });
+        }).catch(function (error) {
+            console.log(error);
+        });
         try {
             var json = JSON.parse(localStorage.getItem('wallet'));
             this.setState({wallet: json, keys: json['keys']});
@@ -1221,7 +1254,11 @@ export default class Wallet extends React.Component {
 
     setArchiveView() {
         this.setState({
-            archive_active: true
+            archive_active: true,
+            collapse_open: {
+                send_open: false,
+                receive_open: false
+            }
         });
         this.closeHistoryModal();
         this.closeCoinModal();
@@ -1233,7 +1270,11 @@ export default class Wallet extends React.Component {
 
     setHomeView() {
         this.setState({
-            archive_active: false
+            archive_active: false,
+            collapse_open: {
+                send_open: false,
+                receive_open: false
+            }
         });
         this.closeHistoryModal();
         this.closeCoinModal();
@@ -1279,6 +1320,32 @@ export default class Wallet extends React.Component {
         });
     }
 
+    safexDividendOnChange(e) {
+        e.preventDefault();
+        console.log(e.target.value.total_trade_volume)
+        if (e.target.name === "total_trade_volume") {
+            var safexDividendYield = parseFloat(e.target.value) * (parseFloat(this.state.marketplaceFee) / 100) / parseFloat(this.state.safexMarketCap);
+            this.setState({
+                totalTradeVolume: e.target.value,
+                safexDividendYield: (safexDividendYield * 100).toFixed(2)
+            })
+        } else if (e.target.name === "marketplace_fee") {
+            var safexDividendYield = (parseFloat(e.target.value) / 100) * parseFloat(this.state.totalTradeVolume)
+                / parseFloat(this.state.safexMarketCap);
+            this.setState({
+                marketplaceFee: e.target.value,
+                safexDividendYield: (safexDividendYield * 100).toFixed(2)
+            })
+        } else if (e.target.name === "safex_market_cap") {
+            var safexDividendYield = (parseFloat(this.state.marketplaceFee) / 100) * parseFloat(this.state.totalTradeVolume)
+                / parseFloat(e.target.value);
+            this.setState({
+                safexMarketCap: e.target.value,
+                safexDividendYield: (safexDividendYield * 100).toFixed(2)
+            })
+        }
+    }
+
     render() {
         const {keys, archive_active, safex_price, btc_price} = this.state;
 
@@ -1317,7 +1384,7 @@ export default class Wallet extends React.Component {
                                     <img src="images/outbox-white.png" alt="Outbox Logo"/>
                                     <span>SEND</span>
                                 </button>
-                                <button className="receive-btn button-shine disabled" onClick={this.openSendReceive.bind(this, key, 'receive')}>
+                                <button className="receive-btn button-shine-green disabled" onClick={this.openSendReceive.bind(this, key, 'receive')}>
                                     <img src="images/receive-gray.png" alt="Receive"/>
                                     <span>RECEIVE</span>
                                 </button>
@@ -1328,16 +1395,15 @@ export default class Wallet extends React.Component {
                                 <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
                                     onClick={this.openSendReceive.bind(this, key, 'send')} className={this.state.collapse_open.receive_open ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
                                     {
-                                        this.state.collapse_open.receive_open
+                                        this.state.collapse_open.receive_open || keys[key].pending_btc_bal >= 0 || this.state.average_fee !== 0
                                         ?
-                                            <img src="images/outbox-gray.png" alt="Outbox Logo"/>
+                                            <img src="images/outbox-white.png" alt="Outbox Logo"/>
                                         :
                                             <img src="images/outbox-blue.png" alt="Outbox Logo"/>
-
                                     }
                                     <span>SEND</span>
                                 </button>
-                                <button className="receive-btn button-shine" onClick={this.openSendReceive.bind(this, key, 'receive')}>
+                                <button className="receive-btn button-shine-green" onClick={this.openSendReceive.bind(this, key, 'receive')}>
                                     {
                                         this.state.collapse_open.receive_open
                                         ?
@@ -1483,7 +1549,7 @@ export default class Wallet extends React.Component {
                                 <label htmlFor="total">Total:</label>
                                 <input className="total-input" type="number" name="total" readOnly value={this.state.send_total} />
                             </div>
-                            <button type="submit" className="form-send-submit button-shine" onClick={this.closeSettingsModal}>
+                            <button type="submit" className="form-send-submit button-shine-green" onClick={this.closeSettingsModal}>
                                 <img src="images/outgoing.png" alt="Outgoing Icon"/>
                                 Send
                             </button>
@@ -1596,8 +1662,7 @@ export default class Wallet extends React.Component {
                             <label for="total">Total:</label>
                             <input readOnly name="total" value={this.state.send_total} />
                         </div>
-                        <button className="confirm-btn button-shine"
-                            type="submit"> {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}</button>
+                        <button className="confirm-btn button-shine-green" type="submit"> {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}</button>
                     </form>
                 </div>
                 <div className={this.state.transaction_sent
@@ -1621,22 +1686,22 @@ export default class Wallet extends React.Component {
                         <div className="input-group">
                             <label for="from">From:</label>
                             <textarea name="from" className="form-control" readOnly
-                                  value={this.state.send_keys.public_key} placeholder="Address"
-                                  aria-describedby="basic-addon1">
+                                value={this.state.send_keys.public_key} placeholder="Address"
+                                aria-describedby="basic-addon1">
                             </textarea>
                         </div>
                         <div className="input-group">
                             <label for="destination">To:</label>
                             <textarea name="destination" className="form-control" readOnly
-                                  value={this.state.send_to} placeholder="Address"
-                                  aria-describedby="basic-addon1">
+                                value={this.state.send_to} placeholder="Address"
+                                aria-describedby="basic-addon1">
                             </textarea>
                         </div>
                         <div className="input-group">
                             <label for="txid">TX ID:</label>
                             <textarea name="txid" className="form-control" readOnly
-                                  value={this.state.txid}  placeholder="Address"
-                                  aria-describedby="basic-addon1" rows="4">
+                                value={this.state.txid}  placeholder="Address"
+                                aria-describedby="basic-addon1" rows="4">
                             </textarea>
                         </div>
                         <input type="hidden" readOnly name="private_key"
@@ -1662,7 +1727,7 @@ export default class Wallet extends React.Component {
                     ? 'overflow sendModal settingsModal active'
                     : 'overflow sendModal settingsModal'}>
                     <form className="container" onSubmit={this.closeSettingsModal}>
-                        <div className="settings-head">
+                        <div className="head">
                             <h3>
                                 User<br />
                                 Settings
@@ -1685,7 +1750,7 @@ export default class Wallet extends React.Component {
                             </div>
                             <div className="col-xs-12">
                                 <div className="row">
-                                    <button className="submit-btn button-shine" type="submit">Submit</button>
+                                    <button className="submit-btn button-shine-green" type="submit">Submit</button>
                                 </div>
                             </div>
                         </form>
@@ -1697,21 +1762,64 @@ export default class Wallet extends React.Component {
                 <div className={this.state.dividend_active
                     ? 'overflow sendModal dividendModal active'
                     : 'overflow sendModal dividendModal'}>
-                    <form>
-                        <h3>
-                            Dividend<br />
-                            Calculator
-                        </h3>
+                    <form className="container" onChange={this.safexDividendOnChange.bind(this)}>
+                        <div className="head">
+                            <h3>
+                                Dividend<br />
+                                Calculator
+                            </h3>
+                            <img src="images/dividend-logo.png" alt="Transfer Icon"/>
+                        </div>
+
+                        <div className="form-group">
+                            <label>
+                                Projected Marketplace Volume $
+                            </label>
+                            <input type="text" name="total_trade_volume" value="500,000,000"/>
+                        </div>
+                        <div className="form-group">
+                            <label>
+                                Marketplace Fee %
+                            </label>
+                            <input type="text" name="marketplace_fee" value={this.state.marketplaceFee}/>
+                        </div>
+                        <div className="form-group">
+                            <label>
+                                Safex Market Cap $
+                            </label>
+                            <input type="text" name="safex_market_cap" value={this.state.safexMarketCap}/>
+                        </div>
+                        <div className="form-group">
+                            <label>
+                                Number of SAFEX Held
+                            </label>
+                            <input type="text" name="safex_holdings" value="100,000"/>
+                        </div>
+                        <div className="form-group">
+                            <label>
+                                Cost of Safex Holdings $
+                            </label>
+                            <input type="text" name="safex_market_cap" value={this.state.holdingsByMarket}/>
+                        </div>
+                        <div className="form-group">
+                            <label>
+                                Annual Return on Investment %
+                            </label>
+                            <input type="text" name="safex_dividend_yield" value={this.state.safexDividendYield}/>
+                        </div>
                     </form>
                 </div>
                 <div className={this.state.affiliate_active
                     ? 'overflow sendModal affiliateModal active'
                     : 'overflow sendModal affiliateModal'}>
-                    <form>
-                        <h3>
-                            Affiliate<br />
-                            System
-                        </h3>
+                    <form className="container">
+                        <div className="head">
+                            <h3>
+                                Affiliate<br />
+                                System
+                            </h3>
+                            <img src="images/affiliate-logo.png" alt="Transfer Icon"/>
+                        </div>
                     </form>
                 </div>
                 <div className="container key-buttons status bounceInUp">

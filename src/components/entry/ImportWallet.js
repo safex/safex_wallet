@@ -97,8 +97,7 @@ export default class ImportWallet extends React.Component {
                         <button className="btn btn-default button-neon-green" type="submit">IMPORT </button>
                     </form>
                     <p className="text-center">
-                        Write password down and <br />
-                        NEVER lose it.
+                        Write password down and NEVER lose it.
                     </p>
                 </div>
                 <div className="col-xs-12 text-center Intro-footer">
