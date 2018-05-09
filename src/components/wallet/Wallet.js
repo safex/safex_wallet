@@ -98,6 +98,7 @@ export default class Wallet extends React.Component {
         this.closeDividendModal = this.closeDividendModal.bind(this);
         this.openAffiliateModal = this.openAffiliateModal.bind(this);
         this.closeAffiliateModal = this.closeAffiliateModal.bind(this);
+        this.closeSendReceiveModal = this.closeSendReceiveModal.bind(this);
 
         this.exportUnencryptedWallet = this.exportUnencryptedWallet.bind(this);
         this.exportEncryptedWallet = this.exportEncryptedWallet.bind(this);
@@ -350,7 +351,7 @@ export default class Wallet extends React.Component {
                 alert('Invalid destination address');
             }
 
-            //if safex is not selected then it must be Bitcoin
+        //if safex is not selected then it must be Bitcoin
         } else {
             try {  //open the modal by setting transaction_being_sent
                 this.setState({
@@ -384,7 +385,7 @@ export default class Wallet extends React.Component {
                                 destination,
                                 keys,
                                 source);
-                        });
+                    });
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
                     alert('Network communication error, please try again later');
@@ -1126,7 +1127,7 @@ export default class Wallet extends React.Component {
                 var dateTime = new Date(tx['blocktime'] * 1000);
                 var confirmations = tx['confirmations'] > 15 ? "(16/16)" : "("+ tx['confirmations'] + "/16)";
 
-                if (direction === "Received") {
+                if (direction === "Received" && this.state.send_coin === 'safex') {
                     render +=`
                     <div className="history">
                         <p class="coin-name">SAFEX</p><br /> ` + direction + ` <br />
@@ -1255,22 +1256,16 @@ export default class Wallet extends React.Component {
 
     setArchiveView() {
         this.setState({
-            archive_active: true,
-            collapse_open: {
-                send_open: false,
-                receive_open: false
-            }
+            archive_active: true
         });
+        this.closeSendReceiveModal();
     }
 
     setHomeView() {
         this.setState({
-            archive_active: false,
-            collapse_open: {
-                send_open: false,
-                receive_open: false
-            }
+            archive_active: false
         });
+        this.closeSendReceiveModal();
     }
 
     openDividendModal(e) {
@@ -1306,6 +1301,15 @@ export default class Wallet extends React.Component {
     closeAffiliateModal() {
         this.setState({
             affiliate_active: false
+        });
+    }
+
+    closeSendReceiveModal() {
+        this.setState({
+            collapse_open: {
+                send_open: false,
+                receive_open: false
+            }
         });
     }
 
@@ -1709,7 +1713,7 @@ export default class Wallet extends React.Component {
                             <label htmlFor="total">Total:</label>
                             <input readOnly name="total" value={this.state.send_total} />
                         </div>
-                        <button type="submit" className="sent-close button-shine">Close</button>
+                        <button type="submit" className="sent-close button-shine" onClick={this.closeSendReceiveModal}>Close</button>
                     </form>
                 </div>
                 <div className={this.state.settings_active && this.state.send_overflow_active === false
