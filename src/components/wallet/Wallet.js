@@ -802,13 +802,14 @@ export default class Wallet extends React.Component {
         e.preventDefault();
         var key_btc_bal = 0;
         var key_safex_bal = 0;
+
         this.state.keys.map(key => {
             if (key.public_key === e.target.public_key.value) {
                 key_btc_bal = key.btc_bal;
                 key_safex_bal = key.safex_bal;
             }
-
         });
+
         if ((this.state.send_coin === 'safex' & this.state.send_fee > key_btc_bal) | (this.state.send_coin === 'btc' & this.state.send_total > key_btc_bal)) {
             alert('you do not have enough BTC to cover the fee');
         } else if (this.state.send_coin === 'safex' & this.state.send_amount > key_safex_bal) {
@@ -1243,7 +1244,7 @@ export default class Wallet extends React.Component {
                         this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
                         this.prepareDisplay(json.keys[index]);
                     } catch (e) {
-                        alert('an error adding a key to the wallet contact team@safex.io')
+                        alert('An error occured while adding a key to the wallet. Please contact team@safex.io')
                     }
                 }
             });
@@ -1260,12 +1261,6 @@ export default class Wallet extends React.Component {
                 receive_open: false
             }
         });
-        this.closeHistoryModal();
-        this.closeCoinModal();
-        this.closeSettingsModal();
-        this.closeSuccessModal();
-        this.closeDividendModal();
-        this.closeAffiliateModal();
     }
 
     setHomeView() {
@@ -1276,12 +1271,6 @@ export default class Wallet extends React.Component {
                 receive_open: false
             }
         });
-        this.closeHistoryModal();
-        this.closeCoinModal();
-        this.closeSettingsModal();
-        this.closeSuccessModal();
-        this.closeDividendModal();
-        this.closeAffiliateModal();
     }
 
     openDividendModal(e) {
@@ -1384,7 +1373,7 @@ export default class Wallet extends React.Component {
                                     <img src="images/outbox-white.png" alt="Outbox Logo"/>
                                     <span>SEND</span>
                                 </button>
-                                <button className="receive-btn button-shine-green disabled" onClick={this.openSendReceive.bind(this, key, 'receive')}>
+                                <button className="receive-btn button-shine disabled" onClick={this.openSendReceive.bind(this, key, 'receive')}>
                                     <img src="images/receive-gray.png" alt="Receive"/>
                                     <span>RECEIVE</span>
                                 </button>
@@ -1422,6 +1411,14 @@ export default class Wallet extends React.Component {
                     <div className="row amounts">
                         <div className="row amounts">
                             <div className="col-xs-5 amount-btns-wrap">
+                                <button onClick={() => this.removeFromArchive(key)}
+                                        className={keys[key].archived === true
+                                        | (!keys[key].hasOwnProperty('archived') && archive_active === true)
+                                            ? 'archive-button'
+                                            : 'archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
+                                    <span>TO HOME</span>
+                                </button>
+
                                 <button onClick={() => this.sendToArchive(key)}
                                     className={keys[key].archived === false
                                     | (!keys[key].hasOwnProperty('archived') && archive_active === false)
@@ -1446,14 +1443,6 @@ export default class Wallet extends React.Component {
                                 <button onClick={() => this.showPrivateModal(key)}
                                     className='archive-button show-private-button button-shine'>
                                     <span>show private</span>
-                                </button>
-
-                                <button onClick={() => this.removeFromArchive(key)}
-                                    className={keys[key].archived === true
-                                    | (!keys[key].hasOwnProperty('archived') && archive_active === true)
-                                        ? 'archive-button'
-                                        : 'archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
-                                    <span>TO HOME</span>
                                 </button>
                             </div>
                             <div className="amounts safex-amounts">
