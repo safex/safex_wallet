@@ -1546,7 +1546,7 @@ export default class Wallet extends React.Component {
                                     : 'fast-btn button-shine'} onClick={this.feeChange.bind(this, 'fast')}>Fast</span>
                             </div>
                             <div className="form-group">
-                                <label htmlFor="total">Total:</label>
+                                <label htmlFor="total" className="total-label">Total:</label>
                                 <input className="total-input" type="number" name="total" readOnly value={this.state.send_total} />
                             </div>
                             <button type="submit" className="form-send-submit button-shine-green" onClick={this.closeSettingsModal}>
@@ -1840,7 +1840,7 @@ export default class Wallet extends React.Component {
                             <button type="submit" className="button-shine" title="Import Key">Import</button>
                         </form>
                         <button onClick={this.createKey} className="create-btn button-shine" title="Create New Key">
-                            <img src="images/plus.png"/>
+                            <img src="images/plus.png" alt="Plus Logo"/>
                         </button>
                     </div>
                     <div className="right-options">
@@ -1848,11 +1848,11 @@ export default class Wallet extends React.Component {
                             this.state.affiliate_active
                             ?
                                 <button className="aff-btn aff-btn-active button-shine" title="Affiliate System" onClick={this.closeAffiliateModal}>
-                                    <img src="images/world-blue.png"/>
+                                    <img src="images/world-blue.png" alt="World Logo"/>
                                 </button>
                             :
                                 <button className="aff-btn button-shine" title="Affiliate System" onClick={this.openAffiliateModal}>
-                                    <img src="images/world.png"/>
+                                    <img src="images/world.png" alt="World Logo"/>
                                 </button>
                         }
 
@@ -1860,11 +1860,11 @@ export default class Wallet extends React.Component {
                             this.state.dividend_active
                             ?
                                 <button className="dividend-btn dividend-btn-active button-shine" title="Dividends Calculator" onClick={this.closeDividendModal}>
-                                    <img src="images/calculator-blue.png"/>
+                                    <img src="images/calculator-blue.png" alt="Calculator Logo"/>
                                 </button>
                             :
                                 <button className="dividend-btn button-shine" title="Dividends Calculator" onClick={this.openDividendModal}>
-                                    <img src="images/calculator.png"/>
+                                    <img src="images/calculator.png" alt="World Logo"/>
                                 </button>
                         }
 
@@ -1872,11 +1872,11 @@ export default class Wallet extends React.Component {
                             this.state.settings_active
                             ?
                                 <button className="settings button-shine settings-btn-active" onClick={this.closeSettingsModal} title="Settings">
-                                    <img src="images/mixer-blue.png"/>
+                                    <img src="images/mixer-blue.png" alt="Mixer Logo"/>
                                 </button>
                             :
                                 <button className="settings button-shine" onClick={this.openSettingsModal} title="Settings">
-                                    <img src="images/mixer.png"/>
+                                    <img src="images/mixer.png" alt="Mixer Logo"/>
                                 </button>
                         }
 
@@ -1884,11 +1884,11 @@ export default class Wallet extends React.Component {
                             this.state.refreshTimer === 0
                             ?
                                 <button className="refresh-btn button-shine"  onClick={this.refreshWallet} title="Refresh">
-                                    <img src="images/refresh.png"/>
+                                    <img src="images/refresh.png" alt="Refresh Logo"/>
                                 </button>
                             :
                                 <button className="refresh-btn button-shine disabled" title="Refresh">
-                                    <img src="images/refresh-blue.png"/>
+                                    <img src="images/refresh-blue.png" alt="Refresh Logo"/>
                                     <span><p>{this.state.refreshTimer + 's'}</p></span>
                                 </button>
                         }
