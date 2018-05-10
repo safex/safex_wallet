@@ -13,7 +13,7 @@ import QRCode from 'qrcode.react';
 import NumberFormat from 'react-number-format';
 
 import Navigation from '../Navigation';
-import Message from '../Message';
+// import Message from '../Message';
 
 export default class Wallet extends React.Component {
     constructor(props) {
