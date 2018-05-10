@@ -13,6 +13,7 @@ import QRCode from 'qrcode.react';
 import NumberFormat from 'react-number-format';
 
 import Navigation from '../Navigation';
+import Message from '../Message';
 
 export default class Wallet extends React.Component {
     constructor(props) {
@@ -684,9 +685,8 @@ export default class Wallet extends React.Component {
     }
 
     exportUnencryptedWallet() {
-        alert("This will create a file where you can see your private keys. It is a very sensitive file Be responsible with it." +
-            "This file is not for importing. It is for showing you the private keys which you can bring into a new wallet." +
-            "You import keys using the 'import key' feature in another wallet.")
+        alert("This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is not for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the 'import key' feature in another wallet.");
+
         var wallet_data = JSON.parse(localStorage.getItem('wallet'));
         var nice_keys = "";
         var keys = wallet_data['keys'];
@@ -696,13 +696,13 @@ export default class Wallet extends React.Component {
             nice_keys += '\n';
         });
         var date = Date.now();
-        fileDownload(nice_keys, date + 'unsafex.txt');
 
+        fileDownload(nice_keys, date + 'unsafex.txt');
+        this.closeSettingsModal();
     }
 
     exportEncryptedWallet() {
-        alert("This will create an encrypted file that is your Safex Wallet. You use this file to import it into another wallet for use" +
-            "It requires a password, and if you lose the password your precious coins may be irrecoverable.")
+        alert("This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is not for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the 'import key' feature in another wallet.");
 
         fs.readFile(localStorage.getItem('wallet_path'), (err, fd) => {
             if (err) {
@@ -715,6 +715,7 @@ export default class Wallet extends React.Component {
                 fileDownload(fd, date + 'safexwallet.dat');
             }
         });
+        this.closeSettingsModal();
     }
 
     amountChange(receive_amount) {
@@ -797,6 +798,7 @@ export default class Wallet extends React.Component {
         this.closeSettingsModal();
         this.closeDividendModal();
         this.closeAffiliateModal();
+        this.closeMessageModal();
     }
 
     //Activates send_overflow_active state which opens Modal screen displaying transaction pre-confirmation information
@@ -1417,10 +1419,10 @@ export default class Wallet extends React.Component {
                         <div className="row amounts">
                             <div className="col-xs-5 amount-btns-wrap">
                                 <button onClick={() => this.removeFromArchive(key)}
-                                        className={keys[key].archived === true
-                                        | (!keys[key].hasOwnProperty('archived') && archive_active === true)
-                                            ? 'archive-button'
-                                            : 'archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
+                                    className={keys[key].archived === true
+                                    | (!keys[key].hasOwnProperty('archived') && archive_active === true)
+                                        ? 'archive-button'
+                                        : 'archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
                                     <span>TO HOME</span>
                                 </button>
 
@@ -1476,7 +1478,6 @@ export default class Wallet extends React.Component {
                                     <span>
                                         ${(keys[key].btc_bal * btc_price).toFixed(2)}
                                     </span>
-
                                 </span>
                             </div>
                         </div>
@@ -1588,7 +1589,7 @@ export default class Wallet extends React.Component {
                     </div>
                 </div>
                 <div className='container keys-container'>
-                    <div className={this.state.settings_active || this.state.send_overflow_active || this.state.dividend_active || this.state.affiliate_active
+                    <div className={this.state.settings_active || this.state.send_overflow_active || this.state.dividend_active || this.state.affiliate_active || this.state.message_modal
                         ? 'col-xs-12 sidebar-opened keys-wrap fadeIn'
                         : 'col-xs-12 keys-wrap fadeIn'}>
                         <div className="row">
@@ -1651,7 +1652,7 @@ export default class Wallet extends React.Component {
                             <label for="total">Total:</label>
                             <input readOnly name="total" value={this.state.send_total} />
                         </div>
-                        <button className="confirm-btn button-shine-green" type="submit"> {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}</button>
+                        <button className="confirm-btn button-shine-green" type="submit" disabled={this.state.transaction_being_sent ? 'disabled' : ''}> {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}</button>
                     </form>
                 </div>
                 <div className={this.state.transaction_sent
@@ -1717,11 +1718,11 @@ export default class Wallet extends React.Component {
                     : 'overflow sendModal settingsModal'}>
                     <form className="container" onSubmit={this.closeSettingsModal}>
                         <div className="head">
+                            <img src="images/mixer.png" alt="Transfer Icon"/>
                             <h3>
                                 User<br />
                                 Settings
                             </h3>
-                            <img src="images/mixer.png" alt="Transfer Icon"/>
                             <span className="close" onClick={this.closeSettingsModal}>X</span>
                         </div>
 
@@ -1754,11 +1755,11 @@ export default class Wallet extends React.Component {
                     : 'overflow sendModal dividendModal'}>
                     <form className="container" onChange={this.safexDividendOnChange.bind(this)}>
                         <div className="head">
+                            <img src="images/dividend-logo.png" alt="Transfer Icon"/>
                             <h3>
                                 Dividend<br />
                                 Calculator
                             </h3>
-                            <img src="images/dividend-logo.png" alt="Transfer Icon"/>
                             <span className="close" onClick={this.closeDividendModal}>X</span>
                         </div>
 
@@ -1784,7 +1785,7 @@ export default class Wallet extends React.Component {
                             <label>
                                 Number of SAFEX Held
                             </label>
-                            <input type="text" name="safex_holdings" value="100,000"/>
+                            <input type="text" name="safex_holdings" value={this.state.safexHolding}/>
                         </div>
                         <div className="form-group">
                             <label>
@@ -1805,11 +1806,11 @@ export default class Wallet extends React.Component {
                     : 'overflow sendModal affiliateModal'}>
                     <form className="container">
                         <div className="head">
+                            <img src="images/affiliate-logo.png" alt="Transfer Icon"/>
                             <h3>
                                 Affiliate<br />
                                 System
                             </h3>
-                            <img src="images/affiliate-logo.png" alt="Transfer Icon"/>
                             <span className="close" onClick={this.closeAffiliateModal}>X</span>
                         </div>
                     </form>

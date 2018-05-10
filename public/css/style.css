@@ -262,14 +262,12 @@ body{
 }
 .Import-wallet .fileandpass {
   width: 100%;
-  border: 1px solid #445059;
-  border-radius: 0px;
-  background: url('../images/btn-bg.png');
   background-size: 100% 100%;
   background-repeat: no-repeat;
   color: #fff;
   font-size: 18px;
   padding: 15px;
+  border-radius: 10px;
 }
 .Import-wallet .fileandpass > p{
   color: #777E85;
@@ -1146,9 +1144,7 @@ input::-webkit-inner-spin-button {
 .overflow.sendModal p {
   color: #54C4F8;
 }
-.overflow.settingsModal .head,
-.overflow.affiliateModal .head,
-.overflow.dividendModal .head {
+.overflow.sendModal .head {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -1162,6 +1158,9 @@ input::-webkit-inner-spin-button {
   color: #fff;
   text-shadow: none;
   opacity: 1;
+}
+.overflow.sendModal .head img {
+  height: 42px;
 }
 .overflow.dividendModal > form input ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
   color: #fff;
@@ -1184,12 +1183,12 @@ input::-webkit-inner-spin-button {
 .overflow.settingsModal > form h3,
 .overflow.affiliateModal > form h3,
 .overflow.dividendModal > form h3 {
-  text-align: right;
+  text-align: left;
   color: #fff;
   text-transform: uppercase;
   font-size: 21px;
   display: inline-block;
-  margin-right: 15px;
+  margin-left: 15px;
   margin-top: 0px;
   margin-bottom: 0;
 }
@@ -1570,6 +1569,15 @@ input::-webkit-inner-spin-button {
   color: #fff;
   opacity: 1;
   font-size: 20px;
+}
+.overflow.messageModal p {
+  background: none;
+  border: none;
+  text-transform: initial;
+  text-align: left;
+  padding: 0;
+  margin: 0;
+  line-height: 1.2;
 }
 .sendCloseButton .close {
   color: #fff;
