@@ -796,6 +796,7 @@ export default class Wallet extends React.Component {
         this.closeSuccessModal();
         this.closeSettingsModal();
         this.closeDividendModal();
+        this.closeAffiliateModal();
     }
 
     //Activates send_overflow_active state which opens Modal screen displaying transaction pre-confirmation information
@@ -1557,22 +1558,17 @@ export default class Wallet extends React.Component {
                             X
                         </div>
                     </div>
-                    <div className="col-xs-12">
+                    <div className="receive-address-wrap">
                         <label htmlFor="receive-address">Address:</label>
                         <input name="receive-address" value={keys[key].public_key}/>
                     </div>
-                    <div className="col-xs-8">
+                    <div className="col-xs-8 amount-wrap">
                         <label htmlFor="amount">Amount:</label>
                         <input type="amount" placeholder="1" onChange={this.amountChange.bind(this)}
                            value={this.state.receive_amount}/>
                     </div>
-                    <div className="col-xs-4">
-                        <div className="row">
-                            <div className="col-xs-6">
-                                <QRCode
-                                    value={"bitcoin:" + keys[key].public_key + "?amount=" + this.state.receive_amount}/>
-                            </div>
-                        </div>
+                    <div className="col-xs-4 qr-code-wrap">
+                        <QRCode value={"bitcoin:" + keys[key].public_key + "?amount=" + this.state.receive_amount}/>
                     </div>
                 </div>
             </div>
@@ -1726,6 +1722,7 @@ export default class Wallet extends React.Component {
                                 Settings
                             </h3>
                             <img src="images/mixer.png" alt="Transfer Icon"/>
+                            <span className="close" onClick={this.closeSettingsModal}>X</span>
                         </div>
 
                         <form onSubmit={this.changePassword}>
@@ -1762,6 +1759,7 @@ export default class Wallet extends React.Component {
                                 Calculator
                             </h3>
                             <img src="images/dividend-logo.png" alt="Transfer Icon"/>
+                            <span className="close" onClick={this.closeDividendModal}>X</span>
                         </div>
 
                         <div className="form-group">
@@ -1812,6 +1810,7 @@ export default class Wallet extends React.Component {
                                 System
                             </h3>
                             <img src="images/affiliate-logo.png" alt="Transfer Icon"/>
+                            <span className="close" onClick={this.closeAffiliateModal}>X</span>
                         </div>
                     </form>
                 </div>
