@@ -967,7 +967,8 @@ body{
   color: #fff;
 }
 .history-inner {
-
+  padding-left: 45px;
+  padding-right: 45px;
 }
 .overflow.sendModal {
   background: url(../images/sidebar-bg.png);
@@ -975,8 +976,8 @@ body{
   background-repeat: repeat-y;
   position: absolute;
   top: 85px;
-  right: -252px;
-  width: 252px;
+  right: -259px;
+  width: 259px;
   height: 100%;
   display: flex;
   opacity: 0;
@@ -1158,6 +1159,7 @@ input::-webkit-inner-spin-button {
   color: #fff;
   text-shadow: none;
   opacity: 1;
+  font-size: 20px;
 }
 .overflow.sendModal .head img {
   height: 42px;
@@ -1194,7 +1196,7 @@ input::-webkit-inner-spin-button {
 }
 .keys-container {
   overflow: hidden;
-  height: calc(100% - 250px);
+  height: calc(100% - 210px);
 }
 .keys-container .keys-wrap {
   overflow-y: auto;
@@ -1213,7 +1215,7 @@ input::-webkit-inner-spin-button {
   opacity: 1;
 }
 .keys-container .sidebar-opened {
-  width: 710px;
+  width: 705px;
 }
 .wallet-page {
   overflow: hidden;
@@ -1263,8 +1265,8 @@ input::-webkit-inner-spin-button {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-left: 30px;
-  padding-right: 30px;
+  padding-left: 45px;
+  padding-right: 45px;
   background: rgba(0, 22, 40, .71);
   position: absolute;
   bottom: 0;
@@ -1284,14 +1286,20 @@ input::-webkit-inner-spin-button {
   color: #fff;
   text-transform: uppercase;
   font-size: 17px;
-  padding: 0px 10px 0px 0px;
+  padding: 0;
   margin-right: 5px;
   width: 250px;
+}
+.status .status-left-wrap img {
+  position: relative;
+  top: -1px;
 }
 .status span {
   padding-right: 5px;
   letter-spacing: 2px;
   font-size: 12px;
+  position: relative;
+  top: -2px;
 }
 .status span:first-child {
   padding-left: 0;
@@ -1305,7 +1313,7 @@ input::-webkit-inner-spin-button {
   content:"\2b24";
   color: #f00;
   position: relative;
-  top: 0px;
+  top: -1px;
   font-size:12px;
   margin-left: 5px;
 }
@@ -1313,14 +1321,15 @@ input::-webkit-inner-spin-button {
   content:"\2b24";
   color: #0ec884;
   position: relative;
-  top: 0px;
+  top: -1px;
   font-size: 12px;
   margin-left: 5px;
 }
 .status .sync-span {
   padding-left: 8px;
+  padding-right: 0;
   position: relative;
-  top: 1px;
+  top: 0px;
   font-size: 12px;
 }
 .status .import-form-wrap {
@@ -1345,7 +1354,7 @@ input::-webkit-inner-spin-button {
   line-height: 24px;
   font-size: 17px;
   border: 0px none;
-  width: 334px;
+  width: 320px;
   position: relative;
   top: 1px;
   margin-right: 5px;
@@ -1507,6 +1516,10 @@ input::-webkit-inner-spin-button {
   width: 214px;
   border-top-left-radius: 10px;
 }
+.overflow.sendModal.walletResetModal .container {
+  padding-left: 10px;
+  padding-right: 10px;
+}
 .overflow.sendModal.walletResetModal p {
   background: none;
   border: none;
@@ -1523,10 +1536,17 @@ input::-webkit-inner-spin-button {
   text-transform: uppercase;
   font-size: 17px;
   padding-bottom: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 15px;
 }
 .overflow.sendModal.walletResetModal h3 .close {
   color: #fff;
   opacity: 1;
+  margin-left: 10px;
+  font-size: 20px;
 }
 .overflow.sendModal.walletResetModal form button {
   display: block;
@@ -1634,6 +1654,7 @@ input::-webkit-inner-spin-button {
 }
 #history_txs > div > p.coin-name {
   margin-top: 0;
+  padding-top: 0;
 }
 #history_txs > div > p.date {
   font-family: Helvetica, Arial, sans-serif;
@@ -1663,7 +1684,7 @@ input::-webkit-inner-spin-button {
 }
 #history_txs img {
   position: absolute;
-  right: 100px;
+  right: 90px;
   top: 35px;
   max-width: 95px;
   opacity: .2;

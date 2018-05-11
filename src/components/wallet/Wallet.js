@@ -13,7 +13,6 @@ import QRCode from 'qrcode.react';
 import NumberFormat from 'react-number-format';
 
 import Navigation from '../Navigation';
-import Message from '../Message';
 
 export default class Wallet extends React.Component {
     constructor(props) {
@@ -798,7 +797,6 @@ export default class Wallet extends React.Component {
         this.closeSettingsModal();
         this.closeDividendModal();
         this.closeAffiliateModal();
-        this.closeMessageModal();
     }
 
     //Activates send_overflow_active state which opens Modal screen displaying transaction pre-confirmation information
@@ -1130,7 +1128,7 @@ export default class Wallet extends React.Component {
                 var dateTime = new Date(tx['blocktime'] * 1000);
                 var confirmations = tx['confirmations'] > 15 ? "(16/16)" : "("+ tx['confirmations'] + "/16)";
 
-                if (direction === "Received" && this.state.send_coin === 'safex') {
+                if (direction === "Received") {
                     render +=`
                     <div className="history">
                         <p class="coin-name">SAFEX</p><br /> ` + direction + ` <br />
@@ -1143,12 +1141,12 @@ export default class Wallet extends React.Component {
                         `+ tx['amount'] +` safex <br />
                         `+ confirmations +` confirmations
                     </div>`;
+                    console.log('safex received')
                 } else {
                     render +=`
                     <div class="history">
                         <p class="coin-name">SAFEX</p><br /> ` + direction + ` <br />
                         <img class="coin-logo" src="images/coin-white.png" alt="Safex Coin">
-                        <!--<img class="coin-logo" src="images/btc-coin.png" alt="Bitcoin Logo">-->
                         <p class="date">` + dateTime + `</p><br />
                         <p class="address"><b>TX: </b> `+ tx['txid'] +`</p><br />
                         <p class="address address-blue">`+ tx['sendingaddress'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-blue">`+ tx['referenceaddress'] +`</p>
@@ -1157,7 +1155,9 @@ export default class Wallet extends React.Component {
                         `+ tx['amount'] +` safex <br />
                         `+ confirmations +` confirmations
                     </div>`;
+                    console.log('safex sent')
                 }
+
             });
             document.getElementById("history_txs").innerHTML = render;
         })
@@ -1262,6 +1262,7 @@ export default class Wallet extends React.Component {
             archive_active: true
         });
         this.closeSendReceiveModal();
+        this.closeHistoryModal();
     }
 
     setHomeView() {
@@ -1269,6 +1270,7 @@ export default class Wallet extends React.Component {
             archive_active: false
         });
         this.closeSendReceiveModal();
+        this.closeHistoryModal();
     }
 
     openDividendModal(e) {
@@ -1852,12 +1854,12 @@ export default class Wallet extends React.Component {
                         {
                             this.state.dividend_active
                             ?
-                                <button className="dividend-btn dividend-btn-active button-shine" title="Dividends Calculator" onClick={this.closeDividendModal}>
+                                <button className="dividend-btn dividend-btn-active button-shine" title="Dividend Calculator" onClick={this.closeDividendModal}>
                                     <img src="images/calculator-blue.png" alt="Calculator Logo"/>
                                 </button>
                             :
-                                <button className="dividend-btn button-shine" title="Dividends Calculator" onClick={this.openDividendModal}>
-                                    <img src="images/calculator.png" alt="World Logo"/>
+                                <button className="dividend-btn button-shine" title="Dividend Calculator" onClick={this.openDividendModal}>
+                                    <img src="images/calculator.png" alt="Calculator Logo"/>
                                 </button>
                         }
 
