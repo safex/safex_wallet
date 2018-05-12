@@ -21,6 +21,11 @@ export default class Login extends React.Component {
         this.setState({
             wrong_password: true
         });
+        setTimeout(() => {
+            this.setState({
+                wrong_password: false
+            });
+        }, 1000)
     }
 
     handleSubmit(e) {

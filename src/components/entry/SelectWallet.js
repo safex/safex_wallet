@@ -63,6 +63,11 @@ export default class SelectWallet extends React.Component {
         this.setState({
             wrong_password: true
         });
+        setTimeout(() => {
+            this.setState({
+                wrong_password: false
+            });
+        }, 1000)
     }
 
     //This happens when you click wallet reset on the main screen

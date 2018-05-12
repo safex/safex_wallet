@@ -27,6 +27,11 @@ export default class CreateWallet extends React.Component {
         this.setState({
             wrong_password: true
         });
+        setTimeout(() => {
+            this.setState({
+                wrong_password: false
+            });
+        }, 1000)
     }
 
     //here we create the wallet file in the default location after prompting for a password and creating the encrypted file.
