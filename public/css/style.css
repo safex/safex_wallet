@@ -588,6 +588,11 @@ body{
   font-size: 16px;
   letter-spacing: 1px;
 }
+.single-key .pull-right button .img-wrap {
+  position: relative;
+  top: 0px;
+  letter-spacing: initial;
+}
 .form-send {
   height: 0;
   overflow: hidden;
