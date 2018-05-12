@@ -945,7 +945,6 @@ export default class Wallet extends React.Component {
                 private_key: ''
             }
         });
-        this.closeSendReceiveModal();
         this.prepareDisplay();
         setTimeout(() => {
             this.prepareDisplay();
