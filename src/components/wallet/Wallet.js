@@ -1370,47 +1370,6 @@ export default class Wallet extends React.Component {
                     </span>
                 </div>
                 <div className="pull-right single-key-btns-wrap">
-                    {/*{*/}
-                        {/*this.state.collapse_open.send_open*/}
-                        {/*?*/}
-                            {/*<div className="inner-btns-wrap">*/}
-                                {/*<button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}*/}
-                                    {/*onClick={this.openSendReceive.bind(this, key, 'send')} className="send-btn button-shine active">*/}
-                                    {/*<img src="images/outbox-white.png" alt="Outbox Logo"/>*/}
-                                    {/*<span>SEND</span>*/}
-                                {/*</button>*/}
-                                {/*<button className="receive-btn button-shine disabled" onClick={this.openSendReceive.bind(this, key, 'receive')}>*/}
-                                    {/*<img src="images/receive-gray.png" alt="Receive"/>*/}
-                                    {/*<span>RECEIVE</span>*/}
-                                {/*</button>*/}
-                            {/*</div>*/}
-
-                        {/*:*/}
-                            {/*<div className="inner-btns-wrap">*/}
-                                {/*<button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}*/}
-                                    {/*onClick={this.openSendReceive.bind(this, key, 'send')} className={this.state.collapse_open.receive_open ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>*/}
-                                    {/*{*/}
-                                        {/*this.state.collapse_open.receive_open || keys[key].pending_btc_bal >= 0 || this.state.average_fee !== 0*/}
-                                        {/*?*/}
-                                            {/*<img src="images/outbox-white.png" alt="Outbox Logo"/>*/}
-                                        {/*:*/}
-                                            {/*<img src="images/outbox-blue.png" alt="Outbox Logo"/>*/}
-                                    {/*}*/}
-                                    {/*<span>SEND</span>*/}
-                                {/*</button>*/}
-                                {/*<button className="receive-btn button-shine-green" onClick={this.openSendReceive.bind(this, key, 'receive')}>*/}
-                                    {/*{*/}
-                                        {/*this.state.collapse_open.receive_open*/}
-                                        {/*?*/}
-                                            {/*<img src="images/receive-white.png" alt="Inbox Logo"/>*/}
-                                        {/*:*/}
-                                            {/*<img src="images/receive-blue.png" alt="Inbox Logo"/>*/}
-
-                                    {/*}*/}
-                                    {/*<span>RECEIVE</span>*/}
-                                {/*</button>*/}
-                            {/*</div>*/}
-                    {/*}*/}
                     <div className="inner-btns-wrap">
                         {
                             this.state.collapse_open.send_open && this.state.collapse_open.key === key
