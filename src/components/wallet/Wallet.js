@@ -1733,7 +1733,7 @@ export default class Wallet extends React.Component {
                 <div className={this.state.settings_active && this.state.send_overflow_active === false
                     ? 'overflow sendModal settingsModal active'
                     : 'overflow sendModal settingsModal'}>
-                    <form className="container" onSubmit={this.closeSettingsModal}>
+                    <form className="container">
                         <div className="head">
                             <img src="images/mixer.png" alt="Transfer Icon"/>
                             <h3>
