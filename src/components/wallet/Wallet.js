@@ -156,12 +156,25 @@ export default class Wallet extends React.Component {
             this.setState({
                 holdingsYield: dividend_yield,
                 holdingsByMarket: holdings_market.toFixed(2),
-                safexPrice: safex_price, safexMarketCap: (safex_price * 2147483647).toFixed(0),
+                safexPrice: safex_price,
+                safexMarketCap: (safex_price * 2147483647).toFixed(0),
                 safexDividendYield: safex_dividend.toFixed(2)
             });
         }).catch(function (error) {
             console.log(error);
         });
+
+        // axios({method: 'post', url: 'http://omni.safex.io:3001/balance'}).then(res => {
+        //
+        //     var safex_balance = parseFloat(res.data.safex_balance);
+        //
+        //     this.setState({
+        //         safex_balance: safex_balance
+        //     });
+        // }).catch(function (error) {
+        //     console.log(error);
+        // });
+
         try {
             var json = JSON.parse(localStorage.getItem('wallet'));
             this.setState({wallet: json, keys: json['keys']});
@@ -344,6 +357,7 @@ export default class Wallet extends React.Component {
                     alert('network communication error, please try again later');
                     this.setState({
                         transaction_being_sent: false,
+
                     });
                 }
             } catch (e) {
@@ -352,10 +366,11 @@ export default class Wallet extends React.Component {
             }
 
         //if safex is not selected then it must be Bitcoin
-        } else {
+        } else if(this.state.send_coin === 'btc') {
             try {  //open the modal by setting transaction_being_sent
                 this.setState({
                     transaction_being_sent: true,
+                    settings_active: false,
                 });
 
                 //set the signing key for the transaction
@@ -434,7 +449,7 @@ export default class Wallet extends React.Component {
                 this.setState({
                     transaction_sent: true,
                     transaction_being_sent: false,
-                    txid: resp
+                    txid: resp,
                 });
             });
     }
@@ -1120,12 +1135,15 @@ export default class Wallet extends React.Component {
             localStorage.setItem("history_txs", JSON.stringify(response.data.transactions));
             var history = JSON.stringify(response.data.transactions);
             var render = '';
+
             JSON.parse(history).forEach((tx) => {
                 var direction = tx['referenceaddress'] === key ? "Received" : "Sent";
                 var dateTime = new Date(tx['blocktime'] * 1000);
                 var confirmations = tx['confirmations'] > 15 ? "(16/16)" : "("+ tx['confirmations'] + "/16)";
+                var coin = tx['propertyname'];
+                // console.log(tx['propertyname'])
 
-                if (direction === "Received") {
+                if (direction === "Received" && coin === 'SafeExchangeCoin') {
                     render +=`
                     <div className="history">
                         <p class="coin-name">SAFEX</p><br /> ` + direction + ` <br />
@@ -1139,7 +1157,7 @@ export default class Wallet extends React.Component {
                         `+ confirmations +` confirmations
                     </div>`;
                     console.log('safex received')
-                } else {
+                } else if (direction === "Sent" && coin === 'SafeExchangeCoin') {
                     render +=`
                     <div class="history">
                         <p class="coin-name">SAFEX</p><br /> ` + direction + ` <br />
@@ -1153,6 +1171,34 @@ export default class Wallet extends React.Component {
                         `+ confirmations +` confirmations
                     </div>`;
                     console.log('safex sent')
+                } else if (direction === "Received" && coin === 'Bitcoin') {
+                    render +=`
+                    <div class="history">
+                        <p class="coin-name">BITCOIN</p><br /> ` + direction + ` <br />
+                        <img class="coin-logo" src="images/btc-coin.png" alt="Bitcoin Logo">
+                        <p class="date">` + dateTime + `</p><br />
+                        <p class="address"><b>TX: </b> `+ tx['txid'] +`</p><br />
+                        <p class="address address-green">`+ tx['sendingaddress'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-green">`+ tx['referenceaddress'] +`</p>
+                    </div>
+                    <div className="col-xs-2">
+                        `+ tx['amount'] +` bitcoin <br />
+                        `+ confirmations +` confirmations
+                    </div>`;
+                    console.log('bitcoin received')
+                } else if (direction === "Sent" && coin === 'Bitcoin') {
+                    render +=`
+                    <div class="history">
+                        <p class="coin-name">BITCOIN</p><br /> ` + direction + ` <br />
+                        <img class="coin-logo" src="images/btc-coin.png" alt="Bitcoin Logo">
+                        <p class="date">` + dateTime + `</p><br />
+                        <p class="address"><b>TX: </b> `+ tx['txid'] +`</p><br />
+                        <p class="address address-blue">`+ tx['sendingaddress'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-blue">`+ tx['referenceaddress'] +`</p>
+                    </div>
+                    <div className="col-xs-2">
+                        `+ tx['amount'] +` bitcoin <br />
+                        `+ confirmations +` confirmations
+                    </div>`;
+                    console.log('bitcoin sent')
                 }
 
             });
@@ -1370,65 +1416,63 @@ export default class Wallet extends React.Component {
                     </span>
                 </div>
                 <div className="pull-right single-key-btns-wrap">
-                    <div className="inner-btns-wrap">
-                        {
-                            this.state.collapse_open.send_open && this.state.collapse_open.key === key
-                            ?
-                                <div>
-                                    <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
-                                        onClick={this.openSendReceive.bind(this, key, 'send')}
-                                        className="send-btn button-shine active">
-                                        <span className="img-wrap">
-                                            <img src="images/outbox-white.png" alt="Outbox Logo"/>
-                                        </span>
-                                        <span>SEND</span>
-                                    </button>
-                                    <button className="receive-btn button-shine disabled" onClick={this.openSendReceive.bind(this, key, 'receive')}>
-                                        <img src="images/receive-gray.png" alt="Receive"/>
-                                        <span>RECEIVE</span>
-                                    </button>
-                                </div>
-                            :
-                                <div>
-                                    <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
-                                        onClick={this.openSendReceive.bind(this, key, 'send')}
-                                        className={this.state.collapse_open.key === key && this.state.collapse_open.receive_open ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
+                    {
+                        this.state.collapse_open.send_open && this.state.collapse_open.key === key
+                        ?
+                            <div>
+                                <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
+                                    onClick={this.openSendReceive.bind(this, key, 'send')}
+                                    className="send-btn button-shine active">
+                                    <span className="img-wrap">
+                                        <img src="images/outbox-white.png" alt="Outbox Logo"/>
+                                    </span>
+                                    <span>SEND</span>
+                                </button>
+                                <button className="receive-btn button-shine disabled" onClick={this.openSendReceive.bind(this, key, 'receive')}>
+                                    <img src="images/receive-gray.png" alt="Receive"/>
+                                    <span>RECEIVE</span>
+                                </button>
+                            </div>
+                        :
+                            <div>
+                                <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
+                                    onClick={this.openSendReceive.bind(this, key, 'send')}
+                                    className={this.state.collapse_open.key === key && this.state.collapse_open.receive_open ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
 
-                                        {
-                                            this.state.collapse_open.key === key && this.state.collapse_open.receive_open
-                                            ?
-                                                <span className="img-wrap">
-                                                    <img src="images/outbox-gray.png" alt="Outbox Logo"/>
-                                                </span>
-                                            :
-                                                <span className="img-wrap">
-                                                {
-                                                    keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0
-                                                    ?
-                                                        <img src="images/outbox-blue.png" alt="Outbox Logo"/>
-                                                    :
-                                                        <img src="images/outbox-gray.png" alt="Outbox Logo"/>
-
-                                                }
-                                                </span>
-                                        }
-
-                                        <span>SEND</span>
-                                    </button>
-                                    <button className="receive-btn button-shine-green" onClick={this.openSendReceive.bind(this, key, 'receive')}>
                                     {
                                         this.state.collapse_open.key === key && this.state.collapse_open.receive_open
                                         ?
-                                            <img src="images/receive-white.png" alt="Inbox Logo"/>
+                                            <span className="img-wrap">
+                                                <img src="images/outbox-gray.png" alt="Outbox Logo"/>
+                                            </span>
                                         :
-                                            <img src="images/receive-blue.png" alt="Inbox Logo"/>
+                                            <span className="img-wrap">
+                                            {
+                                                keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0
+                                                ?
+                                                    <img src="images/outbox-blue.png" alt="Outbox Logo"/>
+                                                :
+                                                    <img src="images/outbox-gray.png" alt="Outbox Logo"/>
 
+                                            }
+                                            </span>
                                     }
-                                    <span>RECEIVE</span>
-                                    </button>
-                                </div>
-                        }
-                    </div>
+
+                                    <span>SEND</span>
+                                </button>
+                                <button className="receive-btn button-shine-green" onClick={this.openSendReceive.bind(this, key, 'receive')}>
+                                {
+                                    this.state.collapse_open.key === key && this.state.collapse_open.receive_open
+                                    ?
+                                        <img src="images/receive-white.png" alt="Inbox Logo"/>
+                                    :
+                                        <img src="images/receive-blue.png" alt="Inbox Logo"/>
+
+                                }
+                                <span>RECEIVE</span>
+                                </button>
+                            </div>
+                    }
                 </div>
 
                 <div className="col-xs-12">

@@ -454,6 +454,9 @@ body{
   -moz-transition: all ease 0.2s;
   -webkit-transition: all ease 0.2s;
 }
+.single-key:last-of-type {
+  margin-bottom: 0;
+}
 .single-key .col-xs-7 {
   padding-left: 0;
 }
@@ -473,14 +476,20 @@ body{
   padding-left: 0;
 }
 .single-key .safex-amounts {
-  width: 180px;
+  width: 200px;
   display: inline-block;
   float: left;
+  position: relative;
+  left: 17px;
+  top: 5px;
 }
 .single-key .bitcoin-amounts {
   width: 240px;
   display: inline-block;
   float: left;
+  position: relative;
+  left: 17px;
+  top: 5px;
 }
 .single-key .bitcoin-amounts .amount span:first-child {
   width: 100px;
@@ -497,15 +506,18 @@ body{
   background: none;
   border: none;
   padding: 2px 0px 3px;
-  margin: 0 3px;
+  margin: 0 5px 0 0;
   color: #fff;
+}
+.single-key .amounts button.archive-button:last-of-type {
+  margin: 0;
 }
 .single-key .amounts button.archive-button > span {
   background: #00d0ff;
   padding: 7px 6px 7px;
   white-space: nowrap;
   font-family: Helvetica, sans-serif;
-  font-size: 12px;
+  font-size: 11.6px;
   border-top-right-radius: 10px;
   border-bottom-left-radius: 10px;
   text-transform: uppercase;
@@ -513,8 +525,10 @@ body{
 .single-key .amounts .amount-btns-wrap {
   margin-left: -3px;
   bottom: -1px;
-  width: 295px;
+  left: 18px;
+  width: 256px;
   padding-right: 0;
+  padding-left: 0;
 }
 .single-key .amounts > button.history-button > span {
   margin-top: 25px;
@@ -549,16 +563,19 @@ body{
   padding: 10px;
   margin-right: 5px;
 }
+.single-key .single-key-btns-wrap {
+  position: relative;
+  top: 15px;
+}
 .single-key .single-key-btns-wrap button {
   font-family: 'Gotham Medium', sans-serif;
   padding: 7px 9px;
-  margin-top: 13px;
   border: none;
   border-radius: 8px;
   color: #fff;
   text-transform: uppercase;
   font-size: 17px;
-  margin-right: 15px;
+  margin: 2px 15px 10px 0;
 }
 .single-key .single-key-btns-wrap button:last-child {
   margin-right: 10px;
