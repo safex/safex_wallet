@@ -704,7 +704,6 @@ export default class Wallet extends React.Component {
         var date = Date.now();
 
         fileDownload(nice_keys, date + 'unsafex.txt');
-        this.closeSettingsModal();
     }
 
     exportEncryptedWallet() {
@@ -721,7 +720,6 @@ export default class Wallet extends React.Component {
                 fileDownload(fd, date + 'safexwallet.dat');
             }
         });
-        this.closeSettingsModal();
     }
 
     amountChange(receive_amount) {
@@ -1763,7 +1761,7 @@ export default class Wallet extends React.Component {
                 <div className={this.state.transaction_sent
                     ? 'overflow sendModal active'
                     : 'overflow sendModal'}>
-                    <form className="container" onSubmit={this.closeSuccessModal}>
+                    <form className="container"  onSubmit={this.closeSuccessModal}>
                         <h3>Sent <span className="close" onClick={this.closeSuccessModal}>X</span></h3>
                         <div className="currency">
                             <span>Currency:</span>

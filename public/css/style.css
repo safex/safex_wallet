@@ -1600,10 +1600,9 @@ input::-webkit-inner-spin-button {
 .overflow.sendModal.walletResetModal form input {
   text-align: center;
   margin-bottom: 15px;
-}
-.overflow.sendModal.walletResetModal form .password-btn {
   animation-duration: 1s;
   animation-fill-mode: both;
+  padding: 6px 5px 5px;
 }
 .overflow.sendModal.walletResetModal form input[type=checkbox] {
   width: auto;
