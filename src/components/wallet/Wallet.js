@@ -75,7 +75,8 @@ export default class Wallet extends React.Component {
             refreshInterval: '',
             status_text: 'Loading...',
             dividend_active: false,
-            affiliate_active: false
+            affiliate_active: false,
+            import_wrap_glow: false,
         }
 
         this.createKey = this.createKey.bind(this);
@@ -114,6 +115,8 @@ export default class Wallet extends React.Component {
         this.setArchiveView = this.setArchiveView.bind(this);
         this.setHomeView = this.setHomeView.bind(this);
         this.removeFromArchive = this.removeFromArchive.bind(this);
+        this.importGlow = this.importGlow.bind(this);
+        this.importGlowDeactivate = this.importGlowDeactivate.bind(this);
     }
 
     logout() {
@@ -164,17 +167,6 @@ export default class Wallet extends React.Component {
             console.log(error);
         });
 
-        // axios({method: 'post', url: 'http://omni.safex.io:3001/balance'}).then(res => {
-        //
-        //     var safex_balance = parseFloat(res.data.safex_balance);
-        //
-        //     this.setState({
-        //         safex_balance: safex_balance
-        //     });
-        // }).catch(function (error) {
-        //     console.log(error);
-        // });
-
         try {
             var json = JSON.parse(localStorage.getItem('wallet'));
             this.setState({wallet: json, keys: json['keys']});
@@ -212,9 +204,7 @@ export default class Wallet extends React.Component {
     prepareDisplayPendingTx(keys = null) {
         var promises = [];
         if (keys === null) {
-            keys = this.state.keys.filter(function(item) {
-                return (item.archived === false || !item.hasOwnProperty("archived"))
-            })
+            keys = this.state.keys.slice();
         }
 
         if (!Array.isArray(keys)) {
@@ -247,9 +237,7 @@ export default class Wallet extends React.Component {
     prepareDisplay(keys = null) {
         var promises = [];
         if (keys === null) {
-            keys = this.state.keys.filter(function(item) {
-                return (item.archived === false || !item.hasOwnProperty("archived"))
-            })
+            keys = this.state.keys.slice();
         }
 
         if (!Array.isArray(keys)) {
@@ -263,6 +251,7 @@ export default class Wallet extends React.Component {
                 method: "POST",
                 body: JSON.stringify(json)
             })
+
                 .then(resp => resp.json())
                 .then((resp) => {
                     return resp
@@ -623,7 +612,7 @@ export default class Wallet extends React.Component {
     importKeyChange(e) {
         this.setState({
             import_key: e.target.value
-        })
+        });
     }
 
     importKey(e) {
@@ -824,11 +813,11 @@ export default class Wallet extends React.Component {
             }
         });
 
-        if ((this.state.send_coin === 'safex' & this.state.send_fee > key_btc_bal) | (this.state.send_coin === 'btc' & this.state.send_total > key_btc_bal)) {
+        if ((this.state.send_coin === 'safex' && this.state.send_fee > key_btc_bal) | (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal)) {
             alert('you do not have enough BTC to cover the fee');
-        } else if (this.state.send_coin === 'safex' & this.state.send_amount > key_safex_bal) {
+        } else if (this.state.send_coin === 'safex' && this.state.send_amount > key_safex_bal) {
             alert('you do not have enough SAFEX to cover this transaction');
-        } else if (this.state.send_coin === 'btc' & this.state.send_total > key_btc_bal) {
+        } else if (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal) {
             alert('you do not have enough BTC to cover this transaction');
         } else if (e.target.destination.value === '') {
             alert('destination field is empty');
@@ -1141,7 +1130,6 @@ export default class Wallet extends React.Component {
                 var dateTime = new Date(tx['blocktime'] * 1000);
                 var confirmations = tx['confirmations'] > 15 ? "(16/16)" : "("+ tx['confirmations'] + "/16)";
                 var coin = tx['propertyname'];
-                // console.log(tx['propertyname'])
 
                 if (direction === "Received" && coin === 'SafeExchangeCoin') {
                     render +=`
@@ -1202,6 +1190,9 @@ export default class Wallet extends React.Component {
                 }
 
             });
+            if (response.data.transactions.length == 0) {
+                render =`<h5>No transaction history</h5>`;
+            }
             document.getElementById("history_txs").innerHTML = render;
         })
         .catch(function (error) {
@@ -1281,12 +1272,11 @@ export default class Wallet extends React.Component {
                     try {
                         var json2 = JSON.parse(localStorage.getItem('wallet'));
                         json2['keys'].forEach((key) => {
-                                var currentIndex = this.state.keys.findIndex(i => i.public_key === key['public_key'])
-                                key['safex_bal'] = this.state.keys[currentIndex].safex_bal;
-                                key['btc_bal'] = this.state.keys[currentIndex].btc_bal;
-                                key['pending_safex_bal'] = this.state.keys[currentIndex].pending_safex_bal;
-                                key['pending_btc_bal'] = this.state.keys[currentIndex].pending_btc_bal;
-
+                            var currentIndex = this.state.keys.findIndex(i => i.public_key === key['public_key'])
+                            key['safex_bal'] = this.state.keys[currentIndex].safex_bal;
+                            key['btc_bal'] = this.state.keys[currentIndex].btc_bal;
+                            key['pending_safex_bal'] = this.state.keys[currentIndex].pending_safex_bal;
+                            key['pending_btc_bal'] = this.state.keys[currentIndex].pending_btc_bal;
                         });
                         this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
                         this.prepareDisplay(json.keys[index]);
@@ -1387,13 +1377,25 @@ export default class Wallet extends React.Component {
         }
     }
 
+    importGlow() {
+        this.setState({
+            import_wrap_glow: true
+        });
+    }
+
+    importGlowDeactivate() {
+        this.setState({
+            import_wrap_glow: false
+        });
+    }
+
     render() {
         const {keys, archive_active, safex_price, btc_price} = this.state;
 
         var table = Object.keys(keys).map((key) => {
 
             return <div className={keys[key].archived === archive_active
-            | (!keys[key].hasOwnProperty('archived') && archive_active === false)
+            || (!keys[key].hasOwnProperty('archived') && archive_active === false)
                 ? 'col-xs-12 single-key'
                 : 'col-xs-12 single-key hidden-xs hidden-sm hidden-md hidden-lg'} key={key}>
                 <div className="col-xs-7">
@@ -1401,7 +1403,7 @@ export default class Wallet extends React.Component {
                     <span>
                         {
                             keys[key].pending_safex_bal > 0
-                            | keys[key].pending_safex_bal < 0
+                            || keys[key].pending_safex_bal < 0
                                 ? ' (safex: pending ' + keys[key].pending_safex_bal + ')'
                                 : ''
                         }
@@ -1409,7 +1411,7 @@ export default class Wallet extends React.Component {
                     <span>
                         {
                             keys[key].pending_btc_bal > 0
-                            | keys[key].pending_btc_bal < 0
+                            || keys[key].pending_btc_bal < 0
                                 ? ' (bitcoin: pending ' + keys[key].pending_btc_bal + ')'
                                 : ''
                         }
@@ -1481,7 +1483,7 @@ export default class Wallet extends React.Component {
                             <div className="col-xs-5 amount-btns-wrap">
                                 <button onClick={() => this.removeFromArchive(key)}
                                     className={keys[key].archived === true
-                                    | (!keys[key].hasOwnProperty('archived') && archive_active === true)
+                                    || (!keys[key].hasOwnProperty('archived') && archive_active === true)
                                         ? 'archive-button'
                                         : 'archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
                                     <span>TO HOME</span>
@@ -1489,7 +1491,7 @@ export default class Wallet extends React.Component {
 
                                 <button onClick={() => this.sendToArchive(key)}
                                     className={keys[key].archived === false
-                                    | (!keys[key].hasOwnProperty('archived') && archive_active === false)
+                                    || (!keys[key].hasOwnProperty('archived') && archive_active === false)
                                         ? 'archive-button button-shine'
                                         : 'archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
                                     <span>TO ARCHIVE</span>
@@ -1650,7 +1652,7 @@ export default class Wallet extends React.Component {
                     </div>
                 </div>
                 <div className='container keys-container'>
-                    <div className={this.state.settings_active || this.state.send_overflow_active || this.state.dividend_active || this.state.affiliate_active || this.state.message_modal
+                    <div className={this.state.settings_active || this.state.send_overflow_active || this.state.dividend_active || this.state.affiliate_active
                         ? 'col-xs-12 sidebar-opened keys-wrap fadeIn'
                         : 'col-xs-12 keys-wrap fadeIn'}>
                         <div className="row">
@@ -1888,9 +1890,9 @@ export default class Wallet extends React.Component {
                         <img src="images/transfer.png" alt="Transfer Icon"/>
                         <span className="sync-span">{this.state.status_text}</span>
                     </div>
-                    <div className="import-form-wrap">
+                    <div className={this.state.import_wrap_glow ? 'import-form-wrap active' :'import-form-wrap'}>
                         <form onChange={this.importKeyChange} onSubmit={this.importKey}>
-                            <input name="key" value={this.state.import_key}></input>
+                            <input name="key" value={this.state.import_key} onFocus={this.importGlow} onBlur={this.importGlowDeactivate} />
                             <button type="submit" className="button-shine" title="Import Key">Import</button>
                         </form>
                         <button onClick={this.createKey} className="create-btn button-shine" title="Create New Key">

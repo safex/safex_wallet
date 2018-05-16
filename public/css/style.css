@@ -121,7 +121,7 @@ body{
 }
 .login-wrap .col-xs-12 {
   background: url('../images/login-bg.png');
-  background-size: 100% 100%;
+  background-size: contain;
   display: block;
   padding-bottom: 20px;
 }
@@ -132,7 +132,7 @@ body{
 }
 .importwallet-wrap .col-xs-12 {
   background: url('../images/importwallet-bg.png');
-  background-size: 100% 100%;
+  background-size: contain;
   background-repeat: x;
   display: block;
   padding-bottom: 20px;
@@ -578,7 +578,7 @@ body{
   margin: 2px 15px 10px 0;
 }
 .single-key .single-key-btns-wrap button:last-child {
-  margin-right: 10px;
+  margin-right: 11px;
 }
 .single-key .single-key-btns-wrap .send-btn {
   background: #12bedd;
@@ -990,6 +990,9 @@ body{
 .overflow.historyModal p {
   color: #fff;
 }
+.overflow.historyModal h5 {
+  font-size: 16px;
+}
 .history-inner {
   padding-left: 45px;
   padding-right: 45px;
@@ -1363,6 +1366,12 @@ input::-webkit-inner-spin-button {
   position: relative;
   height: 48px;
   background: url(../images/import-form-bg.png);
+  -webkit-transition: all 0.2s ease-out;
+  -moz-transition: all 0.2s ease-out;
+  transition: all 0.2s ease-out;
+}
+.status .import-form-wrap.active {
+  box-shadow: 0 0 15px 0 rgba(0, 199, 236, 0.5);
 }
 .status .import-form-wrap form {
   width: auto;
@@ -1405,7 +1414,7 @@ input::-webkit-inner-spin-button {
   top: 6px;
   background: transparent;
   border: 1px solid rgba(178, 178, 178, .44);
-  margin-right: 6px;
+  margin-left: 1px;
   height: 34px;
   width: 34px;
 }
@@ -1555,7 +1564,7 @@ input::-webkit-inner-spin-button {
 }
 .overflow.sendModal.walletResetModal h3 {
   text-align: left;
-  border-bottom: 1px solid #4D5D66;
+  /*border-bottom: 1px solid #4D5D66;*/
   color: #fff;
   text-transform: uppercase;
   font-size: 17px;
