@@ -77,6 +77,9 @@ export default class Wallet extends React.Component {
             dividend_active: false,
             affiliate_active: false,
             import_wrap_glow: false,
+            wrong_old_password: false,
+            wrong_new_password: false,
+            wrong_repeat_password: false,
         }
 
         this.createKey = this.createKey.bind(this);
@@ -117,6 +120,9 @@ export default class Wallet extends React.Component {
         this.removeFromArchive = this.removeFromArchive.bind(this);
         this.importGlow = this.importGlow.bind(this);
         this.importGlowDeactivate = this.importGlowDeactivate.bind(this);
+        this.wrongOldPassword = this.wrongOldPassword.bind(this);
+        this.wrongNewPassword = this.wrongNewPassword.bind(this);
+        this.wrongRepeatPassword = this.wrongRepeatPassword.bind(this);
     }
 
     logout() {
@@ -846,7 +852,6 @@ export default class Wallet extends React.Component {
         var new_pass = e.target.new_pass.value;
         var repeat_pass = e.target.repeat_pass.value;
 
-
         //check if the new password field is full
         if (new_pass.length > 0) {
             //check that the new password matches the repeated password
@@ -906,18 +911,22 @@ export default class Wallet extends React.Component {
                                     });
                                 }
                             } else {
-                                alert('wrong password')
+                                alert('wrong password');
+                                this.wrongOldPassword();
                             }
                         } catch (e) {
                             alert('wrong password');
+                            this.wrongOldPassword();
                         }
                     }
                 });
             } else {
-                alert('new password does not match repeated password')
+                alert('new password does not match repeated password');
+                this.wrongRepeatPassword();
             }
         } else {
-            alert('new password field is empty')
+            alert('new password field is empty');
+            this.wrongNewPassword();
         }
     }
 
@@ -1389,6 +1398,39 @@ export default class Wallet extends React.Component {
         });
     }
 
+    wrongOldPassword() {
+        this.setState({
+            wrong_old_password: true
+        });
+        setTimeout(() => {
+            this.setState({
+                wrong_old_password: false
+            });
+        }, 1000)
+    }
+
+    wrongNewPassword() {
+        this.setState({
+            wrong_new_password: true
+        });
+        setTimeout(() => {
+            this.setState({
+                wrong_new_password: false
+            });
+        }, 1000)
+    }
+
+    wrongRepeatPassword() {
+        this.setState({
+            wrong_repeat_password: true
+        });
+        setTimeout(() => {
+            this.setState({
+                wrong_repeat_password: false
+            });
+        }, 1000)
+    }
+
     render() {
         const {keys, archive_active, safex_price, btc_price} = this.state;
 
@@ -1690,12 +1732,12 @@ export default class Wallet extends React.Component {
                                     alt="Bitcoin Coin"/>
                         </div>
                         <div className="input-group">
-                            <label for="from">From:</label>
+                            <label htmlFor="from">From:</label>
                             <textarea name="from" className="form-control" readOnly aria-describedby="basic-addon1" value={this.state.send_keys.public_key}>
                             </textarea>
                         </div>
                         <div className="input-group">
-                            <label for="destination">To:</label>
+                            <label htmlFor="destination">To:</label>
                             <textarea name="destination" className="form-control" readOnly aria-describedby="basic-addon1" value={this.state.send_to}>
                             </textarea>
                         </div>
@@ -1704,15 +1746,15 @@ export default class Wallet extends React.Component {
                         <input type="hidden" readOnly name="public_key"
                             value={this.state.send_keys.public_key} />
                         <div className="form-group">
-                            <label for="amount">Amount:</label>
+                            <label htmlFor="amount">Amount:</label>
                             <input readOnly name="amount" value={this.state.send_amount}/>
                         </div>
                         <div className="form-group">
-                            <label for="fee">Fee(BTC):</label>
+                            <label htmlFor="fee">Fee(BTC):</label>
                             <input readOnly name="fee" value={this.state.send_fee}/>
                         </div>
                         <div className="form-group">
-                            <label for="total">Total:</label>
+                            <label htmlFor="total">Total:</label>
                             <input readOnly name="total" value={this.state.send_total} />
                         </div>
                         <button className="confirm-btn button-shine-green" type="submit" disabled={this.state.transaction_being_sent ? 'disabled' : ''}> {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}</button>
@@ -1737,21 +1779,21 @@ export default class Wallet extends React.Component {
                                     alt="Bitcoin Coin"/>
                         </div>
                         <div className="input-group">
-                            <label for="from">From:</label>
+                            <label htmlFor="from">From:</label>
                             <textarea name="from" className="form-control" readOnly
                                 value={this.state.send_keys.public_key} placeholder="Address"
                                 aria-describedby="basic-addon1">
                             </textarea>
                         </div>
                         <div className="input-group">
-                            <label for="destination">To:</label>
+                            <label htmlFor="destination">To:</label>
                             <textarea name="destination" className="form-control" readOnly
                                 value={this.state.send_to} placeholder="Address"
                                 aria-describedby="basic-addon1">
                             </textarea>
                         </div>
                         <div className="input-group">
-                            <label for="txid">TX ID:</label>
+                            <label htmlFor="txid">TX ID:</label>
                             <textarea name="txid" className="form-control" readOnly
                                 value={this.state.txid}  placeholder="Address"
                                 aria-describedby="basic-addon1" rows="4">
@@ -1779,7 +1821,7 @@ export default class Wallet extends React.Component {
                 <div className={this.state.settings_active && this.state.send_overflow_active === false
                     ? 'overflow sendModal settingsModal active'
                     : 'overflow sendModal settingsModal'}>
-                    <form className="container">
+                    <div className="container form-wrap">
                         <div className="head">
                             <img src="images/mixer.png" alt="Transfer Icon"/>
                             <h3>
@@ -1792,15 +1834,33 @@ export default class Wallet extends React.Component {
                         <form onSubmit={this.changePassword}>
                             <div className="form-group">
                                 <label htmlFor="old_pass">Old Password:</label>
-                                <input type="password" name="old_pass"/>
+                                {
+                                    this.state.wrong_old_password
+                                    ?
+                                        <input type="password" className="form-control shake" name="old_pass" />
+                                    :
+                                        <input type="password" className="form-control" name="old_pass" />
+                                }
                             </div>
                             <div className="form-group">
                                 <label htmlFor="new_pass">New Password:</label>
-                                <input type="password" name="new_pass"/>
+                                {
+                                    this.state.wrong_new_password
+                                    ?
+                                        <input type="password" className="form-control shake" name="new_pass" />
+                                    :
+                                        <input type="password" className="form-control" name="new_pass"/>
+                                }
                             </div>
                             <div className="form-group">
                                 <label htmlFor="repeat_pass">Repeat Password:</label>
-                                <input type="password" name="repeat_pass"/>
+                                {
+                                    this.state.wrong_repeat_password
+                                    ?
+                                        <input type="password" className="form-control shake" name="repeat_pass"/>
+                                    :
+                                        <input type="password" className="form-control" name="repeat_pass"/>
+                                }
                             </div>
                             <div className="col-xs-12">
                                 <div className="row">
@@ -1811,7 +1871,7 @@ export default class Wallet extends React.Component {
                         <button className="keys-btn button-shine" onClick={this.exportEncryptedWallet}>Export Encrypted Wallet <span className="blue-text">(.dat)</span></button>
                         <button className="keys-btn button-shine" onClick={this.exportUnencryptedWallet}>Export Unencrypted Keys</button>
                         <button className="submit-btn button-shine" onClick={this.logout}>Logout</button>
-                    </form>
+                    </div>
                 </div>
                 <div className={this.state.dividend_active
                     ? 'overflow sendModal dividendModal active'
@@ -1830,7 +1890,7 @@ export default class Wallet extends React.Component {
                             <label>
                                 Projected Marketplace Volume $
                             </label>
-                            <input type="text" name="total_trade_volume" value="500,000,000"/>
+                            <input type="text" name="total_trade_volume" value={this.state.totalTradeVolume}/>
                         </div>
                         <div className="form-group">
                             <label>

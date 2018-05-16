@@ -93,7 +93,7 @@ export default class CreateWallet extends React.Component {
                 <div className="col-xs-12 Login-logo">
                     <h2>Safex</h2>
                     <h3>Wallet</h3>
-                    <Link className="back-button" to="/"><img src="images/back.png" /> Back</Link>
+                    <Link className="back-button" to="/"><img src="images/back.png" alt="Back img"/> Back</Link>
                 </div>
                 <div className="col-xs-12 Login-form Create-wallet-form">
                     <form className="form-group" onSubmit={this.handleSubmit}>
