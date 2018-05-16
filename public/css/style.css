@@ -1034,6 +1034,7 @@ body{
   font-size: 21px;
   display: inline-block;
   margin-top: 10px;
+  width: 100%;
 }
 .overflow.sendModal > form h3 span {
   text-align: right;
