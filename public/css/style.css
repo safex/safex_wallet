@@ -290,6 +290,8 @@ body{
   margin-bottom: 10px;
   border-radius: 10px;
   line-height: 60px;
+  box-shadow: none;
+  -webkit-box-shadow: none;
   transition: all ease 0.3s;
   -o-transition: all ease 0.3s;
   -moz-transition: all ease 0.3s;
@@ -443,7 +445,7 @@ body{
   background-size: 710px;
   background-repeat: repeat-y;
   color: #fff;
-  padding: 5px 5px 0 0;
+  padding: 5px 0 0 0;
   border-radius: 10px;
   margin-bottom: 5px;
   border-top: 1px solid rgba(0, 126, 162, .52);
@@ -462,14 +464,14 @@ body{
 }
 .single-key .col-xs-7 span {
   position: relative;
-  bottom: 4px;
+  bottom: 3px;
   left: 10px;
   color: #00d1ff;
 }
 .single-key .key {
   font-size: 18px;
   letter-spacing: 0.1em;
-  margin: 5px 10px 0px;
+  margin: 0px 10px 0px;
 }
 .single-key .amounts{
   text-transform: uppercase;
@@ -481,7 +483,7 @@ body{
   float: left;
   position: relative;
   left: 17px;
-  top: 5px;
+  top: 3px;
 }
 .single-key .bitcoin-amounts {
   width: 240px;
@@ -489,7 +491,7 @@ body{
   float: left;
   position: relative;
   left: 17px;
-  top: 5px;
+  top: 3px;
 }
 .single-key .bitcoin-amounts .amount span:first-child {
   width: 100px;
@@ -503,28 +505,38 @@ body{
   padding-right: 0;
 }
 .single-key .amounts button.archive-button {
-  background: none;
+  background: #009dbf;
   border: none;
   padding: 2px 0px 3px;
-  margin: 0 5px 0 0;
+  margin: 0;
   color: #fff;
+  border-radius: 0;
+}
+.single-key .amounts button.archive-button:hover {
+  background: #00d0ff;
 }
 .single-key .amounts button.archive-button:last-of-type {
   margin: 0;
 }
+.single-key .amounts button.to-archive-btn,
+.single-key .amounts button.to-home-btn {
+  border-bottom-left-radius: 10px;
+}
+.single-key .amounts button.show-private-btn {
+  border-top-right-radius: 10px;
+}
 .single-key .amounts button.archive-button > span {
-  background: #00d0ff;
   padding: 7px 6px 7px;
   white-space: nowrap;
   font-family: Helvetica, sans-serif;
   font-size: 11.6px;
-  border-top-right-radius: 10px;
-  border-bottom-left-radius: 10px;
+  /*border-top-right-radius: 10px;*/
+  /*border-bottom-left-radius: 10px;*/
   text-transform: uppercase;
 }
 .single-key .amounts .amount-btns-wrap {
   margin-left: -3px;
-  bottom: -1px;
+  bottom: 0px;
   left: 18px;
   width: 256px;
   padding-right: 0;
@@ -565,11 +577,18 @@ body{
 }
 .single-key .single-key-btns-wrap {
   position: relative;
-  top: 15px;
+  top: 3px;
+}
+.single-key .amounts-wrap {
+  background: url(../images/amounts-bg.png) top right;
+  background-size: 50%;
+  background-repeat: repeat-y;
+  border-bottom-right-radius: 9px;
+  bottom: -2px;
 }
 .single-key .single-key-btns-wrap button {
   font-family: 'Gotham Medium', sans-serif;
-  padding: 7px 9px;
+  padding: 5px 8px;
   border: none;
   border-radius: 8px;
   color: #fff;
@@ -597,7 +616,7 @@ body{
 .single-key .pull-right button img {
   display: inline-block;
   margin-right: 5px;
-  height: 24px;
+  height: 20px;
   position: relative;
   top: 0px;
 }
@@ -616,13 +635,18 @@ body{
   height: 0;
   overflow: hidden;
   transition: all 0.3s;
+  top: 2px;
+  border: 0px none;
+  visibility: hidden;
 }
 .form-send.active {
   border-top: 1px solid rgba(255,255,255, .2);
-  margin-top: 2px;
+  margin-top: 0px;
   padding-top: 15px;
   padding-bottom: 40px;
   height: auto;
+  visibility: visible;
+  top: 2px;
 }
 .form-send .fee-buttons span {
   float: right;
@@ -641,7 +665,7 @@ body{
   float: right;
   margin-top: 10px;
   margin-right: 0;
-  padding: 7px 10px 6px;
+  padding: 4px 10px;
   border: 1px solid rgba(0, 231, 255, .44);
   border-radius: 8px;
 }
@@ -650,6 +674,7 @@ body{
   left: 0;
   top: -3px;
   margin-right: 10px;
+  height: 17px;
 }
 .form-send .form-send-submit:hover {
   background: #0ec8c1;
@@ -773,71 +798,45 @@ body{
   padding-left: 10px;
   padding-right: 10px;
   transition: all 0.4s;
+  top: 1px;
+  visibility: hidden;
 }
 .receive.active{
   height: auto;
   border-top: 1px solid rgba(255,255,255, .2);
-  margin-top: 1px;
+  margin-top: 0px;
   padding-top: 15px;
+  padding-bottom: 35px;
+  visibility: visible;
+  top: 1px;
 }
 .receive label {
-  font-size: 20px;
-  margin-bottom: 0;
+  font-family: 'Gotham Medium', sans-serif;
+  font-size: 15px;
+  margin-bottom: 1px;
+  font-weight: 400;
 }
-.receive input[name="receive-address"] {
+.receive input {
   width: 100%;
   border-radius: 10px;
   display: block;
-  margin-bottom: 7px;
-  border: 1px solid rgba(0, 231, 255, 1);
+  margin-bottom: 15px;
+  border: 1px solid transparent;
   background: rgba(255,255,255,.1);
   border-top-left-radius: 8px !important;
   border-top-right-radius: 8px;
   border-bottom-left-radius: 8px !important;
   border-bottom-right-radius: 8px;
   color: #fff;
-  font-size: 18px;
-  padding: 5px 10px 4px;
+  font-size: 16px;
+  padding: 4px 10px 3px;
   text-align: left;
   transition: all ease 0.3s;
   -o-transition: all ease 0.3s;
   -moz-transition: all ease 0.3s;
   -webkit-transition: all ease 0.3s;
 }
-.receive input[name="receive-address"]:focus {
-  outline: 0px none;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 10px rgba(84, 188, 217, 1) !important;
-  box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 10px rgba(84, 188, 217, 1) !important;
-  border: 1px solid #00e7ff !important;
-}
-.receive .amount-wrap {
-  padding-left: 0;
-}
-.receive .amount-wrap label {
-  display: block;
-  margin-top: 10px;
-}
-.receive .amount-wrap input {
-  width: initial;
-  border-radius: 10px;
-  display: block;
-  margin-bottom: 7px;
-  border: 1px solid rgba(0, 231, 255, 1);
-  background: rgba(255,255,255,.1);
-  border-top-left-radius: 8px !important;
-  border-top-right-radius: 8px;
-  border-bottom-left-radius: 8px !important;
-  border-bottom-right-radius: 8px;
-  color: #fff;
-  font-size: 18px;
-  padding: 5px 10px 4px;
-  text-align: left;
-  transition: all ease 0.3s;
-  -o-transition: all ease 0.3s;
-  -moz-transition: all ease 0.3s;
-  -webkit-transition: all ease 0.3s;
-}
-.receive .amount-wrap input:focus {
+.receive input:focus {
   outline: 0px none;
   -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 10px rgba(84, 188, 217, 1) !important;
   box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 10px rgba(84, 188, 217, 1) !important;
@@ -848,7 +847,7 @@ body{
 }
 .receive canvas {
   margin-top: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
   width: 100px !important;
   height: 100px !important;
   background: #fff;
@@ -981,6 +980,7 @@ body{
   opacity: 1;
   z-index: 9999;
   width: 100%;
+  overflow: hidden;
 }
 .overflow.historyModal h3 {
   color: #fff;
@@ -992,10 +992,11 @@ body{
 }
 .overflow.historyModal h5 {
   font-size: 16px;
+  text-indent: -10px;
 }
 .history-inner {
-  padding-left: 45px;
-  padding-right: 45px;
+  padding-left: 35px;
+  padding-right: 35px;
 }
 .overflow.sendModal {
   background: url(../images/sidebar-bg.png);
@@ -1033,7 +1034,9 @@ body{
   text-transform: uppercase;
   font-size: 21px;
   display: inline-block;
-  margin-top: 10px;
+  margin-top: 0px;
+  margin-bottom: 0;
+  text-indent: 27px;
   width: 100%;
 }
 .overflow.sendModal > form h3 span {
@@ -1050,6 +1053,7 @@ body{
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  margin-bottom: 15px;
 }
 .overflow.sendModal .currency span {
   margin-right: 20px;
@@ -1060,7 +1064,7 @@ body{
 .overflow.sendModal input {
   display: block;
   margin-bottom: 7px;
-  border: 1px solid rgba(0, 231, 255, 1);
+  border: 1px solid transparent;
   background: rgba(255,255,255,.1);
   border-top-left-radius: 8px !important;
   border-top-right-radius: 8px;
@@ -1089,7 +1093,7 @@ body{
 .overflow.sendModal textarea {
   display: block;
   margin-bottom: 7px;
-  border: 1px solid rgba(0, 231, 255, 1);
+  border: 1px solid transparent;
   background: rgba(255,255,255,.1);
   border-top-left-radius: 8px !important;
   border-top-right-radius: 8px;
@@ -1224,10 +1228,11 @@ input::-webkit-inner-spin-button {
   margin-top: 0px;
   margin-bottom: 0;
   width: 100%;
+  text-indent: initial;
 }
 .keys-container {
   overflow: hidden;
-  height: calc(100% - 210px);
+  height: calc(100% - 240px);
 }
 .keys-container .keys-wrap {
   overflow-y: auto;
@@ -1499,8 +1504,14 @@ input::-webkit-inner-spin-button {
 .form-send .fee-buttons span.slow-btn {
   border: 1px solid #ff9600;
 }
+.form-send .fee-buttons span.slow-btn.active {
+  background: rgba(255, 150, 0, .5);
+}
 .form-send .fee-buttons span.medium-btn {
   border: 1px solid #0ec8c1;
+}
+.form-send .fee-buttons span.medium-btn.active {
+  background: rgba(14, 200, 193, .4);
 }
 .form-send .fee-buttons span.fast-btn {
   border: 1px solid #00e7ff;
@@ -1533,9 +1544,12 @@ input::-webkit-inner-spin-button {
   color: #00c8f3;
   text-transform: initial;
 }
-.settingsModal .submit-btn {
+.settingsModal .submit-wrap {
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(102, 132, 146, .7);
+}
+.settingsModal .reset-btn {
   display: block;
-  margin: 20px auto 60px;
   border: 1px solid rgba(0, 231, 255, 1);
   border-radius: 10px;
   background: transparent;
@@ -1544,6 +1558,33 @@ input::-webkit-inner-spin-button {
   font-size: 12px;
   padding: 6px 1px 5px;
   width: 70%;
+  margin: 10px auto;
+}
+.settingsModal .submit-btn {
+  display: block;
+  border: 1px solid #0ec8c1;
+  border-radius: 10px;
+  background: #0ec8c1;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 12px;
+  padding: 6px 1px 5px;
+  width: 70%;
+  margin: 10px auto 50px;
+  font-weight: 600;
+}
+.settingsModal .logout-btn {
+  display: block;
+  border: 1px solid #c80e4b;
+  border-radius: 10px;
+  background: #c80e4b;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 12px;
+  padding: 6px 1px 5px;
+  width: 70%;
+  margin: 20px auto;
+  font-weight: 600;
 }
 .settingsModal label{
   width: 100%;
@@ -1625,6 +1666,8 @@ input::-webkit-inner-spin-button {
   color: #fff;
   opacity: 1;
   font-size: 20px;
+  position: relative;
+  right: 12px;
 }
 .overflow.messageModal p {
   background: none;
@@ -1652,14 +1695,14 @@ input::-webkit-inner-spin-button {
   color: #fff;
 }
 #history_txs {
-  height: 100%;
+  height: 480px;
   text-align: center;
   color: #fff;
+  overflow: auto;
 }
 #history_txs > div {
   border: 1px solid #00C9FF;
   border-radius: 8px;
-  margin-bottom: 10px;
   background: transparent;
   padding: 8px;
   text-align: left;
@@ -1668,15 +1711,14 @@ input::-webkit-inner-spin-button {
   -o-transition: all ease 0.3s;
   -moz-transition: all ease 0.3s;
   -webkit-transition: all ease 0.3s;
+  width: calc(100% - 20px);
+  margin: 10px auto;
 }
 #history_txs > div:hover {
   outline: 0px none;
   -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 10px rgba(84, 188, 217, 1) !important;
   box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 10px rgba(84, 188, 217, 1) !important;
   border: 1px solid #00e7ff !important;
-}
-#history_txs > div:last-of-type {
-  margin-bottom: 30px;
 }
 #history_txs > div > p {
   display: inline-block;
@@ -1725,6 +1767,8 @@ input::-webkit-inner-spin-button {
   max-width: 95px;
   opacity: .2;
 }
+
+/* Buttons and Transitions */
 .button-shine {
   position: relative;
   text-align: center;
@@ -1772,16 +1816,15 @@ input::-webkit-inner-spin-button {
   transform: skewX(-20deg);
 }
 .button-shine-green {
-  position: relative;
-  text-align: center;
-  color: #00c7ec;
-  border: 1px solid #00c7ec;
-  border-radius: 5px;
-  box-shadow: 0 0 0 0 transparent;
-  -webkit-transition: all 0.2s ease-in;
-  -moz-transition: all 0.2s ease-in;
-  transition: all 0.2s ease-in;
-}
+   position: relative;
+   text-align: center;
+   border: 1px solid #00c7ec;
+   border-radius: 5px;
+   box-shadow: 0 0 0 0 transparent;
+   -webkit-transition: all 0.2s ease-in;
+   -moz-transition: all 0.2s ease-in;
+   transition: all 0.2s ease-in;
+ }
 .button-shine-green:hover {
   color: white;
   box-shadow: 0 0 30px 0 rgba(14, 200, 193, .5) !important;
@@ -1801,6 +1844,96 @@ input::-webkit-inner-spin-button {
   transition: box-shadow 0.2s ease-in;
 }
 .button-shine-green:before {
+  content: '';
+  display: block;
+  width: 0px;
+  height: 86%;
+  position: absolute;
+  top: 7%;
+  left: 0%;
+  opacity: 0;
+  background: white;
+  box-shadow: 0 0 15px 3px white;
+  -webkit-transform: skewX(-20deg);
+  -moz-transform: skewX(-20deg);
+  -ms-transform: skewX(-20deg);
+  -o-transform: skewX(-20deg);
+  transform: skewX(-20deg);
+}
+.button-shine-orange {
+  position: relative;
+  text-align: center;
+  border: 1px solid #fda43c;
+  border-radius: 5px;
+  box-shadow: 0 0 0 0 transparent;
+  -webkit-transition: all 0.2s ease-in;
+  -moz-transition: all 0.2s ease-in;
+  transition: all 0.2s ease-in;
+}
+.button-shine-orange:hover {
+  color: white;
+  box-shadow: 0 0 30px 0 rgba(253, 164, 60, .5) !important;
+  -webkit-transition: all 0.2s ease-out;
+  -moz-transition: all 0.2s ease-out;
+  transition: all 0.2s ease-out;
+}
+.button-shine-orange:hover:before {
+  -webkit-animation: shine 0.5s 0s linear;
+  -moz-animation: shine 0.5s 0s linear;
+  animation: shine 0.5s 0s linear;
+}
+.button-shine-orange:active {
+  box-shadow: 0 0 0 0 transparent;
+  -webkit-transition: box-shadow 0.2s ease-in;
+  -moz-transition: box-shadow 0.2s ease-in;
+  transition: box-shadow 0.2s ease-in;
+}
+.button-shine-orange:before {
+  content: '';
+  display: block;
+  width: 0px;
+  height: 86%;
+  position: absolute;
+  top: 7%;
+  left: 0%;
+  opacity: 0;
+  background: white;
+  box-shadow: 0 0 15px 3px white;
+  -webkit-transform: skewX(-20deg);
+  -moz-transform: skewX(-20deg);
+  -ms-transform: skewX(-20deg);
+  -o-transform: skewX(-20deg);
+  transform: skewX(-20deg);
+}
+.button-shine-red {
+  position: relative;
+  text-align: center;
+  border: 1px solid #c80e4b;
+  border-radius: 5px;
+  box-shadow: 0 0 0 0 transparent;
+  -webkit-transition: all 0.2s ease-in;
+  -moz-transition: all 0.2s ease-in;
+  transition: all 0.2s ease-in;
+}
+.button-shine-red:hover {
+  color: white;
+  box-shadow: 0 0 30px 0 rgba(200, 14, 75, 1) !important;
+  -webkit-transition: all 0.2s ease-out;
+  -moz-transition: all 0.2s ease-out;
+  transition: all 0.2s ease-out;
+}
+.button-shine-red:hover:before {
+  -webkit-animation: shine 0.5s 0s linear;
+  -moz-animation: shine 0.5s 0s linear;
+  animation: shine 0.5s 0s linear;
+}
+.button-shine-red:active {
+  box-shadow: 0 0 0 0 transparent;
+  -webkit-transition: box-shadow 0.2s ease-in;
+  -moz-transition: box-shadow 0.2s ease-in;
+  transition: box-shadow 0.2s ease-in;
+}
+.button-shine-red:before {
   content: '';
   display: block;
   width: 0px;
@@ -1842,6 +1975,7 @@ input::-webkit-inner-spin-button {
   -moz-animation: neon-green 1.5s ease-in-out infinite alternate;
   animation: neon-green 1.5s ease-in-out infinite alternate;
 }
+
 @-webkit-keyframes shine {
   from {
     opacity: 0;

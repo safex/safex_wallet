@@ -606,6 +606,7 @@ export default class Wallet extends React.Component {
                     var json2 = JSON.parse(localStorage.getItem('wallet'));
                     this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
                     this.prepareDisplay();
+                    this.closeHistoryModal();
                     alert('key added to wallet')
                 } catch (e) {
                     alert('an error adding a key to the wallet contact team@safex.io')
@@ -688,6 +689,7 @@ export default class Wallet extends React.Component {
         } catch (e) {
             alert('invalid private key')
         }
+        this.closeHistoryModal();
     }
 
     exportUnencryptedWallet() {
@@ -792,7 +794,7 @@ export default class Wallet extends React.Component {
     }
 
     openHistoryModal(e) {
-        document.getElementById("history_txs").innerHTML = "loading...";
+        document.getElementById("history_txs").innerHTML = "<h5>Loading...</h5>";
         this.setState({
             history_overflow_active: true,
         })
@@ -975,6 +977,10 @@ export default class Wallet extends React.Component {
     }
 
     closeSettingsModal() {
+        document.getElementById('old_pass').value = '';
+        document.getElementById('new_pass').value = '';
+        document.getElementById('repeat_pass').value = '';
+
         this.setState({
             settings_active: false
         });
@@ -1114,6 +1120,58 @@ export default class Wallet extends React.Component {
         }
     }
 
+    //TODO: Add API for Bitcoin transactions
+    // listTransactions(key) {
+    //     var render = '';
+    //     var bodyFormData = new FormData();
+    //     var promises = [];
+    //     bodyFormData.set('addr', key);
+    //
+    //     promises.push(axios({
+    //         method: 'post',
+    //         url: 'https://api.omniexplorer.info/v1/transaction/address/0',
+    //         data: bodyFormData,
+    //         config: {
+    //             headers: {'Content-Type': 'multipart/form-data', 'origin': '', 'referrer': '', 'referer': ''}
+    //         }
+    //     }));
+    //
+    //     promises.push(fetch(`https://chain.api.btc.com/v3/address/${key}/tx`, { mode: 'no-cors' }));
+    //
+    //     Promise.all(promises)
+    //         .then(function (response) {
+    //             var txArray = [];
+    //             var historySafex = txArray.push(JSON.stringify(response[0].data.transactions));
+    //             var historyBitcoin = txArray.push(JSON.stringify(response[1]));
+    //             // var safexArray = txArray[0];
+    //             // var btcArray = txArray[1];
+    //
+    //             txArray.forEach((tx) => {
+    //                 var safexDirection = tx['referenceaddress'] === key ? "Received" : "Sent";
+    //                 var safexDateTime = new Date(tx['blocktime'] * 1000);
+    //                 var safexConfirmations = tx['confirmations'] > 15 ? "(16/16)" : "("+ tx['confirmations'] + "/16)";
+    //                 var safexCoin = tx['propertyname'];
+    //
+    //                 console.log(tx)
+    //             });
+    //
+    //             // var render = '';
+    //
+    //             // goal = [
+    //             //     {
+    //             //         direction: '',
+    //             //         dateTime: '',
+    //             //         confirmations: '',
+    //             //         coin: '',
+    //             //     }
+    //             // ]
+    //         })
+    //         .catch(function (error) {
+    //             console.log(error);
+    //             alert("Could not fetch transaction history...");
+    //         });
+    // }
+
     listTransactions(key) {
         var render = '';
         var bodyFormData = new FormData();
@@ -1127,19 +1185,19 @@ export default class Wallet extends React.Component {
                 headers: {'Content-Type': 'multipart/form-data', 'origin': '', 'referrer': '', 'referer': ''}
             }
         })
-        .then(function (response) {
-            localStorage.setItem("history_txs", JSON.stringify(response.data.transactions));
-            var history = JSON.stringify(response.data.transactions);
-            var render = '';
+            .then(function (response) {
+                localStorage.setItem("history_txs", JSON.stringify(response.data.transactions));
+                var history = JSON.stringify(response.data.transactions);
+                var render = '';
 
-            JSON.parse(history).forEach((tx) => {
-                var direction = tx['referenceaddress'] === key ? "Received" : "Sent";
-                var dateTime = new Date(tx['blocktime'] * 1000);
-                var confirmations = tx['confirmations'] > 15 ? "(16/16)" : "("+ tx['confirmations'] + "/16)";
-                var coin = tx['propertyname'];
+                JSON.parse(history).forEach((tx) => {
+                    var direction = tx['referenceaddress'] === key ? "Received" : "Sent";
+                    var dateTime = new Date(tx['blocktime'] * 1000);
+                    var confirmations = tx['confirmations'] > 15 ? "(16/16)" : "("+ tx['confirmations'] + "/16)";
+                    var coin = tx['propertyname'];
 
-                if (direction === "Received" && coin === 'SafeExchangeCoin') {
-                    render +=`
+                    if (direction === "Received" && coin === 'SafeExchangeCoin') {
+                        render +=`
                     <div className="history">
                         <p class="coin-name">SAFEX</p><br /> ` + direction + ` <br />
                         <img class="coin-logo" src="images/coin-white.png" alt="Safex Coin">
@@ -1151,9 +1209,9 @@ export default class Wallet extends React.Component {
                         `+ tx['amount'] +` safex <br />
                         `+ confirmations +` confirmations
                     </div>`;
-                    console.log('safex received')
-                } else if (direction === "Sent" && coin === 'SafeExchangeCoin') {
-                    render +=`
+                        console.log('safex received')
+                    } else if (direction === "Sent" && coin === 'SafeExchangeCoin') {
+                        render +=`
                     <div class="history">
                         <p class="coin-name">SAFEX</p><br /> ` + direction + ` <br />
                         <img class="coin-logo" src="images/coin-white.png" alt="Safex Coin">
@@ -1165,9 +1223,9 @@ export default class Wallet extends React.Component {
                         `+ tx['amount'] +` safex <br />
                         `+ confirmations +` confirmations
                     </div>`;
-                    console.log('safex sent')
-                } else if (direction === "Received" && coin === 'Bitcoin') {
-                    render +=`
+                        console.log('safex sent')
+                    } else if (direction === "Received" && coin === 'Bitcoin') {
+                        render +=`
                     <div class="history">
                         <p class="coin-name">BITCOIN</p><br /> ` + direction + ` <br />
                         <img class="coin-logo" src="images/btc-coin.png" alt="Bitcoin Logo">
@@ -1179,9 +1237,9 @@ export default class Wallet extends React.Component {
                         `+ tx['amount'] +` bitcoin <br />
                         `+ confirmations +` confirmations
                     </div>`;
-                    console.log('bitcoin received')
-                } else if (direction === "Sent" && coin === 'Bitcoin') {
-                    render +=`
+                        console.log('bitcoin received')
+                    } else if (direction === "Sent" && coin === 'Bitcoin') {
+                        render +=`
                     <div class="history">
                         <p class="coin-name">BITCOIN</p><br /> ` + direction + ` <br />
                         <img class="coin-logo" src="images/btc-coin.png" alt="Bitcoin Logo">
@@ -1193,19 +1251,19 @@ export default class Wallet extends React.Component {
                         `+ tx['amount'] +` bitcoin <br />
                         `+ confirmations +` confirmations
                     </div>`;
-                    console.log('bitcoin sent')
-                }
+                        console.log('bitcoin sent')
+                    }
 
+                });
+                if (response.data.transactions.length == 0) {
+                    render =`<h5>No transaction history</h5>`;
+                }
+                document.getElementById("history_txs").innerHTML = render;
+            })
+            .catch(function (error) {
+                console.log(error);
+                alert("Could not fetch transaction history...");
             });
-            if (response.data.transactions.length == 0) {
-                render =`<h5>No transaction history</h5>`;
-            }
-            document.getElementById("history_txs").innerHTML = render;
-        })
-        .catch(function (error) {
-            console.log(error);
-            alert("Could not fetch transaction history...");
-        });
     }
 
     sendToArchive(index) {
@@ -1233,15 +1291,18 @@ export default class Wallet extends React.Component {
                     try {
                         var json2 = JSON.parse(localStorage.getItem('wallet'));
                         json2['keys'].forEach((key) => {
-                                var currentIndex = this.state.keys.findIndex(i => i.public_key === key['public_key'])
-                                key['safex_bal'] = this.state.keys[currentIndex].safex_bal;
-                                key['btc_bal'] = this.state.keys[currentIndex].btc_bal;
-                                key['pending_safex_bal'] = this.state.keys[currentIndex].pending_safex_bal;
-                                key['pending_btc_bal'] = this.state.keys[currentIndex].pending_btc_bal;
-
+                            var currentIndex = this.state.keys.findIndex(i => i.public_key === key['public_key'])
+                            key['safex_bal'] = this.state.keys[currentIndex].safex_bal;
+                            key['btc_bal'] = this.state.keys[currentIndex].btc_bal;
+                            key['pending_safex_bal'] = this.state.keys[currentIndex].pending_safex_bal;
+                            key['pending_btc_bal'] = this.state.keys[currentIndex].pending_btc_bal;
                         });
 
-                        this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
+                        this.setState({
+                            wallet: json2,
+                            keys: json2['keys'],
+                            is_loading: false
+                        });
                     } catch (e) {
                         alert('an error adding a key to the wallet contact team@safex.io')
                     }
@@ -1285,7 +1346,12 @@ export default class Wallet extends React.Component {
                             key['pending_safex_bal'] = this.state.keys[currentIndex].pending_safex_bal;
                             key['pending_btc_bal'] = this.state.keys[currentIndex].pending_btc_bal;
                         });
-                        this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
+
+                        this.setState({
+                            wallet: json2,
+                            keys: json2['keys'],
+                            is_loading: false
+                        });
                         this.prepareDisplay(json.keys[index]);
                     } catch (e) {
                         alert('An error occured while adding a key to the wallet. Please contact team@safex.io')
@@ -1334,7 +1400,7 @@ export default class Wallet extends React.Component {
     openAffiliateModal(e) {
         e.preventDefault();
         this.setState({
-            affiliate_active: true
+            affiliate_active: true,
         });
         this.closeHistoryModal();
         this.closeCoinModal();
@@ -1360,7 +1426,6 @@ export default class Wallet extends React.Component {
 
     safexDividendOnChange(e) {
         e.preventDefault();
-        console.log(e.target.value.total_trade_volume)
         if (e.target.name === "total_trade_volume") {
             var safexDividendYield = parseFloat(e.target.value) * (parseFloat(this.state.marketplaceFee) / 100) / parseFloat(this.state.safexMarketCap);
             this.setState({
@@ -1517,41 +1582,41 @@ export default class Wallet extends React.Component {
                     }
                 </div>
 
-                <div className="col-xs-12">
+                <div className="col-xs-12 amounts-wrap">
                     <div className="row amounts">
                         <div className="row amounts">
                             <div className="col-xs-5 amount-btns-wrap">
                                 <button onClick={() => this.removeFromArchive(key)}
                                     className={keys[key].archived === true
                                     || (!keys[key].hasOwnProperty('archived') && archive_active === true)
-                                        ? 'archive-button'
-                                        : 'archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
+                                        ? 'archive-button button-shine to-home-btn'
+                                        : 'archive-button button-shine hidden-xs hidden-sm hidden-md hidden-lg to-home-btn'}>
                                     <span>TO HOME</span>
                                 </button>
 
                                 <button onClick={() => this.sendToArchive(key)}
                                     className={keys[key].archived === false
                                     || (!keys[key].hasOwnProperty('archived') && archive_active === false)
-                                        ? 'archive-button button-shine'
-                                        : 'archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
+                                        ? 'archive-button button-shine to-archive-btn'
+                                        : 'archive-button button-shine hidden-xs hidden-sm hidden-md hidden-lg to-archive-btn'}>
                                     <span>TO ARCHIVE</span>
                                 </button>
                                 {
                                     this.state.history_overflow_active
                                     ?
                                         <button onClick={this.closeHistoryModal}
-                                            className='archive-button history-button button-shine'>
+                                            className='archive-button history-button button-shine history-btn'>
                                             <span>HISTORY</span>
                                         </button>
                                     :
                                         <button onClick={() => this.openHistoryModal(key)}
-                                            className='archive-button history-button button-shine'>
+                                            className='archive-button history-button button-shine history-btn'>
                                             <span>HISTORY</span>
                                         </button>
                                 }
 
                                 <button onClick={() => this.showPrivateModal(key)}
-                                    className='archive-button show-private-button button-shine'>
+                                    className='archive-button show-private-button button-shine show-private-btn'>
                                     <span>show private</span>
                                 </button>
                             </div>
@@ -1634,11 +1699,11 @@ export default class Wallet extends React.Component {
                             </div>
                             <div className="form-group fee-buttons">
                                 <span className={this.state.active_fee === 'slow'
-                                    ? 'slow slow-btn button-shine active'
-                                    : 'slow-btn button-shine'} onClick={this.feeChange.bind(this, 'slow')}>Slow</span>
+                                    ? 'slow slow-btn button-shine-orange active'
+                                    : 'slow-btn button-shine-orange'} onClick={this.feeChange.bind(this, 'slow')}>Slow</span>
                                 <span className={this.state.active_fee === 'med'
-                                    ? 'medium medium-btn button-shine active'
-                                    : 'medium-btn button-shine'} onClick={this.feeChange.bind(this, 'med')}>Med</span>
+                                    ? 'medium medium-btn button-shine-green active'
+                                    : 'medium-btn button-shine-green'} onClick={this.feeChange.bind(this, 'med')}>Med</span>
                                 <span className={this.state.active_fee === 'fast'
                                     ? 'fast fast-btn button-shine active'
                                     : 'fast-btn button-shine'} onClick={this.feeChange.bind(this, 'fast')}>Fast</span>
@@ -1654,6 +1719,7 @@ export default class Wallet extends React.Component {
                         </div>
                     </div>
                 </form>
+
                 <div className={this.state.collapse_open.receive_open && this.state.collapse_open.key === key
                     ? 'col-xs-12 receive active'
                     : 'col-xs-12 receive'}>
@@ -1662,16 +1728,15 @@ export default class Wallet extends React.Component {
                             X
                         </div>
                     </div>
-                    <div className="receive-address-wrap">
+                    <div className="col-xs-7 receive-address-wrap">
                         <label htmlFor="receive-address">Address:</label>
                         <input name="receive-address" value={keys[key].public_key}/>
-                    </div>
-                    <div className="col-xs-8 amount-wrap">
+
                         <label htmlFor="amount">Amount:</label>
                         <input type="amount" placeholder="1" onChange={this.amountChange.bind(this)}
-                           value={this.state.receive_amount}/>
+                               value={this.state.receive_amount}/>
                     </div>
-                    <div className="col-xs-4 qr-code-wrap">
+                    <div className="col-xs-5 qr-code-wrap">
                         <QRCode value={"bitcoin:" + keys[key].public_key + "?amount=" + this.state.receive_amount}/>
                     </div>
                 </div>
@@ -1706,7 +1771,7 @@ export default class Wallet extends React.Component {
                     <div className="col-xs-12 history-inner">
                         <h3>History <span className="close" onClick={this.closeHistoryModal}>X</span></h3>
                         <div id="history_txs">
-                            loading...
+                            <h5>Loading...</h5>
                         </div>
                     </div>
                 </div>
@@ -1715,7 +1780,10 @@ export default class Wallet extends React.Component {
                     ? 'overflow sendModal active'
                     : 'overflow sendModal'}>
                     <form className="container" onSubmit={this.sendCoins}>
-                        <h3>Sending <span className="close" onClick={this.closeCoinModal}>X</span></h3>
+                        <div className="head">
+                            <h3>Sending </h3>
+                            <span className="close" onClick={this.closeCoinModal}>X</span>
+                        </div>
                         <div className="currency">
                             <span>Currency:</span>
                             <img className={this.state.send_coin === 'safex'
@@ -1762,7 +1830,10 @@ export default class Wallet extends React.Component {
                     ? 'overflow sendModal active'
                     : 'overflow sendModal'}>
                     <form className="container"  onSubmit={this.closeSuccessModal}>
-                        <h3>Sent <span className="close" onClick={this.closeSuccessModal}>X</span></h3>
+                        <div className="head">
+                            <h3>Sent </h3>
+                            <span className="close" onClick={this.closeSuccessModal}>X</span>
+                        </div>
                         <div className="currency">
                             <span>Currency:</span>
                             <img className={this.state.send_coin === 'safex'
@@ -1794,7 +1865,7 @@ export default class Wallet extends React.Component {
                             <label htmlFor="txid">TX ID:</label>
                             <textarea name="txid" className="form-control" readOnly
                                 value={this.state.txid}  placeholder="Address"
-                                aria-describedby="basic-addon1" rows="4">
+                                aria-describedby="basic-addon1" rows="3">
                             </textarea>
                         </div>
                         <input type="hidden" readOnly name="private_key"
@@ -1835,9 +1906,9 @@ export default class Wallet extends React.Component {
                                 {
                                     this.state.wrong_old_password
                                     ?
-                                        <input type="password" className="form-control shake" name="old_pass" />
+                                        <input type="password" className="form-control shake" id="old_pass" name="old_pass" />
                                     :
-                                        <input type="password" className="form-control" name="old_pass" />
+                                        <input type="password" className="form-control" id="old_pass" name="old_pass" />
                                 }
                             </div>
                             <div className="form-group">
@@ -1845,9 +1916,9 @@ export default class Wallet extends React.Component {
                                 {
                                     this.state.wrong_new_password
                                     ?
-                                        <input type="password" className="form-control shake" name="new_pass" />
+                                        <input type="password" className="form-control shake" id="new_pass" name="new_pass" />
                                     :
-                                        <input type="password" className="form-control" name="new_pass"/>
+                                        <input type="password" className="form-control" id="new_pass" name="new_pass"/>
                                 }
                             </div>
                             <div className="form-group">
@@ -1855,20 +1926,21 @@ export default class Wallet extends React.Component {
                                 {
                                     this.state.wrong_repeat_password
                                     ?
-                                        <input type="password" className="form-control shake" name="repeat_pass"/>
+                                        <input type="password" className="form-control shake" id="repeat_pass" name="repeat_pass"/>
                                     :
-                                        <input type="password" className="form-control" name="repeat_pass"/>
+                                        <input type="password" className="form-control" id="repeat_pass" name="repeat_pass"/>
                                 }
                             </div>
-                            <div className="col-xs-12">
+                            <div className="col-xs-12 submit-wrap">
                                 <div className="row">
+                                    <button className="reset-btn button-shine" type="reset">Reset</button>
                                     <button className="submit-btn button-shine-green" type="submit">Submit</button>
                                 </div>
                             </div>
                         </form>
                         <button className="keys-btn button-shine" onClick={this.exportEncryptedWallet}>Export Encrypted Wallet <span className="blue-text">(.dat)</span></button>
                         <button className="keys-btn button-shine" onClick={this.exportUnencryptedWallet}>Export Unencrypted Keys</button>
-                        <button className="submit-btn button-shine" onClick={this.logout}>Logout</button>
+                        <button className="logout-btn button-shine-red" onClick={this.logout}>Logout</button>
                     </div>
                 </div>
                 <div className={this.state.dividend_active
@@ -1912,7 +1984,7 @@ export default class Wallet extends React.Component {
                             <label>
                                 Cost of Safex Holdings $
                             </label>
-                            <input type="text" name="safex_market_cap" value={this.state.holdingsByMarket}/>
+                            <input type="text" name="safex_holdings_by_market" value={this.state.holdingsByMarket}/>
                         </div>
                         <div className="form-group">
                             <label>

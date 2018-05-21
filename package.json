@@ -80,7 +80,7 @@
     ],
     "mac": {
       "category": "public.app-category.business",
-      "icon": "public/images/icons/wallet-icon.icns",
+      "icon": "public/images/icons/wallet-icon2.png",
       "type": "distribution",
       "target": [
         "dmg"
@@ -88,7 +88,7 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "public/images/icons/wallet-icon.ico",
+      "icon": "public/images/icons/wallet-icon2.png",
       "certificateFile": "../../../safexDevelopersCertificate.p12",
       "certificatePassword": ""
     },
