@@ -39,7 +39,7 @@ export default class Navigation extends React.Component {
                 console.log(resp.price_usd)
                 var safex = 0.02;
                 if (resp.price_usd !== null) {
-                    safex = parseFloat(resp.price_usd).toFixed(5);
+                    safex = parseFloat(resp.price_usd).toFixed(8);
                     this.setState({safex_price: safex});
                 }
                 localStorage.setItem('safex_price', safex);
@@ -68,7 +68,7 @@ export default class Navigation extends React.Component {
 
     render() {
 
-        return (<nav className="navbar navbar-default">
+        return (<nav className="navbar navbar-default bounceInDown">
             <div className="container">
                 <div className="navbar-header">
                     <button type="button" className="navbar-toggle collapsed" data-toggle="collapse"

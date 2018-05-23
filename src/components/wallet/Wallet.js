@@ -12,9 +12,7 @@ import {genkey} from '../../utils/keys';
 import QRCode from 'qrcode.react';
 import NumberFormat from 'react-number-format';
 
-
 import Navigation from '../Navigation';
-
 
 export default class Wallet extends React.Component {
     constructor(props) {
@@ -48,6 +46,21 @@ export default class Wallet extends React.Component {
             safex_price: 0,
             btc_price: 0,
 
+            //Dividend calculator
+            totalTradeVolume: 500000000,
+            marketplaceFee: 5,
+            marketplaceEarnings: 0,
+            safexMarketCap: 0,
+            safexDividendYield: 0,
+            safexDividendInfo: false,
+            safexHoldingsInfo: false,
+            safexHolding: 100000,
+            holdingsByMarket: 0,
+            holdingsYield: 0,
+            safexPrice: 0,
+            selectedAmount: 0,
+            safexQuantity: 0,
+
             //UI state
             btc_sync: false,
             safex_sync: false,
@@ -61,7 +74,13 @@ export default class Wallet extends React.Component {
             settings_active: false,
             refreshTimer: 0,
             refreshInterval: '',
-            status_text: 'Loading...'
+            status_text: 'Loading...',
+            dividend_active: false,
+            affiliate_active: false,
+            import_wrap_glow: false,
+            wrong_old_password: false,
+            wrong_new_password: false,
+            wrong_repeat_password: false,
         }
 
         this.createKey = this.createKey.bind(this);
@@ -80,6 +99,11 @@ export default class Wallet extends React.Component {
         this.sendFeeOnBlur = this.sendFeeOnBlur.bind(this);
         this.sendTotalAdjustCoinChange = this.sendTotalAdjustCoinChange.bind(this);
         this.closeSuccessModal = this.closeSuccessModal.bind(this);
+        this.openDividendModal = this.openDividendModal.bind(this);
+        this.closeDividendModal = this.closeDividendModal.bind(this);
+        this.openAffiliateModal = this.openAffiliateModal.bind(this);
+        this.closeAffiliateModal = this.closeAffiliateModal.bind(this);
+        this.closeSendReceiveModal = this.closeSendReceiveModal.bind(this);
 
         this.exportUnencryptedWallet = this.exportUnencryptedWallet.bind(this);
         this.exportEncryptedWallet = this.exportEncryptedWallet.bind(this);
@@ -95,6 +119,11 @@ export default class Wallet extends React.Component {
         this.setArchiveView = this.setArchiveView.bind(this);
         this.setHomeView = this.setHomeView.bind(this);
         this.removeFromArchive = this.removeFromArchive.bind(this);
+        this.importGlow = this.importGlow.bind(this);
+        this.importGlowDeactivate = this.importGlowDeactivate.bind(this);
+        this.wrongOldPassword = this.wrongOldPassword.bind(this);
+        this.wrongNewPassword = this.wrongNewPassword.bind(this);
+        this.wrongRepeatPassword = this.wrongRepeatPassword.bind(this);
     }
 
     logout() {
@@ -124,6 +153,37 @@ export default class Wallet extends React.Component {
     }
 
     componentWillMount() {
+        axios({method: 'post', url: 'https://safex.io/api/price/'}).then(res => {
+
+            var safex_price = parseFloat(res.data.price_usd);
+            var safex_dividend = (parseFloat(this.state.totalTradeVolume) *
+                (parseFloat(this.state.marketplaceFee) / 100) /
+                parseFloat(safex_price * 2147483647)) * 100;
+
+            var dividend_yield = (safex_price * 100000 * (safex_dividend / 100)).toFixed(2);
+            var holdings_market = safex_price * 100000;
+
+            this.setState({
+                holdingsYield: dividend_yield,
+                holdingsByMarket: holdings_market.toFixed(2),
+                safexPrice: safex_price,
+                safexMarketCap: (safex_price * 2147483647).toFixed(0),
+                safexDividendYield: safex_dividend.toFixed(2)
+            });
+        }).catch(function (error) {
+            console.log(error);
+        });
+
+        axios({method: 'get', url: 'https://api.coinmarketcap.com/v1/ticker/safe-exchange-coin/'}).then(res => {
+            var total_supply = res.data[0].total_supply;
+
+            this.setState({
+                safexQuantity: total_supply
+            });
+        }).catch(function(error) {
+            console.log(error);
+        });
+
         try {
             var json = JSON.parse(localStorage.getItem('wallet'));
             this.setState({wallet: json, keys: json['keys']});
@@ -142,7 +202,6 @@ export default class Wallet extends React.Component {
         clearInterval(this.timerID);
     }
 
-
     getFee() {
         fetch('http://omni.safex.io:3001/getfee')
             .then(resp => resp.text())
@@ -154,7 +213,7 @@ export default class Wallet extends React.Component {
                 this.setState({
                     btc_sync: false,
                     safex_sync: false,
-                    status_text: 'Sync error, try refreshing later'
+                    status_text: 'Sync error, please refresh again'
                 });
             });
     }
@@ -162,9 +221,7 @@ export default class Wallet extends React.Component {
     prepareDisplayPendingTx(keys = null) {
         var promises = [];
         if (keys === null) {
-            keys = this.state.keys.filter(function(item) {
-                return (item.archived == false || !item.hasOwnProperty("archived"))
-            })
+            keys = this.state.keys.slice();
         }
 
         if (!Array.isArray(keys)) {
@@ -181,14 +238,14 @@ export default class Wallet extends React.Component {
                 .then(resp => resp.json())
                 .then((resp) => {
                     return resp
-            }));
+                }));
         });
 
         Promise.all(promises).then(values => {
             var iteration = 0;
             for (var x = 0; x < values.length; x++) {
                 var currentIndex = this.state.keys.findIndex(i => i.public_key === keys[iteration]['public_key']);
-                this.state.keys[currentIndex].pending_safex_bal = values[iteration]
+                this.state.keys[currentIndex].pending_safex_bal = values[iteration];
                 iteration += 1;
             }
         });
@@ -197,9 +254,7 @@ export default class Wallet extends React.Component {
     prepareDisplay(keys = null) {
         var promises = [];
         if (keys === null) {
-            keys = this.state.keys.filter(function(item) {
-                return (item.archived == false || !item.hasOwnProperty("archived"))
-            })
+            keys = this.state.keys.slice();
         }
 
         if (!Array.isArray(keys)) {
@@ -213,6 +268,7 @@ export default class Wallet extends React.Component {
                 method: "POST",
                 body: JSON.stringify(json)
             })
+
                 .then(resp => resp.json())
                 .then((resp) => {
                     return resp
@@ -258,11 +314,10 @@ export default class Wallet extends React.Component {
             this.setState({
                 btc_sync: false,
                 safex_sync: false,
-                status_text: 'Synchronization error, try refreshing later'
+                status_text: 'Sync error, please refresh again'
             });
         });
     }
-
 
     sendCoins(e) {
         e.preventDefault();
@@ -272,6 +327,7 @@ export default class Wallet extends React.Component {
             try {
                 this.setState({
                     transaction_being_sent: true,
+                    settings_active: false,
                 });
 
                 //set the signing key for the transaction
@@ -307,18 +363,20 @@ export default class Wallet extends React.Component {
                     alert('network communication error, please try again later');
                     this.setState({
                         transaction_being_sent: false,
+
                     });
                 }
             } catch (e) {
                 //this is triggered if the destination address is not a valid bitcoin address
-                alert('invalid destination address');
+                alert('Invalid destination address');
             }
 
             //if safex is not selected then it must be Bitcoin
-        } else {
+        } else if(this.state.send_coin === 'btc') {
             try {  //open the modal by setting transaction_being_sent
                 this.setState({
                     transaction_being_sent: true,
+                    settings_active: false,
                 });
 
                 //set the signing key for the transaction
@@ -351,14 +409,14 @@ export default class Wallet extends React.Component {
                         });
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
-                    alert('network communication error, please try again later');
+                    alert('Network communication error, please try again later');
                     this.setState({
                         transaction_being_sent: false,
                     });
                 }
             } catch (e) {
                 //this is triggered if the destination address is not a valid bitcoin address
-                alert('invalid destination address');
+                alert('Invalid destination address');
             }
         }
     }
@@ -397,11 +455,11 @@ export default class Wallet extends React.Component {
                 this.setState({
                     transaction_sent: true,
                     transaction_being_sent: false,
-                    txid: resp
+                    txid: resp,
                 });
             });
+        this.closeSendReceiveModal();
     }
-
 
     formSafexTransaction(utxos, amount, fee, destination, key, source) {
         var running_total = 0;
@@ -423,7 +481,7 @@ export default class Wallet extends React.Component {
             tx.addOutput(source, (running_total - (700 + fee)));
         } else {
             check++; // no need check for source
-            checks = [destination]; 
+            checks = [destination];
         }
 
         var SafexTransaction = {};
@@ -457,7 +515,7 @@ export default class Wallet extends React.Component {
                     fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
                         .then(resp => resp.text())
                         .then((resp) => {
-                            if (resp=="") {
+                            if (resp === "") {
                                 throw "There was an error with the transaction.";
                             }
                             this.setState({
@@ -470,6 +528,7 @@ export default class Wallet extends React.Component {
                     alert("error with transaction")
                 }
             });
+        this.closeSendReceiveModal();
     }
 
     //TODO: needs more testing - safex not sent
@@ -519,8 +578,7 @@ export default class Wallet extends React.Component {
                     txid: resp
                 });
             });
-        }
-    
+    }
 
     createKey() {
         this.setState({is_loading: true});
@@ -544,16 +602,13 @@ export default class Wallet extends React.Component {
             alert('error parsing the wallet data')
         }
 
-
         json['keys'].push(key_json);
-
 
         var crypto = require('crypto'),
             algorithm = 'aes-256-ctr',
             password = localStorage.getItem('password');
 
         var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
-
 
         fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
             if (err) {
@@ -564,6 +619,7 @@ export default class Wallet extends React.Component {
                     var json2 = JSON.parse(localStorage.getItem('wallet'));
                     this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
                     this.prepareDisplay();
+                    this.closeHistoryModal();
                     alert('key added to wallet')
                 } catch (e) {
                     alert('an error adding a key to the wallet contact team@safex.io')
@@ -576,7 +632,7 @@ export default class Wallet extends React.Component {
     importKeyChange(e) {
         this.setState({
             import_key: e.target.value
-        })
+        });
     }
 
     importKey(e) {
@@ -646,14 +702,12 @@ export default class Wallet extends React.Component {
         } catch (e) {
             alert('invalid private key')
         }
-
-
+        this.closeHistoryModal();
     }
 
     exportUnencryptedWallet() {
-        alert("This will create a file where you can see your private keys. It is a very sensitive file Be responsible with it." +
-            "This file is not for importing. It is for showing you the private keys which you can bring into a new wallet." +
-            "You import keys using the 'import key' feature in another wallet.")
+        alert("This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is not for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the 'import key' feature in another wallet.");
+
         var wallet_data = JSON.parse(localStorage.getItem('wallet'));
         var nice_keys = "";
         var keys = wallet_data['keys'];
@@ -663,13 +717,12 @@ export default class Wallet extends React.Component {
             nice_keys += '\n';
         });
         var date = Date.now();
-        fileDownload(nice_keys, date + 'unsafex.txt');
 
+        fileDownload(nice_keys, date + 'unsafex.txt');
     }
 
     exportEncryptedWallet() {
-        alert("This will create an encrypted file that is your Safex Wallet. You use this file to import it into another wallet for use" +
-            "It requires a password, and if you lose the password your precious coins may be irrecoverable.")
+        alert("This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is not for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the 'import key' feature in another wallet.");
 
         fs.readFile(localStorage.getItem('wallet_path'), (err, fd) => {
             if (err) {
@@ -684,13 +737,11 @@ export default class Wallet extends React.Component {
         });
     }
 
-
     amountChange(receive_amount) {
         this.setState({
             receive_amount: receive_amount.value
         });
     }
-
 
     //This function is connected to Send expansion button and receive expansion button
     openSendReceive(key, sendreceive) {
@@ -756,11 +807,16 @@ export default class Wallet extends React.Component {
     }
 
     openHistoryModal(e) {
-        document.getElementById("history_txs").innerHTML = "loading...";
+        document.getElementById("history_txs").innerHTML = "<h5>Loading...</h5>";
         this.setState({
             history_overflow_active: true,
         })
         this.listTransactions(this.state.keys[e].public_key);
+        this.closeCoinModal();
+        this.closeSuccessModal();
+        this.closeSettingsModal();
+        this.closeDividendModal();
+        this.closeAffiliateModal();
     }
 
     //Activates send_overflow_active state which opens Modal screen displaying transaction pre-confirmation information
@@ -768,18 +824,19 @@ export default class Wallet extends React.Component {
         e.preventDefault();
         var key_btc_bal = 0;
         var key_safex_bal = 0;
+
         this.state.keys.map(key => {
             if (key.public_key === e.target.public_key.value) {
                 key_btc_bal = key.btc_bal;
                 key_safex_bal = key.safex_bal;
             }
-
         });
-        if ((this.state.send_coin === 'safex' & this.state.send_fee > key_btc_bal) | (this.state.send_coin === 'btc' & this.state.send_total > key_btc_bal)) {
+
+        if ((this.state.send_coin === 'safex' && this.state.send_fee > key_btc_bal) | (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal)) {
             alert('you do not have enough BTC to cover the fee');
-        } else if (this.state.send_coin === 'safex' & this.state.send_amount > key_safex_bal) {
+        } else if (this.state.send_coin === 'safex' && this.state.send_amount > key_safex_bal) {
             alert('you do not have enough SAFEX to cover this transaction');
-        } else if (this.state.send_coin === 'btc' & this.state.send_total > key_btc_bal) {
+        } else if (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal) {
             alert('you do not have enough BTC to cover this transaction');
         } else if (e.target.destination.value === '') {
             alert('destination field is empty');
@@ -792,23 +849,21 @@ export default class Wallet extends React.Component {
                     send_keys: {
                         public_key: e.target.public_key.value,
                         private_key: e.target.private_key.value
-                    }
+                    },
+                    dividend_active: false,
+                    affiliate_active: false
                 })
             } catch (e) {
                 alert('destination address is invalid');
             }
-
         }
-
     }
 
     changePassword(e) {
-
         e.preventDefault();
         var now_pass = e.target.old_pass.value;
         var new_pass = e.target.new_pass.value;
         var repeat_pass = e.target.repeat_pass.value;
-
 
         //check if the new password field is full
         if (new_pass.length > 0) {
@@ -869,21 +924,24 @@ export default class Wallet extends React.Component {
                                     });
                                 }
                             } else {
-                                alert('wrong password')
+                                alert('wrong password');
+                                this.wrongOldPassword();
                             }
                         } catch (e) {
                             alert('wrong password');
+                            this.wrongOldPassword();
                         }
                     }
                 });
             } else {
-                alert('new password does not match repeated password')
+                alert('new password does not match repeated password');
+                this.wrongRepeatPassword();
             }
         } else {
-            alert('new password field is empty')
+            alert('new password field is empty');
+            this.wrongNewPassword();
         }
     }
-
 
     closeCoinModal() {
         this.setState({
@@ -903,8 +961,7 @@ export default class Wallet extends React.Component {
         })
     }
 
-    closeSuccessModal(e) {
-        e.preventDefault();
+    closeSuccessModal() {
         this.setState({
             transaction_sent: false,
             send_overflow_active: false,
@@ -925,10 +982,18 @@ export default class Wallet extends React.Component {
         this.setState({
             settings_active: true
         });
-
+        this.closeHistoryModal();
+        this.closeCoinModal();
+        this.closeSuccessModal();
+        this.closeDividendModal();
+        this.closeAffiliateModal();
     }
 
     closeSettingsModal() {
+        document.getElementById('old_pass').value = '';
+        document.getElementById('new_pass').value = '';
+        document.getElementById('repeat_pass').value = '';
+
         this.setState({
             settings_active: false
         });
@@ -1068,45 +1133,164 @@ export default class Wallet extends React.Component {
         }
     }
 
+    //TODO: Add API for Bitcoin transactions
     listTransactions(key) {
         var render = '';
         var bodyFormData = new FormData();
+        var promises = [];
         bodyFormData.set('addr', key);
 
-        axios({
-            method: 'post',
-            url: 'https://api.omniexplorer.info/v1/transaction/address/0',
-            data: bodyFormData,
-            config: { 
-                headers: {'Content-Type': 'multipart/form-data', 'origin': '', 'referrer': '', 'referer': ''}
-            }
-        })
-          .then(function (response) {
-            localStorage.setItem("history_txs", JSON.stringify(response.data.transactions));
-            var history = JSON.stringify(response.data.transactions);
-            var render = '';
-                JSON.parse(history).forEach((tx) => {
-                    var direction = tx['referenceaddress'] === key ? "Received🔸" : "SENT🔻";
-                    var dateTime = new Date(tx['blocktime'] * 1000);
-                    var confirmations = tx['confirmations'] > 15 ? "(16/16)" : "("+ tx['confirmations'] + "/16)"
-                    render +=`
-                        <div className="col-xs-10 history" style="min-width:650px;margin-left:70px;">
-                            <span className="coin-name">SAFEX</span> `+ direction +` <pre class="date">` + dateTime + `</pre><br />
-                            <pre class="address"><b>TX</b> `+ tx['txid'] +`</pre><br /> 
-                            <pre class="address">`+ tx['sendingaddress'] +`</pre> ➡ <pre class="address">`+ tx['referenceaddress'] +`</pre>
-                        </div>
-                        <div className="col-xs-2">
-                            `+ tx['amount'] +` safex <br />
-                            `+ confirmations +` confirmations
-                        </div>`;
-                });
-                document.getElementById("history_txs").innerHTML = render; 
+        promises.push(
+            fetch('https://api.omniexplorer.info/v1/transaction/address/0', {
+                method: 'POST',
+                body: bodyFormData,
             })
-          .catch(function (error) {
-            console.log(error);
-            alert("Could not fetch tx history...");
-        });
+            .then(res => {
+                return res.json();
+            })
+        );
+
+        promises.push(
+            fetch(`https://chain.api.btc.com/v3/address/${key}/tx`)
+                .then(res => {
+                    return res.json();
+                })
+        );
+
+
+        // Promise.all(promises).then(responses =>
+        //     Promise.all(responses.map(res => re;s.json())).then(response => {
+        //         var txArray = [];
+        //         var historySafex = JSON.stringify(response[0].data.transactions);
+        //         var historyBitcoin = JSON.stringify(response[1]);
+        //
+        //         console.log(historySafex);
+        //         console.log(historyBitcoin);
+        //     })
+        // );
+
+        Promise.all(promises)
+            .then(function (response) {
+                var txArray = [];
+                var historySafex = response[0].transactions;
+                var historyBtc = response[1].data.list;
+                console.log(historySafex, historyBtc);
+                
+                // TODO: Continue from here
+                
+                /*txArray.push(historySafex);
+                txArray.push(historyBtc);
+
+                var safexDirection = txArray[0]['referenceaddress'] === key ? "Received" : "Sent";
+                var safexDateTime = new Date(txArray[0]['blocktime'] * 1000);
+                var safexConfirmations = txArray[0]['confirmations'] > 15 ? "(16/16)" : "(" + txArray[0]['confirmations'] + "/16)";
+
+
+                txArray.forEach((tx) => {
+
+                });*/
+
+            })
+            .catch(function (error) {
+                console.log(error);
+                alert("Could not fetch transaction history...");
+            });
+
     }
+
+    // listTransactions(key) {
+    //     var render = '';
+    //     var bodyFormData = new FormData();
+    //     bodyFormData.set('addr', key);
+    //
+    //     axios({
+    //         method: 'post',
+    //         url: 'https://api.omniexplorer.info/v1/transaction/address/0',
+    //         data: bodyFormData,
+    //         config: {
+    //             headers: {'Content-Type': 'multipart/form-data', 'origin': '', 'referrer': '', 'referer': ''}
+    //         }
+    //     })
+    //         .then(function (response) {
+    //             localStorage.setItem("history_txs", JSON.stringify(response.data.transactions));
+    //             var history = JSON.stringify(response.data.transactions);
+    //             var render = '';
+    //
+    //             JSON.parse(history).forEach((tx) => {
+    //                 var direction = tx['referenceaddress'] === key ? "Received" : "Sent";
+    //                 var dateTime = new Date(tx['blocktime'] * 1000);
+    //                 var confirmations = tx['confirmations'] > 15 ? "(16/16)" : "("+ tx['confirmations'] + "/16)";
+    //                 var coin = tx['propertyname'];
+    //
+    //                 if (direction === "Received" && coin === 'SafeExchangeCoin') {
+    //                     render +=`
+    //                 <div className="history">
+    //                     <p class="coin-name">SAFEX</p><br /> ` + direction + ` <br />
+    //                     <img class="coin-logo" src="images/coin-white.png" alt="Safex Coin">
+    //                     <p class="date">` + dateTime + `</p><br />
+    //                     <p class="address"><b>TX: </b> `+ tx['txid'] +`</p><br />
+    //                     <p class="address address-green">`+ tx['sendingaddress'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-green">`+ tx['referenceaddress'] +`</p>
+    //                 </div>
+    //                 <div className="col-xs-2">
+    //                     `+ tx['amount'] +` safex <br />
+    //                     `+ confirmations +` confirmations
+    //                 </div>`;
+    //                     console.log('safex received')
+    //                 } else if (direction === "Sent" && coin === 'SafeExchangeCoin') {
+    //                     render +=`
+    //                 <div class="history">
+    //                     <p class="coin-name">SAFEX</p><br /> ` + direction + ` <br />
+    //                     <img class="coin-logo" src="images/coin-white.png" alt="Safex Coin">
+    //                     <p class="date">` + dateTime + `</p><br />
+    //                     <p class="address"><b>TX: </b> `+ tx['txid'] +`</p><br />
+    //                     <p class="address address-blue">`+ tx['sendingaddress'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-blue">`+ tx['referenceaddress'] +`</p>
+    //                 </div>
+    //                 <div className="col-xs-2">
+    //                     `+ tx['amount'] +` safex <br />
+    //                     `+ confirmations +` confirmations
+    //                 </div>`;
+    //                     console.log('safex sent')
+    //                 } else if (direction === "Received" && coin === 'Bitcoin') {
+    //                     render +=`
+    //                 <div class="history">
+    //                     <p class="coin-name">BITCOIN</p><br /> ` + direction + ` <br />
+    //                     <img class="coin-logo" src="images/btc-coin.png" alt="Bitcoin Logo">
+    //                     <p class="date">` + dateTime + `</p><br />
+    //                     <p class="address"><b>TX: </b> `+ tx['txid'] +`</p><br />
+    //                     <p class="address address-green">`+ tx['sendingaddress'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-green">`+ tx['referenceaddress'] +`</p>
+    //                 </div>
+    //                 <div className="col-xs-2">
+    //                     `+ tx['amount'] +` bitcoin <br />
+    //                     `+ confirmations +` confirmations
+    //                 </div>`;
+    //                     console.log('bitcoin received')
+    //                 } else if (direction === "Sent" && coin === 'Bitcoin') {
+    //                     render +=`
+    //                 <div class="history">
+    //                     <p class="coin-name">BITCOIN</p><br /> ` + direction + ` <br />
+    //                     <img class="coin-logo" src="images/btc-coin.png" alt="Bitcoin Logo">
+    //                     <p class="date">` + dateTime + `</p><br />
+    //                     <p class="address"><b>TX: </b> `+ tx['txid'] +`</p><br />
+    //                     <p class="address address-blue">`+ tx['sendingaddress'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-blue">`+ tx['referenceaddress'] +`</p>
+    //                 </div>
+    //                 <div className="col-xs-2">
+    //                     `+ tx['amount'] +` bitcoin <br />
+    //                     `+ confirmations +` confirmations
+    //                 </div>`;
+    //                     console.log('bitcoin sent')
+    //                 }
+    //
+    //             });
+    //             if (response.data.transactions.length == 0) {
+    //                 render =`<h5>No transaction history</h5>`;
+    //             }
+    //             document.getElementById("history_txs").innerHTML = render;
+    //         })
+    //         .catch(function (error) {
+    //             console.log(error);
+    //             alert("Could not fetch transaction history...");
+    //         });
+    // }
 
     sendToArchive(index) {
         try {
@@ -1133,15 +1317,18 @@ export default class Wallet extends React.Component {
                     try {
                         var json2 = JSON.parse(localStorage.getItem('wallet'));
                         json2['keys'].forEach((key) => {
-                                var currentIndex = this.state.keys.findIndex(i => i.public_key === key['public_key'])
-                                key['safex_bal'] = this.state.keys[currentIndex].safex_bal;
-                                key['btc_bal'] = this.state.keys[currentIndex].btc_bal;
-                                key['pending_safex_bal'] = this.state.keys[currentIndex].pending_safex_bal;
-                                key['pending_btc_bal'] = this.state.keys[currentIndex].pending_btc_bal;
-
+                            var currentIndex = this.state.keys.findIndex(i => i.public_key === key['public_key'])
+                            key['safex_bal'] = this.state.keys[currentIndex].safex_bal;
+                            key['btc_bal'] = this.state.keys[currentIndex].btc_bal;
+                            key['pending_safex_bal'] = this.state.keys[currentIndex].pending_safex_bal;
+                            key['pending_btc_bal'] = this.state.keys[currentIndex].pending_btc_bal;
                         });
 
-                        this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
+                        this.setState({
+                            wallet: json2,
+                            keys: json2['keys'],
+                            is_loading: false
+                        });
                     } catch (e) {
                         alert('an error adding a key to the wallet contact team@safex.io')
                     }
@@ -1179,35 +1366,163 @@ export default class Wallet extends React.Component {
                     try {
                         var json2 = JSON.parse(localStorage.getItem('wallet'));
                         json2['keys'].forEach((key) => {
-                                var currentIndex = this.state.keys.findIndex(i => i.public_key === key['public_key'])
-                                key['safex_bal'] = this.state.keys[currentIndex].safex_bal;
-                                key['btc_bal'] = this.state.keys[currentIndex].btc_bal;
-                                key['pending_safex_bal'] = this.state.keys[currentIndex].pending_safex_bal;
-                                key['pending_btc_bal'] = this.state.keys[currentIndex].pending_btc_bal;
-
+                            var currentIndex = this.state.keys.findIndex(i => i.public_key === key['public_key'])
+                            key['safex_bal'] = this.state.keys[currentIndex].safex_bal;
+                            key['btc_bal'] = this.state.keys[currentIndex].btc_bal;
+                            key['pending_safex_bal'] = this.state.keys[currentIndex].pending_safex_bal;
+                            key['pending_btc_bal'] = this.state.keys[currentIndex].pending_btc_bal;
                         });
-                        this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
+
+                        this.setState({
+                            wallet: json2,
+                            keys: json2['keys'],
+                            is_loading: false
+                        });
                         this.prepareDisplay(json.keys[index]);
                     } catch (e) {
-                        alert('an error adding a key to the wallet contact team@safex.io')
+                        alert('An error occured while adding a key to the wallet. Please contact team@safex.io')
                     }
                 }
             });
         } catch (e) {
             alert('error parsing the wallet data')
         }
-
-
     }
 
     setArchiveView() {
-        this.setState({archive_active: true});
+        this.setState({
+            archive_active: true
+        });
+        this.closeSendReceiveModal();
+        this.closeHistoryModal();
     }
 
     setHomeView() {
-        this.setState({archive_active: false});
+        this.setState({
+            archive_active: false
+        });
+        this.closeSendReceiveModal();
+        this.closeHistoryModal();
     }
 
+    openDividendModal(e) {
+        e.preventDefault();
+        this.setState({
+            dividend_active: true
+        });
+        this.closeHistoryModal();
+        this.closeCoinModal();
+        this.closeSuccessModal();
+        this.closeSettingsModal();
+        this.closeAffiliateModal();
+    }
+
+    closeDividendModal() {
+        this.setState({
+            dividend_active: false
+        });
+    }
+
+    openAffiliateModal(e) {
+        e.preventDefault();
+        this.setState({
+            affiliate_active: true,
+        });
+        this.closeHistoryModal();
+        this.closeCoinModal();
+        this.closeSuccessModal();
+        this.closeSettingsModal();
+        this.closeDividendModal();
+    }
+
+    closeAffiliateModal() {
+        this.setState({
+            affiliate_active: false
+        });
+    }
+
+    closeSendReceiveModal() {
+        this.setState({
+            collapse_open: {
+                send_open: false,
+                receive_open: false
+            }
+        });
+    }
+
+    safexDividendOnChange(e) {
+        e.preventDefault();
+        if (e.target.name === "total_trade_volume") {
+            var safexDividendYield = parseFloat(e.target.value) * (parseFloat(this.state.marketplaceFee) / 100) / parseFloat(this.state.safexMarketCap);
+            this.setState({
+                totalTradeVolume: e.target.value,
+                safexDividendYield: (safexDividendYield * 100).toFixed(2)
+            })
+        } else if (e.target.name === "marketplace_fee") {
+            var safexDividendYield = (parseFloat(e.target.value) / 100) * parseFloat(this.state.totalTradeVolume) / parseFloat(this.state.safexMarketCap);
+            this.setState({
+                marketplaceFee: e.target.value,
+                safexDividendYield: (safexDividendYield * 100).toFixed(2)
+            })
+        } else if (e.target.name === "safex_market_cap") {
+            var safexDividendYield = (parseFloat(this.state.marketplaceFee) / 100) * parseFloat(this.state.totalTradeVolume) / parseFloat(e.target.value);
+            this.setState({
+                safexMarketCap: e.target.value,
+                safexDividendYield: (safexDividendYield * 100).toFixed(2)
+            })
+        } else if (e.target.name === "safex_holdings") {
+            var safexDividendYield = ((parseFloat(this.state.marketplaceFee) / 100) * parseFloat(this.state.totalTradeVolume) / 2147483647) * parseFloat(e.target.value) * (100 / (parseFloat(this.state.holdingsByMarket)));
+            this.setState({
+                safexHolding: e.target.value,
+                safexDividendYield: safexDividendYield.toFixed(2)
+            })
+        }
+    }
+
+    importGlow() {
+        this.setState({
+            import_wrap_glow: true
+        });
+    }
+
+    importGlowDeactivate() {
+        this.setState({
+            import_wrap_glow: false
+        });
+    }
+
+    wrongOldPassword() {
+        this.setState({
+            wrong_old_password: true
+        });
+        setTimeout(() => {
+            this.setState({
+                wrong_old_password: false
+            });
+        }, 1000)
+    }
+
+    wrongNewPassword() {
+        this.setState({
+            wrong_new_password: true
+        });
+        setTimeout(() => {
+            this.setState({
+                wrong_new_password: false
+            });
+        }, 1000)
+    }
+
+    wrongRepeatPassword() {
+        this.setState({
+            wrong_repeat_password: true
+        });
+        setTimeout(() => {
+            this.setState({
+                wrong_repeat_password: false
+            });
+        }, 1000)
+    }
 
     render() {
         const {keys, archive_active, safex_price, btc_price} = this.state;
@@ -1215,20 +1530,39 @@ export default class Wallet extends React.Component {
         var table = Object.keys(keys).map((key) => {
 
             return <div className={keys[key].archived === archive_active
-            | (!keys[key].hasOwnProperty('archived') && archive_active === false)
+            || (!keys[key].hasOwnProperty('archived') && archive_active === false)
                 ? 'col-xs-12 single-key'
                 : 'col-xs-12 single-key hidden-xs hidden-sm hidden-md hidden-lg'} key={key}>
                 <div className="col-xs-7">
                     <div className="key">{keys[key].public_key}</div>
+                    <span>
+                        {
+                            keys[key].pending_safex_bal > 0
+                            || keys[key].pending_safex_bal < 0
+                                ? ' (safex: pending ' + keys[key].pending_safex_bal + ')'
+                                : ''
+                        }
+                    </span>
+                    <span>
+                        {
+                            keys[key].pending_btc_bal > 0
+                            || keys[key].pending_btc_bal < 0
+                                ? ' (bitcoin: pending ' + keys[key].pending_btc_bal + ')'
+                                : ''
+                        }
+                    </span>
                 </div>
                 <div className="pull-right single-key-btns-wrap">
                     {
-                        this.state.collapse_open.send_open
-                        ?
-                            <div className="inner-btns-wrap">
+                        this.state.collapse_open.send_open && this.state.collapse_open.key === key
+                            ?
+                            <div>
                                 <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
-                                        onClick={this.openSendReceive.bind(this, key, 'send')} className="send-btn button-shine active">
-                                    <img src="images/outbox-white.png" alt="Outbox Logo"/>
+                                        onClick={this.openSendReceive.bind(this, key, 'send')}
+                                        className="send-btn button-shine active">
+                                    <span className="img-wrap">
+                                        <img src="images/outbox-white.png" alt="Outbox Logo"/>
+                                    </span>
                                     <span>SEND</span>
                                 </button>
                                 <button className="receive-btn button-shine disabled" onClick={this.openSendReceive.bind(this, key, 'receive')}>
@@ -1236,27 +1570,39 @@ export default class Wallet extends React.Component {
                                     <span>RECEIVE</span>
                                 </button>
                             </div>
-
-                        :
-                            <div className="inner-btns-wrap">
+                            :
+                            <div>
                                 <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
-                                        onClick={this.openSendReceive.bind(this, key, 'send')} className={this.state.collapse_open.receive_open ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
-                                    {
-                                        this.state.collapse_open.receive_open
-                                        ?
-                                            <img src="images/outbox-gray.png" alt="Outbox Logo"/>
-                                        :
-                                            <img src="images/outbox-blue.png" alt="Outbox Logo"/>
+                                        onClick={this.openSendReceive.bind(this, key, 'send')}
+                                        className={this.state.collapse_open.key === key && this.state.collapse_open.receive_open ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
 
+                                    {
+                                        this.state.collapse_open.key === key && this.state.collapse_open.receive_open
+                                            ?
+                                            <span className="img-wrap">
+                                                <img src="images/outbox-gray.png" alt="Outbox Logo"/>
+                                            </span>
+                                            :
+                                            <span className="img-wrap">
+                                            {
+                                                keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0
+                                                    ?
+                                                    <img src="images/outbox-blue.png" alt="Outbox Logo"/>
+                                                    :
+                                                    <img src="images/outbox-gray.png" alt="Outbox Logo"/>
+
+                                            }
+                                            </span>
                                     }
+
                                     <span>SEND</span>
                                 </button>
-                                <button className="receive-btn button-shine" onClick={this.openSendReceive.bind(this, key, 'receive')}>
+                                <button className="receive-btn button-shine-green" onClick={this.openSendReceive.bind(this, key, 'receive')}>
                                     {
-                                        this.state.collapse_open.receive_open
-                                        ?
+                                        this.state.collapse_open.key === key && this.state.collapse_open.receive_open
+                                            ?
                                             <img src="images/receive-white.png" alt="Inbox Logo"/>
-                                        :
+                                            :
                                             <img src="images/receive-blue.png" alt="Inbox Logo"/>
 
                                     }
@@ -1266,47 +1612,49 @@ export default class Wallet extends React.Component {
                     }
                 </div>
 
-                <div className={this.state.settings_active === true ? 'col-xs-12' : 'col-xs-9'}>
+                <div className="col-xs-12 amounts-wrap">
                     <div className="row amounts">
-                        
                         <div className="row amounts">
                             <div className="col-xs-5 amount-btns-wrap">
-                                <button onClick={() => this.sendToArchive(key)}
-                                        className={keys[key].archived === false
-                                        | (!keys[key].hasOwnProperty('archived') && archive_active === false)
-                                            ? 'archive-button button-shine'
-                                            : 'archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
-                                    <span>TO ARCHIVE</span>
-                                </button>
-                                <button onClick={() => this.openHistoryModal(key)}
-                                        className='archive-button history-button button-shine'>
-                                    <span>HISTORY</span>
-                                </button>
-                                <button onClick={() => this.showPrivateModal(key)}
-                                        className='archive-button show-private-button button-shine'>
-                                    <span>show private</span>
-                                </button>
-
-
                                 <button onClick={() => this.removeFromArchive(key)}
                                         className={keys[key].archived === true
-                                        | (!keys[key].hasOwnProperty('archived') && archive_active === true)
-                                            ? 'archive-button'
-                                            : 'archive-button hidden-xs hidden-sm hidden-md hidden-lg'}>
+                                        || (!keys[key].hasOwnProperty('archived') && archive_active === true)
+                                            ? 'archive-button button-shine to-home-btn'
+                                            : 'archive-button button-shine hidden-xs hidden-sm hidden-md hidden-lg to-home-btn'}>
                                     <span>TO HOME</span>
                                 </button>
+
+                                <button onClick={() => this.sendToArchive(key)}
+                                        className={keys[key].archived === false
+                                        || (!keys[key].hasOwnProperty('archived') && archive_active === false)
+                                            ? 'archive-button button-shine to-archive-btn'
+                                            : 'archive-button button-shine hidden-xs hidden-sm hidden-md hidden-lg to-archive-btn'}>
+                                    <span>TO ARCHIVE</span>
+                                </button>
+                                {
+                                    this.state.history_overflow_active
+                                        ?
+                                        <button onClick={this.closeHistoryModal}
+                                                className='archive-button history-button button-shine history-btn'>
+                                            <span>HISTORY</span>
+                                        </button>
+                                        :
+                                        <button onClick={() => this.openHistoryModal(key)}
+                                                className='archive-button history-button button-shine history-btn'>
+                                            <span>HISTORY</span>
+                                        </button>
+                                }
+
+                                <button onClick={() => this.showPrivateModal(key)}
+                                        className='archive-button show-private-button button-shine show-private-btn'>
+                                    <span>show private</span>
+                                </button>
                             </div>
-                            <div className="col-xs-3 amounts">
+                            <div className="amounts safex-amounts">
                                 <span className="col-xs-12 amount">
                                     <span>
                                         {
                                             parseFloat(keys[key].safex_bal)
-                                        }
-                                        {
-                                            keys[key].pending_safex_bal > 0
-                                            | keys[key].pending_safex_bal < 0
-                                                ? ' (pending ' + keys[key].pending_safex_bal + ')'
-                                                : ''
                                         }
                                     </span>
                                     <span className="coin-name">Safex</span>
@@ -1315,7 +1663,7 @@ export default class Wallet extends React.Component {
                                     </span>
                                 </span>
                             </div>
-                            <div className="col-xs-4 amounts">
+                            <div className="amounts bitcoin-amounts">
                                 <span className="col-xs-12 amount">
                                     <span>
                                         {
@@ -1323,24 +1671,16 @@ export default class Wallet extends React.Component {
                                                 ? (parseFloat(keys[key].btc_bal) + parseFloat(keys[key].pending_btc_bal)).toFixed(8)
                                                 : keys[key].btc_bal
                                         }
-                                        {
-                                            keys[key].pending_btc_bal > 0
-                                            | keys[key].pending_btc_bal < 0
-                                                ? ' (pending ' + keys[key].pending_btc_bal + ')'
-                                                : ''
-                                        }
                                     </span>
                                     <span className="coin-name">Bitcoin</span>
                                     <span>
                                         ${(keys[key].btc_bal * btc_price).toFixed(2)}
                                     </span>
-
                                 </span>
                             </div>
                         </div>
                     </div>
                 </div>
-
 
                 <form onSubmit={this.openCoinModal}
                       className={this.state.collapse_open.send_open && this.state.collapse_open.key === key
@@ -1356,15 +1696,13 @@ export default class Wallet extends React.Component {
                             <label htmlFor="which">Currency:</label>
                             <img className={this.state.send_coin === 'safex'
                                 ? 'coin active'
-                                : 'coin'} onClick={this.sendCoinChoose.bind(this, 'safex')} src="images/coin-white.png"
-                                 alt="Safex Coin"/>
+                                : 'coin'} onClick={this.sendCoinChoose.bind(this, 'safex')} src="images/coin-white.png"  alt="Safex Coin"/>
                             <img className={this.state.send_coin === 'btc'
                                 ? 'coin active'
-                                : 'coin'} onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
-                                 alt="Bitcoin Coin"/>
-                            <input type="hidden" name="which" readOnly value={this.state.send_coin}></input>
-                            <input type="hidden" name="private_key" readOnly value={keys[key].private_key}></input>
-                            <input type="hidden" name="public_key" readOnly value={keys[key].public_key}></input>
+                                : 'coin'} onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png" alt="Bitcoin Coin"/>
+                            <input type="hidden" name="which" readOnly value={this.state.send_coin} />
+                            <input type="hidden" name="private_key" readOnly value={keys[key].private_key} />
+                            <input type="hidden" name="public_key" readOnly value={keys[key].public_key} />
                             <div className="input-group">
                                 <span className="input-group-addon" id="basic-addon1">From:</span>
                                 <input name="from" type="text" className="form-control" placeholder="From"
@@ -1376,7 +1714,7 @@ export default class Wallet extends React.Component {
                                        aria-describedby="basic-addon1"/>
                             </div>
                         </div>
-                        <div className="col-xs-5">
+                        <div className="col-xs-5 send-right">
                             <div className="form-group">
                                 <label htmlFor="amount">Amount<span className={this.state.send_coin === "safex"
                                     ? ''
@@ -1391,26 +1729,27 @@ export default class Wallet extends React.Component {
                             </div>
                             <div className="form-group fee-buttons">
                                 <span className={this.state.active_fee === 'slow'
-                                    ? 'slow slow-btn button-shine active'
-                                    : 'slow-btn button-shine'} onClick={this.feeChange.bind(this, 'slow')}>Slow</span>
+                                    ? 'slow slow-btn button-shine-orange active'
+                                    : 'slow-btn button-shine-orange'} onClick={this.feeChange.bind(this, 'slow')}>Slow</span>
                                 <span className={this.state.active_fee === 'med'
-                                    ? 'medium medium-btn button-shine active'
-                                    : 'medium-btn button-shine'} onClick={this.feeChange.bind(this, 'med')}>Med</span>
+                                    ? 'medium medium-btn button-shine-green active'
+                                    : 'medium-btn button-shine-green'} onClick={this.feeChange.bind(this, 'med')}>Med</span>
                                 <span className={this.state.active_fee === 'fast'
                                     ? 'fast fast-btn button-shine active'
                                     : 'fast-btn button-shine'} onClick={this.feeChange.bind(this, 'fast')}>Fast</span>
                             </div>
                             <div className="form-group">
-                                <label htmlFor="total">Total:</label>
-                                <input type="number" name="total" readOnly value={this.state.send_total}></input>
+                                <label htmlFor="total" className="total-label">Total:</label>
+                                <input className="total-input" type="number" name="total" readOnly value={this.state.send_total} />
                             </div>
-                            <button type="submit" className="form-send-submit button-shine">
+                            <button type="submit" className="form-send-submit button-shine-green" onClick={this.closeSettingsModal}>
                                 <img src="images/outgoing.png" alt="Outgoing Icon"/>
                                 Send
                             </button>
                         </div>
                     </div>
                 </form>
+
                 <div className={this.state.collapse_open.receive_open && this.state.collapse_open.key === key
                     ? 'col-xs-12 receive active'
                     : 'col-xs-12 receive'}>
@@ -1419,22 +1758,16 @@ export default class Wallet extends React.Component {
                             X
                         </div>
                     </div>
-                    <div className="col-xs-12">
+                    <div className="col-xs-7 receive-address-wrap">
                         <label htmlFor="receive-address">Address:</label>
                         <input name="receive-address" value={keys[key].public_key}/>
-                    </div>
-                    <div className="col-xs-8">
+
                         <label htmlFor="amount">Amount:</label>
                         <input type="amount" placeholder="1" onChange={this.amountChange.bind(this)}
                                value={this.state.receive_amount}/>
                     </div>
-                    <div className="col-xs-4">
-                        <div className="row">
-                            <div className="col-xs-6">
-                                <QRCode
-                                    value={"bitcoin:" + keys[key].public_key + "?amount=" + this.state.receive_amount}/>
-                            </div>
-                        </div>
+                    <div className="col-xs-5 qr-code-wrap">
+                        <QRCode value={"bitcoin:" + keys[key].public_key + "?amount=" + this.state.receive_amount}/>
                     </div>
                 </div>
             </div>
@@ -1443,7 +1776,7 @@ export default class Wallet extends React.Component {
         return (
             <div className="wallet-page">
                 <Navigation/>
-                <div className="wallet-tabs">
+                <div className="wallet-tabs fadeIn">
                     <div onClick={this.setHomeView}
                          className={archive_active === false ? 'btn btn-default button-shine active' : 'btn btn-default button-shine'}>
                         Home
@@ -1454,178 +1787,258 @@ export default class Wallet extends React.Component {
                     </div>
                 </div>
                 <div className='container keys-container'>
-                    <div className={this.state.settings_active === true ? 'col-xs-12 sidebar-opened' : 'col-xs-12'}>
+                    <div className={this.state.settings_active || this.state.send_overflow_active || this.state.dividend_active || this.state.affiliate_active
+                        ? 'col-xs-12 sidebar-opened keys-wrap fadeIn'
+                        : 'col-xs-12 keys-wrap fadeIn'}>
                         <div className="row">
                             {table}
                         </div>
                     </div>
                 </div>
                 <div className={this.state.history_overflow_active
-                    ? 'overflow historyModal active'
+                    ? 'overflow historyModal fadeIn active'
                     : 'overflow historyModal'}>
-                    <div className="col-xs-12">
+                    <div className="col-xs-12 history-inner">
                         <h3>History <span className="close" onClick={this.closeHistoryModal}>X</span></h3>
-                            <div className="col-xs-12" id="history_txs">
-                                loading...
-                            </div>
+                        <div id="history_txs">
+                            <h5>Loading...</h5>
+                        </div>
                     </div>
                 </div>
 
-                <div className={this.state.send_overflow_active
+                <div className={this.state.send_overflow_active && this.state.transaction_sent === false
                     ? 'overflow sendModal active'
                     : 'overflow sendModal'}>
                     <form className="container" onSubmit={this.sendCoins}>
-                        <div className="col-xs-12">
-                            <h3>Sending <span className="close" onClick={this.closeCoinModal}>X</span></h3>
-                            <div className="col-xs-10 col-xs-offset-1">
-                                <div className="col-xs-12">
-                                    <div className="currency">
-                                        Currency: <img className={this.state.send_coin === 'safex'
-                                        ? 'coin'
-                                        : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                                       onClick={this.sendCoinChoose.bind(this, 'safex')}
-                                                       src="images/safex-coin.png" alt="Safex Coin"/>
-                                        <img className={this.state.send_coin === 'btc'
-                                            ? 'coin'
-                                            : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                             onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
-                                             alt="Bitcoin Coin"/>
-                                    </div>
-                                </div>
-                                <div className="input-group">
-                                    <span className="input-group-addon" id="basic-addon1">FROM:</span>
-                                    <input name="from" type="text" className="form-control" readOnly
-                                           value={this.state.send_keys.public_key} placeholder="Address"
-                                           aria-describedby="basic-addon1"/>
-                                </div>
-                                <div className="input-group">
-                                    <span className="input-group-addon" id="basic-addon1">TO:</span>
-                                    <input name="destination" type="text" className="form-control" readOnly
-                                           value={this.state.send_to} placeholder="Address"
-                                           aria-describedby="basic-addon1"/>
-                                </div>
-                                <input type="hidden" readOnly name="private_key"
-                                       value={this.state.send_keys.private_key}></input>
-                                <input type="hidden" readOnly name="public_key"
-                                       value={this.state.send_keys.public_key}></input>
-                                <div className="col-xs-6 col-xs-offset-3">
-                                    <div className="form-group">
-                                        <label htmlFor="amount">Amount:</label>
-                                        <input readOnly name="amount" value={this.state.send_amount}/>
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="fee">Fee(BTC):</label>
-                                        <input readOnly name="fee" value={this.state.send_fee}/>
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="total">Total:</label>
-                                        <input readOnly name="total" value={this.state.send_total}></input>
-                                    </div>
-                                    <button className=''
-                                            type="submit"> {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}</button>
-                                </div>
-                            </div>
+                        <div className="head">
+                            <h3>Sending </h3>
+                            <span className="close" onClick={this.closeCoinModal}>X</span>
                         </div>
+                        <div className="currency">
+                            <span>Currency:</span>
+                            <img className={this.state.send_coin === 'safex'
+                                ? 'coin'
+                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
+                                 onClick={this.sendCoinChoose.bind(this, 'safex')}
+                                 src="images/coin-white.png" alt="Safex Coin"/>
+                            <img className={this.state.send_coin === 'btc'
+                                ? 'coin'
+                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
+                                 onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
+                                 alt="Bitcoin Coin"/>
+                        </div>
+                        <div className="input-group">
+                            <label htmlFor="from">From:</label>
+                            <textarea name="from" className="form-control" readOnly aria-describedby="basic-addon1" value={this.state.send_keys.public_key}>
+                            </textarea>
+                        </div>
+                        <div className="input-group">
+                            <label htmlFor="destination">To:</label>
+                            <textarea name="destination" className="form-control" readOnly aria-describedby="basic-addon1" value={this.state.send_to}>
+                            </textarea>
+                        </div>
+                        <input type="hidden" readOnly name="private_key"
+                               value={this.state.send_keys.private_key} />
+                        <input type="hidden" readOnly name="public_key"
+                               value={this.state.send_keys.public_key} />
+                        <div className="form-group">
+                            <label htmlFor="amount">Amount:</label>
+                            <input readOnly name="amount" value={this.state.send_amount}/>
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="fee">Fee(BTC):</label>
+                            <input readOnly name="fee" value={this.state.send_fee}/>
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="total">Total:</label>
+                            <input readOnly name="total" value={this.state.send_total} />
+                        </div>
+                        <button className="confirm-btn button-shine-green" type="submit" disabled={this.state.transaction_being_sent ? 'disabled' : ''}> {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}</button>
                     </form>
                 </div>
                 <div className={this.state.transaction_sent
                     ? 'overflow sendModal active'
                     : 'overflow sendModal'}>
-                    <form className="container" onSubmit={this.closeSuccessModal}>
-                        <div className="col-xs-12">
-                            <h3>Sent <span className="close" onClick={this.closeSuccessModal}>X</span></h3>
-                            <div className="col-xs-10 col-xs-offset-1">
-                                <div className="col-xs-12">
-                                    <div className="currency">
-                                        Currency: <img className={this.state.send_coin === 'safex'
-                                        ? 'coin'
-                                        : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                                       onClick={this.sendCoinChoose.bind(this, 'safex')}
-                                                       src="images/safex-coin.png" alt="Safex Coin"/>
-                                        <img className={this.state.send_coin === 'btc'
-                                            ? 'coin'
-                                            : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                             onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
-                                             alt="Bitcoin Coin"/>
-                                    </div>
-                                </div>
-                                <div className="input-group">
-                                    <span className="input-group-addon" id="basic-addon1">FROM:</span>
-                                    <input name="from" type="text" className="form-control" readOnly
-                                           value={this.state.send_keys.public_key} placeholder="Address"
-                                           aria-describedby="basic-addon1"/>
-                                </div>
-                                <div className="input-group">
-                                    <span className="input-group-addon" id="basic-addon1">TO:</span>
-                                    <input name="destination" type="text" className="form-control" readOnly
-                                           value={this.state.send_to} placeholder="Address"
-                                           aria-describedby="basic-addon1"/>
-                                </div>
-                                <div className="input-group">
-                                    <span className="input-group-addon" id="basic-addon1">TX ID:</span>
-                                    <input name="destination" type="text" className="form-control" readOnly
-                                           value={this.state.txid} placeholder="Address"
-                                           aria-describedby="basic-addon1"/>
-                                </div>
-                                <input type="hidden" readOnly name="private_key"
-                                       value={this.state.send_keys.private_key}></input>
-                                <input type="hidden" readOnly name="public_key"
-                                       value={this.state.send_keys.public_key}></input>
-                                <div className="col-xs-6 col-xs-offset-3">
-                                    <div className="form-group">
-                                        <label htmlFor="amount">Amount:</label>
-                                        <input readOnly name="amount" value={this.state.send_amount}/>
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="fee">Fee(BTC):</label>
-                                        <input readOnly name="fee" value={this.state.send_fee}/>
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="total">Total:</label>
-                                        <input readOnly name="total" value={this.state.send_total}></input>
-                                    </div>
-                                    <button type="submit">Close X</button>
-                                </div>
-                            </div>
+                    <form className="container"  onSubmit={this.closeSuccessModal}>
+                        <div className="head">
+                            <h3>Sent </h3>
+                            <span className="close" onClick={this.closeSuccessModal}>X</span>
                         </div>
+                        <div className="currency">
+                            <span>Currency:</span>
+                            <img className={this.state.send_coin === 'safex'
+                                ? 'coin'
+                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
+                                 onClick={this.sendCoinChoose.bind(this, 'safex')}
+                                 src="images/coin-white.png" alt="Safex Coin"/>
+                            <img className={this.state.send_coin === 'btc'
+                                ? 'coin'
+                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
+                                 onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
+                                 alt="Bitcoin Coin"/>
+                        </div>
+                        <div className="input-group">
+                            <label htmlFor="from">From:</label>
+                            <textarea name="from" className="form-control" readOnly
+                                      value={this.state.send_keys.public_key} placeholder="Address"
+                                      aria-describedby="basic-addon1">
+                            </textarea>
+                        </div>
+                        <div className="input-group">
+                            <label htmlFor="destination">To:</label>
+                            <textarea name="destination" className="form-control" readOnly
+                                      value={this.state.send_to} placeholder="Address"
+                                      aria-describedby="basic-addon1">
+                            </textarea>
+                        </div>
+                        <div className="input-group">
+                            <label htmlFor="txid">TX ID:</label>
+                            <textarea name="txid" className="form-control" readOnly
+                                      value={this.state.txid}  placeholder="Address"
+                                      aria-describedby="basic-addon1" rows="3">
+                            </textarea>
+                        </div>
+                        <input type="hidden" readOnly name="private_key"
+                               value={this.state.send_keys.private_key} />
+                        <input type="hidden" readOnly name="public_key"
+                               value={this.state.send_keys.public_key} />
+                        <div className="form-group">
+                            <label htmlFor="amount">Amount:</label>
+                            <input readOnly name="amount" value={this.state.send_amount} />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="fee">Fee(BTC):</label>
+                            <input readOnly name="fee" value={this.state.send_fee} />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="total">Total:</label>
+                            <input readOnly name="total" value={this.state.send_total} />
+                        </div>
+                        <button type="submit" className="sent-close button-shine" onClick={this.closeSendReceiveModal}>Close</button>
                     </form>
                 </div>
-                <div className={this.state.settings_active
+                <div className={this.state.settings_active && this.state.send_overflow_active === false
                     ? 'overflow sendModal settingsModal active'
                     : 'overflow sendModal settingsModal'}>
-                    <form className="container" onSubmit={this.closeSettingsModal}>
-                        <div className="col-xs-12">
-                            <h3>Settings <span className="close" onClick={this.closeSettingsModal}>X</span></h3>
-                            <div className="col-xs-10 col-xs-offset-1">
-                                <form className="col-xs-12" onSubmit={this.changePassword}>
-                                    <div className="form-group">
-                                        <label htmlFor="old_pass">Old Password:</label>
-                                        <input type="password" name="old_pass"/>
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="new_pass">New Password:</label>
-                                        <input type="password" name="new_pass"/>
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="repeat_pass">Repeat Password:</label>
-                                        <input type="password" name="repeat_pass"/>
-                                    </div>
-                                    <div className="col-xs-12">
-                                        <div className="row">
-                                            <button type="submit">Submit</button>
-                                        </div>
-                                    </div>
-                                </form>
-                                <div className="col-xs-12">
-                                    <button onClick={this.exportEncryptedWallet}>Export Encrypted Wallet (.dat)</button>
-                                    <button onClick={this.exportUnencryptedWallet}>Export Unencrypted Keys</button>
-                                    <button onClick={this.logout}>Logout</button>
+                    <div className="container form-wrap">
+                        <div className="head">
+                            <img src="images/mixer.png" alt="Transfer Icon"/>
+                            <h3>
+                                User<br />
+                                Settings
+                            </h3>
+                            <span className="close" onClick={this.closeSettingsModal}>X</span>
+                        </div>
+
+                        <form onSubmit={this.changePassword}>
+                            <div className="form-group">
+                                <label htmlFor="old_pass">Old Password:</label>
+                                {
+                                    this.state.wrong_old_password
+                                        ?
+                                        <input type="password" className="form-control shake" id="old_pass" name="old_pass" />
+                                        :
+                                        <input type="password" className="form-control" id="old_pass" name="old_pass" />
+                                }
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="new_pass">New Password:</label>
+                                {
+                                    this.state.wrong_new_password
+                                        ?
+                                        <input type="password" className="form-control shake" id="new_pass" name="new_pass" />
+                                        :
+                                        <input type="password" className="form-control" id="new_pass" name="new_pass"/>
+                                }
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="repeat_pass">Repeat Password:</label>
+                                {
+                                    this.state.wrong_repeat_password
+                                        ?
+                                        <input type="password" className="form-control shake" id="repeat_pass" name="repeat_pass"/>
+                                        :
+                                        <input type="password" className="form-control" id="repeat_pass" name="repeat_pass"/>
+                                }
+                            </div>
+                            <div className="col-xs-12 submit-wrap">
+                                <div className="row">
+                                    <button className="reset-btn button-shine" type="reset">Reset</button>
+                                    <button className="submit-btn button-shine-green" type="submit">Submit</button>
                                 </div>
                             </div>
+                        </form>
+                        <button className="keys-btn button-shine" onClick={this.exportEncryptedWallet}>Export Encrypted Wallet <span className="blue-text">(.dat)</span></button>
+                        <button className="keys-btn button-shine" onClick={this.exportUnencryptedWallet}>Export Unencrypted Keys</button>
+                        <button className="logout-btn button-shine-red" onClick={this.logout}>Logout</button>
+                    </div>
+                </div>
+                <div className={this.state.dividend_active
+                    ? 'overflow sendModal dividendModal active'
+                    : 'overflow sendModal dividendModal'}>
+                    <form className="container" onChange={this.safexDividendOnChange.bind(this)}>
+                        <div className="head">
+                            <img src="images/dividend-logo.png" alt="Transfer Icon"/>
+                            <h3>
+                                Dividend<br />
+                                Calculator
+                            </h3>
+                            <span className="close" onClick={this.closeDividendModal}>X</span>
+                        </div>
+
+                        <div className="form-group">
+                            <label>
+                                Projected Marketplace Volume $
+                            </label>
+                            <input type="text" name="total_trade_volume" value={this.state.totalTradeVolume}/>
+                        </div>
+                        <div className="form-group">
+                            <label>
+                                Marketplace Fee %
+                            </label>
+                            <input type="text" name="marketplace_fee" value={this.state.marketplaceFee}/>
+                        </div>
+                        <div className="form-group">
+                            <label>
+                                Safex Market Cap $
+                            </label>
+                            <input type="text" name="safex_market_cap" value={this.state.safexMarketCap}/>
+                        </div>
+                        <div className="form-group">
+                            <label>
+                                Number of SAFEX Held
+                            </label>
+                            <input type="text" name="safex_holdings" value={this.state.safexHolding}/>
+                        </div>
+                        <div className="form-group">
+                            <label>
+                                Cost of Safex Holdings $
+                            </label>
+                            <input type="text" name="safex_holdings_by_market" value={this.state.holdingsByMarket} readOnly/>
+                        </div>
+                        <div className="form-group">
+                            <label>
+                                Annual Return on Investment %
+                            </label>
+                            <input type="text" name="safex_dividend_yield" value={this.state.safexDividendYield}/>
                         </div>
                     </form>
                 </div>
-                <div className="container key-buttons status">
+                <div className={this.state.affiliate_active
+                    ? 'overflow sendModal affiliateModal active'
+                    : 'overflow sendModal affiliateModal'}>
+                    <form className="container">
+                        <div className="head">
+                            <img src="images/affiliate-logo.png" alt="Transfer Icon"/>
+                            <h3>
+                                Affiliate<br />
+                                System
+                            </h3>
+                            <span className="close" onClick={this.closeAffiliateModal}>X</span>
+                        </div>
+                    </form>
+                </div>
+                <div className="container key-buttons status bounceInUp">
                     <div className="status-left-wrap">
                         <span>Status:</span>
                         <span className={this.state.safex_sync
@@ -1637,43 +2050,64 @@ export default class Wallet extends React.Component {
                         <img src="images/transfer.png" alt="Transfer Icon"/>
                         <span className="sync-span">{this.state.status_text}</span>
                     </div>
-                    <div className="import-form-wrap">
+                    <div className={this.state.import_wrap_glow ? 'import-form-wrap active' :'import-form-wrap'}>
                         <form onChange={this.importKeyChange} onSubmit={this.importKey}>
-                            <input name="key" value={this.state.import_key}></input>
+                            <input name="key" value={this.state.import_key} onFocus={this.importGlow} onBlur={this.importGlowDeactivate} />
                             <button type="submit" className="button-shine" title="Import Key">Import</button>
                         </form>
                         <button onClick={this.createKey} className="create-btn button-shine" title="Create New Key">
-                            <img src="images/plus.png"/>
+                            <img src="images/plus.png" alt="Plus Logo"/>
                         </button>
                     </div>
                     <div className="right-options">
-                        {/*<button className="button-shine">*/}
-                            {/*<img src="images/plus.png"/>*/}
-                        {/*</button>*/}
-                        <button className="button-shine" title="">
-                            <img src="images/world.png"/>
-                        </button>
-                        <button className="button-shine" title="Dividends calculator">
-                            <img src="images/calculator.png"/>
-                        </button>
                         {
-                            this.state.settings_active === true
-                            ?
-                                <button className="settings button-shine" onClick={this.closeSettingsModal} title="Settings">
-                                    <img src="images/mixer.png"/>
+                            this.state.affiliate_active
+                                ?
+                                <button className="aff-btn aff-btn-active button-shine" title="Affiliate System" onClick={this.closeAffiliateModal}>
+                                    <img src="images/world-blue.png" alt="World Logo"/>
                                 </button>
-                            :
-                                <button className="settings button-shine" onClick={this.openSettingsModal} title="Settings">
-                                    <img src="images/mixer.png"/>
+                                :
+                                <button className="aff-btn button-shine" title="Affiliate System" onClick={this.openAffiliateModal}>
+                                    <img src="images/world.png" alt="World Logo"/>
                                 </button>
                         }
 
-                        <button className={this.state.refreshTimer === 0
-                            ? 'refresh-button button-shine'
-                            : 'refresh-button button-shine disabled'} onClick={this.refreshWallet} title="Refresh">
-                            <img src="images/refresh.png"/>
-                            <span><p>{this.state.refreshTimer + 's'}</p></span>
-                        </button>
+                        {
+                            this.state.dividend_active
+                                ?
+                                <button className="dividend-btn dividend-btn-active button-shine" title="Dividend Calculator" onClick={this.closeDividendModal}>
+                                    <img src="images/calculator-blue.png" alt="Calculator Logo"/>
+                                </button>
+                                :
+                                <button className="dividend-btn button-shine" title="Dividend Calculator" onClick={this.openDividendModal}>
+                                    <img src="images/calculator.png" alt="Calculator Logo"/>
+                                </button>
+                        }
+
+                        {
+                            this.state.settings_active
+                                ?
+                                <button className="settings button-shine settings-btn-active" onClick={this.closeSettingsModal} title="Settings">
+                                    <img src="images/mixer-blue.png" alt="Mixer Logo"/>
+                                </button>
+                                :
+                                <button className="settings button-shine" onClick={this.openSettingsModal} title="Settings">
+                                    <img src="images/mixer.png" alt="Mixer Logo"/>
+                                </button>
+                        }
+
+                        {
+                            this.state.refreshTimer === 0
+                                ?
+                                <button className="refresh-btn button-shine"  onClick={this.refreshWallet} title="Refresh">
+                                    <img src="images/refresh.png" alt="Refresh Logo"/>
+                                </button>
+                                :
+                                <button className="refresh-btn button-shine disabled" title="Refresh">
+                                    <img src="images/refresh-blue.png" alt="Refresh Logo"/>
+                                    <span><p>{this.state.refreshTimer + 's'}</p></span>
+                                </button>
+                        }
                     </div>
                 </div>
             </div>

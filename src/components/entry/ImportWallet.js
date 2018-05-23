@@ -19,11 +19,24 @@ export default class ImportWallet extends React.Component {
 
         this.state = {
             filename: file,
-            path: ''
+            path: '',
+            wrong_password: false
         }
 
+        this.wrongPassword = this.wrongPassword.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    wrongPassword() {
+        this.setState({
+            wrong_password: true
+        });
+        setTimeout(() => {
+            this.setState({
+                wrong_password: false
+            });
+        }, 1000)
     }
 
     handleChange(e) {
@@ -75,6 +88,7 @@ export default class ImportWallet extends React.Component {
                 this.context.router.push('/wallet');
             }
         });
+        this.wrongPassword();
     }
 
     render() {
@@ -92,13 +106,19 @@ export default class ImportWallet extends React.Component {
                         <div className="col-xs-12 fileandpass">
                             <p>Selected File:</p>
                             <p className="filename">{this.state.filename}</p>
-                            <input type="password" name="password" placeholder="Enter Password" />
+
+                            {
+                                this.state.wrong_password
+                                ?
+                                    <input type="password" className="form-control shake" name="password" placeholder="Enter Password" />
+                                :
+                                    <input type="password" className="form-control" name="password" placeholder="Enter Password" />
+                            }
                         </div>
                         <button className="btn btn-default button-neon-green" type="submit">IMPORT </button>
                     </form>
                     <p className="text-center">
-                        Write password down and <br />
-                        NEVER lose it.
+                        Write password down and NEVER lose it.
                     </p>
                 </div>
                 <div className="col-xs-12 text-center Intro-footer">

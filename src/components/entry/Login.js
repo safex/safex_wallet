@@ -8,8 +8,24 @@ export default class Login extends React.Component {
 
     constructor(props) {
         super(props);
-        this.handleSubmit = this.handleSubmit.bind(this);
 
+        this.state = {
+            wrong_password: false
+        };
+
+        this.wrongPassword = this.wrongPassword.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    wrongPassword() {
+        this.setState({
+            wrong_password: true
+        });
+        setTimeout(() => {
+            this.setState({
+                wrong_password: false
+            });
+        }, 1000)
     }
 
     handleSubmit(e) {
@@ -33,15 +49,14 @@ export default class Login extends React.Component {
 
                 this.context.router.push('/wallet');
             } else {
-
+                this.wrongPassword();
                 console.log('wrong password');
             }
 
         } catch (e) {
-            alert('wrong password');
+            this.wrongPassword();
             console.log('error parsing wallet');
         }
-
     }
 
     //here we load up the wallet into the local storage and move on with life.
@@ -51,11 +66,17 @@ export default class Login extends React.Component {
                <div className="col-xs-12 Login-logo">
                    <h2>Safex</h2>
                    <h3>Wallet</h3>
-                   <Link className="back-button" to="/"><img src="images/back.png" /> Back</Link>
+                   <Link className="back-button" to="/"><img src="images/back.png" alt="back button"/> Back</Link>
                </div>
                <div className="col-xs-12 Login-form">
                     <form className="form-group" onSubmit={this.handleSubmit}>
-                        <input className="form-control" type="password" name="password" placeholder="Enter Password" />
+                        {
+                            this.state.wrong_password
+                            ?
+                                <input className="form-control shake" type="password" name="password" placeholder="Enter Password" />
+                            :
+                                <input className="form-control" type="password" name="password" placeholder="Enter Password" />
+                        }
                         <button className="btn btn-default button-neon-blue" type="submit">Proceed </button>
                     </form>
                </div>
@@ -67,7 +88,6 @@ export default class Login extends React.Component {
         );
     }
 }
-
 
 Login.contextTypes = {
     router: React.PropTypes.object.isRequired
