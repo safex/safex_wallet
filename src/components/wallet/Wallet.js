@@ -1144,19 +1144,18 @@ export default class Wallet extends React.Component {
             fetch('https://api.omniexplorer.info/v1/transaction/address/0', {
                 method: 'POST',
                 body: bodyFormData,
-                //mode: 'no-cors'
             })
             .then(res => {
                 return res.json();
             })
         );
 
-        // promises.push(
-        //     fetch(`https://chain.api.btc.com/v3/address/${key}/tx`)
-        //         .then(res => {
-        //             return res.json();
-        //         })
-        // );
+        promises.push(
+            fetch(`https://chain.api.btc.com/v3/address/${key}/tx`)
+                .then(res => {
+                    return res.json();
+                })
+        );
 
 
         // Promise.all(promises).then(responses =>
@@ -1173,9 +1172,13 @@ export default class Wallet extends React.Component {
         Promise.all(promises)
             .then(function (response) {
                 var txArray = [];
-                var historySafex = JSON.stringify(response[0].data.transactions);
-                var historyBtc = JSON.stringify(response[1]);
-                txArray.push(historySafex);
+                var historySafex = response[0].transactions;
+                var historyBtc = response[1].data.list;
+                console.log(historySafex, historyBtc);
+                
+                // TODO: Continue from here
+                
+                /*txArray.push(historySafex);
                 txArray.push(historyBtc);
 
                 var safexDirection = txArray[0]['referenceaddress'] === key ? "Received" : "Sent";
@@ -1185,7 +1188,7 @@ export default class Wallet extends React.Component {
 
                 txArray.forEach((tx) => {
 
-                });
+                });*/
 
             })
             .catch(function (error) {
