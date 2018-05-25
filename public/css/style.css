@@ -290,6 +290,7 @@ body{
   margin-bottom: 10px;
   border-radius: 10px;
   line-height: 60px;
+  color: #fff;
   box-shadow: none;
   -webkit-box-shadow: none;
   transition: all ease 0.3s;
@@ -447,7 +448,7 @@ body{
   color: #fff;
   padding: 5px 0 0 0;
   border-radius: 10px;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
   border-top: 1px solid rgba(0, 126, 162, .52);
   border-right: 1px solid rgba(0, 126, 162, .52);
   border-bottom: 1px solid rgba(0, 126, 162, .52);
@@ -655,19 +656,17 @@ body{
   padding: 5px 15px;
 }
 .form-send .form-send-submit {
-  /*background: url(../images/btn-bg.png);*/
-  background: rgba(0, 16, 25, .47);
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
+  background: #12bedd;
   color: #fff;
   text-transform: uppercase;
   font-size: 17px;
   float: right;
   margin-top: 10px;
   margin-right: 0;
-  padding: 4px 10px;
+  padding: 5px 10px 6px;
   border: 1px solid rgba(0, 231, 255, .44);
   border-radius: 8px;
+  line-height: 1.2;
 }
 .form-send .form-send-submit img {
   position: relative;
@@ -675,9 +674,6 @@ body{
   top: -3px;
   margin-right: 10px;
   height: 17px;
-}
-.form-send .form-send-submit:hover {
-  background: #0ec8c1;
 }
 .form-send .form-group {
   width: 100%;
@@ -737,8 +733,7 @@ body{
   text-align: left;
   border-radius: 0px;
   padding-bottom: 0px;
-  padding-left: 5px;
-  margin-left: 10px;
+  padding-left: 3px;
   font-size: 14px;
   transition: all ease 0.2s;
   -o-transition: all ease 0.2s;
@@ -780,7 +775,9 @@ body{
   font-size: 16px;
   position: relative;
   top: 3px;
-  width: 50px;
+  left: 0;
+  width: 58px;
+  padding-right: 8px;
 }
 .form-send .send-right {
   padding-left: 0;
@@ -795,8 +792,6 @@ body{
 .receive{
   height: 0;
   overflow: hidden;
-  padding-left: 10px;
-  padding-right: 10px;
   transition: all 0.4s;
   top: 1px;
   visibility: hidden;
@@ -841,6 +836,10 @@ body{
   -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 10px rgba(84, 188, 217, 1) !important;
   box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 10px rgba(84, 188, 217, 1) !important;
   border: 1px solid #00e7ff !important;
+}
+.receive .receive-address-wrap {
+  padding-left: 10px;
+  padding-right: 0;
 }
 .receive .qr-code-wrap {
   text-align: center;
@@ -1232,7 +1231,7 @@ input::-webkit-inner-spin-button {
 }
 .keys-container {
   overflow: hidden;
-  height: calc(100% - 240px);
+  height: calc(100% - 210px);
 }
 .keys-container .keys-wrap {
   overflow-y: auto;
@@ -1245,7 +1244,7 @@ input::-webkit-inner-spin-button {
   transition: width .3s;
 }
 .keys-container .keys-wrap .row:hover .single-key {
-  opacity: .75;
+  opacity: .7;
 }
 .keys-container .keys-wrap .row:hover .single-key:hover{
   opacity: 1;
@@ -1713,6 +1712,9 @@ input::-webkit-inner-spin-button {
   -webkit-transition: all ease 0.3s;
   width: calc(100% - 20px);
   margin: 10px auto;
+}
+#history_txs .history {
+  height: 166px;
 }
 #history_txs > div:hover {
   outline: 0px none;

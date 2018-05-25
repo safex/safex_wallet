@@ -36,7 +36,6 @@ export default class Navigation extends React.Component {
         .then(resp => resp.json())
         .then((resp) => {
             try {
-                console.log(resp.price_usd)
                 var safex = 0.02;
                 if (resp.price_usd !== null) {
                     safex = parseFloat(resp.price_usd).toFixed(8);

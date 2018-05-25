@@ -75,7 +75,7 @@ export default class SelectWallet extends React.Component {
         alert('This feature is only if you want to delete a wallet and start over. This is not for upgrading ' +
             'wallet versions.');
         alert('This is not necessary for upgrading wallet versions.');
-        alert('PROCEED WITH CAUTION THIS PROCESS WILL DELETE YOUR EXISTING WALLET');
+        alert('PROCEED WITH CAUTION THIS PROCESS WILL DELETE YOUR EXISTING WALLET.');
         alert('This procedure will reset the wallet. It will take you through steps to backup the existing wallet.' +
             'Then the existing wallet will be deleted to make room for a new one. PROCEED WITH CAUTION!!');
         alert('If you pushed this by mistake you will see a white "x" in the top right in a following screen.');
@@ -304,11 +304,13 @@ export default class SelectWallet extends React.Component {
                     ? 'overflow sendModal walletResetModal active'
                     : 'overflow sendModal walletResetModal'}>
                     <div className="container">
-                        <h3>Wallet Reset Back Up Unencrypted Keys
+                        <h3>Back Up Unencrypted Keys
                             <span onClick={this.walletResetClose} className="close">X</span>
                         </h3>
-                        <p>You do not need to do this for upgrading wallet versions.
-                            If you have your password and want to backup your keys unencrypted press proceed, otherwise press skip</p>
+                        <p>
+                            You do not need to do this for upgrading wallet versions.
+                            If you have your password and want to backup your keys unencrypted press proceed, otherwise press skip.
+                        </p>
                         <button className="keys-btn button-shine" onClick={this.walletResetStep1Skip}>Skip</button>
                         <button className="keys-btn button-shine" onClick={this.walletResetStep1Proceed}>Proceed</button>
                     </div>

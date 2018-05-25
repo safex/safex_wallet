@@ -919,7 +919,10 @@ export default class Wallet extends React.Component {
                                             //set the active password and wallet to the new file
                                             localStorage.setItem('password', new_pass);
                                             localStorage.setItem('wallet', decrypted_wallet);
-                                            alert('password has been changed')
+                                            alert('password has been changed');
+                                            document.getElementById('old_pass').value = '';
+                                            document.getElementById('new_pass').value = '';
+                                            document.getElementById('repeat_pass').value = '';
                                         }
                                     });
                                 }
@@ -1133,7 +1136,6 @@ export default class Wallet extends React.Component {
         }
     }
 
-    //TODO: Add API for Bitcoin transactions
     listTransactions(key) {
         var render = '';
         var bodyFormData = new FormData();
@@ -1151,45 +1153,149 @@ export default class Wallet extends React.Component {
         );
 
         promises.push(
-            fetch(`https://chain.api.btc.com/v3/address/${key}/tx`)
+            fetch(`http://bitcoin.safex.io:3001/insight-api/txs/?address=${key}`)
                 .then(res => {
                     return res.json();
                 })
         );
 
-
-        // Promise.all(promises).then(responses =>
-        //     Promise.all(responses.map(res => re;s.json())).then(response => {
-        //         var txArray = [];
-        //         var historySafex = JSON.stringify(response[0].data.transactions);
-        //         var historyBitcoin = JSON.stringify(response[1]);
-        //
-        //         console.log(historySafex);
-        //         console.log(historyBitcoin);
-        //     })
-        // );
-
         Promise.all(promises)
             .then(function (response) {
-                var txArray = [];
                 var historySafex = response[0].transactions;
-                var historyBtc = response[1].data.list;
-                console.log(historySafex, historyBtc);
-                
-                // TODO: Continue from here
-                
-                /*txArray.push(historySafex);
-                txArray.push(historyBtc);
+                var historyBtc = response[1].txs;
+                var render = '';
 
-                var safexDirection = txArray[0]['referenceaddress'] === key ? "Received" : "Sent";
-                var safexDateTime = new Date(txArray[0]['blocktime'] * 1000);
-                var safexConfirmations = txArray[0]['confirmations'] > 15 ? "(16/16)" : "(" + txArray[0]['confirmations'] + "/16)";
+                historyBtc.unshift.apply( historyBtc, historySafex );
 
+                var array = historyBtc.map(tx => ({
+                    safex_direction: tx.referenceaddress === key ? "Received" : "Sent",
+                    safex_reference_address: tx.referenceaddress,
+                    safex_date_time: tx.blocktime,
+                    safex_txid: tx.txid,
+                    safex_sending_address: tx.sendingaddress,
+                    safex_amount: tx.amount,
+                    confirmations: tx.confirmations,
+                    coin: tx.propertyname === "SafeExchangeCoin" ? "safex" : "bitcoin",
+                    btc_date_time: tx.time,
+                    btc_txid: tx.txid,
+                    btc_sending_address: tx.vout
+                }));
 
-                txArray.forEach((tx) => {
+                var txArray = JSON.stringify(array);
 
-                });*/
+                JSON.parse(txArray).forEach((tx) => {
+                    var safex_direction = tx['safex_direction'];
+                    var coin = tx['coin'];
+                    var safex_date_time = new Date(tx['safex_date_time'] * 1000);
+                    var safex_confirmations = tx['confirmations'] > 15 ? "(16/16)" : "("+ tx['confirmations'] + "/16)";
+                    var btc_date_time = new Date(tx['btc_date_time'] * 1000);
+                    var btc_reference_address = tx['btc_sending_address'];
+                    var btc_confirmations = tx['confirmations'];
+                    var scriptPubKey = [];
+                    var btc_amount = 0;
+                    var btc_send_addr = '';
+                    var btc_receive_addr = '';
+                    var btc_send_direction = [];
+                    var btc_sending_direction = [];
+                    var btc_tx_direction = [];
+                    var btc_tx_send_direction = '';
 
+                    if(btc_reference_address !== undefined){
+                        btc_reference_address.forEach(function(nestedProp) {
+                            scriptPubKey.push(nestedProp['scriptPubKey']['addresses'], nestedProp.value);
+                        })
+                    }
+
+                    if (scriptPubKey.length > 0 && scriptPubKey[0] !== undefined) {
+                        btc_send_addr = scriptPubKey[0];
+                        btc_amount = scriptPubKey[1];
+                        btc_receive_addr = scriptPubKey[2];
+                    }
+
+                    if (btc_send_addr[0] !== undefined && btc_send_addr[0].length) {
+                        btc_send_addr.forEach(function(addr) {
+                            btc_send_direction.push(addr);
+                        })
+                    }
+
+                    if(btc_send_direction[0] !== undefined) {
+                        btc_sending_direction.push(btc_send_direction[0]);
+                    }
+
+                    if (btc_sending_direction[0] !== undefined && btc_sending_direction[0].length > 0) {
+                        btc_sending_direction.forEach(function(addr) {
+                            btc_tx_direction.push(addr);
+                        })
+                    }
+
+                    if (btc_tx_direction !== []) {
+                        btc_tx_direction.forEach(function(send_addr) {
+                            btc_tx_send_direction = send_addr;
+                        })
+                    }
+
+                    if (btc_tx_send_direction === key) {
+                        btc_tx_send_direction = "Received";
+                    } else {
+                        btc_tx_send_direction = "Sent";
+                    }
+
+                    if (safex_direction === "Received" && coin === 'safex') {
+                        render +=`
+                        <div className="history">
+                            <p class="coin-name">SAFEX</p><br /> ` + safex_direction + ` <br />
+                            <img class="coin-logo" src="images/coin-white.png" alt="Safex Coin">
+                            <p class="date">` + safex_date_time + `</p><br />
+                            <p class="address"><b>TX: </b> `+ tx['safex_txid'] +`</p><br />
+                            <p class="address address-green">`+ tx['safex_sending_address'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-green">`+ tx['safex_reference_address'] +`</p>
+                        </div>
+                        <div className="col-xs-2">
+                            `+ tx['safex_amount'] +` safex <br />
+                            `+ safex_confirmations +` confirmations
+                        </div>`;
+                    } else if (safex_direction === "Sent" && coin === 'safex') {
+                        render +=`
+                        <div class="history">
+                            <p class="coin-name">SAFEX</p><br /> ` + safex_direction + ` <br />
+                            <img class="coin-logo" src="images/coin-white.png" alt="Safex Coin">
+                            <p class="date">` + safex_date_time + `</p><br />
+                            <p class="address"><b>TX: </b> `+ tx['safex_txid'] +`</p><br />
+                            <p class="address address-blue">`+ tx['safex_sending_address'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-blue">`+ tx['safex_reference_address'] +`</p>
+                        </div>
+                        <div className="col-xs-2">
+                            `+ tx['safex_amount'] +` safex <br />
+                            `+ safex_confirmations +` confirmations
+                        </div>`;
+                    }
+                    else if (btc_tx_send_direction === "Received" && coin === 'bitcoin') {
+                        render += `
+                        <div class="history">
+                            <p class="coin-name">BITCOIN</p><br /> ` + btc_tx_send_direction + ` <br />
+                            <img class="coin-logo" src="images/btc-coin.png" alt="Bitcoin Logo">
+                            <p class="date">` + btc_date_time + `</p><br />
+                            <p class="address"><b>TX: </b> ` + tx['btc_txid'] + `</p><br />
+                            <p class="address address-green">`+ btc_receive_addr +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-green">`+ btc_send_addr +`</p>
+                        </div>
+                        <div className="col-xs-2">
+                            ` + btc_amount +` bitcoin(s) <br />
+                            ` + btc_confirmations + ` confirmations
+                        </div>`;
+                    } else if (btc_tx_send_direction === "Sent" && coin === 'bitcoin') {
+                        render += `
+                        <div class="history">
+                            <p class="coin-name">BITCOIN</p><br /> ` + btc_tx_send_direction + ` <br />
+                            <img class="coin-logo" src="images/btc-coin.png" alt="Bitcoin Logo">
+                            <p class="date">` + btc_date_time + `</p><br />
+                            <p class="address"><b>TX: </b> ` + tx['btc_txid'] + `</p><br />
+                            <p class="address address-blue">`+ btc_receive_addr +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-blue">`+ btc_send_addr +`</p>
+                        </div>
+                        <div className="col-xs-2">
+                            ` + btc_amount +` bitcoin(s) <br />
+                            ` + btc_confirmations + ` confirmations
+                        </div>`;
+                    }
+                    document.getElementById("history_txs").innerHTML = render;
+                });
             })
             .catch(function (error) {
                 console.log(error);
@@ -1742,7 +1848,7 @@ export default class Wallet extends React.Component {
                                 <label htmlFor="total" className="total-label">Total:</label>
                                 <input className="total-input" type="number" name="total" readOnly value={this.state.send_total} />
                             </div>
-                            <button type="submit" className="form-send-submit button-shine-green" onClick={this.closeSettingsModal}>
+                            <button type="submit" className="form-send-submit button-shine" onClick={this.closeSettingsModal}>
                                 <img src="images/outgoing.png" alt="Outgoing Icon"/>
                                 Send
                             </button>
@@ -1758,16 +1864,18 @@ export default class Wallet extends React.Component {
                             X
                         </div>
                     </div>
-                    <div className="col-xs-7 receive-address-wrap">
-                        <label htmlFor="receive-address">Address:</label>
-                        <input name="receive-address" value={keys[key].public_key}/>
+                    <div className="row">
+                        <div className="col-xs-7 receive-address-wrap">
+                            <label htmlFor="receive-address">Address:</label>
+                            <input name="receive-address" value={keys[key].public_key}/>
 
-                        <label htmlFor="amount">Amount:</label>
-                        <input type="amount" placeholder="1" onChange={this.amountChange.bind(this)}
-                               value={this.state.receive_amount}/>
-                    </div>
-                    <div className="col-xs-5 qr-code-wrap">
-                        <QRCode value={"bitcoin:" + keys[key].public_key + "?amount=" + this.state.receive_amount}/>
+                            <label htmlFor="amount">Amount:</label>
+                            <input type="amount" placeholder="1" onChange={this.amountChange.bind(this)}
+                                   value={this.state.receive_amount}/>
+                        </div>
+                        <div className="col-xs-5 qr-code-wrap">
+                            <QRCode value={"bitcoin:" + keys[key].public_key + "?amount=" + this.state.receive_amount}/>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2088,11 +2196,11 @@ export default class Wallet extends React.Component {
                             this.state.settings_active
                                 ?
                                 <button className="settings button-shine settings-btn-active" onClick={this.closeSettingsModal} title="Settings">
-                                    <img src="images/mixer-blue.png" alt="Mixer Logo"/>
+                                    <img src="images/settings-blue.png" alt="Mixer Logo"/>
                                 </button>
                                 :
                                 <button className="settings button-shine" onClick={this.openSettingsModal} title="Settings">
-                                    <img src="images/mixer.png" alt="Mixer Logo"/>
+                                    <img src="images/settings.png" alt="Mixer Logo"/>
                                 </button>
                         }
 
