@@ -1248,10 +1248,9 @@ export default class Wallet extends React.Component {
                             <p class="date">` + safex_date_time + `</p><br />
                             <p class="address"><b>TX: </b> `+ tx['safex_txid'] +`</p><br />
                             <p class="address address-green">`+ tx['safex_sending_address'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-green">`+ tx['safex_reference_address'] +`</p>
-                        </div>
-                        <div className="col-xs-2">
-                            `+ tx['safex_amount'] +` safex <br />
-                            `+ safex_confirmations +` confirmations
+                            <div class="col-xs-12 confirmations_wrap">
+                                `+ tx['safex_amount'] +` safex `+ safex_confirmations +` confirmations
+                            </div>
                         </div>`;
                     } else if (safex_direction === "Sent" && coin === 'safex') {
                         render +=`
@@ -1261,10 +1260,9 @@ export default class Wallet extends React.Component {
                             <p class="date">` + safex_date_time + `</p><br />
                             <p class="address"><b>TX: </b> `+ tx['safex_txid'] +`</p><br />
                             <p class="address address-blue">`+ tx['safex_sending_address'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-blue">`+ tx['safex_reference_address'] +`</p>
-                        </div>
-                        <div className="col-xs-2">
-                            `+ tx['safex_amount'] +` safex <br />
-                            `+ safex_confirmations +` confirmations
+                            <div class="col-xs-12 confirmations_wrap">
+                                `+ tx['safex_amount'] +` safex `+ safex_confirmations +` confirmations
+                            </div>
                         </div>`;
                     }
                     else if (btc_tx_send_direction === "Received" && coin === 'bitcoin') {
@@ -1275,10 +1273,9 @@ export default class Wallet extends React.Component {
                             <p class="date">` + btc_date_time + `</p><br />
                             <p class="address"><b>TX: </b> ` + tx['btc_txid'] + `</p><br />
                             <p class="address address-green">`+ btc_receive_addr +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-green">`+ btc_send_addr +`</p>
-                        </div>
-                        <div className="col-xs-2">
-                            ` + btc_amount +` bitcoin(s) <br />
-                            ` + btc_confirmations + ` confirmations
+                            <div class="col-xs-12 confirmations_wrap">
+                                ` + btc_amount +` bitcoin(s) ` + btc_confirmations + ` confirmations
+                            </div>
                         </div>`;
                     } else if (btc_tx_send_direction === "Sent" && coin === 'bitcoin') {
                         render += `
@@ -1288,10 +1285,9 @@ export default class Wallet extends React.Component {
                             <p class="date">` + btc_date_time + `</p><br />
                             <p class="address"><b>TX: </b> ` + tx['btc_txid'] + `</p><br />
                             <p class="address address-blue">`+ btc_receive_addr +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-blue">`+ btc_send_addr +`</p>
-                        </div>
-                        <div className="col-xs-2">
-                            ` + btc_amount +` bitcoin(s) <br />
-                            ` + btc_confirmations + ` confirmations
+                            <div class="col-xs-12 confirmations_wrap">
+                                ` + btc_amount +` bitcoin(s) ` + btc_confirmations + ` confirmations
+                            </div>
                         </div>`;
                     }
                     document.getElementById("history_txs").innerHTML = render;

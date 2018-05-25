@@ -1714,8 +1714,22 @@ input::-webkit-inner-spin-button {
   margin: 10px auto;
 }
 #history_txs .history {
-  height: 166px;
+  overflow: hidden;
 }
+#history_txs .history .confirmations_wrap {
+  border: 1px solid #00C9FF;
+  border-radius: 8px;
+  background: transparent;
+  padding: 8px;
+  text-align: left;
+  position: relative;
+  margin: 15px 0 0;
+  transition: all ease 0.3s;
+  -o-transition: all ease 0.3s;
+  -moz-transition: all ease 0.3s;
+  -webkit-transition: all ease 0.3s;
+}
+
 #history_txs > div:hover {
   outline: 0px none;
   -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 10px rgba(84, 188, 217, 1) !important;
