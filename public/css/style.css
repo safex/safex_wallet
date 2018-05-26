@@ -904,6 +904,7 @@ body{
 }
 .private_key_popup p {
   margin-bottom: 4px;
+  height: 20px;
 }
 .private_key_popup button {
   font-family: 'Gotham Medium', sans-serif;
