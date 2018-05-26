@@ -906,6 +906,12 @@ body{
   margin-bottom: 4px;
   height: 20px;
 }
+.private_key_popup p::selection {
+  background: #ffb7b7;
+}
+.private_key_popup p::-moz-selection {
+  background: #ffb7b7;
+}
 .private_key_popup button {
   font-family: 'Gotham Medium', sans-serif;
   padding: 2px 15px 1px;
