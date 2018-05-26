@@ -24,7 +24,6 @@ export default class Wallet extends React.Component {
             wallet: {},
             import_key: '',
             archive_active: false,
-            transfer_key_to_archive: false,
 
             //transaction
             send_coin: 'safex',
@@ -87,6 +86,8 @@ export default class Wallet extends React.Component {
             wrong_old_password: false,
             wrong_new_password: false,
             wrong_repeat_password: false,
+            transfer_key_to_archive: false,
+            transfer_key_to_home: false,
         }
 
         this.createKey = this.createKey.bind(this);
@@ -1520,6 +1521,14 @@ export default class Wallet extends React.Component {
         } catch (e) {
             alert('error parsing the wallet data')
         }
+        this.setState({
+            transfer_key_to_home: true,
+        });
+        setTimeout(() => {
+            this.setState({
+                transfer_key_to_home: false
+            });
+        }, 1000);
     }
 
     setArchiveView() {
@@ -1925,7 +1934,7 @@ export default class Wallet extends React.Component {
                 <Navigation/>
                 <div className="wallet-tabs fadeIn">
                     <div onClick={this.setHomeView}
-                        className={archive_active === false ? 'btn btn-default button-shine active' : 'btn btn-default button-shine'}>
+                        className={archive_active === false || this.state.transfer_key_to_home ? 'btn btn-default button-shine active' : 'btn btn-default button-shine'}>
                         Home
                     </div>
                     <div onClick={this.setArchiveView}
