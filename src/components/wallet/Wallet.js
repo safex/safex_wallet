@@ -883,12 +883,12 @@ export default class Wallet extends React.Component {
                 send_receive_popup: true,
                 send_receive_info: 'You do not have enough SAFEX to cover this transaction'
             });
-        } else if (this.state.send_coin === 'safex' && (this.state.send_amount === '' || this.state.send_amount === 0)) {
+        } else if (this.state.send_coin === 'safex' && (this.state.send_amount === '' || this.state.send_amount === 0 || isNaN(this.state.send_amount))) {
             this.setState({
                 send_receive_popup: true,
                 send_receive_info: 'Invalid SAFEX amount',
             })
-        } else if (this.state.send_coin === 'btc' && (this.state.send_amount === '' || this.state.send_amount === 0)) {
+        } else if (this.state.send_coin === 'btc' && (this.state.send_amount === '' || this.state.send_amount === 0 || isNaN(this.state.send_total))) {
             this.setState({
                 send_receive_popup: true,
                 send_receive_info: 'Invalid BITCOIN amount',
@@ -1099,6 +1099,7 @@ export default class Wallet extends React.Component {
             this.prepareDisplay();
         }, 35000)
         this.closeSettingsInfoPopup();
+        this.closeSendReceiveModal();
     }
 
     openSettingsModal(e) {
