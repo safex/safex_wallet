@@ -24,6 +24,7 @@ export default class Wallet extends React.Component {
             wallet: {},
             import_key: '',
             archive_active: false,
+            transfer_key_to_archive: false,
 
             //transaction
             send_coin: 'safex',
@@ -71,6 +72,11 @@ export default class Wallet extends React.Component {
                 receive_open: false,
                 send_open: false
             },
+            private_key_open: {
+                key: '',
+                display_private_key: '',
+                private_key_popup: false,
+            },
             settings_active: false,
             refreshTimer: 0,
             refreshInterval: '',
@@ -93,6 +99,7 @@ export default class Wallet extends React.Component {
         this.closeCoinModal = this.closeCoinModal.bind(this);
         this.openHistoryModal = this.openHistoryModal.bind(this);
         this.showPrivateModal = this.showPrivateModal.bind(this);
+        this.closePrivateModal = this.closePrivateModal.bind(this);
         this.closeHistoryModal = this.closeHistoryModal.bind(this);
         this.sendAmountOnChange = this.sendAmountOnChange.bind(this);
         this.sendFeeOnChange = this.sendFeeOnChange.bind(this);
@@ -620,6 +627,7 @@ export default class Wallet extends React.Component {
                     this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
                     this.prepareDisplay();
                     this.closeHistoryModal();
+                    this.closePrivateModal();
                     alert('key added to wallet')
                 } catch (e) {
                     alert('an error adding a key to the wallet contact team@safex.io')
@@ -703,6 +711,7 @@ export default class Wallet extends React.Component {
             alert('invalid private key')
         }
         this.closeHistoryModal();
+        this.closePrivateModal();
     }
 
     exportUnencryptedWallet() {
@@ -802,8 +811,22 @@ export default class Wallet extends React.Component {
     }
 
     showPrivateModal(e) {
-        alert("The following key is to control your coins, do not share it.")
-        alert("Keep your private key for yourself only!" + '\n' + '\n' + this.state.keys[e].private_key);
+        this.setState({
+            private_key_open: {
+                private_key_popup: true,
+                display_private_key: this.state.keys[e].private_key,
+                current_public_key: this.state.keys[e].public_key
+            }
+        });
+        this.closeSendReceiveModal();
+    }
+
+    closePrivateModal(){
+        this.setState({
+            private_key_open: {
+                private_key_popup: false,
+            }
+        });
     }
 
     openHistoryModal(e) {
@@ -1242,7 +1265,7 @@ export default class Wallet extends React.Component {
 
                     if (safex_direction === "Received" && coin === 'safex') {
                         render +=`
-                        <div className="history">
+                        <div class="history">
                             <p class="coin-name">SAFEX</p><br /> ` + safex_direction + ` <br />
                             <img class="coin-logo" src="images/coin-white.png" alt="Safex Coin">
                             <p class="date">` + safex_date_time + `</p><br />
@@ -1440,6 +1463,14 @@ export default class Wallet extends React.Component {
         } catch (e) {
             alert('error parsing the wallet data')
         }
+        this.setState({
+            transfer_key_to_archive: true,
+        });
+        setTimeout(() => {
+            this.setState({
+                transfer_key_to_archive: false
+            });
+        }, 1000);
     }
 
     removeFromArchive(index) {
@@ -1497,6 +1528,7 @@ export default class Wallet extends React.Component {
         });
         this.closeSendReceiveModal();
         this.closeHistoryModal();
+        this.closePrivateModal();
     }
 
     setHomeView() {
@@ -1505,6 +1537,7 @@ export default class Wallet extends React.Component {
         });
         this.closeSendReceiveModal();
         this.closeHistoryModal();
+        this.closePrivateModal();
     }
 
     openDividendModal(e) {
@@ -1657,7 +1690,7 @@ export default class Wallet extends React.Component {
                 <div className="pull-right single-key-btns-wrap">
                     {
                         this.state.collapse_open.send_open && this.state.collapse_open.key === key
-                            ?
+                        ?
                             <div>
                                 <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
                                         onClick={this.openSendReceive.bind(this, key, 'send')}
@@ -1672,7 +1705,7 @@ export default class Wallet extends React.Component {
                                     <span>RECEIVE</span>
                                 </button>
                             </div>
-                            :
+                        :
                             <div>
                                 <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
                                         onClick={this.openSendReceive.bind(this, key, 'send')}
@@ -1680,11 +1713,11 @@ export default class Wallet extends React.Component {
 
                                     {
                                         this.state.collapse_open.key === key && this.state.collapse_open.receive_open
-                                            ?
+                                        ?
                                             <span className="img-wrap">
                                                 <img src="images/outbox-gray.png" alt="Outbox Logo"/>
                                             </span>
-                                            :
+                                        :
                                             <span className="img-wrap">
                                             {
                                                 keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0
@@ -1702,9 +1735,9 @@ export default class Wallet extends React.Component {
                                 <button className="receive-btn button-shine-green" onClick={this.openSendReceive.bind(this, key, 'receive')}>
                                     {
                                         this.state.collapse_open.key === key && this.state.collapse_open.receive_open
-                                            ?
+                                        ?
                                             <img src="images/receive-white.png" alt="Inbox Logo"/>
-                                            :
+                                        :
                                             <img src="images/receive-blue.png" alt="Inbox Logo"/>
 
                                     }
@@ -1748,7 +1781,7 @@ export default class Wallet extends React.Component {
                                 }
 
                                 <button onClick={() => this.showPrivateModal(key)}
-                                        className='archive-button show-private-button button-shine show-private-btn'>
+                                    className='archive-button show-private-button button-shine show-private-btn'>
                                     <span>show private</span>
                                 </button>
                             </div>
@@ -1808,12 +1841,12 @@ export default class Wallet extends React.Component {
                             <div className="input-group">
                                 <span className="input-group-addon" id="basic-addon1">From:</span>
                                 <input name="from" type="text" className="form-control" placeholder="From"
-                                       aria-describedby="From" value={keys[key].public_key}/>
+                                    aria-describedby="From" value={keys[key].public_key}/>
                             </div>
                             <div className="input-group">
                                 <span className="input-group-addon" id="basic-addon1">To:</span>
                                 <input name="destination" type="text" className="form-control" placeholder="Address"
-                                       aria-describedby="basic-addon1"/>
+                                    aria-describedby="basic-addon1"/>
                             </div>
                         </div>
                         <div className="col-xs-5 send-right">
@@ -1822,12 +1855,12 @@ export default class Wallet extends React.Component {
                                     ? ''
                                     : 'hidden-xs hidden-sm hidden-md hidden-lg'}>(Safex)</span>:</label>
                                 <input type="number" name="amount" onChange={this.sendAmountOnChange}
-                                       value={this.state.send_amount}/>
+                                    value={this.state.send_amount}/>
                             </div>
                             <div className="form-group">
                                 <label htmlFor="fee">Fee(BTC):</label>
                                 <input type="number" name="fee" onChange={this.sendFeeOnChange}
-                                       onBlur={this.sendFeeOnBlur} value={this.state.send_fee}/>
+                                    onBlur={this.sendFeeOnBlur} value={this.state.send_fee}/>
                             </div>
                             <div className="form-group fee-buttons">
                                 <span className={this.state.active_fee === 'slow'
@@ -1874,6 +1907,16 @@ export default class Wallet extends React.Component {
                         </div>
                     </div>
                 </div>
+
+                <div className={this.state.private_key_open.private_key_popup && keys[key].public_key === this.state.private_key_open.current_public_key
+                    ?  'col-xs-12 private_key_popup active'
+                    :  'col-xs-12 private_key_popup'}>
+                    <h4>The following key is to control your coins, do not share it. Keep your private key for yourself only!</h4>
+                    <p>{this.state.private_key_open.display_private_key}</p>
+                    <button onClick={this.closePrivateModal}>
+                        Ok
+                    </button>
+                </div>
             </div>
         });
 
@@ -1882,11 +1925,11 @@ export default class Wallet extends React.Component {
                 <Navigation/>
                 <div className="wallet-tabs fadeIn">
                     <div onClick={this.setHomeView}
-                         className={archive_active === false ? 'btn btn-default button-shine active' : 'btn btn-default button-shine'}>
+                        className={archive_active === false ? 'btn btn-default button-shine active' : 'btn btn-default button-shine'}>
                         Home
                     </div>
                     <div onClick={this.setArchiveView}
-                         className={archive_active === true ? 'btn btn-default button-shine active' : 'btn btn-default button-shine'}>
+                        className={archive_active || this.state.transfer_key_to_archive ? 'btn btn-default button-shine active' : 'btn btn-default button-shine'}>
                         Archive
                     </div>
                 </div>
@@ -1942,9 +1985,9 @@ export default class Wallet extends React.Component {
                             </textarea>
                         </div>
                         <input type="hidden" readOnly name="private_key"
-                               value={this.state.send_keys.private_key} />
+                           value={this.state.send_keys.private_key} />
                         <input type="hidden" readOnly name="public_key"
-                               value={this.state.send_keys.public_key} />
+                           value={this.state.send_keys.public_key} />
                         <div className="form-group">
                             <label htmlFor="amount">Amount:</label>
                             <input readOnly name="amount" value={this.state.send_amount}/>
@@ -1984,28 +2027,28 @@ export default class Wallet extends React.Component {
                         <div className="input-group">
                             <label htmlFor="from">From:</label>
                             <textarea name="from" className="form-control" readOnly
-                                      value={this.state.send_keys.public_key} placeholder="Address"
-                                      aria-describedby="basic-addon1">
+                                value={this.state.send_keys.public_key} placeholder="Address"
+                                aria-describedby="basic-addon1">
                             </textarea>
                         </div>
                         <div className="input-group">
                             <label htmlFor="destination">To:</label>
                             <textarea name="destination" className="form-control" readOnly
-                                      value={this.state.send_to} placeholder="Address"
-                                      aria-describedby="basic-addon1">
+                                value={this.state.send_to} placeholder="Address"
+                                aria-describedby="basic-addon1">
                             </textarea>
                         </div>
                         <div className="input-group">
                             <label htmlFor="txid">TX ID:</label>
                             <textarea name="txid" className="form-control" readOnly
-                                      value={this.state.txid}  placeholder="Address"
-                                      aria-describedby="basic-addon1" rows="3">
+                                value={this.state.txid}  placeholder="Address"
+                                aria-describedby="basic-addon1" rows="3">
                             </textarea>
                         </div>
                         <input type="hidden" readOnly name="private_key"
-                               value={this.state.send_keys.private_key} />
+                           value={this.state.send_keys.private_key} />
                         <input type="hidden" readOnly name="public_key"
-                               value={this.state.send_keys.public_key} />
+                           value={this.state.send_keys.public_key} />
                         <div className="form-group">
                             <label htmlFor="amount">Amount:</label>
                             <input readOnly name="amount" value={this.state.send_amount} />
@@ -2039,9 +2082,9 @@ export default class Wallet extends React.Component {
                                 <label htmlFor="old_pass">Old Password:</label>
                                 {
                                     this.state.wrong_old_password
-                                        ?
+                                    ?
                                         <input type="password" className="form-control shake" id="old_pass" name="old_pass" />
-                                        :
+                                    :
                                         <input type="password" className="form-control" id="old_pass" name="old_pass" />
                                 }
                             </div>
@@ -2049,9 +2092,9 @@ export default class Wallet extends React.Component {
                                 <label htmlFor="new_pass">New Password:</label>
                                 {
                                     this.state.wrong_new_password
-                                        ?
+                                    ?
                                         <input type="password" className="form-control shake" id="new_pass" name="new_pass" />
-                                        :
+                                    :
                                         <input type="password" className="form-control" id="new_pass" name="new_pass"/>
                                 }
                             </div>
@@ -2059,9 +2102,9 @@ export default class Wallet extends React.Component {
                                 <label htmlFor="repeat_pass">Repeat Password:</label>
                                 {
                                     this.state.wrong_repeat_password
-                                        ?
+                                    ?
                                         <input type="password" className="form-control shake" id="repeat_pass" name="repeat_pass"/>
-                                        :
+                                    :
                                         <input type="password" className="form-control" id="repeat_pass" name="repeat_pass"/>
                                 }
                             </div>
@@ -2166,11 +2209,11 @@ export default class Wallet extends React.Component {
                     <div className="right-options">
                         {
                             this.state.affiliate_active
-                                ?
+                            ?
                                 <button className="aff-btn aff-btn-active button-shine" title="Affiliate System" onClick={this.closeAffiliateModal}>
                                     <img src="images/world-blue.png" alt="World Logo"/>
                                 </button>
-                                :
+                            :
                                 <button className="aff-btn button-shine" title="Affiliate System" onClick={this.openAffiliateModal}>
                                     <img src="images/world.png" alt="World Logo"/>
                                 </button>
@@ -2178,11 +2221,11 @@ export default class Wallet extends React.Component {
 
                         {
                             this.state.dividend_active
-                                ?
+                            ?
                                 <button className="dividend-btn dividend-btn-active button-shine" title="Dividend Calculator" onClick={this.closeDividendModal}>
                                     <img src="images/calculator-blue.png" alt="Calculator Logo"/>
                                 </button>
-                                :
+                            :
                                 <button className="dividend-btn button-shine" title="Dividend Calculator" onClick={this.openDividendModal}>
                                     <img src="images/calculator.png" alt="Calculator Logo"/>
                                 </button>
@@ -2190,11 +2233,11 @@ export default class Wallet extends React.Component {
 
                         {
                             this.state.settings_active
-                                ?
+                            ?
                                 <button className="settings button-shine settings-btn-active" onClick={this.closeSettingsModal} title="Settings">
                                     <img src="images/settings-blue.png" alt="Mixer Logo"/>
                                 </button>
-                                :
+                            :
                                 <button className="settings button-shine" onClick={this.openSettingsModal} title="Settings">
                                     <img src="images/settings.png" alt="Mixer Logo"/>
                                 </button>
@@ -2202,11 +2245,11 @@ export default class Wallet extends React.Component {
 
                         {
                             this.state.refreshTimer === 0
-                                ?
+                            ?
                                 <button className="refresh-btn button-shine"  onClick={this.refreshWallet} title="Refresh">
                                     <img src="images/refresh.png" alt="Refresh Logo"/>
                                 </button>
-                                :
+                            :
                                 <button className="refresh-btn button-shine disabled" title="Refresh">
                                     <img src="images/refresh-blue.png" alt="Refresh Logo"/>
                                     <span><p>{this.state.refreshTimer + 's'}</p></span>
