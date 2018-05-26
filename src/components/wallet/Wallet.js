@@ -90,6 +90,8 @@ export default class Wallet extends React.Component {
             transfer_key_to_home: false,
             info_popup: false,
             info_text: '',
+            send_receive_popup: false,
+            send_receive_info: '',
         }
 
         this.createKey = this.createKey.bind(this);
@@ -134,8 +136,9 @@ export default class Wallet extends React.Component {
         this.wrongOldPassword = this.wrongOldPassword.bind(this);
         this.wrongNewPassword = this.wrongNewPassword.bind(this);
         this.wrongRepeatPassword = this.wrongRepeatPassword.bind(this);
-        this.closeInfoPopup = this.closeInfoPopup.bind(this);
+        this.closeSettingsInfoPopup = this.closeSettingsInfoPopup.bind(this);
         this.resetSettingsForm = this.resetSettingsForm.bind(this);
+        this.closeSendReceivePopup = this.closeSendReceivePopup.bind(this);
     }
 
     logout() {
@@ -354,9 +357,9 @@ export default class Wallet extends React.Component {
                 var destination = e.target.destination.value;
 
                 //here we will check to make sure that the destination is a valid bitcoin address
-
                 var address = bitcore.Address.fromString(destination);
                 var address2 = bitcore.Address.fromString(source);
+
                 //here we try to get the unspent transactions from the source we send from
                 try {
                     fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
@@ -372,15 +375,18 @@ export default class Wallet extends React.Component {
                         });
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
-                    alert('network communication error, please try again later');
                     this.setState({
                         transaction_being_sent: false,
-
+                        send_receive_popup: true,
+                        send_receive_info: 'Network communication error, please try again later'
                     });
                 }
             } catch (e) {
                 //this is triggered if the destination address is not a valid bitcoin address
-                alert('Invalid destination address');
+                this.setState({
+                    send_receive_popup: true,
+                    send_receive_info: 'Invalid destination address'
+                });
             }
 
             //if safex is not selected then it must be Bitcoin
@@ -421,14 +427,18 @@ export default class Wallet extends React.Component {
                         });
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
-                    alert('Network communication error, please try again later');
                     this.setState({
                         transaction_being_sent: false,
+                        send_receive_popup: true,
+                        send_receive_info: 'Network communication error, please try again later'
                     });
                 }
             } catch (e) {
                 //this is triggered if the destination address is not a valid bitcoin address
-                alert('Invalid destination address');
+                this.setState({
+                    send_receive_popup: true,
+                    send_receive_info: 'Invalid destination address'
+                });
             }
         }
     }
@@ -470,7 +480,6 @@ export default class Wallet extends React.Component {
                     txid: resp,
                 });
             });
-        this.closeSendReceiveModal();
     }
 
     formSafexTransaction(utxos, amount, fee, destination, key, source) {
@@ -537,10 +546,12 @@ export default class Wallet extends React.Component {
                             });
                         })
                 } else {
-                    alert("error with transaction")
+                    this.setState({
+                        send_receive_popup: true,
+                        send_receive_info: 'Error with transaction'
+                    });
                 }
             });
-        this.closeSendReceiveModal();
     }
 
     //TODO: needs more testing - safex not sent
@@ -809,7 +820,8 @@ export default class Wallet extends React.Component {
                         key: key,
                         send_open: false,
                         receive_open: !this.state.collapse_open.receive_open
-                    }
+                    },
+                    send_receive_popup: false,
                 });
             }
         }
@@ -824,6 +836,7 @@ export default class Wallet extends React.Component {
             }
         });
         this.closeSendReceiveModal();
+        this.closeSendReceivePopup();
     }
 
     closePrivateModal(){
@@ -861,16 +874,39 @@ export default class Wallet extends React.Component {
         });
 
         if ((this.state.send_coin === 'safex' && this.state.send_fee > key_btc_bal) | (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal)) {
-            alert('you do not have enough BTC to cover the fee');
+            this.setState({
+                send_receive_popup: true,
+                send_receive_info: 'You do not have enough BITCOIN to cover the fee'
+            });
         } else if (this.state.send_coin === 'safex' && this.state.send_amount > key_safex_bal) {
-            alert('you do not have enough SAFEX to cover this transaction');
+            this.setState({
+                send_receive_popup: true,
+                send_receive_info: 'You do not have enough SAFEX to cover this transaction'
+            });
+        } else if (this.state.send_coin === 'safex' && (this.state.send_amount === '' || this.state.send_amount === 0)) {
+            this.setState({
+                send_receive_popup: true,
+                send_receive_info: 'Invalid SAFEX amount',
+            })
+        } else if (this.state.send_coin === 'btc' && (this.state.send_amount === '' || this.state.send_amount === 0)) {
+            this.setState({
+                send_receive_popup: true,
+                send_receive_info: 'Invalid BITCOIN amount',
+            })
         } else if (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal) {
-            alert('you do not have enough BTC to cover this transaction');
+            this.setState({
+                send_receive_popup: true,
+                send_receive_info: 'You do not have enough BITCOIN to cover this transaction'
+            });
         } else if (e.target.destination.value === '') {
-            alert('destination field is empty');
+            this.setState({
+                send_receive_popup: true,
+                send_receive_info: 'Destination field is empty'
+            });
         } else {
             try {
-                bitcore.Address.fromString(e.target.destination.value)
+                bitcore.Address.fromString(e.target.destination.value);
+                console.log(this.state.send_amount);
                 this.setState({
                     send_overflow_active: true,
                     send_to: e.target.destination.value,
@@ -879,12 +915,24 @@ export default class Wallet extends React.Component {
                         private_key: e.target.private_key.value
                     },
                     dividend_active: false,
-                    affiliate_active: false
+                    affiliate_active: false,
+                    send_receive_popup: false,
+                    send_receive_info: ''
                 })
             } catch (e) {
-                alert('destination address is invalid');
+                this.setState({
+                    send_receive_popup: true,
+                    send_receive_info: 'Destination address is invalid'
+                });
             }
         }
+    }
+
+    closeSendReceivePopup() {
+        this.setState({
+            send_receive_popup: false,
+            send_receive_info: ''
+        });
     }
 
     changePassword(e) {
@@ -992,7 +1040,7 @@ export default class Wallet extends React.Component {
         }
     }
 
-    closeInfoPopup(){
+    closeSettingsInfoPopup(){
         this.setState({
             info_popup: false
         })
@@ -1050,6 +1098,7 @@ export default class Wallet extends React.Component {
         setTimeout(() => {
             this.prepareDisplay();
         }, 35000)
+        this.closeSettingsInfoPopup();
     }
 
     openSettingsModal(e) {
@@ -1148,7 +1197,6 @@ export default class Wallet extends React.Component {
                 active_fee: 'fast'
             });
         }
-
     }
 
     feeChange(speed) {
@@ -1491,6 +1539,7 @@ export default class Wallet extends React.Component {
         this.closeSendReceiveModal();
         this.closeHistoryModal();
         this.closePrivateModal();
+        this.closeSendReceivePopup();
     }
 
     setHomeView() {
@@ -1500,6 +1549,7 @@ export default class Wallet extends React.Component {
         this.closeSendReceiveModal();
         this.closeHistoryModal();
         this.closePrivateModal();
+        this.closeSendReceivePopup();
     }
 
     openDividendModal(e) {
@@ -1839,10 +1889,19 @@ export default class Wallet extends React.Component {
                                 <label htmlFor="total" className="total-label">Total:</label>
                                 <input className="total-input" type="number" name="total" readOnly value={this.state.send_total} />
                             </div>
-                            <button type="submit" className="form-send-submit button-shine" onClick={this.closeSettingsModal}>
+                            <button type="submit" className="form-send-submit button-shine">
                                 <img src="images/outgoing.png" alt="Outgoing Icon"/>
                                 Send
                             </button>
+                        </div>
+                    </div>
+
+                    <div className="send_receive_popup_wrap">
+                        <div className={this.state.send_receive_popup
+                            ?  'send_receive_info active'
+                            :  'send_receive_info'}>
+                            <p>{this.state.send_receive_info}</p>
+                            <span className="close" onClick={this.closeSendReceivePopup}>X</span>
                         </div>
                     </div>
                 </form>
@@ -1962,7 +2021,9 @@ export default class Wallet extends React.Component {
                             <label htmlFor="total">Total:</label>
                             <input readOnly name="total" value={this.state.send_total} />
                         </div>
-                        <button className="confirm-btn button-shine-green" type="submit" disabled={this.state.transaction_being_sent ? 'disabled' : ''}> {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}</button>
+                        <button className="confirm-btn button-shine-green" type="submit" disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
+                            {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}
+                        </button>
                     </form>
                 </div>
                 <div className={this.state.transaction_sent
@@ -2080,7 +2141,7 @@ export default class Wallet extends React.Component {
                                         ? 'info-text active'
                                         : 'info-text'}>
                                         <p>{this.state.info_text}</p>
-                                        <span className="close" onClick={this.closeInfoPopup}>X</span>
+                                        <span className="close" onClick={this.closeSettingsInfoPopup}>X</span>
                                     </div>
                                 </div>
                             </div>
@@ -2169,7 +2230,7 @@ export default class Wallet extends React.Component {
                     </div>
                     <div className={this.state.import_wrap_glow ? 'import-form-wrap active' :'import-form-wrap'}>
                         <form onChange={this.importKeyChange} onSubmit={this.importKey}>
-                            <input name="key" value={this.state.import_key} onFocus={this.importGlow} onBlur={this.importGlowDeactivate} />
+                            <input name="key" value={this.state.import_key} onFocus={this.importGlow} onBlur={this.importGlowDeactivate} placeholder="Import Key"/>
                             <button type="submit" className="button-shine" title="Import Key">Import</button>
                         </form>
                         <button onClick={this.createKey} className="create-btn button-shine" title="Create New Key">

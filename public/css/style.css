@@ -644,7 +644,7 @@ body{
   border-top: 1px solid rgba(255,255,255, .2);
   margin-top: 0px;
   padding-top: 15px;
-  padding-bottom: 40px;
+  padding-bottom: 50px;
   height: auto;
   visibility: visible;
   top: 2px;
@@ -744,21 +744,23 @@ body{
   border-bottom: 1px solid #54C4F8;
   color: #54C4F8;
 }
-.form-send .send-left input ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+.form-send .send-left input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  opacity: .8;
   color: #fff;
   font-size: 14px;
 }
-.form-send .send-left input ::-moz-placeholder { /* Firefox 19+ */
-  opacity:  1;
+.form-send .send-left input::-moz-placeholder { /* Firefox 19+ */
+  opacity: .8;
   color: #fff;
   font-size: 14px;
 }
-.form-send .send-left input :-moz-placeholder { /* Firefox 18- */
-  opacity:  1;
+.form-send .send-left input:-moz-placeholder { /* Firefox 18- */
+  opacity: .8;
   color: #fff;
   font-size: 14px;
 }
-.form-send .send-left input :-ms-input-placeholder { /* IE 10+ */
+.form-send .send-left input:-ms-input-placeholder { /* IE 10+ */
+  opacity: .8;
   color: #fff;
   font-size: 14px;
 }
@@ -788,6 +790,61 @@ body{
 }
 .form-send .coin.active{
   opacity: 1;
+}
+.form-send .send_receive_popup_wrap {
+  height: 32px;
+  position: absolute;
+  left: 40px;
+  bottom: 10px;
+  width: calc(100% - 50px);
+}
+.form-send .send_receive_info {
+  position: relative;
+  border: 1px solid #327A9B;
+  border-radius: 8px;
+  background: url(../images/info-bg.png);
+  background-size: 100% 100%;
+  background-repeat: repeat-y;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 17px;
+  padding: 6px 26px 8px 8px;
+  margin-right: 0;
+  opacity: 0;
+  visibility: hidden;
+  height: 100%;
+  transition: all ease 0.2s;
+  -o-transition: all ease 0.2s;
+  -moz-transition: all ease 0.2s;
+  -webkit-transition: all ease 0.2s;
+}
+.form-send .send_receive_info.active {
+  visibility: visible;
+  opacity: 1;
+}
+.form-send .send_receive_info:hover {
+  outline: 0px none;
+  -webkit-box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5) !important;
+  box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5) !important;
+  border: 1px solid #00e7ff !important;
+}
+.form-send .send_receive_info p {
+  background: transparent;
+  border: 0px none;
+  margin-right: 0;
+  padding: 0;
+  font-size: 15px;
+  margin-bottom: 0;
+  text-transform: initial;
+  line-height: 1.2;
+}
+.form-send .send_receive_info .close {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  color: #fff;
+  opacity: 1;
+  font-size: 16px;
 }
 .receive{
   height: 0;
@@ -1251,21 +1308,23 @@ input::-webkit-inner-spin-button {
 .overflow.sendModal .head img {
   height: 42px;
 }
-.overflow.dividendModal > form input ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+.overflow.dividendModal > form input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  opacity: .8;
   color: #fff;
   font-size: 14px;
 }
-.overflow.dividendModal > form input ::-moz-placeholder { /* Firefox 19+ */
-  opacity:  1;
+.overflow.dividendModal > form input::-moz-placeholder { /* Firefox 19+ */
+  opacity: .8;
   color: #fff;
   font-size: 14px;
 }
-.overflow.dividendModal > form input :-moz-placeholder { /* Firefox 18- */
-  opacity:  1;
+.overflow.dividendModal > form input:-moz-placeholder { /* Firefox 18- */
+  opacity: .8;
   color: #fff;
   font-size: 14px;
 }
-.overflow.dividendModal > form input :-ms-input-placeholder { /* IE 10+ */
+.overflow.dividendModal > form input:-ms-input-placeholder { /* IE 10+ */
+  opacity: .8;
   color: #fff;
   font-size: 14px;
 }
@@ -1453,6 +1512,22 @@ input::-webkit-inner-spin-button {
   position: relative;
   top: 1px;
   margin-right: 5px;
+}
+.import-form-wrap input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  opacity: .8;
+  color: #fff;
+}
+.import-form-wrap input::-moz-placeholder { /* Firefox 19+ */
+  opacity: .8;
+  color: #fff;
+}
+.import-form-wrap input:-moz-placeholder { /* Firefox 18- */
+  opacity: .8;
+  color: #fff;
+}
+.import-form-wrap input:-ms-input-placeholder { /* IE 10+ */
+  opacity: .8;
+  color: #fff;
 }
 .status .import-form-wrap button {
   border: 1px solid #327A9B;
@@ -1653,9 +1728,9 @@ input::-webkit-inner-spin-button {
   position: relative;
   border: 1px solid #327A9B;
   border-radius: 8px;
-  background: url(../images/btn-bg.png);
-  background-size: cover;
-  background-repeat: no-repeat;
+  background: url(../images/info-bg.png);
+  background-size: 100% 100%;
+  background-repeat: repeat-y;
   color: #fff;
   text-transform: uppercase;
   font-size: 17px;
