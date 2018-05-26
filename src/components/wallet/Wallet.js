@@ -1166,6 +1166,15 @@ export default class Wallet extends React.Component {
         var promises = [];
         bodyFormData.set('addr', key);
 
+        // promises.push(axios({
+        //     method: 'post',
+        //     url: 'https://api.omniexplorer.info/v1/transaction/address/0',
+        //     data: bodyFormData,
+        //     config: {
+        //         headers: {'Content-Type': 'multipart/form-data', 'origin': '', 'referrer': '', 'referer': ''}
+        //     }
+        // }));
+
         promises.push(
             fetch('https://api.omniexplorer.info/v1/transaction/address/0', {
                 method: 'POST',
@@ -1323,100 +1332,6 @@ export default class Wallet extends React.Component {
             });
 
     }
-
-    // listTransactions(key) {
-    //     var render = '';
-    //     var bodyFormData = new FormData();
-    //     bodyFormData.set('addr', key);
-    //
-    //     axios({
-    //         method: 'post',
-    //         url: 'https://api.omniexplorer.info/v1/transaction/address/0',
-    //         data: bodyFormData,
-    //         config: {
-    //             headers: {'Content-Type': 'multipart/form-data', 'origin': '', 'referrer': '', 'referer': ''}
-    //         }
-    //     })
-    //         .then(function (response) {
-    //             localStorage.setItem("history_txs", JSON.stringify(response.data.transactions));
-    //             var history = JSON.stringify(response.data.transactions);
-    //             var render = '';
-    //
-    //             JSON.parse(history).forEach((tx) => {
-    //                 var direction = tx['referenceaddress'] === key ? "Received" : "Sent";
-    //                 var dateTime = new Date(tx['blocktime'] * 1000);
-    //                 var confirmations = tx['confirmations'] > 15 ? "(16/16)" : "("+ tx['confirmations'] + "/16)";
-    //                 var coin = tx['propertyname'];
-    //
-    //                 if (direction === "Received" && coin === 'SafeExchangeCoin') {
-    //                     render +=`
-    //                 <div className="history">
-    //                     <p class="coin-name">SAFEX</p><br /> ` + direction + ` <br />
-    //                     <img class="coin-logo" src="images/coin-white.png" alt="Safex Coin">
-    //                     <p class="date">` + dateTime + `</p><br />
-    //                     <p class="address"><b>TX: </b> `+ tx['txid'] +`</p><br />
-    //                     <p class="address address-green">`+ tx['sendingaddress'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-green">`+ tx['referenceaddress'] +`</p>
-    //                 </div>
-    //                 <div className="col-xs-2">
-    //                     `+ tx['amount'] +` safex <br />
-    //                     `+ confirmations +` confirmations
-    //                 </div>`;
-    //                     console.log('safex received')
-    //                 } else if (direction === "Sent" && coin === 'SafeExchangeCoin') {
-    //                     render +=`
-    //                 <div class="history">
-    //                     <p class="coin-name">SAFEX</p><br /> ` + direction + ` <br />
-    //                     <img class="coin-logo" src="images/coin-white.png" alt="Safex Coin">
-    //                     <p class="date">` + dateTime + `</p><br />
-    //                     <p class="address"><b>TX: </b> `+ tx['txid'] +`</p><br />
-    //                     <p class="address address-blue">`+ tx['sendingaddress'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-blue">`+ tx['referenceaddress'] +`</p>
-    //                 </div>
-    //                 <div className="col-xs-2">
-    //                     `+ tx['amount'] +` safex <br />
-    //                     `+ confirmations +` confirmations
-    //                 </div>`;
-    //                     console.log('safex sent')
-    //                 } else if (direction === "Received" && coin === 'Bitcoin') {
-    //                     render +=`
-    //                 <div class="history">
-    //                     <p class="coin-name">BITCOIN</p><br /> ` + direction + ` <br />
-    //                     <img class="coin-logo" src="images/btc-coin.png" alt="Bitcoin Logo">
-    //                     <p class="date">` + dateTime + `</p><br />
-    //                     <p class="address"><b>TX: </b> `+ tx['txid'] +`</p><br />
-    //                     <p class="address address-green">`+ tx['sendingaddress'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-green">`+ tx['referenceaddress'] +`</p>
-    //                 </div>
-    //                 <div className="col-xs-2">
-    //                     `+ tx['amount'] +` bitcoin <br />
-    //                     `+ confirmations +` confirmations
-    //                 </div>`;
-    //                     console.log('bitcoin received')
-    //                 } else if (direction === "Sent" && coin === 'Bitcoin') {
-    //                     render +=`
-    //                 <div class="history">
-    //                     <p class="coin-name">BITCOIN</p><br /> ` + direction + ` <br />
-    //                     <img class="coin-logo" src="images/btc-coin.png" alt="Bitcoin Logo">
-    //                     <p class="date">` + dateTime + `</p><br />
-    //                     <p class="address"><b>TX: </b> `+ tx['txid'] +`</p><br />
-    //                     <p class="address address-blue">`+ tx['sendingaddress'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-blue">`+ tx['referenceaddress'] +`</p>
-    //                 </div>
-    //                 <div className="col-xs-2">
-    //                     `+ tx['amount'] +` bitcoin <br />
-    //                     `+ confirmations +` confirmations
-    //                 </div>`;
-    //                     console.log('bitcoin sent')
-    //                 }
-    //
-    //             });
-    //             if (response.data.transactions.length == 0) {
-    //                 render =`<h5>No transaction history</h5>`;
-    //             }
-    //             document.getElementById("history_txs").innerHTML = render;
-    //         })
-    //         .catch(function (error) {
-    //             console.log(error);
-    //             alert("Could not fetch transaction history...");
-    //         });
-    // }
 
     sendToArchive(index) {
         try {
@@ -1761,28 +1676,28 @@ export default class Wallet extends React.Component {
                         <div className="row amounts">
                             <div className="col-xs-5 amount-btns-wrap">
                                 <button onClick={() => this.removeFromArchive(key)}
-                                        className={keys[key].archived === true
-                                        || (!keys[key].hasOwnProperty('archived') && archive_active === true)
-                                            ? 'archive-button button-shine to-home-btn'
-                                            : 'archive-button button-shine hidden-xs hidden-sm hidden-md hidden-lg to-home-btn'}>
+                                    className={keys[key].archived === true
+                                    || (!keys[key].hasOwnProperty('archived') && archive_active === true)
+                                        ? 'archive-button button-shine to-home-btn'
+                                        : 'archive-button button-shine hidden-xs hidden-sm hidden-md hidden-lg to-home-btn'}>
                                     <span>TO HOME</span>
                                 </button>
 
                                 <button onClick={() => this.sendToArchive(key)}
-                                        className={keys[key].archived === false
-                                        || (!keys[key].hasOwnProperty('archived') && archive_active === false)
-                                            ? 'archive-button button-shine to-archive-btn'
-                                            : 'archive-button button-shine hidden-xs hidden-sm hidden-md hidden-lg to-archive-btn'}>
+                                    className={keys[key].archived === false
+                                    || (!keys[key].hasOwnProperty('archived') && archive_active === false)
+                                        ? 'archive-button button-shine to-archive-btn'
+                                        : 'archive-button button-shine hidden-xs hidden-sm hidden-md hidden-lg to-archive-btn'}>
                                     <span>TO ARCHIVE</span>
                                 </button>
                                 {
                                     this.state.history_overflow_active
-                                        ?
+                                    ?
                                         <button onClick={this.closeHistoryModal}
                                                 className='archive-button history-button button-shine history-btn'>
                                             <span>HISTORY</span>
                                         </button>
-                                        :
+                                    :
                                         <button onClick={() => this.openHistoryModal(key)}
                                                 className='archive-button history-button button-shine history-btn'>
                                             <span>HISTORY</span>
@@ -1909,7 +1824,7 @@ export default class Wallet extends React.Component {
 
                             <label htmlFor="amount">Amount:</label>
                             <input type="amount" placeholder="1" onChange={this.amountChange.bind(this)}
-                                   value={this.state.receive_amount}/>
+                               value={this.state.receive_amount}/>
                         </div>
                         <div className="col-xs-5 qr-code-wrap">
                             <QRCode value={"bitcoin:" + keys[key].public_key + "?amount=" + this.state.receive_amount}/>
