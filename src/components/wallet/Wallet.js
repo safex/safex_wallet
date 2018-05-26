@@ -906,7 +906,6 @@ export default class Wallet extends React.Component {
         } else {
             try {
                 bitcore.Address.fromString(e.target.destination.value);
-                console.log(this.state.send_amount);
                 this.setState({
                     send_overflow_active: true,
                     send_to: e.target.destination.value,
@@ -1099,7 +1098,6 @@ export default class Wallet extends React.Component {
             this.prepareDisplay();
         }, 35000)
         this.closeSettingsInfoPopup();
-        this.closeSendReceiveModal();
     }
 
     openSettingsModal(e) {
@@ -2169,37 +2167,37 @@ export default class Wallet extends React.Component {
                             <label>
                                 Projected Marketplace Volume $
                             </label>
-                            <input type="text" name="total_trade_volume" value={this.state.totalTradeVolume}/>
+                            <input type="number" name="total_trade_volume" value={this.state.totalTradeVolume}/>
                         </div>
                         <div className="form-group">
                             <label>
                                 Marketplace Fee %
                             </label>
-                            <input type="text" name="marketplace_fee" value={this.state.marketplaceFee}/>
+                            <input type="number" name="marketplace_fee" value={this.state.marketplaceFee}/>
                         </div>
                         <div className="form-group">
                             <label>
                                 Safex Market Cap $
                             </label>
-                            <input type="text" name="safex_market_cap" value={this.state.safexMarketCap}/>
+                            <input type="number" name="safex_market_cap" value={this.state.safexMarketCap}/>
                         </div>
                         <div className="form-group">
                             <label>
                                 Number of SAFEX Held
                             </label>
-                            <input type="text" name="safex_holdings" value={this.state.safexHolding}/>
+                            <input type="number" name="safex_holdings" value={this.state.safexHolding}/>
                         </div>
                         <div className="form-group">
                             <label>
                                 Cost of Safex Holdings $
                             </label>
-                            <input type="text" name="safex_holdings_by_market" value={this.state.holdingsByMarket} readOnly/>
+                            <input type="number" name="safex_holdings_by_market" value={this.state.holdingsByMarket} readOnly/>
                         </div>
                         <div className="form-group">
                             <label>
                                 Annual Return on Investment %
                             </label>
-                            <input type="text" name="safex_dividend_yield" value={this.state.safexDividendYield}/>
+                            <input type="number" name="safex_dividend_yield" value={isNaN(this.state.safexDividendYield) ? '0' : this.state.safexDividendYield}/>
                         </div>
                     </form>
                 </div>
