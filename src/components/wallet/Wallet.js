@@ -88,6 +88,8 @@ export default class Wallet extends React.Component {
             wrong_repeat_password: false,
             transfer_key_to_archive: false,
             transfer_key_to_home: false,
+            info_popup: false,
+            info_text: '',
         }
 
         this.createKey = this.createKey.bind(this);
@@ -132,6 +134,7 @@ export default class Wallet extends React.Component {
         this.wrongOldPassword = this.wrongOldPassword.bind(this);
         this.wrongNewPassword = this.wrongNewPassword.bind(this);
         this.wrongRepeatPassword = this.wrongRepeatPassword.bind(this);
+        this.closeInfoPopup = this.closeInfoPopup.bind(this);
     }
 
     logout() {
@@ -938,12 +941,18 @@ export default class Wallet extends React.Component {
                                     //write the new file to the path
                                     fs.writeFile(localStorage.getItem('wallet_path'), encrypted_wallet, (err) => {
                                         if (err) {
-                                            alert('there was a problem writing the new encrypted file to disk')
+                                            this.setState({
+                                                info_popup: true,
+                                                info_text: 'There was a problem writing the new encrypted file to disk'
+                                            });
                                         } else {
                                             //set the active password and wallet to the new file
                                             localStorage.setItem('password', new_pass);
                                             localStorage.setItem('wallet', decrypted_wallet);
-                                            alert('password has been changed');
+                                            this.setState({
+                                                info_popup: true,
+                                                info_text: 'Password has been changed'
+                                            });
                                             document.getElementById('old_pass').value = '';
                                             document.getElementById('new_pass').value = '';
                                             document.getElementById('repeat_pass').value = '';
@@ -951,23 +960,41 @@ export default class Wallet extends React.Component {
                                     });
                                 }
                             } else {
-                                alert('wrong password');
+                                this.setState({
+                                    info_popup: true,
+                                    info_text: 'Wrong password'
+                                });
                                 this.wrongOldPassword();
                             }
                         } catch (e) {
-                            alert('wrong password');
+                            this.setState({
+                                info_popup: true,
+                                info_text: 'Wrong password'
+                            });
                             this.wrongOldPassword();
                         }
                     }
                 });
             } else {
-                alert('new password does not match repeated password');
+                this.setState({
+                    info_popup: true,
+                    info_text: 'New password does not match repeated password'
+                });
                 this.wrongRepeatPassword();
             }
         } else {
-            alert('new password field is empty');
+            this.setState({
+                info_popup: true,
+                info_text: 'New password field is empty'
+            });
             this.wrongNewPassword();
         }
+    }
+
+    closeInfoPopup(){
+        this.setState({
+            info_popup: false
+        })
     }
 
     closeCoinModal() {
@@ -2036,6 +2063,12 @@ export default class Wallet extends React.Component {
                                 <div className="row">
                                     <button className="reset-btn button-shine" type="reset">Reset</button>
                                     <button className="submit-btn button-shine-green" type="submit">Submit</button>
+                                </div>
+                                <div className={this.state.info_popup
+                                    ? 'info-wrap active'
+                                    : 'info-wrap'}>
+                                    <p>{this.state.info_text}</p>
+                                    <span className="close" onClick={this.closeInfoPopup}>X</span>
                                 </div>
                             </div>
                         </form>
