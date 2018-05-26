@@ -1645,7 +1645,11 @@ input::-webkit-inner-spin-button {
   width: 100%;
   text-align: right;
 }
-.settingsModal .info-wrap {
+.settingsModal .info-wrap  {
+  height: 53px;
+  margin-bottom: 10px;
+}
+.settingsModal .info-wrap .info-text {
   position: relative;
   border: 1px solid #327A9B;
   border-radius: 8px;
@@ -1655,26 +1659,27 @@ input::-webkit-inner-spin-button {
   color: #fff;
   text-transform: uppercase;
   font-size: 17px;
-  padding: 6px 25px 8px 8px;
+  padding: 6px 26px 8px 8px;
   margin-right: 0;
-  margin-bottom: 10px;
-  height: 60px;
   opacity: 0;
+  visibility: hidden;
+  height: 100%;
   transition: all ease 0.2s;
   -o-transition: all ease 0.2s;
   -moz-transition: all ease 0.2s;
   -webkit-transition: all ease 0.2s;
 }
-.settingsModal .info-wrap.active {
+.settingsModal .info-wrap .info-text.active {
+  visibility: visible;
   opacity: 1;
 }
-.settingsModal .info-wrap:hover {
+.settingsModal .info-wrap .info-text:hover {
   outline: 0px none;
   -webkit-box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5) !important;
   box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5) !important;
   border: 1px solid #00e7ff !important;
 }
-.settingsModal .info-wrap p {
+.settingsModal .info-wrap .info-text p {
   background: transparent;
   border: 0px none;
   margin-right: 0;
@@ -1684,7 +1689,7 @@ input::-webkit-inner-spin-button {
   text-transform: initial;
   line-height: 1.2;
 }
-.settingsModal .info-wrap .close {
+.settingsModal .info-wrap .info-text .close {
   position: absolute;
   right: 8px;
   top: 8px;

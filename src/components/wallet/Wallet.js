@@ -2075,11 +2075,13 @@ export default class Wallet extends React.Component {
                                     <button className="reset-btn button-shine" type="reset" onClick={this.resetSettingsForm}>Reset</button>
                                     <button className="submit-btn button-shine-green" type="submit">Submit</button>
                                 </div>
-                                <div className={this.state.info_popup
-                                    ? 'info-wrap active'
-                                    : 'info-wrap'}>
-                                    <p>{this.state.info_text}</p>
-                                    <span className="close" onClick={this.closeInfoPopup}>X</span>
+                                <div className="info-wrap">
+                                    <div className={this.state.info_popup
+                                        ? 'info-text active'
+                                        : 'info-text'}>
+                                        <p>{this.state.info_text}</p>
+                                        <span className="close" onClick={this.closeInfoPopup}>X</span>
+                                    </div>
                                 </div>
                             </div>
                         </form>
