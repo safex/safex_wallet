@@ -135,6 +135,7 @@ export default class Wallet extends React.Component {
         this.wrongNewPassword = this.wrongNewPassword.bind(this);
         this.wrongRepeatPassword = this.wrongRepeatPassword.bind(this);
         this.closeInfoPopup = this.closeInfoPopup.bind(this);
+        this.resetSettingsForm = this.resetSettingsForm.bind(this);
     }
 
     logout() {
@@ -997,6 +998,26 @@ export default class Wallet extends React.Component {
         })
     }
 
+    closeSettingsModal() {
+        document.getElementById('old_pass').value = '';
+        document.getElementById('new_pass').value = '';
+        document.getElementById('repeat_pass').value = '';
+
+        this.setState({
+            settings_active: false
+        });
+    }
+
+    resetSettingsForm() {
+        document.getElementById('old_pass').value = '';
+        document.getElementById('new_pass').value = '';
+        document.getElementById('repeat_pass').value = '';
+
+        this.setState({
+            info_popup: false
+        });
+    }
+
     closeCoinModal() {
         this.setState({
             send_overflow_active: false,
@@ -1041,16 +1062,6 @@ export default class Wallet extends React.Component {
         this.closeSuccessModal();
         this.closeDividendModal();
         this.closeAffiliateModal();
-    }
-
-    closeSettingsModal() {
-        document.getElementById('old_pass').value = '';
-        document.getElementById('new_pass').value = '';
-        document.getElementById('repeat_pass').value = '';
-
-        this.setState({
-            settings_active: false
-        });
     }
 
     //This is fired when amount is changed
@@ -2061,7 +2072,7 @@ export default class Wallet extends React.Component {
                             </div>
                             <div className="col-xs-12 submit-wrap">
                                 <div className="row">
-                                    <button className="reset-btn button-shine" type="reset">Reset</button>
+                                    <button className="reset-btn button-shine" type="reset" onClick={this.resetSettingsForm}>Reset</button>
                                     <button className="submit-btn button-shine-green" type="submit">Submit</button>
                                 </div>
                                 <div className={this.state.info_popup
