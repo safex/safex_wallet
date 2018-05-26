@@ -914,12 +914,12 @@ body{
 }
 .private_key_popup button {
   font-family: 'Gotham Medium', sans-serif;
-  padding: 2px 15px 1px;
+  padding: 3px 15px 2px;
   border: none;
   border-radius: 8px;
   color: #fff;
   text-transform: uppercase;
-  font-size: 15px;
+  font-size: 14px;
   margin: 0;
   background: #0ec8c1;
   display: inline-block;
