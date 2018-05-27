@@ -1952,15 +1952,14 @@ export default class Wallet extends React.Component {
                                 <img src="images/outgoing.png" alt="Outgoing Icon"/>
                                 Send
                             </button>
-                        </div>
-                    </div>
-
-                    <div className="send_receive_popup_wrap">
-                        <div className={this.state.send_receive_popup
-                            ?  'send_receive_info active'
-                            :  'send_receive_info'}>
-                            <p>{this.state.send_receive_info}</p>
-                            <span className="close" onClick={this.closeSendReceivePopup}>X</span>
+                            <div className="send_receive_popup_wrap">
+                                <div className={this.state.send_receive_popup
+                                    ?  'send_receive_info active'
+                                    :  'send_receive_info'}>
+                                    <p>{this.state.send_receive_info}</p>
+                                    <span className="close" onClick={this.closeSendReceivePopup}>X</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>

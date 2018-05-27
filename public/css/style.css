@@ -644,7 +644,7 @@ body{
   border-top: 1px solid rgba(255,255,255, .2);
   margin-top: 0px;
   padding-top: 15px;
-  padding-bottom: 50px;
+  padding-bottom: 10px;
   height: auto;
   visibility: visible;
   top: 2px;
@@ -792,11 +792,10 @@ body{
   opacity: 1;
 }
 .form-send .send_receive_popup_wrap {
-  height: 32px;
-  position: absolute;
-  left: 40px;
-  bottom: 10px;
-  width: calc(100% - 50px);
+  min-height: 34px;
+  margin-top: 10px;
+  width: 100%;
+  float: right;
 }
 .form-send .send_receive_info {
   position: relative;
