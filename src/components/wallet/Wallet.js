@@ -154,7 +154,7 @@ export default class Wallet extends React.Component {
                 refreshTimer: 23,
                 refreshInterval: interval,
             });
-            this.prepareDisplayPendingTx()
+            this.prepareDisplayPendingTx();
         }
     }
 
@@ -203,7 +203,9 @@ export default class Wallet extends React.Component {
             var json = JSON.parse(localStorage.getItem('wallet'));
             this.setState({wallet: json, keys: json['keys']});
         } catch (e) {
-            alert('failed to parse wallet')
+            this.setState({
+                status_text: 'Failed to parse wallet'
+            });
             this.context.router.push('/');
         }
     }
@@ -537,6 +539,18 @@ export default class Wallet extends React.Component {
                         .then(resp => resp.text())
                         .then((resp) => {
                             if (resp === "") {
+                                this.setState({
+                                    send_receive_popup: true,
+                                    send_receive_info: 'There was an error with the transaction',
+                                    send_overflow_active: false,
+                                    settings_active: false,
+                                    affiliate_active: false
+                                });
+                                setTimeout(() => {
+                                    this.setState({
+                                        transaction_being_sent: false,
+                                    });
+                                }, 1000);
                                 throw "There was an error with the transaction.";
                             }
                             this.setState({
@@ -548,8 +562,16 @@ export default class Wallet extends React.Component {
                 } else {
                     this.setState({
                         send_receive_popup: true,
-                        send_receive_info: 'Error with transaction'
+                        send_receive_info: 'Error with transaction',
+                        send_overflow_active: false,
+                        settings_active: false,
+                        affiliate_active: false
                     });
+                    setTimeout(() => {
+                        this.setState({
+                            transaction_being_sent: false,
+                        });
+                    }, 1000);
                 }
             });
     }
@@ -825,6 +847,7 @@ export default class Wallet extends React.Component {
                 });
             }
         }
+        this.closeSendReceivePopup();
     }
 
     showPrivateModal(e) {
@@ -876,32 +899,58 @@ export default class Wallet extends React.Component {
         if ((this.state.send_coin === 'safex' && this.state.send_fee > key_btc_bal) | (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal)) {
             this.setState({
                 send_receive_popup: true,
-                send_receive_info: 'You do not have enough BITCOIN to cover the fee'
+                send_receive_info: 'You do not have enough BITCOIN to cover the fee',
+                send_overflow_active: false,
+                settings_active: false,
+                affiliate_active: false
             });
         } else if (this.state.send_coin === 'safex' && this.state.send_amount > key_safex_bal) {
             this.setState({
                 send_receive_popup: true,
-                send_receive_info: 'You do not have enough SAFEX to cover this transaction'
+                send_receive_info: 'You do not have enough SAFEX to cover this transaction',
+                send_overflow_active: false,
+                settings_active: false,
+                affiliate_active: false
             });
         } else if (this.state.send_coin === 'safex' && (this.state.send_amount === '' || this.state.send_amount === 0 || isNaN(this.state.send_amount))) {
             this.setState({
                 send_receive_popup: true,
                 send_receive_info: 'Invalid SAFEX amount',
+                send_overflow_active: false,
+                settings_active: false,
+                affiliate_active: false
             })
-        } else if (this.state.send_coin === 'btc' && (this.state.send_amount === '' || this.state.send_amount === 0 || isNaN(this.state.send_total))) {
+        } else if (this.state.send_coin === 'btc' && (this.state.send_amount === '' || parseFloat(this.state.send_amount) === 0 || isNaN(this.state.send_total))) {
             this.setState({
                 send_receive_popup: true,
                 send_receive_info: 'Invalid BITCOIN amount',
+                send_overflow_active: false,
+                settings_active: false,
+                affiliate_active: false
             })
         } else if (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal) {
             this.setState({
                 send_receive_popup: true,
-                send_receive_info: 'You do not have enough BITCOIN to cover this transaction'
+                send_receive_info: 'You do not have enough BITCOIN to cover this transaction',
+                send_overflow_active: false,
+                settings_active: false,
+                affiliate_active: false
             });
         } else if (e.target.destination.value === '') {
             this.setState({
                 send_receive_popup: true,
-                send_receive_info: 'Destination field is empty'
+                send_receive_info: 'Destination field is empty',
+                send_overflow_active: false,
+                settings_active: false,
+                affiliate_active: false
+            });
+        } else if (e.target.destination.value === e.target.public_key.value) {
+            this.setState({
+                send_receive_popup: true,
+                send_receive_info: 'Invalid address',
+                send_overflow_active: false,
+                settings_active: false,
+                affiliate_active: false
             });
         } else {
             try {
@@ -921,7 +970,10 @@ export default class Wallet extends React.Component {
             } catch (e) {
                 this.setState({
                     send_receive_popup: true,
-                    send_receive_info: 'Destination address is invalid'
+                    send_receive_info: 'Destination address is invalid',
+                    send_overflow_active: false,
+                    settings_active: false,
+                    affiliate_active: false
                 });
             }
         }
@@ -1408,12 +1460,16 @@ export default class Wallet extends React.Component {
                             </div>
                         </div>`;
                     }
-                    document.getElementById("history_txs").innerHTML = render;
                 });
+                if (response[0].transactions.length === 0 && response[1].txs.length === 0) {
+                    render =`<h5>No transaction history</h5>`;
+                }
+                document.getElementById("history_txs").innerHTML = render;
             })
             .catch(function (error) {
                 console.log(error);
-                alert("Could not fetch transaction history...");
+                render += `<h5>Could not fetch transaction history...</h5>`
+                document.getElementById("history_txs").innerHTML = render;
             });
 
     }
@@ -1535,7 +1591,7 @@ export default class Wallet extends React.Component {
         this.setState({
             archive_active: true
         });
-        this.closeSendReceiveModal();
+        // this.closeSendReceiveModal();
         this.closeHistoryModal();
         this.closePrivateModal();
         this.closeSendReceivePopup();
@@ -1545,7 +1601,7 @@ export default class Wallet extends React.Component {
         this.setState({
             archive_active: false
         });
-        this.closeSendReceiveModal();
+        // this.closeSendReceiveModal();
         this.closeHistoryModal();
         this.closePrivateModal();
         this.closeSendReceivePopup();
@@ -1704,8 +1760,8 @@ export default class Wallet extends React.Component {
                         ?
                             <div>
                                 <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
-                                        onClick={this.openSendReceive.bind(this, key, 'send')}
-                                        className="send-btn button-shine active">
+                                    onClick={this.openSendReceive.bind(this, key, 'send')}
+                                    className="send-btn button-shine active">
                                     <span className="img-wrap">
                                         <img src="images/outbox-white.png" alt="Outbox Logo"/>
                                     </span>
@@ -1719,8 +1775,8 @@ export default class Wallet extends React.Component {
                         :
                             <div>
                                 <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
-                                        onClick={this.openSendReceive.bind(this, key, 'send')}
-                                        className={this.state.collapse_open.key === key && this.state.collapse_open.receive_open ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
+                                    onClick={this.openSendReceive.bind(this, key, 'send')}
+                                    className={this.state.collapse_open.key === key && this.state.collapse_open.receive_open ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
 
                                     {
                                         this.state.collapse_open.key === key && this.state.collapse_open.receive_open
@@ -1732,9 +1788,9 @@ export default class Wallet extends React.Component {
                                             <span className="img-wrap">
                                             {
                                                 keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0
-                                                    ?
+                                                ?
                                                     <img src="images/outbox-blue.png" alt="Outbox Logo"/>
-                                                    :
+                                                :
                                                     <img src="images/outbox-gray.png" alt="Outbox Logo"/>
 
                                             }
@@ -1865,7 +1921,7 @@ export default class Wallet extends React.Component {
                                 <label htmlFor="amount">Amount<span className={this.state.send_coin === "safex"
                                     ? ''
                                     : 'hidden-xs hidden-sm hidden-md hidden-lg'}>(Safex)</span>:</label>
-                                <input type="number" name="amount" onChange={this.sendAmountOnChange}
+                                <input type="number" name="amount" id="amount" onChange={this.sendAmountOnChange}
                                     value={this.state.send_amount}/>
                             </div>
                             <div className="form-group">
@@ -2005,9 +2061,9 @@ export default class Wallet extends React.Component {
                             </textarea>
                         </div>
                         <input type="hidden" readOnly name="private_key"
-                           value={this.state.send_keys.private_key} />
+                            value={this.state.send_keys.private_key} />
                         <input type="hidden" readOnly name="public_key"
-                           value={this.state.send_keys.public_key} />
+                            value={this.state.send_keys.public_key} />
                         <div className="form-group">
                             <label htmlFor="amount">Amount:</label>
                             <input readOnly name="amount" value={this.state.send_amount}/>

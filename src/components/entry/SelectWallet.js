@@ -6,8 +6,6 @@ var os = window.require('os');
 var fileDownload = require('react-file-download');
 import { decrypt } from '../../utils/utils';
 
-
-
 export default class SelectWallet extends React.Component {
 
     constructor(props) {
