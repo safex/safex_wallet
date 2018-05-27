@@ -836,6 +836,7 @@ body{
   margin-bottom: 0;
   text-transform: initial;
   line-height: 1.2;
+  min-height: 18px;
 }
 .form-send .send_receive_info .close {
   position: absolute;
