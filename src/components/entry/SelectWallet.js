@@ -20,9 +20,19 @@ export default class SelectWallet extends React.Component {
             walletResetModalDone: false,
             walletResetModalDlUnencrypted: false,
             walletResetModalDlEncrypted: false,
+            walletResetWarning1: false,
+            walletResetWarning2: false,
+            walletResetWarning3: false,
+            walletResetWarning4: false,
+            walletResetWarning5: false,
             wrong_password: false
         };
         this.walletResetStart = this.walletResetStart.bind(this);
+        this.walletResetWarning1Proceed = this.walletResetWarning1Proceed.bind(this);
+        this.walletResetWarning2Proceed = this.walletResetWarning2Proceed.bind(this);
+        this.walletResetWarning3Proceed = this.walletResetWarning3Proceed.bind(this);
+        this.walletResetWarning4Proceed = this.walletResetWarning4Proceed.bind(this);
+        this.walletResetWarning5Proceed = this.walletResetWarning5Proceed.bind(this);
         this.walletResetStep1Skip = this.walletResetStep1Skip.bind(this);
         this.walletResetStep1Proceed = this.walletResetStep1Proceed.bind(this);
         this.walletResetStep2 = this.walletResetStep2.bind(this);
@@ -70,14 +80,42 @@ export default class SelectWallet extends React.Component {
 
     //This happens when you click wallet reset on the main screen
     walletResetStart() {
-        alert('This feature is only if you want to delete a wallet and start over. This is not for upgrading ' +
-            'wallet versions.');
-        alert('This is not necessary for upgrading wallet versions.');
-        alert('PROCEED WITH CAUTION THIS PROCESS WILL DELETE YOUR EXISTING WALLET.');
-        alert('This procedure will reset the wallet. It will take you through steps to backup the existing wallet.' +
-            'Then the existing wallet will be deleted to make room for a new one. PROCEED WITH CAUTION!!');
-        alert('If you pushed this by mistake you will see a white "x" in the top right in a following screen.');
         this.setState({
+            walletResetWarning1: true
+        })
+    }
+
+    walletResetWarning1Proceed() {
+        this.setState({
+            walletResetWarning1: false,
+            walletResetWarning2: true
+        })
+    }
+
+    walletResetWarning2Proceed() {
+        this.setState({
+            walletResetWarning2: false,
+            walletResetWarning3: true
+        })
+    }
+
+    walletResetWarning3Proceed() {
+        this.setState({
+            walletResetWarning3: false,
+            walletResetWarning4: true
+        })
+    }
+
+    walletResetWarning4Proceed() {
+        this.setState({
+            walletResetWarning4: false,
+            walletResetWarning5: true
+        })
+    }
+
+    walletResetWarning5Proceed() {
+        this.setState({
+            walletResetWarning5: false,
             walletResetModal1: true
         })
     }
@@ -298,6 +336,72 @@ export default class SelectWallet extends React.Component {
         return (
             <div>
                 {show_options}
+                <div className={this.state.walletResetWarning1
+                    ? 'overflow sendModal walletResetModal active'
+                    : 'overflow sendModal walletResetModal'}>
+                    <div className="container">
+                        <h3>Wallet Reset
+                            <span onClick={this.walletResetClose} className="close">X</span>
+                        </h3>
+                        <p>
+                            This feature is only if you want to delete a wallet and start over. This is not for upgrading wallet versions.
+                        </p>
+                        <button className="keys-btn button-shine" onClick={this.walletResetWarning1Proceed}>Proceed</button>
+                    </div>
+                </div>
+                <div className={this.state.walletResetWarning2
+                    ? 'overflow sendModal walletResetModal active'
+                    : 'overflow sendModal walletResetModal'}>
+                    <div className="container">
+                        <h3>Wallet Reset
+                            <span onClick={this.walletResetClose} className="close">X</span>
+                        </h3>
+                        <p>
+                            This is not necessary for upgrading wallet versions
+                        </p>
+                        <button className="keys-btn button-shine" onClick={this.walletResetWarning2Proceed}>Proceed</button>
+                    </div>
+                </div>
+                <div className={this.state.walletResetWarning3
+                    ? 'overflow sendModal walletResetModal active'
+                    : 'overflow sendModal walletResetModal'}>
+                    <div className="container">
+                        <h3>Wallet Reset
+                            <span onClick={this.walletResetClose} className="close">X</span>
+                        </h3>
+                        <p>
+                            PROCEED WITH CAUTION THIS PROCESS WILL DELETE YOUR EXISTING WALLET.
+                        </p>
+                        <button className="keys-btn button-shine" onClick={this.walletResetWarning3Proceed}>Proceed</button>
+                    </div>
+                </div>
+                <div className={this.state.walletResetWarning4
+                    ? 'overflow sendModal walletResetModal active'
+                    : 'overflow sendModal walletResetModal'}>
+                    <div className="container">
+                        <h3>Wallet Reset
+                            <span onClick={this.walletResetClose} className="close">X</span>
+                        </h3>
+                        <p>
+                            This procedure will reset the wallet. It will take you through steps to backup the existing wallet.
+                            Then the existing wallet will be deleted to make room for a new one. PROCEED WITH CAUTION!!
+                        </p>
+                        <button className="keys-btn button-shine" onClick={this.walletResetWarning4Proceed}>Proceed</button>
+                    </div>
+                </div>
+                <div className={this.state.walletResetWarning5
+                    ? 'overflow sendModal walletResetModal active'
+                    : 'overflow sendModal walletResetModal'}>
+                    <div className="container">
+                        <h3>Wallet Reset
+                            <span onClick={this.walletResetClose} className="close">X</span>
+                        </h3>
+                        <p>
+                            If you pushed this by mistake hit the white "x" to cancel wallet reset.
+                        </p>
+                        <button className="keys-btn button-shine" onClick={this.walletResetWarning5Proceed}>Proceed</button>
+                    </div>
+                </div>
                 <div className={this.state.walletResetModal1
                     ? 'overflow sendModal walletResetModal active'
                     : 'overflow sendModal walletResetModal'}>
