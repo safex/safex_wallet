@@ -1787,7 +1787,8 @@ input::-webkit-inner-spin-button {
   font-size: 16px;
   text-transform: initial;
   line-height: 1.2;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
+  margin-right: 0;
 }
 .overflow.sendModal.walletResetModal h3 {
   text-align: left;

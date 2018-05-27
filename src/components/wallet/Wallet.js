@@ -947,7 +947,7 @@ export default class Wallet extends React.Component {
         } else if (e.target.destination.value === e.target.public_key.value) {
             this.setState({
                 send_receive_popup: true,
-                send_receive_info: 'Invalid address',
+                send_receive_info: 'Invalid sending address',
                 send_overflow_active: false,
                 settings_active: false,
                 affiliate_active: false
@@ -1918,9 +1918,13 @@ export default class Wallet extends React.Component {
                         </div>
                         <div className="col-xs-5 send-right">
                             <div className="form-group">
-                                <label htmlFor="amount">Amount<span className={this.state.send_coin === "safex"
+                                <label htmlFor="amount">Amount
+                                    <span className={this.state.send_coin === "safex"
                                     ? ''
-                                    : 'hidden-xs hidden-sm hidden-md hidden-lg'}>(Safex)</span>:</label>
+                                    : 'hidden-xs hidden-sm hidden-md hidden-lg'}>
+                                        (Safex):
+                                    </span>
+                                </label>
                                 <input type="number" name="amount" id="amount" onChange={this.sendAmountOnChange}
                                     value={this.state.send_amount}/>
                             </div>
@@ -2094,13 +2098,13 @@ export default class Wallet extends React.Component {
                             <img className={this.state.send_coin === 'safex'
                                 ? 'coin'
                                 : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                 onClick={this.sendCoinChoose.bind(this, 'safex')}
-                                 src="images/coin-white.png" alt="Safex Coin"/>
+                                onClick={this.sendCoinChoose.bind(this, 'safex')}
+                                src="images/coin-white.png" alt="Safex Coin"/>
                             <img className={this.state.send_coin === 'btc'
                                 ? 'coin'
                                 : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                 onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
-                                 alt="Bitcoin Coin"/>
+                                onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
+                                alt="Bitcoin Coin"/>
                         </div>
                         <div className="input-group">
                             <label htmlFor="from">From:</label>

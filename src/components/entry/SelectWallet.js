@@ -235,6 +235,11 @@ export default class SelectWallet extends React.Component {
     //This closes every modal
     walletResetClose() {
         this.setState({
+            walletResetWarning1: false,
+            walletResetWarning2: false,
+            walletResetWarning3: false,
+            walletResetWarning4: false,
+            walletResetWarning5: false,
             walletResetModal1: false,
             walletResetModal2: false,
             walletResetModal2unencrypted: false,
@@ -459,7 +464,7 @@ export default class SelectWallet extends React.Component {
                         </h3>
                         <p>This is second confirmation. When you check the box and proceed you will be able to backup your encrypted wallet. After this there is no turning back
                             your wallet will be deleted so that you can make a new one. In this step you'll backup your encrypted wallet that was already in the wallet.
-                            During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists.
+                            During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists. <br />
                             AFTER THIS THERE IS NO TURNING BACK, YOUR WALLET WILL BE DELETED HIT THE "X" TO GET OUT OF THIS</p>
                         <form onSubmit={this.walletResetStep2}>
                             <label><input name="checkbox" type="checkbox" /> I understand that this is my last chance to backup my wallet file after this it will be deleted</label>
@@ -482,7 +487,6 @@ export default class SelectWallet extends React.Component {
         );
     }
 }
-
 
 SelectWallet.contextTypes = {
     router: React.PropTypes.object.isRequired
