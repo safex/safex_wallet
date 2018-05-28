@@ -995,7 +995,7 @@ body{
   text-transform: uppercase;
   font-size: 14px;
   margin: 0;
-  background: #0ec8c1;
+  background: rgba(0, 231, 255, .8);
   display: inline-block;
 }
 .wallet-tabs {
@@ -1047,7 +1047,7 @@ body{
   -moz-transition: all 0.2s ease-out;
   transition: all 0.2s ease-out;
   color: #fff;
-  transform: scale(1.15);
+  transform: scale(1.13);
 }
 .explorer {
   color: #fff;
@@ -2059,14 +2059,18 @@ input::-webkit-inner-spin-button {
 .mainAlertPopupWrap .mainAlertPopup button {
   font-family: 'Gotham Medium', sans-serif;
   padding: 3px 15px 2px;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 8px;
   color: #fff;
   text-transform: uppercase;
   font-size: 14px;
   margin: 0;
-  background: #12bedd;
+  background: #0d8fa6;;
   display: none;
+  transition: all ease 0.3s;
+  -o-transition: all ease 0.3s;
+  -moz-transition: all ease 0.3s;
+  -webkit-transition: all ease 0.3s;
 }
 .mainAlertPopupWrap .mainAlertPopup button.active {
   display: inline-block;

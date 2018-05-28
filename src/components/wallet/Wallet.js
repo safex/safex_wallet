@@ -791,6 +791,8 @@ export default class Wallet extends React.Component {
     closeMainAlertPopup() {
         this.setState({
             main_alert_popup: false,
+            export_encrypted_wallet: false,
+            export_unencrypted_wallet: false,
         });
     }
 
@@ -799,6 +801,9 @@ export default class Wallet extends React.Component {
             main_alert_popup: true,
             export_encrypted_wallet: true,
             export_unencrypted_wallet: false,
+            private_key_open: {
+                private_key_popup: false,
+            },
             main_alert_popup_text: "This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the 'import key' feature in another wallet. Press OK to proceed.",
         });
     }
@@ -834,7 +839,11 @@ export default class Wallet extends React.Component {
             main_alert_popup: true,
             export_encrypted_wallet: false,
             export_unencrypted_wallet: true,
+            private_key_open: {
+                private_key_popup: false,
+            },
             main_alert_popup_text: "This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is not for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the 'import key' feature in another wallet. Press OK to proceed.",
+
         });
     }
 
@@ -854,7 +863,6 @@ export default class Wallet extends React.Component {
         setTimeout(() => {
             this.setState({
                 main_alert_popup: false,
-
             });
         }, 600)
 
