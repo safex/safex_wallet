@@ -767,7 +767,11 @@ export default class Wallet extends React.Component {
                         }
                     });
                 } else {
-                    console.log('key exists');
+                    this.setState({
+                        main_alert_popup: true,
+                        main_alert_popup_text: 'Key exists',
+                    });
+                    console.log('Key exists');
                 }
 
 
