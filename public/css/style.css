@@ -2032,6 +2032,8 @@ input::-webkit-inner-spin-button {
   padding: 15px;
   margin-right: 0;
   width: 400px;
+  -webkit-filter: brightness(1.3);
+  filter: brightness(1.3);
   transition: all ease 0.3s;
   -o-transition: all ease 0.3s;
   -moz-transition: all ease 0.3s;
@@ -2063,7 +2065,7 @@ input::-webkit-inner-spin-button {
   text-transform: uppercase;
   font-size: 14px;
   margin: 0;
-  background: #0ec8c1;
+  background: #12bedd;
   display: none;
 }
 .mainAlertPopupWrap .mainAlertPopup button.active {
