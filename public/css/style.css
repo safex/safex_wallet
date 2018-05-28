@@ -1022,6 +1022,17 @@ body{
   background: rgba(18, 190, 221, .4);
   border: 1px solid #00e7ff;
 }
+.wallet-tabs .btn.glow-active {
+  background: rgba(0, 231, 255, .9);
+  border: 1px solid #00e7ff;
+  box-shadow: 0 0 30px 0 rgba(0, 199, 236, 0.5);
+  -moz-box-shadow: 0 0 30px 0 rgba(0, 199, 236, 0.5);
+  -webkit-transition: all 0.2s ease-out;
+  -moz-transition: all 0.2s ease-out;
+  transition: all 0.2s ease-out;
+  color: #fff;
+  transform: scale(1.15);
+}
 .explorer {
   color: #fff;
 }
@@ -1735,7 +1746,7 @@ input::-webkit-inner-spin-button {
   color: #fff;
   text-transform: uppercase;
   font-size: 17px;
-  padding: 6px 26px 8px 8px;
+  padding: 6px 8px 8px 8px;
   margin-right: 0;
   opacity: 0;
   visibility: hidden;
@@ -1764,6 +1775,7 @@ input::-webkit-inner-spin-button {
   margin-bottom: 0;
   text-transform: initial;
   line-height: 1.2;
+  color: #ff9600;
 }
 .settingsModal .info-wrap .info-text .close {
   position: absolute;
@@ -2019,7 +2031,7 @@ input::-webkit-inner-spin-button {
   background: transparent;
   border: 0px none;
   margin-right: 0;
-  padding-right: 10px;
+  padding-right: 15px;
   font-size: 17px;
   margin-bottom: 0;
   text-transform: initial;
@@ -2486,5 +2498,19 @@ input::-webkit-inner-spin-button {
   }
   to {
     text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 6px #fff, 0 0 8px #0ec8c1, 0 0 10px #0ec8c1, 0 0 12px #0ec8c1, 0 0 14px #0ec8c1, 0 0 16px #0ec8c1;
+  }
+}
+@keyframes effect_dylan {
+  50% {
+    transform: scale(1.5, 1.5);
+    opacity: 0;
+  }
+  99% {
+    transform: scale(0.001, 0.001);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(0.001, 0.001);
+    opacity: 1;
   }
 }

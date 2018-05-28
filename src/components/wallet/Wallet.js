@@ -1624,7 +1624,7 @@ export default class Wallet extends React.Component {
             this.setState({
                 transfer_key_to_archive: false
             });
-        }, 1000);
+        }, 800);
     }
 
     removeFromArchive(index) {
@@ -1690,7 +1690,7 @@ export default class Wallet extends React.Component {
             this.setState({
                 transfer_key_to_home: false
             });
-        }, 1000);
+        }, 800);
     }
 
     setArchiveView() {
@@ -1942,19 +1942,16 @@ export default class Wallet extends React.Component {
                                 {
                                     this.state.history_overflow_active
                                     ?
-                                        <button onClick={this.closeHistoryModal}
-                                                className='archive-button history-button button-shine history-btn'>
+                                        <button onClick={this.closeHistoryModal} className='archive-button history-button button-shine history-btn'>
                                             <span>HISTORY</span>
                                         </button>
                                     :
-                                        <button onClick={() => this.openHistoryModal(key)}
-                                                className='archive-button history-button button-shine history-btn'>
+                                        <button onClick={() => this.openHistoryModal(key)} className='archive-button history-button button-shine history-btn'>
                                             <span>HISTORY</span>
                                         </button>
                                 }
 
-                                <button onClick={() => this.showPrivateModal(key)}
-                                    className='archive-button show-private-button button-shine show-private-btn'>
+                                <button onClick={() => this.showPrivateModal(key)} className='archive-button show-private-button button-shine show-private-btn'>
                                     <span>show private</span>
                                 </button>
                             </div>
@@ -2109,14 +2106,43 @@ export default class Wallet extends React.Component {
             <div className="wallet-page">
                 <Navigation/>
                 <div className="wallet-tabs fadeIn">
-                    <div onClick={this.setHomeView}
-                        className={archive_active === false || this.state.transfer_key_to_home ? 'btn btn-default button-shine active' : 'btn btn-default button-shine'}>
-                        Home
-                    </div>
-                    <div onClick={this.setArchiveView}
-                        className={archive_active || this.state.transfer_key_to_archive ? 'btn btn-default button-shine active' : 'btn btn-default button-shine'}>
-                        Archive
-                    </div>
+                    {
+                        archive_active
+                        ?
+                            <div>
+                                {
+                                    this.state.transfer_key_to_home
+                                    ?
+                                        <div onClick={this.setHomeView} className='btn btn-default button-shine glow-active'>
+                                            Home
+                                        </div>
+                                    :
+                                        <div onClick={this.setHomeView} className='btn btn-default button-shine'>
+                                            Home
+                                        </div>
+                                }
+                                <div onClick={this.setArchiveView} className='btn btn-default button-shine active'>
+                                    Archive
+                                </div>
+                            </div>
+                        :
+                            <div>
+                                <div onClick={this.setHomeView} className='btn btn-default button-shine active'>
+                                    Home
+                                </div>
+                                {
+                                    this.state.transfer_key_to_archive
+                                    ?
+                                        <div onClick={this.setArchiveView} className='btn btn-default button-shine glow-active'>
+                                            Archive
+                                        </div>
+                                    :
+                                        <div onClick={this.setArchiveView} className='btn btn-default button-shine'>
+                                            Archive
+                                        </div>
+                                }
+                            </div>
+                    }
                 </div>
                 <div className='container keys-container'>
                     <div className={this.state.settings_active || this.state.send_overflow_active || this.state.dividend_active || this.state.affiliate_active
@@ -2270,9 +2296,9 @@ export default class Wallet extends React.Component {
                                 {
                                     this.state.wrong_old_password
                                     ?
-                                        <input type="password" className="form-control shake" id="old_pass" name="old_pass" />
+                                        <input type="password" className="form-control shake" id="old_pass" name="old_pass" onChange={this.closeSettingsInfoPopup} />
                                     :
-                                        <input type="password" className="form-control" id="old_pass" name="old_pass" />
+                                        <input type="password" className="form-control" id="old_pass" name="old_pass" onChange={this.closeSettingsInfoPopup} />
                                 }
                             </div>
                             <div className="form-group">
@@ -2280,9 +2306,9 @@ export default class Wallet extends React.Component {
                                 {
                                     this.state.wrong_new_password
                                     ?
-                                        <input type="password" className="form-control shake" id="new_pass" name="new_pass" />
+                                        <input type="password" className="form-control shake" id="new_pass" name="new_pass" onChange={this.closeSettingsInfoPopup} />
                                     :
-                                        <input type="password" className="form-control" id="new_pass" name="new_pass"/>
+                                        <input type="password" className="form-control" id="new_pass" name="new_pass" onChange={this.closeSettingsInfoPopup} />
                                 }
                             </div>
                             <div className="form-group">
@@ -2290,9 +2316,9 @@ export default class Wallet extends React.Component {
                                 {
                                     this.state.wrong_repeat_password
                                     ?
-                                        <input type="password" className="form-control shake" id="repeat_pass" name="repeat_pass"/>
+                                        <input type="password" className="form-control shake" id="repeat_pass" name="repeat_pass" onChange={this.closeSettingsInfoPopup} />
                                     :
-                                        <input type="password" className="form-control" id="repeat_pass" name="repeat_pass"/>
+                                        <input type="password" className="form-control" id="repeat_pass" name="repeat_pass" onChange={this.closeSettingsInfoPopup} />
                                 }
                             </div>
                             <div className="col-xs-12 submit-wrap">
@@ -2305,7 +2331,7 @@ export default class Wallet extends React.Component {
                                         ? 'info-text active'
                                         : 'info-text'}>
                                         <p>{this.state.info_text}</p>
-                                        <span className="close" onClick={this.closeSettingsInfoPopup}>X</span>
+                                        {/*<span className="close" onClick={this.closeSettingsInfoPopup}>X</span>*/}
                                     </div>
                                 </div>
                             </div>
@@ -2394,7 +2420,7 @@ export default class Wallet extends React.Component {
                     </div>
                     <div className={this.state.import_wrap_glow ? 'import-form-wrap active' :'import-form-wrap'}>
                         <form onChange={this.importKeyChange} onSubmit={this.importKey}>
-                            <input name="key" value={this.state.import_key} onFocus={this.importGlow} onBlur={this.importGlowDeactivate} placeholder="Import Key"/>
+                            <input name="key" value={this.state.import_key} onFocus={this.importGlow} onBlur={this.importGlowDeactivate} placeholder="Paste your private key"/>
                             <button type="submit" className="button-shine" title="Import Key">Import</button>
                         </form>
                         <button onClick={this.createKey} className="create-btn button-shine" title="Create New Key">
