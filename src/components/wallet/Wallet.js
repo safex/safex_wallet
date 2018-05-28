@@ -92,6 +92,10 @@ export default class Wallet extends React.Component {
             info_text: '',
             send_receive_popup: false,
             send_receive_info: '',
+            main_alert_popup: false,
+            main_alert_popup_text: '',
+            export_unencrypted_wallet: false,
+            export_encrypted_wallet: false,
         }
 
         this.createKey = this.createKey.bind(this);
@@ -117,7 +121,9 @@ export default class Wallet extends React.Component {
         this.closeAffiliateModal = this.closeAffiliateModal.bind(this);
         this.closeSendReceiveModal = this.closeSendReceiveModal.bind(this);
 
+        this.openExportUnencryptedWalletPopup = this.openExportUnencryptedWalletPopup.bind(this);
         this.exportUnencryptedWallet = this.exportUnencryptedWallet.bind(this);
+        this.openExportEncryptedWallet = this.openExportEncryptedWallet.bind(this);
         this.exportEncryptedWallet = this.exportEncryptedWallet.bind(this);
         this.getFee = this.getFee.bind(this);
         this.refreshWallet = this.refreshWallet.bind(this);
@@ -139,6 +145,7 @@ export default class Wallet extends React.Component {
         this.closeSettingsInfoPopup = this.closeSettingsInfoPopup.bind(this);
         this.resetSettingsForm = this.resetSettingsForm.bind(this);
         this.closeSendReceivePopup = this.closeSendReceivePopup.bind(this);
+        this.closeMainAlertPopup = this.closeMainAlertPopup.bind(this);
     }
 
     logout() {
@@ -226,10 +233,11 @@ export default class Wallet extends React.Component {
                 this.setState({average_fee: resp, send_fee: resp});
             })
             .catch(e => {
-                alert('unable to fetch average fee')
                 this.setState({
                     btc_sync: false,
                     safex_sync: false,
+                    main_alert_popup: true,
+                    main_alert_popup_text: 'Unable to fetch average fee',
                     status_text: 'Sync error, please refresh again'
                 });
             });
@@ -599,7 +607,10 @@ export default class Wallet extends React.Component {
 
         var btc = require('bitcoinjs-lib');
         if (amount <= 0.1) {
-            alert("Transaction not processed - Amount is too low. ")
+            this.setState({
+                main_alert_popup: true,
+                main_alert_popup_text: 'Transaction not processed - Amount is too low.',
+            });
             return;
         }
 
@@ -644,7 +655,10 @@ export default class Wallet extends React.Component {
         try {
             var json = JSON.parse(localStorage.getItem('wallet'));
         } catch (e) {
-            alert('error parsing the wallet data')
+            this.setState({
+                main_alert_popup: true,
+                main_alert_popup_text: 'Error parsing the wallet data.',
+            });
         }
 
         json['keys'].push(key_json);
@@ -657,7 +671,10 @@ export default class Wallet extends React.Component {
 
         fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
             if (err) {
-                alert('problem communicating to the wallet file')
+                this.setState({
+                    main_alert_popup: true,
+                    main_alert_popup_text: 'Problem communicating to the wallet file.',
+                });
             } else {
                 localStorage.setItem('wallet', JSON.stringify(json));
                 try {
@@ -666,9 +683,15 @@ export default class Wallet extends React.Component {
                     this.prepareDisplay();
                     this.closeHistoryModal();
                     this.closePrivateModal();
-                    alert('key added to wallet')
+                    this.setState({
+                        main_alert_popup: true,
+                        main_alert_popup_text: 'Key added to wallet',
+                    });
                 } catch (e) {
-                    alert('an error adding a key to the wallet contact team@safex.io')
+                    this.setState({
+                        main_alert_popup: true,
+                        main_alert_popup_text: 'An error adding a key to the wallet. Please contact team@safex.io',
+                    });
                 }
 
             }
@@ -729,7 +752,13 @@ export default class Wallet extends React.Component {
                             })
                             try {
                                 var json2 = JSON.parse(localStorage.getItem('wallet'));
-                                this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
+                                this.setState({
+                                    wallet: json2,
+                                    keys: json2['keys'],
+                                    is_loading: false,
+                                    main_alert_popup: true,
+                                    main_alert_popup_text: 'Key Imported',
+                                });
                                 this.prepareDisplay();
                             } catch (e) {
                                 console.log(e);
@@ -746,31 +775,31 @@ export default class Wallet extends React.Component {
                 console.log(e);
             }
         } catch (e) {
-            alert('invalid private key')
+            this.setState({
+                main_alert_popup: true,
+                main_alert_popup_text: 'Invalid private key',
+            });
         }
         this.closeHistoryModal();
         this.closePrivateModal();
     }
 
-    exportUnencryptedWallet() {
-        alert("This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is not for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the 'import key' feature in another wallet.");
-
-        var wallet_data = JSON.parse(localStorage.getItem('wallet'));
-        var nice_keys = "";
-        var keys = wallet_data['keys'];
-        keys.map((key) => {
-            nice_keys += "private key: " + key.private_key + '\n';
-            nice_keys += "public key: " + key.public_key + '\n';
-            nice_keys += '\n';
+    closeMainAlertPopup() {
+        this.setState({
+            main_alert_popup: false,
         });
-        var date = Date.now();
+    }
 
-        fileDownload(nice_keys, date + 'unsafex.txt');
+    openExportEncryptedWallet() {
+        this.setState({
+            main_alert_popup: true,
+            export_encrypted_wallet: true,
+            export_unencrypted_wallet: false,
+            main_alert_popup_text: "This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the 'import key' feature in another wallet. Press OK to proceed.",
+        });
     }
 
     exportEncryptedWallet() {
-        alert("This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is not for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the 'import key' feature in another wallet.");
-
         fs.readFile(localStorage.getItem('wallet_path'), (err, fd) => {
             if (err) {
                 //if the error is that No File exists, let's step through and make the file
@@ -782,6 +811,54 @@ export default class Wallet extends React.Component {
                 fileDownload(fd, date + 'safexwallet.dat');
             }
         });
+
+        setTimeout(() => {
+            this.setState({
+                main_alert_popup: false,
+            });
+        }, 600)
+
+        setTimeout(() => {
+            this.setState({
+                export_encrypted_wallet: false
+            });
+        }, 1500)
+    }
+
+    openExportUnencryptedWalletPopup() {
+        this.setState({
+            main_alert_popup: true,
+            export_encrypted_wallet: false,
+            export_unencrypted_wallet: true,
+            main_alert_popup_text: "This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is not for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the 'import key' feature in another wallet. Press OK to proceed.",
+        });
+    }
+
+    exportUnencryptedWallet() {
+        var wallet_data = JSON.parse(localStorage.getItem('wallet'));
+        var nice_keys = "";
+        var keys = wallet_data['keys'];
+        keys.map((key) => {
+            nice_keys += "private key: " + key.private_key + '\n';
+            nice_keys += "public key: " + key.public_key + '\n';
+            nice_keys += '\n';
+        });
+        var date = Date.now();
+
+        fileDownload(nice_keys, date + 'unsafex.txt');
+
+        setTimeout(() => {
+            this.setState({
+                main_alert_popup: false,
+
+            });
+        }, 600)
+
+        setTimeout(() => {
+            this.setState({
+                export_unencrypted_wallet: false,
+            });
+        }, 1500)
     }
 
     amountChange(receive_amount) {
@@ -902,7 +979,8 @@ export default class Wallet extends React.Component {
                 send_receive_info: 'You do not have enough BITCOIN to cover the fee',
                 send_overflow_active: false,
                 settings_active: false,
-                affiliate_active: false
+                affiliate_active: false,
+                dividend_active: false,
             });
         } else if (this.state.send_coin === 'safex' && this.state.send_amount > key_safex_bal) {
             this.setState({
@@ -910,7 +988,8 @@ export default class Wallet extends React.Component {
                 send_receive_info: 'You do not have enough SAFEX to cover this transaction',
                 send_overflow_active: false,
                 settings_active: false,
-                affiliate_active: false
+                affiliate_active: false,
+                dividend_active: false,
             });
         } else if (this.state.send_coin === 'safex' && (this.state.send_amount === '' || this.state.send_amount === 0 || isNaN(this.state.send_amount))) {
             this.setState({
@@ -918,7 +997,8 @@ export default class Wallet extends React.Component {
                 send_receive_info: 'Invalid SAFEX amount',
                 send_overflow_active: false,
                 settings_active: false,
-                affiliate_active: false
+                affiliate_active: false,
+                dividend_active: false,
             })
         } else if (this.state.send_coin === 'btc' && (this.state.send_amount === '' || parseFloat(this.state.send_amount) === 0 || isNaN(this.state.send_total))) {
             this.setState({
@@ -926,7 +1006,8 @@ export default class Wallet extends React.Component {
                 send_receive_info: 'Invalid BITCOIN amount',
                 send_overflow_active: false,
                 settings_active: false,
-                affiliate_active: false
+                affiliate_active: false,
+                dividend_active: false,
             })
         } else if (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal) {
             this.setState({
@@ -934,7 +1015,8 @@ export default class Wallet extends React.Component {
                 send_receive_info: 'You do not have enough BITCOIN to cover this transaction',
                 send_overflow_active: false,
                 settings_active: false,
-                affiliate_active: false
+                affiliate_active: false,
+                dividend_active: false,
             });
         } else if (e.target.destination.value === '') {
             this.setState({
@@ -942,7 +1024,8 @@ export default class Wallet extends React.Component {
                 send_receive_info: 'Destination field is empty',
                 send_overflow_active: false,
                 settings_active: false,
-                affiliate_active: false
+                affiliate_active: false,
+                dividend_active: false,
             });
         } else if (e.target.destination.value === e.target.public_key.value) {
             this.setState({
@@ -950,7 +1033,8 @@ export default class Wallet extends React.Component {
                 send_receive_info: 'Invalid sending address',
                 send_overflow_active: false,
                 settings_active: false,
-                affiliate_active: false
+                affiliate_active: false,
+                dividend_active: false,
             });
         } else {
             try {
@@ -973,7 +1057,8 @@ export default class Wallet extends React.Component {
                     send_receive_info: 'Destination address is invalid',
                     send_overflow_active: false,
                     settings_active: false,
-                    affiliate_active: false
+                    affiliate_active: false,
+                    dividend_active: false,
                 });
             }
         }
@@ -1002,7 +1087,10 @@ export default class Wallet extends React.Component {
                     if (err) {
                         //if the error is that No File exists, let's step through and make the file
                         if (err.code === 'ENOENT') {
-                            alert('no wallet was found');
+                            this.setState({
+                                main_alert_popup: true,
+                                main_alert_popup_text: "No wallet was found.",
+                            });
                         }
                     } else {
 
@@ -1493,7 +1581,10 @@ export default class Wallet extends React.Component {
 
             fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
                 if (err) {
-                    alert('problem communicating to the wallet file')
+                    this.setState({
+                        main_alert_popup: true,
+                        main_alert_popup_text: "Problem communicating to the wallet file.",
+                    });
                 } else {
                     localStorage.setItem('wallet', JSON.stringify(json));
                     try {
@@ -1512,13 +1603,19 @@ export default class Wallet extends React.Component {
                             is_loading: false
                         });
                     } catch (e) {
-                        alert('an error adding a key to the wallet contact team@safex.io')
+                        this.setState({
+                            main_alert_popup: true,
+                            main_alert_popup_text: "An error adding a key to the wallet. Please contact team@safex.io",
+                        });
                     }
 
                 }
             });
         } catch (e) {
-            alert('error parsing the wallet data')
+            this.setState({
+                main_alert_popup: true,
+                main_alert_popup_text: "Error parsing the wallet data.",
+            });
         }
         this.setState({
             transfer_key_to_archive: true,
@@ -1550,7 +1647,10 @@ export default class Wallet extends React.Component {
 
             fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
                 if (err) {
-                    alert('problem communicating to the wallet file')
+                    this.setState({
+                        main_alert_popup: true,
+                        main_alert_popup_text: "Problem communicating to the wallet file.",
+                    });
                 } else {
                     localStorage.setItem('wallet', JSON.stringify(json));
                     try {
@@ -1570,12 +1670,18 @@ export default class Wallet extends React.Component {
                         });
                         this.prepareDisplay(json.keys[index]);
                     } catch (e) {
-                        alert('An error occured while adding a key to the wallet. Please contact team@safex.io')
+                        this.setState({
+                            main_alert_popup: true,
+                            main_alert_popup_text: "An error occured while adding a key to the wallet. Please contact team@safex.io",
+                        });
                     }
                 }
             });
         } catch (e) {
-            alert('error parsing the wallet data')
+            this.setState({
+                main_alert_popup: true,
+                main_alert_popup_text: "Error parsing the wallet data",
+            });
         }
         this.setState({
             transfer_key_to_home: true,
@@ -2204,8 +2310,8 @@ export default class Wallet extends React.Component {
                                 </div>
                             </div>
                         </form>
-                        <button className="keys-btn button-shine" onClick={this.exportEncryptedWallet}>Export Encrypted Wallet <span className="blue-text">(.dat)</span></button>
-                        <button className="keys-btn button-shine" onClick={this.exportUnencryptedWallet}>Export Unencrypted Keys</button>
+                        <button className="keys-btn button-shine" onClick={this.openExportEncryptedWallet}>Export Encrypted Wallet <span className="blue-text">(.dat)</span></button>
+                        <button className="keys-btn button-shine" onClick={this.openExportUnencryptedWalletPopup}>Export Unencrypted Keys</button>
                         <button className="logout-btn button-shine-red" onClick={this.logout}>Logout</button>
                     </div>
                 </div>
@@ -2344,6 +2450,24 @@ export default class Wallet extends React.Component {
                                     <span><p>{this.state.refreshTimer + 's'}</p></span>
                                 </button>
                         }
+                    </div>
+                </div>
+                <div className={this.state.main_alert_popup
+                    ?   'mainAlertPopupWrap active'
+                    :   'mainAlertPopupWrap'}>
+                    <div className="mainAlertPopup">
+                        <p>{this.state.main_alert_popup_text}</p>
+                        <button className={this.state.export_unencrypted_wallet === false && this.state.export_encrypted_wallet
+                            ? 'mainAlertProceed active'
+                            : 'mainAlertProceed'} onClick={this.exportEncryptedWallet}>
+                            Ok
+                        </button>
+                        <button className={this.state.export_unencrypted_wallet && this.state.export_encrypted_wallet === false
+                            ? 'mainAlertProceed active'
+                            : 'mainAlertProceed'} onClick={this.exportUnencryptedWallet}>
+                            Ok
+                        </button>
+                        <span className="close" onClick={this.closeMainAlertPopup}>X</span>
                     </div>
                 </div>
             </div>
