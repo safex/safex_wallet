@@ -791,9 +791,14 @@ export default class Wallet extends React.Component {
     closeMainAlertPopup() {
         this.setState({
             main_alert_popup: false,
-            export_encrypted_wallet: false,
-            export_unencrypted_wallet: false,
         });
+
+        setTimeout(() => {
+            this.setState({
+                export_encrypted_wallet: false,
+                export_unencrypted_wallet: false,
+            });
+        }, 300)
     }
 
     openExportEncryptedWallet() {
@@ -821,17 +826,15 @@ export default class Wallet extends React.Component {
             }
         });
 
-        setTimeout(() => {
-            this.setState({
-                main_alert_popup: false,
-            });
-        }, 600)
+        this.setState({
+            main_alert_popup: false,
+        });
 
         setTimeout(() => {
             this.setState({
                 export_encrypted_wallet: false
-            });
-        }, 1500)
+            })
+        }, 300);
     }
 
     openExportUnencryptedWalletPopup() {
@@ -860,17 +863,15 @@ export default class Wallet extends React.Component {
 
         fileDownload(nice_keys, date + 'unsafex.txt');
 
-        setTimeout(() => {
-            this.setState({
-                main_alert_popup: false,
-            });
-        }, 600)
+        this.setState({
+            main_alert_popup: false,
+        });
 
         setTimeout(() => {
             this.setState({
                 export_unencrypted_wallet: false,
-            });
-        }, 1500)
+            })
+        }, 300);
     }
 
     amountChange(receive_amount) {
@@ -2023,12 +2024,12 @@ export default class Wallet extends React.Component {
                             <div className="input-group">
                                 <span className="input-group-addon" id="basic-addon1">From:</span>
                                 <input name="from" type="text" className="form-control" placeholder="From"
-                                    aria-describedby="From" value={keys[key].public_key}/>
+                                    aria-describedby="From" value={keys[key].public_key} />
                             </div>
                             <div className="input-group">
                                 <span className="input-group-addon" id="basic-addon1">To:</span>
                                 <input name="destination" type="text" className="form-control" placeholder="Address"
-                                    aria-describedby="basic-addon1"/>
+                                    aria-describedby="basic-addon1" onChange={this.closeSendReceivePopup} />
                             </div>
                         </div>
                         <div className="col-xs-5 send-right">
@@ -2490,23 +2491,46 @@ export default class Wallet extends React.Component {
                         }
                     </div>
                 </div>
+
+
                 <div className={this.state.main_alert_popup
-                    ?   'mainAlertPopupWrap active'
-                    :   'mainAlertPopupWrap'}>
-                    <div className="mainAlertPopup">
+                    ?   'mainAlertPopup active'
+                    :   'mainAlertPopup'}>
+                    <div className="mainAlertPopupInner">
                         <p>{this.state.main_alert_popup_text}</p>
-                        <button className={this.state.export_unencrypted_wallet === false && this.state.export_encrypted_wallet
-                            ? 'mainAlertProceed active'
-                            : 'mainAlertProceed'} onClick={this.exportEncryptedWallet}>
-                            Ok
-                        </button>
-                        <button className={this.state.export_unencrypted_wallet && this.state.export_encrypted_wallet === false
-                            ? 'mainAlertProceed active'
-                            : 'mainAlertProceed'} onClick={this.exportUnencryptedWallet}>
-                            Ok
-                        </button>
+                        {
+                            this.state.export_unencrypted_wallet === false && this.state.export_encrypted_wallet
+                            ?
+                                <div className="mainAlertProceedWrap">
+                                    <button className="mainAlertProceed active" onClick={this.exportEncryptedWallet}>
+                                        Ok
+                                    </button>
+                                </div>
+                            :
+                                <div className="mainAlertProceedWrap">
+                                    {
+                                        this.state.export_unencrypted_wallet && this.state.export_encrypted_wallet === false
+                                        ?
+                                            <button className="mainAlertProceed active" onClick={this.exportUnencryptedWallet}>
+                                                Ok
+                                            </button>
+                                        :
+                                            <button className="mainAlertProceed">
+                                                Ok
+                                            </button>
+                                    }
+                                    <button className="mainAlertProceed">
+                                        Ok
+                                    </button>
+                                </div>
+                        }
                         <span className="close" onClick={this.closeMainAlertPopup}>X</span>
                     </div>
+                </div>
+
+                <div className={this.state.main_alert_popup
+                    ?   'mainAlertBackdrop active'
+                    :   'mainAlertBackdrop'} onClick={this.closeMainAlertPopup}>
                 </div>
             </div>
         );

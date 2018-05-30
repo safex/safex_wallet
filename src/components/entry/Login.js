@@ -10,7 +10,8 @@ export default class Login extends React.Component {
         super(props);
 
         this.state = {
-            wrong_password: false
+            wrong_password: false,
+            is_caps_lock: false,
         };
 
         this.wrongPassword = this.wrongPassword.bind(this);
