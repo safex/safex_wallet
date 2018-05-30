@@ -253,6 +253,9 @@ body{
   outline: 0px none;
   background: transparent;
 }
+.Import-wallet .btn:active {
+  color: #fff;
+}
 .Import-wallet .btn img {
   display: inline-block;
   margin-left: 5px;
@@ -288,7 +291,7 @@ body{
   height: 30px;
   text-align: center;
   margin-bottom: 10px;
-  border-radius: 10px;
+  /*border-radius: 10px;*/
   line-height: 60px;
   color: #fff;
   box-shadow: none;

@@ -20,12 +20,15 @@ export default class ImportWallet extends React.Component {
         this.state = {
             filename: file,
             path: '',
-            wrong_password: false
+            wrong_password: false,
+            walletImportAlerts: false,
+            walletImportAlertsText: ''
         }
 
         this.wrongPassword = this.wrongPassword.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.walletImportAlertsClose = this.walletImportAlertsClose.bind(this);
     }
 
     wrongPassword() {
@@ -46,6 +49,13 @@ export default class ImportWallet extends React.Component {
         });
     }
 
+    walletImportAlertsClose() {
+        this.setState({
+            walletImportAlerts: false,
+            walletImportAlertsText: ''
+        });
+    }
+
     handleSubmit(e) {
         e.preventDefault();
         var crypto = require('crypto'),
@@ -56,6 +66,11 @@ export default class ImportWallet extends React.Component {
             if (err) {
                 //if the error is that No File exists, let's step through and make the file
                 if (err.code === 'ENOENT') {
+                    this.setState({
+                        walletImportAlerts: true,
+                        walletImportAlertsText: 'Invalid password or corrupted wallet file'
+                    });
+                    this.wrongPassword();
                     console.error('error');
                     // TODO: Nothing happens here?
                 }
@@ -74,13 +89,21 @@ export default class ImportWallet extends React.Component {
                 }
                 catch (e) {
                     // This means we got an invalid JSON. Wrong password or corrupted file (no way to know?)
-                    alert(`Invalid password or corrupted wallet file`);
+                    this.setState({
+                        walletImportAlerts: true,
+                        walletImportAlertsText: 'Invalid password or corrupted wallet file'
+                    });
+                    this.wrongPassword();
                     return;
                 }
 
                 if (!parsedWallet || parsedWallet['version'] !== '1') {
                     // We got correct decrypt, but wallet is in some unsupported format
-                    alert(`Invalid wallet format`);
+                    this.setState({
+                        walletImportAlerts: true,
+                        walletImportAlertsText: 'Invalid wallet format'
+                    });
+                    this.wrongPassword();
                     return;
                 }
                 
@@ -88,7 +111,6 @@ export default class ImportWallet extends React.Component {
                 this.context.router.push('/wallet');
             }
         });
-        this.wrongPassword();
     }
 
     render() {
@@ -124,6 +146,17 @@ export default class ImportWallet extends React.Component {
                 <div className="col-xs-12 text-center Intro-footer">
                     <img src="images/footer-logo.png" alt="Safex Icon Footer"/>
                     <p className="text-center">2014-2018 All Rights Reserved Safe Exchange Developers &copy;</p>
+                </div>
+
+                <div className={this.state.walletImportAlerts
+                    ? 'overflow sendModal walletResetModal active'
+                    : 'overflow sendModal walletResetModal'}>
+                    <div className="container">
+                        <h3>Wallet Import
+                            <span onClick={this.walletImportAlertsClose} className="close">X</span>
+                        </h3>
+                        <p>{this.state.walletImportAlertsText}</p>
+                    </div>
                 </div>
             </div>
         );
