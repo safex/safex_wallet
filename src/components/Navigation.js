@@ -11,7 +11,6 @@ export default class Navigation extends React.Component {
             bitcoin_price: 0,
         }
         this.getPrices = this.getPrices.bind(this);
-
     }
 
     componentDidMount() {
@@ -61,12 +60,10 @@ export default class Navigation extends React.Component {
                 console.log(e);
             }
         });
-
     }
 
 
     render() {
-
         return (<nav className="navbar navbar-default bounceInDown">
             <div className="container">
                 <div className="navbar-header">

@@ -13,6 +13,7 @@ import QRCode from 'qrcode.react';
 import NumberFormat from 'react-number-format';
 
 import Navigation from '../Navigation';
+import KeyLabel from "../KeyLabel";
 
 export default class Wallet extends React.Component {
     constructor(props) {
@@ -96,6 +97,7 @@ export default class Wallet extends React.Component {
             main_alert_popup_text: '',
             export_unencrypted_wallet: false,
             export_encrypted_wallet: false,
+            import_modal_active: false,
         }
 
         this.createKey = this.createKey.bind(this);
@@ -146,6 +148,8 @@ export default class Wallet extends React.Component {
         this.resetSettingsForm = this.resetSettingsForm.bind(this);
         this.closeSendReceivePopup = this.closeSendReceivePopup.bind(this);
         this.closeMainAlertPopup = this.closeMainAlertPopup.bind(this);
+        this.openImportModal = this.openImportModal.bind(this);
+        this.closeImportModal = this.closeImportModal.bind(this);
     }
 
     logout() {
@@ -651,6 +655,7 @@ export default class Wallet extends React.Component {
         key_json['pending_safex_bal'] = 0;
         key_json['pending_btc_bal'] = 0;
         key_json['archived'] = false;
+        key_json['label'] = '';
 
         try {
             var json = JSON.parse(localStorage.getItem('wallet'));
@@ -704,6 +709,44 @@ export default class Wallet extends React.Component {
         });
     }
 
+    openImportModal(e) {
+        e.preventDefault();
+        try{
+            var key_pair = bitcoin.ECPair.fromWIF(e.target.key.value);
+            var address = key_pair.getAddress();
+
+            try {
+                var json = JSON.parse(localStorage.getItem('wallet'));
+                var key_exists = false;
+
+                if (key_exists === false) {
+                    this.setState({
+                        import_modal_active: true,
+                    });
+                }
+
+                for (var i = 0; i < json['keys'].length; i++) {
+                    // look for the entry with a matching `code` value
+                    if (json['keys'][i].public_key === address) {
+                        this.setState({
+                            import_modal_active: false,
+                            main_alert_popup: true,
+                            main_alert_popup_text: 'Key exists',
+                        });
+                        console.log('Key exists');
+                    }
+                }
+            } catch (e) {
+                console.log(e);
+            }
+        } catch(e) {
+            this.setState({
+                main_alert_popup: true,
+                main_alert_popup_text: 'Invalid private key',
+            });
+        }
+    }
+
     importKey(e) {
         e.preventDefault();
         try {
@@ -718,11 +761,12 @@ export default class Wallet extends React.Component {
             key_json['pending_safex_bal'] = 0;
             key_json['pending_btc_bal'] = 0;
             key_json['archived'] = false;
-
+            key_json['label'] = '';
 
             try {
                 var json = JSON.parse(localStorage.getItem('wallet'));
                 var key_exists = false;
+
 
                 for (var i = 0; i < json['keys'].length; i++) {
                     // look for the entry with a matching `code` value
@@ -734,6 +778,7 @@ export default class Wallet extends React.Component {
                 if (key_exists === false) {
 
                     json['keys'].push(key_json);
+                    console.log(json['keys']['label'])
 
                     var crypto = require('crypto'),
                         algorithm = 'aes-256-ctr',
@@ -741,14 +786,13 @@ export default class Wallet extends React.Component {
 
                     var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
 
-
                     fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
                         if (err) {
                             console.log(err)
                         } else {
                             localStorage.setItem('wallet', JSON.stringify(json));
                             this.setState({
-                                import_key: ''
+                                import_key: '',
                             })
                             try {
                                 var json2 = JSON.parse(localStorage.getItem('wallet'));
@@ -756,25 +800,24 @@ export default class Wallet extends React.Component {
                                     wallet: json2,
                                     keys: json2['keys'],
                                     is_loading: false,
+                                    import_modal_active: false,
                                     main_alert_popup: true,
-                                    main_alert_popup_text: 'Key Imported',
+                                    main_alert_popup_text: 'Key imported',
                                 });
+                                setTimeout(() => {
+                                    this.setState({
+                                        main_alert_popup: false,
+                                    })
+                                }, 5000)
                                 this.prepareDisplay();
                             } catch (e) {
                                 console.log(e);
                             }
-
                         }
                     });
                 } else {
-                    this.setState({
-                        main_alert_popup: true,
-                        main_alert_popup_text: 'Key exists',
-                    });
                     console.log('Key exists');
                 }
-
-
             } catch (e) {
                 console.log(e);
             }
@@ -786,6 +829,24 @@ export default class Wallet extends React.Component {
         }
         this.closeHistoryModal();
         this.closePrivateModal();
+    }
+
+    closeImportModal() {
+        this.setState({
+            import_modal_active: false,
+        })
+    }
+
+    importGlow() {
+        this.setState({
+            import_wrap_glow: true
+        });
+    }
+
+    importGlowDeactivate() {
+        this.setState({
+            import_wrap_glow: false
+        });
     }
 
     closeMainAlertPopup() {
@@ -1800,18 +1861,6 @@ export default class Wallet extends React.Component {
         }
     }
 
-    importGlow() {
-        this.setState({
-            import_wrap_glow: true
-        });
-    }
-
-    importGlowDeactivate() {
-        this.setState({
-            import_wrap_glow: false
-        });
-    }
-
     wrongOldPassword() {
         this.setState({
             wrong_old_password: true
@@ -1855,6 +1904,7 @@ export default class Wallet extends React.Component {
                 ? 'col-xs-12 single-key'
                 : 'col-xs-12 single-key hidden-xs hidden-sm hidden-md hidden-lg'} key={key}>
                 <div className="col-xs-7">
+                    <KeyLabel/>
                     <div className="key">{keys[key].public_key}</div>
                     <span>
                         {
@@ -2344,7 +2394,7 @@ export default class Wallet extends React.Component {
                                         ? 'info-text active'
                                         : 'info-text'}>
                                         <p>{this.state.info_text}</p>
-                                        {/*<span className="close" onClick={this.closeSettingsInfoPopup}>X</span>*/}
+                                        <span className="close" onClick={this.closeSettingsInfoPopup}>X</span>
                                     </div>
                                 </div>
                             </div>
@@ -2432,7 +2482,7 @@ export default class Wallet extends React.Component {
                         <span className="sync-span">{this.state.status_text}</span>
                     </div>
                     <div className={this.state.import_wrap_glow ? 'import-form-wrap active' :'import-form-wrap'}>
-                        <form onChange={this.importKeyChange} onSubmit={this.importKey}>
+                        <form onChange={this.importKeyChange} onSubmit={this.openImportModal}>
                             <input name="key" value={this.state.import_key} onFocus={this.importGlow} onBlur={this.importGlowDeactivate} placeholder="Paste your private key"/>
                             <button type="submit" className="button-shine" title="Import Key">Import</button>
                         </form>
@@ -2492,10 +2542,30 @@ export default class Wallet extends React.Component {
                     </div>
                 </div>
 
+                <div className={this.state.import_modal_active
+                    ? 'importModal active'
+                    : 'importModal'}>
+                    <div className="importModalInner">
+                        <form onSubmit={this.importKey}>
+                            <div className="input-group">
+                                <label htmlFor="key-label">Key Label</label>
+                                <input type="text" placeholder="Enter Key Label"/>
+                            </div>
+
+                            <div className="input-group">
+                                <label htmlFor="key">Private Key</label>
+                                <input name="key" value={this.state.import_key}/>
+                            </div>
+
+                            <button type="submit" className="button-shine" title="Import Key">Import Key</button>
+                        </form>
+                        <span className="close" onClick={this.closeImportModal}>X</span>
+                    </div>
+                </div>
 
                 <div className={this.state.main_alert_popup
-                    ?   'mainAlertPopup active'
-                    :   'mainAlertPopup'}>
+                    ? 'mainAlertPopup active'
+                    : 'mainAlertPopup'}>
                     <div className="mainAlertPopupInner">
                         <p>{this.state.main_alert_popup_text}</p>
                         {
@@ -2528,9 +2598,9 @@ export default class Wallet extends React.Component {
                     </div>
                 </div>
 
-                <div className={this.state.main_alert_popup
-                    ?   'mainAlertBackdrop active'
-                    :   'mainAlertBackdrop'} onClick={this.closeMainAlertPopup}>
+                <div className={this.state.main_alert_popup || this.state.import_modal_active
+                    ? 'mainAlertBackdrop active'
+                    : 'mainAlertBackdrop'} onClick={this.state.main_alert_popup ? this.closeMainAlertPopup : this.closeImportModal}>
                 </div>
             </div>
         );
