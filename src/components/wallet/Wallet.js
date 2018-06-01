@@ -1502,25 +1502,27 @@ export default class Wallet extends React.Component {
                 var array = historyBtc.map(tx => ({
                     safex_direction: tx.referenceaddress === key ? "Received" : "Sent",
                     safex_reference_address: tx.referenceaddress,
-                    safex_date_time: tx.blocktime,
+                    date_time: tx.propertyname === "SafeExchangeCoin" ? tx.blocktime : tx.time,
                     safex_txid: tx.txid,
                     safex_sending_address: tx.sendingaddress,
                     safex_amount: tx.amount,
                     confirmations: tx.confirmations,
                     coin: tx.propertyname === "SafeExchangeCoin" ? "safex" : "bitcoin",
-                    btc_date_time: tx.time,
                     btc_txid: tx.txid,
                     btc_sending_address: tx.vout
                 }));
+
+                array.sort(function(a, b) {
+                    return parseFloat(b.date_time) - parseFloat(a.date_time);
+                });
 
                 var txArray = JSON.stringify(array);
 
                 JSON.parse(txArray).forEach((tx) => {
                     var safex_direction = tx['safex_direction'];
                     var coin = tx['coin'];
-                    var safex_date_time = new Date(tx['safex_date_time'] * 1000);
+                    var date_time = new Date(tx['date_time'] * 1000);
                     var safex_confirmations = tx['confirmations'] > 15 ? "(16/16)" : "("+ tx['confirmations'] + "/16)";
-                    var btc_date_time = new Date(tx['btc_date_time'] * 1000);
                     var btc_reference_address = tx['btc_sending_address'];
                     var btc_confirmations = tx['confirmations'];
                     var scriptPubKey = [];
@@ -1577,7 +1579,7 @@ export default class Wallet extends React.Component {
                         <div class="history">
                             <p class="coin-name">SAFEX</p><br /> ` + safex_direction + ` <br />
                             <img class="coin-logo" src="images/coin-white.png" alt="Safex Coin">
-                            <p class="date">` + safex_date_time + `</p><br />
+                            <p class="date">` + date_time + `</p><br />
                             <p class="address"><b>TX: </b> `+ tx['safex_txid'] +`</p><br />
                             <p class="address address-green">`+ tx['safex_sending_address'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-green">`+ tx['safex_reference_address'] +`</p>
                             <div class="col-xs-12 confirmations_wrap">
@@ -1589,7 +1591,7 @@ export default class Wallet extends React.Component {
                         <div class="history">
                             <p class="coin-name">SAFEX</p><br /> ` + safex_direction + ` <br />
                             <img class="coin-logo" src="images/coin-white.png" alt="Safex Coin">
-                            <p class="date">` + safex_date_time + `</p><br />
+                            <p class="date">` + date_time + `</p><br />
                             <p class="address"><b>TX: </b> `+ tx['safex_txid'] +`</p><br />
                             <p class="address address-blue">`+ tx['safex_sending_address'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-blue">`+ tx['safex_reference_address'] +`</p>
                             <div class="col-xs-12 confirmations_wrap">
@@ -1602,7 +1604,7 @@ export default class Wallet extends React.Component {
                         <div class="history">
                             <p class="coin-name">BITCOIN</p><br /> ` + btc_tx_send_direction + ` <br />
                             <img class="coin-logo" src="images/btc-coin.png" alt="Bitcoin Logo">
-                            <p class="date">` + btc_date_time + `</p><br />
+                            <p class="date">` + date_time + `</p><br />
                             <p class="address"><b>TX: </b> ` + tx['btc_txid'] + `</p><br />
                             <p class="address address-green">`+ btc_receive_addr +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-green">`+ btc_send_addr +`</p>
                             <div class="col-xs-12 confirmations_wrap">
@@ -1614,7 +1616,7 @@ export default class Wallet extends React.Component {
                         <div class="history">
                             <p class="coin-name">BITCOIN</p><br /> ` + btc_tx_send_direction + ` <br />
                             <img class="coin-logo" src="images/btc-coin.png" alt="Bitcoin Logo">
-                            <p class="date">` + btc_date_time + `</p><br />
+                            <p class="date">` + date_time + `</p><br />
                             <p class="address"><b>TX: </b> ` + tx['btc_txid'] + `</p><br />
                             <p class="address address-blue">`+ btc_receive_addr +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-blue">`+ btc_send_addr +`</p>
                             <div class="col-xs-12 confirmations_wrap">

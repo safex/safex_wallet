@@ -478,6 +478,10 @@ body{
   -moz-transition: all ease 0.2s;
   -webkit-transition: all ease 0.2s;
 }
+outline: 0px none;
+-webkit-box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5);
+box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5);
+border: 1px solid #00e7ff;
 .single-key:last-of-type {
   margin-bottom: 0;
 }
@@ -487,7 +491,7 @@ body{
 }
 .single-key .col-xs-7 span {
   position: relative;
-  bottom: 3px;
+  bottom: 0px;
   left: 10px;
   color: #00d1ff;
 }
