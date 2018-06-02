@@ -2555,7 +2555,7 @@ export default class Wallet extends React.Component {
                         <form onSubmit={this.importKey}>
                             <div className="input-group">
                                 <label htmlFor="key-label">Key Label</label>
-                                <input type="text" placeholder="Enter Key Label" value={this.state.import_key_label}/>
+                                <input type="text" placeholder="Enter Key Label" />
                             </div>
 
                             <div className="input-group">
