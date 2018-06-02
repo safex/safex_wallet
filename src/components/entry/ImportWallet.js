@@ -161,9 +161,6 @@ export default class ImportWallet extends React.Component {
             </div>
         );
     }
-
-
-
 }
 
 ImportWallet.contextTypes = {

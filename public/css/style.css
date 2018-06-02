@@ -156,6 +156,7 @@ body{
   border-bottom-left-radius: 15px;
   border-bottom-right-radius: 15px;
   min-height: 389px;
+  margin-bottom: 0;
 }
 .App-intro .col-xs-6 a > div > img{
   height: 190px;
@@ -325,6 +326,9 @@ body{
 .Import-wallet input[name="fileInput"] {
   z-index: 999999 !important;
   padding: 50px !important;
+}
+.Import-wallet input[name="fileInput"]:hover {
+  cursor: pointer;
 }
 .Import-wallet input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
   opacity: .8;
