@@ -97,6 +97,7 @@ export default class Wallet extends React.Component {
             main_alert_popup_text: '',
             export_unencrypted_wallet: false,
             export_encrypted_wallet: false,
+            create_key_active: false,
             import_modal_active: false,
             savedLabel: ''
         }
@@ -152,6 +153,7 @@ export default class Wallet extends React.Component {
         this.openImportModal = this.openImportModal.bind(this);
         this.closeImportModal = this.closeImportModal.bind(this);
         this.saveLabel = this.saveLabel.bind(this);
+        this.openCreateKey = this.openCreateKey.bind(this);
     }
 
     logout() {
@@ -642,7 +644,7 @@ export default class Wallet extends React.Component {
             });
     }
 
-    createKey() {
+    createKey(e) {
         this.setState({is_loading: true});
 
         var key_pair = genkey();
@@ -657,7 +659,7 @@ export default class Wallet extends React.Component {
         key_json['pending_safex_bal'] = 0;
         key_json['pending_btc_bal'] = 0;
         key_json['archived'] = false;
-        key_json['label'] = '';
+        key_json['label'] = e.target.label.value;
 
         try {
             var json = JSON.parse(localStorage.getItem('wallet'));
@@ -686,21 +688,27 @@ export default class Wallet extends React.Component {
                 localStorage.setItem('wallet', JSON.stringify(json));
                 try {
                     var json2 = JSON.parse(localStorage.getItem('wallet'));
-                    this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
+                    this.setState({
+                        wallet: json2,
+                        keys: json2['keys'],
+                        is_loading: false
+                    });
                     this.prepareDisplay();
                     this.closeHistoryModal();
                     this.closePrivateModal();
                     this.setState({
+                        create_key_active: false,
                         main_alert_popup: true,
                         main_alert_popup_text: 'Key added to wallet',
                     });
+                    document.getElementById("label").value = '';
                 } catch (e) {
                     this.setState({
+                        create_key_active: false,
                         main_alert_popup: true,
                         main_alert_popup_text: 'An error adding a key to the wallet. Please contact team@safex.io',
                     });
                 }
-
             }
         });
     }
@@ -748,6 +756,12 @@ export default class Wallet extends React.Component {
                 main_alert_popup_text: 'Invalid private key',
             });
         }
+    }
+
+    openCreateKey() {
+        this.setState({
+            create_key_active: true
+        });
     }
 
     importKey(e) {
@@ -806,6 +820,7 @@ export default class Wallet extends React.Component {
                                     main_alert_popup: true,
                                     main_alert_popup_text: 'Key imported',
                                 });
+                                document.getElementById("label").value = '';
                                 setTimeout(() => {
                                     this.setState({
                                         main_alert_popup: false,
@@ -836,6 +851,7 @@ export default class Wallet extends React.Component {
     closeImportModal() {
         this.setState({
             import_modal_active: false,
+            create_key_active: false,
         })
     }
 
@@ -2498,7 +2514,7 @@ export default class Wallet extends React.Component {
                                 <input name="key" value={this.state.import_key} onFocus={this.importGlow} onBlur={this.importGlowDeactivate} placeholder="Paste your private key"/>
                                 <button type="submit" className="button-shine" title="Import Key">Import</button>
                             </form>
-                            <button onClick={this.createKey} className="create-btn button-shine" title="Create New Key">
+                            <button onClick={this.openCreateKey} className="create-btn button-shine" title="Create New Key">
                                 <img src="images/plus.png" alt="Plus Logo"/>
                             </button>
                         </div>
@@ -2555,14 +2571,14 @@ export default class Wallet extends React.Component {
                     </div>
                 </div>
 
-                <div className={this.state.import_modal_active
+                <div className={this.state.import_modal_active || this.state.create_key_active
                     ? 'importModal active'
                     : 'importModal'}>
                     <div className="importModalInner">
-                        <form onSubmit={this.importKey}>
+                        <form onSubmit={this.state.import_modal_active ? this.importKey : this.createKey}>
                             <div className="input-group">
                                 <label htmlFor="key-label">Key Label</label>
-                                <input type="text" placeholder="Enter Key Label" name="label" onChange={this.saveLabel} />
+                                <input type="text" placeholder="Enter Key Label" name="label" id="label" onChange={this.saveLabel} />
                             </div>
 
                             <div className="input-group">
@@ -2570,7 +2586,7 @@ export default class Wallet extends React.Component {
                                 <input name="key" value={this.state.import_key}/>
                             </div>
 
-                            <button type="submit" className="button-shine" title="Import Key">Import Key</button>
+                            <button type="submit" className="button-shine" title="Import Key">{this.state.import_modal_active ? 'Import Key' : 'Create Key'}</button>
                         </form>
                         <span className="close" onClick={this.closeImportModal}>X</span>
                     </div>
@@ -2611,7 +2627,7 @@ export default class Wallet extends React.Component {
                     </div>
                 </div>
 
-                <div className={this.state.main_alert_popup || this.state.import_modal_active
+                <div className={this.state.main_alert_popup || this.state.import_modal_active || this.state.create_key_active
                     ? 'mainAlertBackdrop active'
                     : 'mainAlertBackdrop'} onClick={this.state.main_alert_popup ? this.closeMainAlertPopup : this.closeImportModal}>
                 </div>
