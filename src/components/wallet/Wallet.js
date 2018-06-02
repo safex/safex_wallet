@@ -2177,10 +2177,20 @@ export default class Wallet extends React.Component {
                                 <label htmlFor="total" className="total-label">Total:</label>
                                 <input className="total-input" type="number" name="total" readOnly value={this.state.send_total} />
                             </div>
-                            <button type="submit" className="form-send-submit button-shine">
-                                <img src="images/outgoing.png" alt="Outgoing Icon"/>
-                                Send
-                            </button>
+                            {
+                                this.state.send_overflow_active && this.state.transaction_sent === false
+                                ?
+                                    <button type="submit" className="form-send-submit button-shine">
+                                        <img src="images/outgoing.png" alt="Outgoing Icon"/>
+                                        Send
+                                    </button>
+                                :
+                                    <button type="submit" className="form-send-submit button-shine">
+                                        <img src="images/outgoing-blue.png" alt="Outgoing Icon"/>
+                                        Send
+                                    </button>
+                            }
+
                             <div className="send_receive_popup_wrap">
                                 <div className={this.state.send_receive_popup
                                     ?  'send_receive_info active'
