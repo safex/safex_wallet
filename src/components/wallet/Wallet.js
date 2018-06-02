@@ -981,6 +981,9 @@ export default class Wallet extends React.Component {
         if (sendreceive === 'send') {
             if (!this.state.collapse_open.send_open && this.state.collapse_open.key !== key || this.state.collapse_open.send_open && this.state.collapse_open.key !== key) {
                 this.setState({
+                    private_key_open: {
+                        private_key_popup: false,
+                    },
                     collapse_open: {
                         key: key,
                         send_open: true,
@@ -1003,6 +1006,9 @@ export default class Wallet extends React.Component {
 
             if (!this.state.collapse_open.send_open && this.state.collapse_open.key === key) {
                 this.setState({
+                    private_key_open: {
+                        private_key_popup: false,
+                    },
                     collapse_open: {
                         key: key,
                         send_open: true,
@@ -1015,6 +1021,9 @@ export default class Wallet extends React.Component {
         if (sendreceive === 'receive') {
             if (!this.state.collapse_open.receive_open && this.state.collapse_open.key !== key || this.state.collapse_open.receive_open && this.state.collapse_open.key !== key) {
                 this.setState({
+                    private_key_open: {
+                        private_key_popup: false,
+                    },
                     collapse_open: {
                         key: key,
                         send_open: false,
@@ -1024,6 +1033,9 @@ export default class Wallet extends React.Component {
             }
             if (this.state.collapse_open.receive_open && this.state.collapse_open.key === key || !this.state.collapse_open.receive_open && this.state.collapse_open.key === key) {
                 this.setState({
+                    private_key_open: {
+                        private_key_popup: false,
+                    },
                     collapse_open: {
                         key: key,
                         send_open: false,
@@ -1531,6 +1543,20 @@ export default class Wallet extends React.Component {
                 var historySafex = response[0].transactions;
                 var historyBtc = response[1].txs;
                 var render = '';
+                var safex_direction = '';
+                var coin = '';
+                var date_time = 0;
+                var safex_confirmations = '';
+                var btc_reference_address = ''
+                var btc_confirmations = ''
+                var btc_amount = '';
+                var scriptPubKey = [];
+                var btc_send_addr = '';
+                var btc_receive_addr = '';
+                var btc_send_direction = [];
+                var btc_sending_direction = [];
+                var btc_tx_direction = [];
+                var btc_tx_send_direction = '';
 
                 historyBtc.unshift.apply( historyBtc, historySafex );
 
@@ -1553,22 +1579,15 @@ export default class Wallet extends React.Component {
                 });
 
                 var txArray = JSON.stringify(array);
-                var scriptPubKey = [];
-                var btc_send_addr = '';
-                var btc_receive_addr = '';
-                var btc_send_direction = [];
-                var btc_sending_direction = [];
-                var btc_tx_direction = [];
-                var btc_tx_send_direction = '';
 
                 JSON.parse(txArray).forEach((tx) => {
-                    var safex_direction = tx['safex_direction'];
-                    var coin = tx['coin'];
-                    var date_time = new Date(tx['date_time'] * 1000);
-                    var safex_confirmations = tx['confirmations'] > 15 ? "(16/16)" : "("+ tx['confirmations'] + "/16)";
-                    var btc_amount = tx['btc_fees'] !== undefined ? tx['btc_fees'] : 0;
-                    var btc_reference_address = tx['btc_sending_address'];
-                    var btc_confirmations = tx['confirmations'];
+                    safex_direction = tx['safex_direction'];
+                    coin = tx['coin'];
+                    date_time = new Date(tx['date_time'] * 1000);
+                    safex_confirmations = tx['confirmations'] > 15 ? "(16/16)" : "("+ tx['confirmations'] + "/16)";
+                    btc_amount = tx['btc_fees'] !== undefined ? tx['btc_fees'] : 0;
+                    btc_reference_address = tx['btc_sending_address'];
+                    btc_confirmations = tx['confirmations'];
 
                     if(btc_reference_address !== undefined){
                         btc_reference_address.forEach(function(nestedProp) {
