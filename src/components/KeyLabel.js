@@ -49,8 +49,8 @@ export default class KeyLabel extends React.Component {
                 </button>
                 <input
                     className="key-label"
-                    placeholder="Label"
-                    value={this.state.editText}
+                    placeholder={this.props.propLabel}
+                    // value={this.props.propLabel}
                     onChange={this.handleChange}
                     onBlur={this.handleSubmit}
                     onKeyDown={this.handleKeyDown}

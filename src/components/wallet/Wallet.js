@@ -98,6 +98,7 @@ export default class Wallet extends React.Component {
             export_unencrypted_wallet: false,
             export_encrypted_wallet: false,
             import_modal_active: false,
+            savedLabel: ''
         }
 
         this.createKey = this.createKey.bind(this);
@@ -150,6 +151,7 @@ export default class Wallet extends React.Component {
         this.closeMainAlertPopup = this.closeMainAlertPopup.bind(this);
         this.openImportModal = this.openImportModal.bind(this);
         this.closeImportModal = this.closeImportModal.bind(this);
+        this.saveLabel = this.saveLabel.bind(this);
     }
 
     logout() {
@@ -762,7 +764,7 @@ export default class Wallet extends React.Component {
             key_json['pending_safex_bal'] = 0;
             key_json['pending_btc_bal'] = 0;
             key_json['archived'] = false;
-            key_json['label'] = '';
+            key_json['label'] = e.target.label.value;
 
             try {
                 var json = JSON.parse(localStorage.getItem('wallet'));
@@ -779,7 +781,6 @@ export default class Wallet extends React.Component {
                 if (key_exists === false) {
 
                     json['keys'].push(key_json);
-                    console.log(json['keys']['label'])
 
                     var crypto = require('crypto'),
                         algorithm = 'aes-256-ctr',
@@ -1511,7 +1512,7 @@ export default class Wallet extends React.Component {
                     coin: tx.propertyname === "SafeExchangeCoin" ? "safex" : "bitcoin",
                     btc_txid: tx.txid,
                     btc_sending_address: tx.vout,
-                    btc_fees: tx.fees,
+                    btc_fees: tx.propertyname === "SafeExchangeCoin" ? 0 : tx.fees
                 }));
 
                 array.sort(function(a, b) {
@@ -1519,6 +1520,13 @@ export default class Wallet extends React.Component {
                 });
 
                 var txArray = JSON.stringify(array);
+                var scriptPubKey = [];
+                var btc_send_addr = '';
+                var btc_receive_addr = '';
+                var btc_send_direction = [];
+                var btc_sending_direction = [];
+                var btc_tx_direction = [];
+                var btc_tx_send_direction = '';
 
                 JSON.parse(txArray).forEach((tx) => {
                     var safex_direction = tx['safex_direction'];
@@ -1528,13 +1536,6 @@ export default class Wallet extends React.Component {
                     var btc_amount = tx['btc_fees'] !== undefined ? tx['btc_fees'] : 0;
                     var btc_reference_address = tx['btc_sending_address'];
                     var btc_confirmations = tx['confirmations'];
-                    var scriptPubKey = [];
-                    var btc_send_addr = '';
-                    var btc_receive_addr = '';
-                    var btc_send_direction = [];
-                    var btc_sending_direction = [];
-                    var btc_tx_direction = [];
-                    var btc_tx_send_direction = '';
 
                     if(btc_reference_address !== undefined){
                         btc_reference_address.forEach(function(nestedProp) {
@@ -1898,6 +1899,12 @@ export default class Wallet extends React.Component {
         }, 1000)
     }
 
+    saveLabel (e) {
+        this.setState({
+            savedLabel: e.target.value
+        })
+    }
+
     render() {
         const {keys, archive_active, safex_price, btc_price} = this.state;
 
@@ -1908,7 +1915,7 @@ export default class Wallet extends React.Component {
                 ? 'col-xs-12 single-key'
                 : 'col-xs-12 single-key hidden-xs hidden-sm hidden-md hidden-lg'} key={key}>
                 <div className="col-xs-7">
-                    <KeyLabel/>
+                    <KeyLabel propLabel={keys[key].label}/>
                     <div className="key">{keys[key].public_key}</div>
                     <span>
                         {
@@ -2555,7 +2562,7 @@ export default class Wallet extends React.Component {
                         <form onSubmit={this.importKey}>
                             <div className="input-group">
                                 <label htmlFor="key-label">Key Label</label>
-                                <input type="text" placeholder="Enter Key Label" />
+                                <input type="text" placeholder="Enter Key Label" name="label" onChange={this.saveLabel} />
                             </div>
 
                             <div className="input-group">
