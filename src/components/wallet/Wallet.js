@@ -741,6 +741,7 @@ export default class Wallet extends React.Component {
             }
         } catch(e) {
             this.setState({
+                import_modal_active: false,
                 main_alert_popup: true,
                 main_alert_popup_text: 'Invalid private key',
             });
@@ -1509,7 +1510,8 @@ export default class Wallet extends React.Component {
                     confirmations: tx.confirmations,
                     coin: tx.propertyname === "SafeExchangeCoin" ? "safex" : "bitcoin",
                     btc_txid: tx.txid,
-                    btc_sending_address: tx.vout
+                    btc_sending_address: tx.vout,
+                    btc_fees: tx.fees,
                 }));
 
                 array.sort(function(a, b) {
@@ -1523,10 +1525,10 @@ export default class Wallet extends React.Component {
                     var coin = tx['coin'];
                     var date_time = new Date(tx['date_time'] * 1000);
                     var safex_confirmations = tx['confirmations'] > 15 ? "(16/16)" : "("+ tx['confirmations'] + "/16)";
+                    var btc_amount = tx['btc_fees'] !== undefined ? tx['btc_fees'] : 0;
                     var btc_reference_address = tx['btc_sending_address'];
                     var btc_confirmations = tx['confirmations'];
                     var scriptPubKey = [];
-                    var btc_amount = 0;
                     var btc_send_addr = '';
                     var btc_receive_addr = '';
                     var btc_send_direction = [];
@@ -1542,8 +1544,8 @@ export default class Wallet extends React.Component {
 
                     if (scriptPubKey.length > 0 && scriptPubKey[0] !== undefined) {
                         btc_send_addr = scriptPubKey[0];
-                        btc_amount = scriptPubKey[1];
                         btc_receive_addr = scriptPubKey[2];
+                        btc_amount = scriptPubKey[1];
                     }
 
                     if (btc_send_addr[0] !== undefined && btc_send_addr[0].length) {
@@ -2471,76 +2473,78 @@ export default class Wallet extends React.Component {
                         </div>
                     </form>
                 </div>
-                <div className="container key-buttons status bounceInUp">
-                    <div className="status-left-wrap">
-                        <span>Status:</span>
-                        <span className={this.state.safex_sync
-                            ? 'status-green'
-                            : 'status-red'}>SAFEX</span>
-                        <span className={this.state.btc_sync
-                            ? 'status-green'
-                            : 'status-red'}>BTC</span><br />
-                        <img src="images/transfer.png" alt="Transfer Icon"/>
-                        <span className="sync-span">{this.state.status_text}</span>
-                    </div>
-                    <div className={this.state.import_wrap_glow ? 'import-form-wrap active' :'import-form-wrap'}>
-                        <form onChange={this.importKeyChange} onSubmit={this.openImportModal}>
-                            <input name="key" value={this.state.import_key} onFocus={this.importGlow} onBlur={this.importGlowDeactivate} placeholder="Paste your private key"/>
-                            <button type="submit" className="button-shine" title="Import Key">Import</button>
-                        </form>
-                        <button onClick={this.createKey} className="create-btn button-shine" title="Create New Key">
-                            <img src="images/plus.png" alt="Plus Logo"/>
-                        </button>
-                    </div>
-                    <div className="right-options">
-                        {
-                            this.state.affiliate_active
-                            ?
-                                <button className="aff-btn aff-btn-active button-shine" title="Affiliate System" onClick={this.closeAffiliateModal}>
-                                    <img src="images/world-blue.png" alt="World Logo"/>
-                                </button>
-                            :
-                                <button className="aff-btn button-shine" title="Affiliate System" onClick={this.openAffiliateModal}>
-                                    <img src="images/world.png" alt="World Logo"/>
-                                </button>
-                        }
+                <div className="key-buttons status bounceInUp">
+                    <div className="container">
+                        <div className="status-left-wrap">
+                            <span>Status:</span>
+                            <span className={this.state.safex_sync
+                                ? 'status-green'
+                                : 'status-red'}>SAFEX</span>
+                            <span className={this.state.btc_sync
+                                ? 'status-green'
+                                : 'status-red'}>BTC</span><br />
+                            <img src="images/transfer.png" alt="Transfer Icon"/>
+                            <span className="sync-span">{this.state.status_text}</span>
+                        </div>
+                        <div className={this.state.import_wrap_glow ? 'import-form-wrap active' :'import-form-wrap'}>
+                            <form onChange={this.importKeyChange} onSubmit={this.openImportModal}>
+                                <input name="key" value={this.state.import_key} onFocus={this.importGlow} onBlur={this.importGlowDeactivate} placeholder="Paste your private key"/>
+                                <button type="submit" className="button-shine" title="Import Key">Import</button>
+                            </form>
+                            <button onClick={this.createKey} className="create-btn button-shine" title="Create New Key">
+                                <img src="images/plus.png" alt="Plus Logo"/>
+                            </button>
+                        </div>
+                        <div className="right-options">
+                            {
+                                this.state.affiliate_active
+                                    ?
+                                    <button className="aff-btn aff-btn-active button-shine" title="Affiliate System" onClick={this.closeAffiliateModal}>
+                                        <img src="images/world-blue.png" alt="World Logo"/>
+                                    </button>
+                                    :
+                                    <button className="aff-btn button-shine" title="Affiliate System" onClick={this.openAffiliateModal}>
+                                        <img src="images/world.png" alt="World Logo"/>
+                                    </button>
+                            }
 
-                        {
-                            this.state.dividend_active
-                            ?
-                                <button className="dividend-btn dividend-btn-active button-shine" title="Dividend Calculator" onClick={this.closeDividendModal}>
-                                    <img src="images/calculator-blue.png" alt="Calculator Logo"/>
-                                </button>
-                            :
-                                <button className="dividend-btn button-shine" title="Dividend Calculator" onClick={this.openDividendModal}>
-                                    <img src="images/calculator.png" alt="Calculator Logo"/>
-                                </button>
-                        }
+                            {
+                                this.state.dividend_active
+                                    ?
+                                    <button className="dividend-btn dividend-btn-active button-shine" title="Dividend Calculator" onClick={this.closeDividendModal}>
+                                        <img src="images/calculator-blue.png" alt="Calculator Logo"/>
+                                    </button>
+                                    :
+                                    <button className="dividend-btn button-shine" title="Dividend Calculator" onClick={this.openDividendModal}>
+                                        <img src="images/calculator.png" alt="Calculator Logo"/>
+                                    </button>
+                            }
 
-                        {
-                            this.state.settings_active
-                            ?
-                                <button className="settings button-shine settings-btn-active" onClick={this.closeSettingsModal} title="Settings">
-                                    <img src="images/settings-blue.png" alt="Mixer Logo"/>
-                                </button>
-                            :
-                                <button className="settings button-shine" onClick={this.openSettingsModal} title="Settings">
-                                    <img src="images/settings.png" alt="Mixer Logo"/>
-                                </button>
-                        }
+                            {
+                                this.state.settings_active
+                                    ?
+                                    <button className="settings button-shine settings-btn-active" onClick={this.closeSettingsModal} title="Settings">
+                                        <img src="images/settings-blue.png" alt="Mixer Logo"/>
+                                    </button>
+                                    :
+                                    <button className="settings button-shine" onClick={this.openSettingsModal} title="Settings">
+                                        <img src="images/settings.png" alt="Mixer Logo"/>
+                                    </button>
+                            }
 
-                        {
-                            this.state.refreshTimer === 0
-                            ?
-                                <button className="refresh-btn button-shine"  onClick={this.refreshWallet} title="Refresh">
-                                    <img src="images/refresh.png" alt="Refresh Logo"/>
-                                </button>
-                            :
-                                <button className="refresh-btn button-shine disabled" title="Refresh">
-                                    <img src="images/refresh-blue.png" alt="Refresh Logo"/>
-                                    <span><p>{this.state.refreshTimer + 's'}</p></span>
-                                </button>
-                        }
+                            {
+                                this.state.refreshTimer === 0
+                                    ?
+                                    <button className="refresh-btn button-shine"  onClick={this.refreshWallet} title="Refresh">
+                                        <img src="images/refresh.png" alt="Refresh Logo"/>
+                                    </button>
+                                    :
+                                    <button className="refresh-btn button-shine disabled" title="Refresh">
+                                        <img src="images/refresh-blue.png" alt="Refresh Logo"/>
+                                        <span><p>{this.state.refreshTimer + 's'}</p></span>
+                                    </button>
+                            }
+                        </div>
                     </div>
                 </div>
 
@@ -2551,7 +2555,7 @@ export default class Wallet extends React.Component {
                         <form onSubmit={this.importKey}>
                             <div className="input-group">
                                 <label htmlFor="key-label">Key Label</label>
-                                <input type="text" placeholder="Enter Key Label"/>
+                                <input type="text" placeholder="Enter Key Label" value={this.state.import_key_label}/>
                             </div>
 
                             <div className="input-group">

@@ -1494,8 +1494,6 @@ input::-webkit-inner-spin-button {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-left: 45px;
-  padding-right: 45px;
   background: rgba(0, 22, 40, .71);
   position: absolute;
   bottom: 0;
@@ -1505,6 +1503,11 @@ input::-webkit-inner-spin-button {
   animation-duration: 1s;
   animation-delay: .8s;
   animation-fill-mode: both;
+}
+.status .container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 .status .status-left-wrap {
   text-align: left;
@@ -1517,7 +1520,7 @@ input::-webkit-inner-spin-button {
   font-size: 17px;
   padding: 0;
   margin-right: 5px;
-  width: 250px;
+  width: 245px;
 }
 .status .status-left-wrap img {
   position: relative;
@@ -1589,7 +1592,7 @@ input::-webkit-inner-spin-button {
   line-height: 24px;
   font-size: 17px;
   border: 0px none;
-  width: 320px;
+  width: 325px;
   position: relative;
   top: 1px;
   margin-right: 5px;
@@ -2703,5 +2706,16 @@ input::-webkit-inner-spin-button {
   100% {
     transform: scale(0.001, 0.001);
     opacity: 1;
+  }
+}
+
+@media (min-width: 1480px) {
+  .keys-container .sidebar-opened {
+    width: 100%;
+  }
+}
+@media (min-width: 1200px) {
+  .container {
+    width: 970px;
   }
 }
