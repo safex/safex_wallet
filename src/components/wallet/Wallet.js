@@ -646,6 +646,7 @@ export default class Wallet extends React.Component {
     }
 
     createKey(e) {
+        e.preventDefault();
         this.setState({is_loading: true});
 
         var key_pair = genkey();
@@ -692,16 +693,18 @@ export default class Wallet extends React.Component {
                     this.setState({
                         wallet: json2,
                         keys: json2['keys'],
-                        is_loading: false
-                    });
-                    this.prepareDisplay();
-                    this.closeHistoryModal();
-                    this.closePrivateModal();
-                    this.setState({
+                        is_loading: false,
                         create_key_active: false,
                         main_alert_popup: true,
                         main_alert_popup_text: 'Key added to wallet',
+                        history_overflow_active: false,
+                        history_key: '',
+                        private_key_open: {
+                            private_key_popup: false,
+                        }
                     });
+                    this.prepareDisplay();
+                    this.prepareDisplayPendingTx();
                     document.getElementById("label").value = '';
                 } catch (e) {
                     this.setState({
@@ -821,13 +824,16 @@ export default class Wallet extends React.Component {
                                     main_alert_popup: true,
                                     main_alert_popup_text: 'Key imported',
                                 });
+                                this.prepareDisplay();
+                                this.prepareDisplayPendingTx();
                                 document.getElementById("label").value = '';
                                 setTimeout(() => {
                                     this.setState({
                                         main_alert_popup: false,
+                                        main_alert_popup_text: '',
                                     })
                                 }, 5000)
-                                this.prepareDisplay();
+
                             } catch (e) {
                                 console.log(e);
                             }
@@ -845,8 +851,13 @@ export default class Wallet extends React.Component {
                 main_alert_popup_text: 'Invalid private key',
             });
         }
-        this.closeHistoryModal();
-        this.closePrivateModal();
+        this.setState({
+            history_overflow_active: false,
+            history_key: '',
+            private_key_open: {
+                private_key_popup: false,
+            }
+        });
     }
 
     closeImportModal() {
@@ -899,12 +910,16 @@ export default class Wallet extends React.Component {
 
     openExportEncryptedWallet() {
         this.setState({
-            main_alert_popup: true,
             export_encrypted_wallet: true,
             export_unencrypted_wallet: false,
+
+            // Close Private Key Popup
             private_key_open: {
                 private_key_popup: false,
             },
+
+            // Open Main Alert Popup
+            main_alert_popup: true,
             main_alert_popup_text: "This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the 'import key' feature in another wallet. Press OK to proceed.",
         });
     }
@@ -935,12 +950,16 @@ export default class Wallet extends React.Component {
 
     openExportUnencryptedWalletPopup() {
         this.setState({
-            main_alert_popup: true,
             export_encrypted_wallet: false,
             export_unencrypted_wallet: true,
+
+            // Close Private Key Popup
             private_key_open: {
                 private_key_popup: false,
             },
+
+            // Open Main Alert Popup
+            main_alert_popup: true,
             main_alert_popup_text: "This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is not for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the 'import key' feature in another wallet. Press OK to proceed.",
 
         });
@@ -1045,7 +1064,11 @@ export default class Wallet extends React.Component {
                 });
             }
         }
-        this.closeSendReceivePopup();
+        this.setState({
+            // Close Send Receive Popup
+            send_receive_popup: false,
+            send_receive_info: ''
+        })
     }
 
     showPrivateModal(e) {
@@ -1054,10 +1077,18 @@ export default class Wallet extends React.Component {
                 private_key_popup: true,
                 display_private_key: this.state.keys[e].private_key,
                 current_public_key: this.state.keys[e].public_key
-            }
+            },
+
+            // Close Send Receive Modal
+            collapse_open: {
+                send_open: false,
+                receive_open: false
+            },
+
+            // Close Send Receive Popup
+            send_receive_popup: false,
+            send_receive_info: ''
         });
-        this.closeSendReceiveModal();
-        this.closeSendReceivePopup();
     }
 
     closePrivateModal(){
@@ -1072,13 +1103,26 @@ export default class Wallet extends React.Component {
         document.getElementById("history_txs").innerHTML = "<h5>Loading...</h5>";
         this.setState({
             history_overflow_active: true,
+
+            // Close Success Modal
+            transaction_sent: false,
+
+            // Close Coin Modal
+            send_overflow_active: false,
+            send_to: '',
+            send_keys: {
+                public_key: '',
+                private_key: ''
+            },
+
+            // Close Dividend Modal
+            dividend_active: false,
+
+            // Close Affiliate Modal
+            affiliate_active: false
         })
         this.listTransactions(this.state.keys[e].public_key);
-        this.closeCoinModal();
-        this.closeSuccessModal();
         this.closeSettingsModal();
-        this.closeDividendModal();
-        this.closeAffiliateModal();
     }
 
     //Activates send_overflow_active state which opens Modal screen displaying transaction pre-confirmation information
@@ -1344,33 +1388,60 @@ export default class Wallet extends React.Component {
         })
     }
 
-    closeSuccessModal() {
+    closeSuccessModal(e) {
+        e.preventDefault();
         this.setState({
             transaction_sent: false,
+
+            // Close Coin Modal
             send_overflow_active: false,
             send_to: '',
             send_keys: {
                 public_key: '',
                 private_key: ''
-            }
+            },
+
+            // Close Send Receive Modal
+            collapse_open: {
+                send_open: false,
+                receive_open: false
+            },
+
+            // Close Settings Info Popup
+            info_popup: false
         });
         this.prepareDisplay();
         setTimeout(() => {
-            this.prepareDisplay();
-        }, 35000)
-        this.closeSettingsInfoPopup();
+            this.prepareDisplayPendingTx();
+        }, 2000);
     }
 
     openSettingsModal(e) {
         e.preventDefault();
         this.setState({
-            settings_active: true
+            settings_active: true,
+
+            // Close Success Modal
+            transaction_sent: false,
+
+            // Close Coin Modal
+            send_overflow_active: false,
+            send_to: '',
+            send_keys: {
+                public_key: '',
+                private_key: ''
+            },
+
+            // Close History Modal
+            history_overflow_active: false,
+            history_key: '',
+
+            // Close Dividend Modal
+            dividend_active: false,
+
+            // Close Affiliate Modal
+            affiliate_active: false,
         });
-        this.closeHistoryModal();
-        this.closeCoinModal();
-        this.closeSuccessModal();
-        this.closeDividendModal();
-        this.closeAffiliateModal();
     }
 
     //This is fired when amount is changed
@@ -1826,34 +1897,66 @@ export default class Wallet extends React.Component {
 
     setArchiveView() {
         this.setState({
-            archive_active: true
+            archive_active: true,
+
+            //Close History Modal
+            history_overflow_active: false,
+            history_key: '',
+
+            // Close Private Key Popup
+            private_key_open: {
+                private_key_popup: false,
+            },
+
+            // Close Send Receive Popup
+            send_receive_popup: false,
+            send_receive_info: ''
         });
-        // this.closeSendReceiveModal();
-        this.closeHistoryModal();
-        this.closePrivateModal();
-        this.closeSendReceivePopup();
     }
 
     setHomeView() {
         this.setState({
-            archive_active: false
+            archive_active: false,
+
+            //Close History Modal
+            history_overflow_active: false,
+            history_key: '',
+
+            // Close Private Key Popup
+            private_key_open: {
+                private_key_popup: false,
+            },
+
+            // Close Send Receive Popup
+            send_receive_popup: false,
+            send_receive_info: ''
         });
-        // this.closeSendReceiveModal();
-        this.closeHistoryModal();
-        this.closePrivateModal();
-        this.closeSendReceivePopup();
     }
 
     openDividendModal(e) {
         e.preventDefault();
         this.setState({
-            dividend_active: true
+            dividend_active: true,
+
+            // Close Success Modal
+            transaction_sent: false,
+
+            // Close Coin Modal
+            send_overflow_active: false,
+            send_to: '',
+            send_keys: {
+                public_key: '',
+                private_key: ''
+            },
+
+            //Close History Modal
+            history_overflow_active: false,
+            history_key: '',
+
+            // Close Affiliate Modal
+            affiliate_active: false
         });
-        this.closeHistoryModal();
-        this.closeCoinModal();
-        this.closeSuccessModal();
         this.closeSettingsModal();
-        this.closeAffiliateModal();
     }
 
     closeDividendModal() {
@@ -1866,12 +1969,26 @@ export default class Wallet extends React.Component {
         e.preventDefault();
         this.setState({
             affiliate_active: true,
+
+            // Close Success Modal
+            transaction_sent: false,
+
+            // Close Coin Modal
+            send_overflow_active: false,
+            send_to: '',
+            send_keys: {
+                public_key: '',
+                private_key: ''
+            },
+
+            // Close History Modal
+            history_overflow_active: false,
+            history_key: '',
+
+            // Close Dividend Modal
+            dividend_active: false,
         });
-        this.closeHistoryModal();
-        this.closeCoinModal();
-        this.closeSuccessModal();
         this.closeSettingsModal();
-        this.closeDividendModal();
     }
 
     closeAffiliateModal() {
@@ -2355,7 +2472,7 @@ export default class Wallet extends React.Component {
                 <div className={this.state.transaction_sent
                     ? 'overflow sendModal active'
                     : 'overflow sendModal'}>
-                    <form className="container"  onSubmit={this.closeSuccessModal}>
+                    <form className="container" onSubmit={this.closeSuccessModal}>
                         <div className="head">
                             <h3>Sent </h3>
                             <span className="close" onClick={this.closeSuccessModal}>X</span>
@@ -2410,7 +2527,7 @@ export default class Wallet extends React.Component {
                             <label htmlFor="total">Total:</label>
                             <input readOnly name="total" value={this.state.send_total} />
                         </div>
-                        <button type="submit" className="sent-close button-shine" onClick={this.closeSendReceiveModal}>Close</button>
+                        <button type="submit" className="sent-close button-shine">Close</button>
                     </form>
                 </div>
                 <div className={this.state.settings_active && this.state.send_overflow_active === false
