@@ -1119,10 +1119,12 @@ export default class Wallet extends React.Component {
             dividend_active: false,
 
             // Close Affiliate Modal
-            affiliate_active: false
+            affiliate_active: false,
+
+            // Close Settings Modal
+            settings_active: false,
         })
         this.listTransactions(this.state.keys[e].public_key);
-        this.closeSettingsModal();
     }
 
     //Activates send_overflow_active state which opens Modal screen displaying transaction pre-confirmation information
@@ -1351,12 +1353,8 @@ export default class Wallet extends React.Component {
     }
 
     closeSettingsModal() {
-        document.getElementById('old_pass').value = '';
-        document.getElementById('new_pass').value = '';
-        document.getElementById('repeat_pass').value = '';
-
         this.setState({
-            settings_active: false
+            settings_active: false,
         });
     }
 
@@ -1954,9 +1952,11 @@ export default class Wallet extends React.Component {
             history_key: '',
 
             // Close Affiliate Modal
-            affiliate_active: false
+            affiliate_active: false,
+
+            // Close Settings Modal
+            settings_active: false,
         });
-        this.closeSettingsModal();
     }
 
     closeDividendModal() {
@@ -1987,8 +1987,10 @@ export default class Wallet extends React.Component {
 
             // Close Dividend Modal
             dividend_active: false,
+
+            // Close Settings Modal
+            settings_active: false,
         });
-        this.closeSettingsModal();
     }
 
     closeAffiliateModal() {
@@ -2410,7 +2412,9 @@ export default class Wallet extends React.Component {
                     ? 'overflow historyModal fadeIn active'
                     : 'overflow historyModal'}>
                     <div className="col-xs-12 history-inner">
-                        <h3>History <span className="close" onClick={this.closeHistoryModal}>X</span></h3>
+                        <div className="container">
+                            <h3>History <span className="close" onClick={this.closeHistoryModal}>X</span></h3>
+                        </div>
                         <div id="history_txs">
                             <h5>Loading...</h5>
                         </div>

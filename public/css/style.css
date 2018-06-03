@@ -751,7 +751,7 @@ border: 1px solid #00e7ff;
   float: right;
   margin-top: 10px;
   margin-right: 0;
-  padding: 5px 10px 6px;
+  padding: 5px 10px;
   border: 1px solid rgba(0, 231, 255, .44);
   border-radius: 8px;
   line-height: 1.2;
@@ -759,9 +759,9 @@ border: 1px solid #00e7ff;
 .form-send .form-send-submit img {
   position: relative;
   left: 0;
-  top: -2px;
+  top: -3px;
   margin-right: 10px;
-  height: 17px;
+  height: 18px;
 }
 .form-send .form-group {
   width: 100%;
@@ -1204,10 +1204,6 @@ border: 1px solid #00e7ff;
 .overflow.historyModal h5 {
   font-size: 16px;
   text-indent: -10px;
-}
-.history-inner {
-  padding-left: 35px;
-  padding-right: 35px;
 }
 .overflow.sendModal {
   background: url(../images/sidebar-bg.png);
@@ -1957,7 +1953,7 @@ input::-webkit-inner-spin-button {
   opacity: 1;
   font-size: 20px;
   position: relative;
-  right: 12px;
+  right: 0;
 }
 .overflow.messageModal p {
   background: none;
@@ -1985,6 +1981,10 @@ input::-webkit-inner-spin-button {
   color: #fff;
 }
 #history_txs {
+  width: 970px;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin: 0 auto;
   height: 480px;
   text-align: center;
   color: #fff;
@@ -2001,7 +2001,6 @@ input::-webkit-inner-spin-button {
   -o-transition: all ease 0.3s;
   -moz-transition: all ease 0.3s;
   -webkit-transition: all ease 0.3s;
-  width: calc(100% - 20px);
   margin: 10px auto;
 }
 #history_txs .history {
