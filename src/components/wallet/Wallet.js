@@ -1409,9 +1409,7 @@ export default class Wallet extends React.Component {
             info_popup: false
         });
         this.prepareDisplay();
-        setTimeout(() => {
-            this.prepareDisplayPendingTx();
-        }, 2000);
+        this.prepareDisplayPendingTx();
     }
 
     openSettingsModal(e) {

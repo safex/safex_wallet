@@ -148,8 +148,6 @@ export default class SelectWallet extends React.Component {
         localStorage.setItem('password', e.target.password.value);
 
         var cipher_text = localStorage.getItem('encrypted_wallet');
-
-
         var decrypted_wallet = decrypt(cipher_text, algorithm, password);
 
         try {
@@ -491,6 +489,5 @@ export default class SelectWallet extends React.Component {
 SelectWallet.contextTypes = {
     router: React.PropTypes.object.isRequired
 }
-
 
 //if wallet is found main image is new wallet found

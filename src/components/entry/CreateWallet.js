@@ -8,8 +8,6 @@ import { encrypt} from '../../utils/utils';
 import { genkey } from '../../utils/keys';
 import {Link} from 'react-router';
 
-
-
 export default class CreateWallet extends React.Component {
     constructor(props) {
         super(props);

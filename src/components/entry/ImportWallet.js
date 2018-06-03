@@ -80,10 +80,9 @@ export default class ImportWallet extends React.Component {
                 localStorage.setItem('password', password);
 
                 const cipher_text = localStorage.getItem('encrypted_wallet');
-
                 const decryptedWallet = decrypt(cipher_text, algorithm, password);
-
                 let parsedWallet;
+
                 try {
                     parsedWallet = JSON.parse(decryptedWallet);
                 }
