@@ -154,7 +154,6 @@ export default class Wallet extends React.Component {
         this.closeImportModal = this.closeImportModal.bind(this);
         this.saveLabel = this.saveLabel.bind(this);
         this.openCreateKey = this.openCreateKey.bind(this);
-        this.closeMainAlertPopupOnEnter = this.closeMainAlertPopupOnEnter.bind(this);
     }
 
     logout() {
@@ -890,22 +889,6 @@ export default class Wallet extends React.Component {
                 export_unencrypted_wallet: false,
             });
         }, 300)
-    }
-
-    closeMainAlertPopupOnEnter() {
-        var code = event.keyCode || event.which;
-        if(code === 13) { //13 is the enter keycode
-            this.setState({
-                main_alert_popup: false,
-            });
-
-            setTimeout(() => {
-                this.setState({
-                    export_encrypted_wallet: false,
-                    export_unencrypted_wallet: false,
-                });
-            }, 300)
-        }
     }
 
     openExportEncryptedWallet() {
@@ -2800,8 +2783,7 @@ export default class Wallet extends React.Component {
 
                 <div className={this.state.main_alert_popup || this.state.import_modal_active || this.state.create_key_active
                     ? 'mainAlertBackdrop active'
-                    : 'mainAlertBackdrop'} onClick={this.state.main_alert_popup ? this.closeMainAlertPopup : this.closeImportModal}
-                     onKeyPress={this.closeMainAlertPopupOnEnter}>
+                    : 'mainAlertBackdrop'} onClick={this.state.main_alert_popup ? this.closeMainAlertPopup : this.closeImportModal}>
                 </div>
             </div>
         );
