@@ -154,6 +154,7 @@ export default class Wallet extends React.Component {
         this.closeImportModal = this.closeImportModal.bind(this);
         this.saveLabel = this.saveLabel.bind(this);
         this.openCreateKey = this.openCreateKey.bind(this);
+        this.amountChange = this.amountChange.bind(this);
     }
 
     logout() {
@@ -2317,7 +2318,7 @@ export default class Wallet extends React.Component {
                             <input name="receive-address" value={keys[key].public_key}/>
 
                             <label htmlFor="amount">Amount:</label>
-                            <input type="amount" placeholder="1" onChange={this.amountChange.bind(this)}
+                            <input type="amount" placeholder="1" onChange={this.amountChange}
                                value={this.state.receive_amount}/>
                         </div>
                         <div className="col-xs-5 qr-code-wrap">
