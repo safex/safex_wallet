@@ -11,7 +11,6 @@ export default class Login extends React.Component {
 
         this.state = {
             wrong_password: false,
-            is_caps_lock: false,
         };
 
         this.wrongPassword = this.wrongPassword.bind(this);
@@ -63,13 +62,13 @@ export default class Login extends React.Component {
     //here we load up the wallet into the local storage and move on with life.
     render() {
         return (
-          <div className="container">
-               <div className="col-xs-12 Login-logo">
-                   <h2>Safex</h2>
-                   <h3>Wallet</h3>
-                   <Link className="back-button" to="/"><img src="images/back.png" alt="back button"/> Back</Link>
-               </div>
-               <div className="col-xs-12 Login-form">
+            <div className="container">
+                <div className="col-xs-12 Login-logo">
+                    <h2>Safex</h2>
+                    <h3>Wallet</h3>
+                    <Link className="back-button" to="/"><img src="images/back.png" alt="back button"/> Back</Link>
+                </div>
+                <div className="col-xs-12 Login-form">
                     <form className="form-group" onSubmit={this.handleSubmit}>
                         {
                             this.state.wrong_password
@@ -80,12 +79,12 @@ export default class Login extends React.Component {
                         }
                         <button className="btn btn-default button-neon-blue" type="submit">Proceed </button>
                     </form>
-               </div>
-               <div className="col-xs-12 text-center Intro-footer">
-                   <img src="images/footer-logo.png" alt="Safex Icon Footer"/>
-                   <p className="text-center">2014-2018 All Rights Reserved Safe Exchange Developers &copy;</p>
-               </div>
-          </div>
+                </div>
+                <div className="col-xs-12 text-center Intro-footer">
+                    <img src="images/footer-logo.png" alt="Safex Icon Footer"/>
+                    <p className="text-center">2014-2018 All Rights Reserved Safe Exchange Developers &copy;</p>
+                </div>
+            </div>
         );
     }
 }
