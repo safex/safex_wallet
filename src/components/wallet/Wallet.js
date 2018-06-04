@@ -248,7 +248,7 @@ export default class Wallet extends React.Component {
                     safex_sync: false,
                     main_alert_popup: true,
                     main_alert_popup_text: 'Unable to fetch average fee',
-                    status_text: 'Sync error, please refresh again'
+                    status_text: 'Sync error, please refresh'
                 });
             });
     }
@@ -349,7 +349,7 @@ export default class Wallet extends React.Component {
             this.setState({
                 btc_sync: false,
                 safex_sync: false,
-                status_text: 'Sync error, please refresh again'
+                status_text: 'Sync error, please refresh'
             });
         });
     }

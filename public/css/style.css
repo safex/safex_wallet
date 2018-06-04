@@ -435,6 +435,8 @@ body{
 }
 .navbar-default .navbar-brand img {
   height: 40px;
+  position: relative;
+  top: 2px;
 }
 .navbar-default .navbar-brand span {
   margin-top: 5px;
@@ -1555,6 +1557,7 @@ input::-webkit-inner-spin-button {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  height: 46px;
 }
 .status .status-left-wrap {
   text-align: left;
@@ -1566,19 +1569,19 @@ input::-webkit-inner-spin-button {
   text-transform: uppercase;
   font-size: 17px;
   padding: 0;
-  margin-right: 5px;
-  width: 245px;
+  margin-right: 0;
+  width: 265px;
 }
 .status .status-left-wrap img {
   position: relative;
-  top: -1px;
+  top: -3px;
 }
 .status span {
   padding-right: 5px;
   letter-spacing: 2px;
   font-size: 12px;
   position: relative;
-  top: -2px;
+  top: -3px;
 }
 .status span:first-child {
   padding-left: 0;
@@ -1605,14 +1608,14 @@ input::-webkit-inner-spin-button {
   margin-left: 5px;
 }
 .status .sync-span {
-  padding-left: 8px;
+  padding-left: 7px;
   padding-right: 0;
   position: relative;
-  top: 0px;
+  top: -2px;
   font-size: 12px;
 }
 .status .import-form-wrap {
-  width: 480px;
+  width: 465px;
   border: 1px solid rgba(0, 231, 255, .44);
   border-radius: 8px;
   position: relative;
@@ -1639,7 +1642,7 @@ input::-webkit-inner-spin-button {
   line-height: 24px;
   font-size: 17px;
   border: 0px none;
-  width: 325px;
+  width: 310px;
   position: relative;
   top: 0px;
   margin-right: 5px;
