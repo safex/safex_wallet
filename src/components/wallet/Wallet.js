@@ -153,6 +153,7 @@ export default class Wallet extends React.Component {
         this.openImportModal = this.openImportModal.bind(this);
         this.closeImportModal = this.closeImportModal.bind(this);
         this.saveLabel = this.saveLabel.bind(this);
+        this.editLabel = this.editLabel.bind(this);
         this.openCreateKey = this.openCreateKey.bind(this);
         this.amountChange = this.amountChange.bind(this);
     }
@@ -703,6 +704,12 @@ export default class Wallet extends React.Component {
                             private_key_popup: false,
                         }
                     });
+                    setTimeout(() => {
+                        this.setState({
+                            main_alert_popup: false,
+                            main_alert_popup_text: 'Key added to wallet',
+                        });
+                    }, 5000)
                     this.prepareDisplay();
                     this.prepareDisplayPendingTx();
                     document.getElementById("label").value = '';
@@ -832,8 +839,7 @@ export default class Wallet extends React.Component {
                                         main_alert_popup: false,
                                         main_alert_popup_text: '',
                                     })
-                                }, 5000)
-
+                                }, 5000);
                             } catch (e) {
                                 console.log(e);
                             }
@@ -1292,9 +1298,7 @@ export default class Wallet extends React.Component {
                                                 info_popup: true,
                                                 info_text: 'Password has been changed'
                                             });
-                                            document.getElementById('old_pass').value = '';
-                                            document.getElementById('new_pass').value = '';
-                                            document.getElementById('repeat_pass').value = '';
+                                            document.getElementsByClassName('password-input').value = '';
                                         }
                                     });
                                 }
@@ -1343,9 +1347,7 @@ export default class Wallet extends React.Component {
     }
 
     resetSettingsForm() {
-        document.getElementById('old_pass').value = '';
-        document.getElementById('new_pass').value = '';
-        document.getElementById('repeat_pass').value = '';
+        document.getElementsByClassName('password-input').value = '';
 
         this.setState({
             info_popup: false
@@ -2052,10 +2054,14 @@ export default class Wallet extends React.Component {
         }, 1000)
     }
 
-    saveLabel (e) {
+    saveLabel(e) {
         this.setState({
             savedLabel: e.target.value
-        })
+        });
+    }
+
+    editLabel(label, key) {
+        console.log(label, key);
     }
 
     render() {
@@ -2068,7 +2074,11 @@ export default class Wallet extends React.Component {
                 ? 'col-xs-12 single-key'
                 : 'col-xs-12 single-key hidden-xs hidden-sm hidden-md hidden-lg'} key={key}>
                 <div className="col-xs-7">
-                    <KeyLabel propLabel={keys[key].label}/>
+                    <KeyLabel
+                        keyReference={keys[key]}
+                        keyLabel={keys[key].label}
+                        editLabel={this.editLabel}
+                    />
                     <div className="key">{keys[key].public_key}</div>
                     <span>
                         {
@@ -2538,9 +2548,9 @@ export default class Wallet extends React.Component {
                                 {
                                     this.state.wrong_old_password
                                     ?
-                                        <input type="password" className="form-control shake" id="old_pass" name="old_pass" onChange={this.closeSettingsInfoPopup} />
+                                        <input type="password" className="form-control shake password-input" name="old_pass" onChange={this.closeSettingsInfoPopup} />
                                     :
-                                        <input type="password" className="form-control" id="old_pass" name="old_pass" onChange={this.closeSettingsInfoPopup} />
+                                        <input type="password" className="form-control password-input" name="old_pass" onChange={this.closeSettingsInfoPopup} />
                                 }
                             </div>
                             <div className="form-group">
@@ -2548,9 +2558,9 @@ export default class Wallet extends React.Component {
                                 {
                                     this.state.wrong_new_password
                                     ?
-                                        <input type="password" className="form-control shake" id="new_pass" name="new_pass" onChange={this.closeSettingsInfoPopup} />
+                                        <input type="password" className="form-control shake password-input" name="new_pass" onChange={this.closeSettingsInfoPopup} />
                                     :
-                                        <input type="password" className="form-control" id="new_pass" name="new_pass" onChange={this.closeSettingsInfoPopup} />
+                                        <input type="password" className="form-control password-input" name="new_pass" onChange={this.closeSettingsInfoPopup} />
                                 }
                             </div>
                             <div className="form-group">
@@ -2558,9 +2568,9 @@ export default class Wallet extends React.Component {
                                 {
                                     this.state.wrong_repeat_password
                                     ?
-                                        <input type="password" className="form-control shake" id="repeat_pass" name="repeat_pass" onChange={this.closeSettingsInfoPopup} />
+                                        <input type="password" className="form-control shake password-input" name="repeat_pass" onChange={this.closeSettingsInfoPopup} />
                                     :
-                                        <input type="password" className="form-control" id="repeat_pass" name="repeat_pass" onChange={this.closeSettingsInfoPopup} />
+                                        <input type="password" className="form-control password-input" name="repeat_pass" onChange={this.closeSettingsInfoPopup} />
                                 }
                             </div>
                             <div className="col-xs-12 submit-wrap">
