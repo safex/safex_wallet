@@ -257,6 +257,7 @@ export default class SelectWallet extends React.Component {
                     <div className="col-xs-12 Login-logo">
                         <h2>Safex</h2>
                         <h3>Wallet</h3>
+                        <p>v0.0.6</p>
                         {
                             this.state.walletResetModal1 ||
                             this.state.walletResetModal2 ||

@@ -72,7 +72,7 @@ body{
 ::-webkit-scrollbar {
   display: none;
 }
-.Login-logo{
+.Login-logo {
   height: 100px;
   /* display: flex; */
   /* align-content: center; */
@@ -98,12 +98,18 @@ body{
   letter-spacing: 4px;
   margin-top: 10px;
 }
-.Login-logo img{
+.Login-logo p {
+  display: inline-block;
+  width: 100%;
+  font-size: 14px;
+  color: #fff;
+}
+.Login-logo img {
   margin: auto;
   display: block;
   max-width: 200px;
 }
-.Login-form form{
+.Login-form form {
   background: url(../images/login-bg.png);
   background-size: contain;
   background-repeat: repeat-x;
@@ -419,6 +425,7 @@ body{
   border-radius: 0px;
   padding-bottom: 10px;
   margin-bottom: 15px;
+  border-bottom: 1px solid rgba(0, 126, 162, .52);
   animation-duration: 1s;
   animation-fill-mode: both;
 }
@@ -438,12 +445,14 @@ body{
   text-transform: uppercase;
 }
 .navbar-default .navbar-nav>li>a {
-  color: #fff;
+  color: #fff !important;
   padding-top: 19px;
   text-transform: uppercase;
 }
 .navbar-default .navbar-nav>li>a:hover,
-.navbar-default .navbar-nav>li>a:focus{
+.navbar-default .navbar-nav>li>a:focus,
+.navbar-default .navbar-nav>li>a:active, {
+  outline: 0px none;
   color: #fff;
   text-transform: uppercase;
 }
@@ -454,6 +463,20 @@ body{
 .navbar-default .navbar-nav>li>span.amount {
   color: #00c9f3;
   letter-spacing: 1px;
+}
+.navbar-default:before {
+  /*background: -moz-linear-gradient(top, rgba(0,0,0,0.65) 0%, rgba(255,255,255,0) 100%); !* FF3.6-15 *!*/
+  /*background: -webkit-linear-gradient(top, rgba(0,0,0,0.65) 0%,rgba(255,255,255,0) 100%); !* Chrome10-25,Safari5.1-6 *!*/
+  /*background: linear-gradient(to bottom, rgba(0,0,0,0.65) 0%,rgba(255,255,255,0) 100%); !* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ *!*/
+  /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00ffffff',GradientType=0 );*/
+  background: url('../images/topborder.png');
+  content: '';
+  position: absolute;
+  bottom: -28px;
+  left: 0;
+  width: 100%;
+  height: 28px;
+  z-index: 1;
 }
 .coin-amounts li {
   margin-right: 10px;
@@ -498,13 +521,6 @@ body{
   -moz-transition: all ease 0.2s;
   -webkit-transition: all ease 0.2s;
 }
-outline: 0px none;
--webkit-box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5);
-box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5);
-border: 1px solid #00e7ff;
-.single-key:last-of-type {
-  margin-bottom: 0;
-}
 .single-key .col-xs-7 {
   padding-left: 0;
   height: 67px;
@@ -518,11 +534,13 @@ border: 1px solid #00e7ff;
 .single-key .key-label {
   background: transparent;
   border: 0px;
-  font-size: 17px;
-  padding-top: 0;
-  padding-bottom: 0;
+  font-size: 15px;
+  padding-top: 5px;
+  padding-bottom: 5px;
   line-height: 1;
   width: calc(100% - 37px);
+  font-family: 'Gotham Medium', sans-serif;
+  color: rgba(255,255,255,.9);
 }
 .single-key .edit-label-btn {
   background: transparent;
@@ -535,6 +553,7 @@ border: 1px solid #00e7ff;
   width: 16px;
   position: relative;
   top: -2px;
+  opacity: .5;
 }
 .single-key .key-label::-webkit-input-placeholder { /* Chrome/Opera/Safari */
   opacity: .8;
@@ -561,6 +580,14 @@ border: 1px solid #00e7ff;
   letter-spacing: 0.1em;
   margin: 0px 10px 0px;
   line-height: 1;
+}
+.single-key .key::selection {
+  /*background: #ffb7b7;*/
+  background: #eee;
+}
+.single-key .key::-moz-selection {
+  /*background: #ffb7b7;*/
+  background: #eee;
 }
 .single-key .amounts{
   text-transform: uppercase;
@@ -1071,10 +1098,13 @@ border: 1px solid #00e7ff;
   background: rgba(0, 231, 255, .8);
   display: inline-block;
 }
+.wallet-tabs-wrap {
+  position: relative;
+}
 .wallet-tabs {
   position: absolute;
-  top: 6px;
-  right: 45px;
+  top: -94px;
+  right: 15px;
   animation-duration: 1s;
   animation-delay: 2.5s;
   animation-fill-mode: both;
@@ -1441,12 +1471,13 @@ input::-webkit-inner-spin-button {
 }
 .keys-container {
   overflow: hidden;
-  height: calc(100% - 200px);
+  height: 100%;
 }
 .keys-container .keys-wrap {
   overflow-y: auto;
   overflow-x: hidden;
   height: 100%;
+  padding-bottom: 194px;
   animation-duration: 1s;
   animation-delay: 1.9s;
   animation-fill-mode: both;
@@ -1510,7 +1541,7 @@ input::-webkit-inner-spin-button {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(0, 22, 40, .71);
+  background: rgba(0, 22, 40, 0.9);
   position: absolute;
   bottom: 0;
   width: 100%;
@@ -1710,6 +1741,8 @@ input::-webkit-inner-spin-button {
   margin: 0;
   position: relative;
   left: 2px;
+  font-weight: 600;
+  font-size: 15px;
 }
 .status .right-options .refresh-btn.disabled:hover {
   background-color: transparent;

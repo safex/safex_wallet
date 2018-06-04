@@ -84,7 +84,9 @@ export default class Navigation extends React.Component {
                 <div className="collapse navbar-collapse" id="navbar-collapse">
                     <ul className="nav navbar-nav navbar-right wallet-nav">
                         <li>
-                            <Link to="/wallet" activeClassName="activeLink" onlyActiveOnIndex>Wallet</Link>
+                            <Link to="/wallet" activeClassName="activeLink" onlyActiveOnIndex>
+                                Wallet &nbsp; v0.0.6
+                            </Link>
                         </li>
                     </ul>
                     {/*<div onClick={this.setHomeView}*/}
