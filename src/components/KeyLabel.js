@@ -18,7 +18,6 @@ export default class KeyLabel extends React.Component {
     toggleEditing() {
         this.setState({ editing: !this.state.editing });
         if (this.state.editing) {
-            //   console.log(this.editLabel);
             setTimeout(() => {
                 this.editLabel.focus();
             }, 100);

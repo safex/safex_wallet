@@ -696,20 +696,12 @@ export default class Wallet extends React.Component {
                         keys: json2['keys'],
                         is_loading: false,
                         create_key_active: false,
-                        main_alert_popup: true,
-                        main_alert_popup_text: 'Key added to wallet',
                         history_overflow_active: false,
                         history_key: '',
                         private_key_open: {
                             private_key_popup: false,
                         }
                     });
-                    setTimeout(() => {
-                        this.setState({
-                            main_alert_popup: false,
-                            main_alert_popup_text: 'Key added to wallet',
-                        });
-                    }, 5000)
                     this.prepareDisplay();
                     this.prepareDisplayPendingTx();
                     document.getElementById("label").value = '';
@@ -828,18 +820,10 @@ export default class Wallet extends React.Component {
                                     keys: json2['keys'],
                                     is_loading: false,
                                     import_modal_active: false,
-                                    main_alert_popup: true,
-                                    main_alert_popup_text: 'Key imported',
                                 });
                                 this.prepareDisplay();
                                 this.prepareDisplayPendingTx();
                                 document.getElementById("label").value = '';
-                                setTimeout(() => {
-                                    this.setState({
-                                        main_alert_popup: false,
-                                        main_alert_popup_text: '',
-                                    })
-                                }, 5000);
                             } catch (e) {
                                 console.log(e);
                             }
@@ -2745,16 +2729,29 @@ export default class Wallet extends React.Component {
                             {
                                 this.state.import_modal_active
                                 ?
-                                    <div className="input-group">
-                                        <label htmlFor="key">Private Key</label>
-                                        <input name="key" value={this.state.import_key}/>
+                                    <div>
+                                        <div className="input-group">
+                                            <label htmlFor="key">Private Key</label>
+                                            <input name="key" value={this.state.import_key} />
+                                        </div>
+
+                                        <button type="submit" className="button-shine" title="Import Key">Import Key</button>
                                     </div>
                                 :
-                                    ''
+                                    <div>
+                                        <div className="input-group input-group-hidden">
+                                            <label htmlFor="key">Private Key</label>
+                                            <input name="key" value="" disabled="disabled" />
+                                        </div>
+                                        {
+                                            this.state.create_key_active
+                                            ?
+                                                <button type="submit" className="button-shine" title="Create Key">Create Key</button>
+                                            :
+                                                <button type="submit" disabled="disabled" className="button-shine" title="Create Key"></button>
+                                        }
+                                    </div>
                             }
-
-
-                            <button type="submit" className="button-shine" title="Import Key">{this.state.import_modal_active ? 'Import Key' : 'Create Key'}</button>
                         </form>
                         <span className="close" onClick={this.closeImportModal}>X</span>
                     </div>
