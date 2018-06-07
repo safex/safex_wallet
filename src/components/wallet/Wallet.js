@@ -10,7 +10,6 @@ var bitcore = window.require('bitcore-lib');
 import {toHexString, encrypt, safexPayload, decrypt} from '../../utils/utils';
 import {genkey} from '../../utils/keys';
 import QRCode from 'qrcode.react';
-import NumberFormat from 'react-number-format';
 
 import Navigation from '../Navigation';
 import KeyLabel from "../KeyLabel";
@@ -66,6 +65,7 @@ export default class Wallet extends React.Component {
             btc_sync: false,
             safex_sync: false,
             is_loading: false,
+            loging_out: false,
             receive_amount: 0.00000001.toFixed(8),
             collapse_open: {
                 key: '',
@@ -160,7 +160,15 @@ export default class Wallet extends React.Component {
 
     logout() {
         localStorage.clear();
-        this.context.router.push('/');
+        this.setState({
+            // Close Settings Modal
+            settings_active: false,
+
+            loging_out: true,
+        });
+        setTimeout(() => {
+            this.context.router.push('/');
+        }, 1500)
     }
 
     refreshWallet() {
@@ -742,6 +750,8 @@ export default class Wallet extends React.Component {
                     // look for the entry with a matching `code` value
                     if (json['keys'][i].public_key === address) {
                         this.setState({
+                            history_overflow_active: false,
+                            history_key: '',
                             import_modal_active: false,
                             main_alert_popup: true,
                             main_alert_popup_text: 'Key exists',
@@ -754,6 +764,8 @@ export default class Wallet extends React.Component {
             }
         } catch(e) {
             this.setState({
+                history_overflow_active: false,
+                history_key: '',
                 import_modal_active: false,
                 main_alert_popup: true,
                 main_alert_popup_text: 'Invalid private key',
@@ -763,6 +775,8 @@ export default class Wallet extends React.Component {
 
     openCreateKey() {
         this.setState({
+            history_overflow_active: false,
+            history_key: '',
             create_key_active: true
         });
     }
@@ -820,6 +834,8 @@ export default class Wallet extends React.Component {
                                     keys: json2['keys'],
                                     is_loading: false,
                                     import_modal_active: false,
+                                    history_overflow_active: false,
+                                    history_key: ''
                                 });
                                 this.prepareDisplay();
                                 this.prepareDisplayPendingTx();
@@ -1097,6 +1113,11 @@ export default class Wallet extends React.Component {
 
             // Close Settings Modal
             settings_active: false,
+
+            // Close Private Key Popup
+            private_key_open: {
+                private_key_popup: false,
+            },
         })
         this.listTransactions(this.state.keys[e].public_key);
     }
@@ -1222,7 +1243,6 @@ export default class Wallet extends React.Component {
         if (new_pass.length > 0) {
             //check that the new password matches the repeated password
             if (new_pass === repeat_pass) {
-
                 //read from the expected path the encrypted wallet
                 fs.readFile(localStorage.getItem('wallet_path'), (err, fd) => {
                     if (err) {
@@ -1234,7 +1254,6 @@ export default class Wallet extends React.Component {
                             });
                         }
                     } else {
-
                         //prepare to decrypt the wallet file from the path
                         var crypto = require('crypto'),
                             algorithm = 'aes-256-ctr',
@@ -1245,12 +1264,10 @@ export default class Wallet extends React.Component {
 
                         //try to parse the decrypted wallet that it is valid
                         try {
-
                             var parse_wallet = JSON.parse(decrypted_wallet);
 
                             //check the version number of the wallet
                             if (parse_wallet['version'] === '1') {
-
                                 const hash1 = crypto.createHash('sha256');
                                 const hash2 = crypto.createHash('sha256');
 
@@ -1280,9 +1297,17 @@ export default class Wallet extends React.Component {
                                             localStorage.setItem('wallet', decrypted_wallet);
                                             this.setState({
                                                 info_popup: true,
-                                                info_text: 'Password has been changed'
+                                                info_text: 'Password has been changed. Write it down, keep it safe.'
                                             });
-                                            document.getElementsByClassName('password-input').value = '';
+                                            setInterval(() => {
+                                                this.setState({
+                                                    info_popup: false,
+                                                    info_text: ''
+                                                })
+                                            }, 4000);
+                                            document.getElementById('old_pass').value = '';
+                                            document.getElementById('new_pass').value = '';
+                                            document.getElementById('repeat_pass').value = '';
                                         }
                                     });
                                 }
@@ -1291,6 +1316,12 @@ export default class Wallet extends React.Component {
                                     info_popup: true,
                                     info_text: 'Wrong password'
                                 });
+                                setInterval(() => {
+                                    this.setState({
+                                        info_popup: false,
+                                        info_text: ''
+                                    })
+                                }, 4000);
                                 this.wrongOldPassword();
                             }
                         } catch (e) {
@@ -1298,6 +1329,12 @@ export default class Wallet extends React.Component {
                                 info_popup: true,
                                 info_text: 'Wrong password'
                             });
+                            setInterval(() => {
+                                this.setState({
+                                    info_popup: false,
+                                    info_text: ''
+                                })
+                            }, 4000);
                             this.wrongOldPassword();
                         }
                     }
@@ -1307,6 +1344,12 @@ export default class Wallet extends React.Component {
                     info_popup: true,
                     info_text: 'New password does not match repeated password'
                 });
+                setInterval(() => {
+                    this.setState({
+                        info_popup: false,
+                        info_text: ''
+                    })
+                }, 4000);
                 this.wrongRepeatPassword();
             }
         } else {
@@ -1314,6 +1357,12 @@ export default class Wallet extends React.Component {
                 info_popup: true,
                 info_text: 'New password field is empty'
             });
+            setInterval(() => {
+                this.setState({
+                    info_popup: false,
+                    info_text: ''
+                })
+            }, 4000);
             this.wrongNewPassword();
         }
     }
@@ -1724,7 +1773,7 @@ export default class Wallet extends React.Component {
             })
             .catch(function (error) {
                 console.log(error);
-                render += `<h5>Could not fetch transaction history...</h5>`
+                render += `<h5>Could not fetch transaction history, plese try again later</h5>`
                 document.getElementById("history_txs").innerHTML = render;
             });
 
@@ -2045,7 +2094,7 @@ export default class Wallet extends React.Component {
     }
 
     editLabel(label, key) {
-        console.log(label, key);
+        // console.log(label, key);
     }
 
     render() {
@@ -2334,21 +2383,21 @@ export default class Wallet extends React.Component {
         });
 
         return (
-            <div className="wallet-page">
+            <div className={this.state.loging_out ? 'wallet-page fadeOutUp' : 'wallet-page'}>
                 <Navigation />
                 <div className="container wallet-tabs-wrap">
                     <div className="wallet-tabs fadeIn">
                         {
                             archive_active
-                                ?
+                            ?
                                 <div>
                                     {
                                         this.state.transfer_key_to_home
-                                            ?
+                                        ?
                                             <div onClick={this.setHomeView} className='btn btn-default button-shine glow-active'>
                                                 Home
                                             </div>
-                                            :
+                                        :
                                             <div onClick={this.setHomeView} className='btn btn-default button-shine'>
                                                 Home
                                             </div>
@@ -2357,18 +2406,18 @@ export default class Wallet extends React.Component {
                                         Archive
                                     </div>
                                 </div>
-                                :
+                            :
                                 <div>
                                     <div onClick={this.setHomeView} className='btn btn-default button-shine active'>
                                         Home
                                     </div>
                                     {
                                         this.state.transfer_key_to_archive
-                                            ?
+                                        ?
                                             <div onClick={this.setArchiveView} className='btn btn-default button-shine glow-active'>
                                                 Archive
                                             </div>
-                                            :
+                                        :
                                             <div onClick={this.setArchiveView} className='btn btn-default button-shine'>
                                                 Archive
                                             </div>
@@ -2526,15 +2575,15 @@ export default class Wallet extends React.Component {
                             <span className="close" onClick={this.closeSettingsModal}>X</span>
                         </div>
 
-                        <form onSubmit={this.changePassword}>
+                        <form onSubmit={this.changePassword} onChange={this.closeSettingsInfoPopup}>
                             <div className="form-group">
                                 <label htmlFor="old_pass">Old Password:</label>
                                 {
                                     this.state.wrong_old_password
                                     ?
-                                        <input type="password" className="form-control shake password-input" name="old_pass" onChange={this.closeSettingsInfoPopup} />
+                                        <input type="password" className="form-control shake password-input" id="old_pass" name="old_pass" />
                                     :
-                                        <input type="password" className="form-control password-input" name="old_pass" onChange={this.closeSettingsInfoPopup} />
+                                        <input type="password" className="form-control password-input" id="old_pass" name="old_pass" />
                                 }
                             </div>
                             <div className="form-group">
@@ -2542,9 +2591,9 @@ export default class Wallet extends React.Component {
                                 {
                                     this.state.wrong_new_password
                                     ?
-                                        <input type="password" className="form-control shake password-input" name="new_pass" onChange={this.closeSettingsInfoPopup} />
+                                        <input type="password" className="form-control shake password-input" id="new_pass" name="new_pass" />
                                     :
-                                        <input type="password" className="form-control password-input" name="new_pass" onChange={this.closeSettingsInfoPopup} />
+                                        <input type="password" className="form-control password-input" id="new_pass" name="new_pass" />
                                 }
                             </div>
                             <div className="form-group">
@@ -2552,9 +2601,9 @@ export default class Wallet extends React.Component {
                                 {
                                     this.state.wrong_repeat_password
                                     ?
-                                        <input type="password" className="form-control shake password-input" name="repeat_pass" onChange={this.closeSettingsInfoPopup} />
+                                        <input type="password" className="form-control shake password-input" id="repeat_pass" name="repeat_pass" />
                                     :
-                                        <input type="password" className="form-control password-input" name="repeat_pass" onChange={this.closeSettingsInfoPopup} />
+                                        <input type="password" className="form-control password-input" id="repeat_pass" name="repeat_pass" />
                                 }
                             </div>
                             <div className="col-xs-12 submit-wrap">
@@ -2642,7 +2691,7 @@ export default class Wallet extends React.Component {
                         </div>
                     </form>
                 </div>
-                <div className="key-buttons status bounceInUp">
+                <div className="key-buttons status fadeInUp">
                     <div className="container">
                         <div className="status-left-wrap">
                             <span>Status:</span>

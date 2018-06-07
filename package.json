@@ -1,7 +1,7 @@
 {
   "name": "SafexWallet",
   "description": "Safex Community Wallet",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "homepage": ".",
   "repository": {
     "type": "git",
@@ -17,6 +17,10 @@
       "name": "Daniel Dabek",
       "url": "https://github.com/ddabek",
       "email": "daniel@safex.io"
+    }, {
+      "name": "Uroš Mitrović",
+      "url": "https://github.com/Kiu0612",
+      "email": "uros@balkaneum.com"
     }
   ],
   "license": "MIT",
@@ -33,6 +37,7 @@
     "electron-builder": "^19.41.0",
     "electron-installer-dmg": "^0.2.1",
     "electron-packager": "^8.7.2",
+    "electron-react-devtools": "^0.5.3",
     "electron-winstaller": "^2.6.3",
     "foreman": "^2.0.0",
     "react-scripts": "^0.8.5"

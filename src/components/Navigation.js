@@ -64,7 +64,7 @@ export default class Navigation extends React.Component {
 
 
     render() {
-        return (<nav className="navbar navbar-default bounceInDown">
+        return (<nav className="navbar navbar-default fadeInDown">
             <div className="container">
                 <div className="navbar-header">
                     <button type="button" className="navbar-toggle collapsed" data-toggle="collapse"
@@ -77,15 +77,14 @@ export default class Navigation extends React.Component {
                     </button>
                     <span className="navbar-brand" href="#">
                         <img src="images/logo.png" alt="Logo"/>
-
                     </span>
                 </div>
 
                 <div className="collapse navbar-collapse" id="navbar-collapse">
                     <ul className="nav navbar-nav navbar-right wallet-nav">
                         <li>
-                            <Link to="/wallet" activeClassName="activeLink" onlyActiveOnIndex>
-                                Wallet &nbsp; v0.0.6
+                            <Link activeClassName="activeLink" onlyActiveOnIndex>
+                                Wallet &nbsp; v0.0.7
                             </Link>
                         </li>
                     </ul>

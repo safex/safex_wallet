@@ -25,6 +25,7 @@ export default class SelectWallet extends React.Component {
             walletResetWarning3: false,
             walletResetWarning4: false,
             walletResetWarning5: false,
+            walletResetNoWallet: false,
             wrong_password: false
         };
         this.walletResetStart = this.walletResetStart.bind(this);
@@ -38,6 +39,7 @@ export default class SelectWallet extends React.Component {
         this.walletResetStep2 = this.walletResetStep2.bind(this);
         this.walletResetDlUnencrypted = this.walletResetDlUnencrypted.bind(this);
         this.walletResetDlEncrypted = this.walletResetDlEncrypted.bind(this);
+        this.walletResetNoWallet = this.walletResetNoWallet.bind(this);
         this.walletResetClose = this.walletResetClose.bind(this);
         this.wrongPassword = this.wrongPassword.bind(this);
     }
@@ -81,42 +83,42 @@ export default class SelectWallet extends React.Component {
     //This happens when you click wallet reset on the main screen
     walletResetStart() {
         this.setState({
-            walletResetWarning1: true
+            walletResetWarning1: true,
         })
     }
 
     walletResetWarning1Proceed() {
         this.setState({
             walletResetWarning1: false,
-            walletResetWarning2: true
+            walletResetWarning2: true,
         })
     }
 
     walletResetWarning2Proceed() {
         this.setState({
             walletResetWarning2: false,
-            walletResetWarning3: true
+            walletResetWarning3: true,
         })
     }
 
     walletResetWarning3Proceed() {
         this.setState({
             walletResetWarning3: false,
-            walletResetWarning4: true
+            walletResetWarning4: true,
         })
     }
 
     walletResetWarning4Proceed() {
         this.setState({
             walletResetWarning4: false,
-            walletResetWarning5: true
+            walletResetWarning5: true,
         })
     }
 
     walletResetWarning5Proceed() {
         this.setState({
             walletResetWarning5: false,
-            walletResetModal1: true
+            walletResetModal1: true,
         })
     }
 
@@ -124,7 +126,7 @@ export default class SelectWallet extends React.Component {
     walletResetStep1Skip() {
         this.setState({
             walletResetModal1: false,
-            walletResetModalDlUnencrypted: true
+            walletResetModalDlUnencrypted: true,
         })
     }
 
@@ -133,7 +135,13 @@ export default class SelectWallet extends React.Component {
         this.setState({
             walletResetModal1: false,
             walletResetModalDlUnencrypted: false,
-            walletResetModal2unencrypted: true
+            walletResetModal2unencrypted: true,
+        })
+    }
+
+    walletResetNoWallet() {
+        this.setState({
+            walletResetNoWallet: true,
         })
     }
 
@@ -191,7 +199,7 @@ export default class SelectWallet extends React.Component {
                 walletResetModal1: false,
                 walletResetModalDlUnencrypted: false,
                 walletResetModal2unencrypted: false,
-                walletResetModalDlEncrypted: true
+                walletResetModalDlEncrypted: true,
             })
         }
     }
@@ -244,6 +252,7 @@ export default class SelectWallet extends React.Component {
             walletResetModalDone: false,
             walletResetModalDlEncrypted: false,
             walletResetModalDlUnencrypted: false,
+            walletResetNoWallet: false,
         })
     }
 
@@ -257,14 +266,20 @@ export default class SelectWallet extends React.Component {
                     <div className="col-xs-12 Login-logo">
                         <h2>Safex</h2>
                         <h3>Wallet</h3>
-                        <p>v0.0.6</p>
+                        <p>v0.0.7</p>
                         {
+                            this.state.walletResetWarning1 ||
+                            this.state.walletResetWarning2 ||
+                            this.state.walletResetWarning3 ||
+                            this.state.walletResetWarning4 ||
+                            this.state.walletResetWarning5 ||
                             this.state.walletResetModal1 ||
                             this.state.walletResetModal2 ||
                             this.state.walletResetModal2unencrypted ||
                             this.state.walletResetModalDone ||
                             this.state.walletResetModalDlEncrypted ||
-                            this.state.walletResetModalDlUnencrypted
+                            this.state.walletResetModalDlUnencrypted ||
+                            this.state.walletResetNoWallet
                             ?
                                 <button className="back-button wallet-reset-button" onClick={this.walletResetClose}>Wallet Reset</button>
                             :
@@ -305,7 +320,8 @@ export default class SelectWallet extends React.Component {
                     <div className="col-xs-12 Login-logo">
                         <h2>Safex</h2>
                         <h3>Wallet</h3>
-                        <button className="back-button wallet-reset-button" onClick={this.walletResetStart}>Wallet Reset</button>
+                        <p>v0.0.7</p>
+                        <button className="back-button wallet-reset-button" onClick={this.walletResetNoWallet}>Wallet Reset</button>
                     </div>
                     <div className="col-xs-8 col-xs-offset-2 App-intro">
                         <div className="row text-center">
@@ -361,7 +377,7 @@ export default class SelectWallet extends React.Component {
                             <span onClick={this.walletResetClose} className="close">X</span>
                         </h3>
                         <p>
-                            This is not necessary for upgrading wallet versions
+                            This is not necessary for upgrading wallet versions.
                         </p>
                         <button className="keys-btn button-shine" onClick={this.walletResetWarning2Proceed}>Proceed</button>
                     </div>
@@ -374,7 +390,7 @@ export default class SelectWallet extends React.Component {
                             <span onClick={this.walletResetClose} className="close">X</span>
                         </h3>
                         <p>
-                            PROCEED WITH CAUTION THIS PROCESS WILL DELETE YOUR EXISTING WALLET.
+                            PROCEED WITH CAUTION THIS PROCESS WILL DELETE YOUR EXISTING WALLET..
                         </p>
                         <button className="keys-btn button-shine" onClick={this.walletResetWarning3Proceed}>Proceed</button>
                     </div>
@@ -387,8 +403,7 @@ export default class SelectWallet extends React.Component {
                             <span onClick={this.walletResetClose} className="close">X</span>
                         </h3>
                         <p>
-                            This procedure will reset the wallet. It will take you through steps to backup the existing wallet.
-                            Then the existing wallet will be deleted to make room for a new one. PROCEED WITH CAUTION!!
+                            This procedure will reset the wallet. It will take you through steps to backup the existing wallet. Then the existing wallet will be deleted to make room for a new one. PROCEED WITH CAUTION!!
                         </p>
                         <button className="keys-btn button-shine" onClick={this.walletResetWarning4Proceed}>Proceed</button>
                     </div>
@@ -414,8 +429,7 @@ export default class SelectWallet extends React.Component {
                             <span onClick={this.walletResetClose} className="close">X</span>
                         </h3>
                         <p>
-                            You do not need to do this for upgrading wallet versions.
-                            If you have your password and want to backup your keys unencrypted press proceed, otherwise press skip.
+                            You do not need to do this for upgrading wallet versions. If you have your password and want to backup your keys unencrypted press proceed, otherwise press skip.
                         </p>
                         <button className="keys-btn button-shine" onClick={this.walletResetStep1Skip}>Skip</button>
                         <button className="keys-btn button-shine" onClick={this.walletResetStep1Proceed}>Proceed</button>
@@ -447,7 +461,9 @@ export default class SelectWallet extends React.Component {
                         <h3>Download Encrypted Wallet
                             <span onClick={this.walletResetClose} className="close">X</span>
                         </h3>
-                        <p>During this stage you will be able to backup your encrypted wallet file. You may need it in the future and that is why this step exists.</p>
+                        <p>
+                            During this stage you will be able to backup your encrypted wallet file. You may need it in the future and that is why this step exists.
+                        </p>
                         <form onSubmit={this.walletResetDlEncrypted}>
                             <label><input name="checkbox" type="checkbox" /> I understand that this is my last chance to backup my wallet file after this it will be deleted</label>
                             <button type="submit" className="submit-btn button-shine">Proceed</button>
@@ -461,10 +477,9 @@ export default class SelectWallet extends React.Component {
                         <h3>Downloading Encrypted Wallet
                             <span onClick={this.walletResetClose} className="close">X</span>
                         </h3>
-                        <p>This is second confirmation. When you check the box and proceed you will be able to backup your encrypted wallet. After this there is no turning back
-                            your wallet will be deleted so that you can make a new one. In this step you'll backup your encrypted wallet that was already in the wallet.
-                            During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists. <br />
-                            AFTER THIS THERE IS NO TURNING BACK, YOUR WALLET WILL BE DELETED HIT THE "X" TO GET OUT OF THIS</p>
+                        <p>
+                            This is second confirmation. When you check the box and proceed you will be able to backup your encrypted wallet. After this there is no turning back your wallet will be deleted so that you can make a new one. In this step you'll backup your encrypted wallet that was already in the wallet. During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists. AFTER THIS THERE IS NO TURNING BACK, YOUR WALLET WILL BE DELETED HIT THE 'X' TO GET OUT OF THIS
+                        </p>
                         <form onSubmit={this.walletResetStep2}>
                             <label><input name="checkbox" type="checkbox" /> I understand that this is my last chance to backup my wallet file after this it will be deleted</label>
                             <button type="submit" className="submit-btn button-shine">Proceed</button>
@@ -478,8 +493,20 @@ export default class SelectWallet extends React.Component {
                         <h3>Wallet Reset Done
                             <span onClick={this.walletResetClose} className="close">X</span>
                         </h3>
-                        <p>Your wallet reset is done. Now you can make a new wallet.</p>
+                        <p>
+                            Your wallet reset is done. Now you can make a new wallet.
+                        </p>
                         <button className="keys-btn button-shine" onClick={this.walletResetClose}>Done</button>
+                    </div>
+                </div>
+                <div className={this.state.walletResetNoWallet
+                    ? 'overflow sendModal walletResetModal active'
+                    : 'overflow sendModal walletResetModal'}>
+                    <div className="container">
+                        <h3>Wallet Reset
+                            <span onClick={this.walletResetClose} className="close">X</span>
+                        </h3>
+                        <p>There in no wallet.</p>
                     </div>
                 </div>
             </div>
