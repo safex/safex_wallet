@@ -56,9 +56,9 @@ function createWindow() {
     });
     
     const template = [{
-        label: "Safex Wallet 0.0.6",
+        label: "Safex Wallet 0.0.7",
         submenu: [
-            { label: "About Safex Wallet v0.0.6", selector: "orderFrontStandardAboutPanel:" },
+            { label: "About Safex Wallet v0.0.7", selector: "orderFrontStandardAboutPanel:" },
             { type: "separator" },
             { label: "Quit", accelerator: "Command+Q", click: function() { app.quit(); }}
         ]}, {

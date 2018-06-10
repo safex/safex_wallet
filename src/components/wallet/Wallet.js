@@ -1299,12 +1299,6 @@ export default class Wallet extends React.Component {
                                                 info_popup: true,
                                                 info_text: 'Password has been changed. Write it down, keep it safe.'
                                             });
-                                            setInterval(() => {
-                                                this.setState({
-                                                    info_popup: false,
-                                                    info_text: ''
-                                                })
-                                            }, 4000);
                                             document.getElementById('old_pass').value = '';
                                             document.getElementById('new_pass').value = '';
                                             document.getElementById('repeat_pass').value = '';
@@ -1316,12 +1310,6 @@ export default class Wallet extends React.Component {
                                     info_popup: true,
                                     info_text: 'Wrong password'
                                 });
-                                setInterval(() => {
-                                    this.setState({
-                                        info_popup: false,
-                                        info_text: ''
-                                    })
-                                }, 4000);
                                 this.wrongOldPassword();
                             }
                         } catch (e) {
@@ -1329,12 +1317,6 @@ export default class Wallet extends React.Component {
                                 info_popup: true,
                                 info_text: 'Wrong password'
                             });
-                            setInterval(() => {
-                                this.setState({
-                                    info_popup: false,
-                                    info_text: ''
-                                })
-                            }, 4000);
                             this.wrongOldPassword();
                         }
                     }
@@ -1344,12 +1326,6 @@ export default class Wallet extends React.Component {
                     info_popup: true,
                     info_text: 'New password does not match repeated password'
                 });
-                setInterval(() => {
-                    this.setState({
-                        info_popup: false,
-                        info_text: ''
-                    })
-                }, 4000);
                 this.wrongRepeatPassword();
             }
         } else {
@@ -1357,12 +1333,6 @@ export default class Wallet extends React.Component {
                 info_popup: true,
                 info_text: 'New password field is empty'
             });
-            setInterval(() => {
-                this.setState({
-                    info_popup: false,
-                    info_text: ''
-                })
-            }, 4000);
             this.wrongNewPassword();
         }
     }
