@@ -17,8 +17,7 @@
       "name": "Daniel Dabek",
       "url": "https://github.com/ddabek",
       "email": "daniel@safex.io"
-    },
-    {
+    }, {
       "name": "Uroš Mitrović",
       "url": "https://github.com/Kiu0612",
       "email": "uros@balkaneum.com"
@@ -70,7 +69,7 @@
     "make-mac-installer": "npm run build && electron-builder build -m",
     "make-win-installer": "npm run build && electron-builder build -w --x64 --ia32",
     "make-linux-installer": "npm run build && electron-builder build -l",
-    "make-all-installers": "npm run build && electron-builder build -ml && electron-builder build -w --x64 --ia32",
+    "make-all-installers": "npm run build && electron-builder build -ml && electron-builder build -w --x64 --ia32"
   },
   "build": {
     "appId": "com.electron.safex_wallet",
