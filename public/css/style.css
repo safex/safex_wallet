@@ -113,7 +113,7 @@ body{
   max-width: 440px;
   margin: auto;
   margin-bottom: 20px;
-  padding: 110px 40px 65px;
+  padding: 110px 40px 45px;
   text-align: center;
   border-radius: 15px;
 }
@@ -401,7 +401,7 @@ body{
   color: #fff;
   border-radius: 0px;
   padding: 15px 10px;
-  margin-top: 20px;
+  margin-top: 30px;
 }
 .Login-form .btn:focus,
 .Login-form .btn:active {
@@ -1483,6 +1483,9 @@ input::-webkit-inner-spin-button {
   animation-fill-mode: both;
   -webkit-transition: width .3s;
   transition: width .3s;
+}
+.keys-container .keys-wrap .row:hover .key-wrap:not(.hidden-xs) {
+  margin-bottom: 0;
 }
 .keys-container .keys-wrap .row:hover .single-key {
   opacity: .8;
