@@ -102,13 +102,13 @@ export default class KeyLabel extends React.Component {
     render() {
         return (
             <div>
-                <button className="edit-label-btn" disabled="disabled" onClick={this.toggleEditing} title="Click to edit Key Label">
-                    <img
-                        src="images/edit.png"
-                        alt="Edit Logo"
-                        style={{ opacity: this.state.editing ? 1 : 0.5 }}
-                    />
-                </button>
+                {/*<button className="edit-label-btn" disabled="disabled" onClick={this.toggleEditing} title="Click to edit Key Label">*/}
+                    {/*<img*/}
+                        {/*src="images/edit.png"*/}
+                        {/*alt="Edit Logo"*/}
+                        {/*style={{ opacity: this.state.editing ? 1 : 0.5 }}*/}
+                    {/*/>*/}
+                {/*</button>*/}
                 <input
                     ref={el => (this.editLabel = el)}
                     disabled={!this.state.editing}
