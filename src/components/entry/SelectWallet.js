@@ -161,6 +161,8 @@ export default class SelectWallet extends React.Component {
         try {
             var parse_wallet = JSON.parse(decrypted_wallet);
 
+            console.log(parse_wallet)
+
             if (parse_wallet['version'] === '1') {
                 localStorage.setItem('wallet', decrypted_wallet);
 

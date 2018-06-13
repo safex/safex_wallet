@@ -1134,6 +1134,12 @@ export default class Wallet extends React.Component {
                 private_key: ''
             },
 
+            // Close Send Receive Modal
+            collapse_open: {
+                send_open: false,
+                receive_open: false
+            },
+
             // Close Dividend Modal
             dividend_active: false,
 
@@ -1633,7 +1639,6 @@ export default class Wallet extends React.Component {
                 var date_time = 0;
                 var safex_confirmations = '';
                 var btc_reference_address = '';
-                var btc_reference_address_arr = [];
                 var btc_confirmations = ''
                 var btc_amount = '';
                 var btc_amount_arr = [];
@@ -1681,11 +1686,11 @@ export default class Wallet extends React.Component {
                             scriptPubKey.push(nestedProp['scriptPubKey']['addresses']);
                         });
 
-                        var newArray = btc_reference_address.filter(function (el) {
+                        btc_amount_arr = btc_reference_address.filter(function (el) {
                             return el.n === 0;
                         });
 
-                        btc_amount = newArray[0]['value']
+                        btc_amount = btc_amount_arr[0]['value']
                     }
 
                     if (scriptPubKey.length > 0 && scriptPubKey[0] !== undefined) {
@@ -2310,7 +2315,7 @@ export default class Wallet extends React.Component {
                             <div className="form-group">
                                 <label htmlFor="fee">Fee(BTC):</label>
                                 <input type="number" name="fee" onChange={this.sendFeeOnChange}
-                                    onBlur={this.sendFeeOnBlur} value={this.state.send_fee}/>
+                                    onBlur={this.sendFeeOnBlur} readOnly value={this.state.send_fee}/>
                             </div>
                             <div className="form-group fee-buttons">
                                 <span className={this.state.active_fee === 'slow'

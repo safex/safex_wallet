@@ -544,7 +544,7 @@ body{
   padding-bottom: 5px;
   line-height: 1;
   width: calc(100% - 37px);
-  margin-left: 10px;
+  /*margin-left: 10px;*/
   font-family: 'Gotham Medium', sans-serif;
   color: rgba(255,255,255,.9);
 }
@@ -1909,7 +1909,8 @@ input::-webkit-inner-spin-button {
   margin-bottom: 0;
   text-transform: initial;
   line-height: 1.3;
-  color: #ff9600;
+  /*color: #ff9600;*/
+  color: #00d1ff;
 }
 .settingsModal .info-wrap .info-text .close {
   position: absolute;
