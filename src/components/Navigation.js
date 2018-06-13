@@ -84,7 +84,7 @@ export default class Navigation extends React.Component {
                     <ul className="nav navbar-nav navbar-right wallet-nav">
                         <li>
                             <Link activeClassName="activeLink" onlyActiveOnIndex>
-                                Wallet &nbsp; v0.0.7
+                                Wallet &nbsp;v0.0.7
                             </Link>
                         </li>
                     </ul>

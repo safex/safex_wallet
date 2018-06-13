@@ -1603,9 +1603,11 @@ export default class Wallet extends React.Component {
                 var coin = '';
                 var date_time = 0;
                 var safex_confirmations = '';
-                var btc_reference_address = ''
+                var btc_reference_address = '';
+                var btc_reference_address_arr = [];
                 var btc_confirmations = ''
                 var btc_amount = '';
+                var btc_amount_arr = [];
                 var scriptPubKey = [];
                 var btc_send_addr = '';
                 var btc_receive_addr = '';
@@ -1647,14 +1649,19 @@ export default class Wallet extends React.Component {
 
                     if(btc_reference_address !== undefined){
                         btc_reference_address.forEach(function(nestedProp) {
-                            scriptPubKey.push(nestedProp['scriptPubKey']['addresses'], nestedProp.value);
-                        })
+                            scriptPubKey.push(nestedProp['scriptPubKey']['addresses']);
+                        });
+
+                        var newArray = btc_reference_address.filter(function (el) {
+                            return el.n === 0;
+                        });
+
+                        btc_amount = newArray[0]['value']
                     }
 
                     if (scriptPubKey.length > 0 && scriptPubKey[0] !== undefined) {
                         btc_send_addr = scriptPubKey[0];
-                        btc_receive_addr = scriptPubKey[2];
-                        btc_amount = scriptPubKey[1];
+                        btc_receive_addr = scriptPubKey[1];
                     }
 
                     if (btc_send_addr[0] !== undefined && btc_send_addr[0].length) {
