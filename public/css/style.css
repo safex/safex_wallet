@@ -2029,7 +2029,7 @@ input::-webkit-inner-spin-button {
   padding-left: 15px;
   padding-right: 15px;
   margin: 0 auto;
-  height: 480px;
+  height: calc(100% - 105px);
   text-align: center;
   color: #fff;
   overflow: auto;

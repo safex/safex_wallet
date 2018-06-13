@@ -743,6 +743,11 @@ export default class Wallet extends React.Component {
                 if (key_exists === false) {
                     this.setState({
                         import_modal_active: true,
+
+                        // Close Private Key Popup
+                        private_key_open: {
+                            private_key_popup: false,
+                        },
                     });
                 }
 
@@ -769,6 +774,11 @@ export default class Wallet extends React.Component {
                 import_modal_active: false,
                 main_alert_popup: true,
                 main_alert_popup_text: 'Invalid private key',
+
+                // Close Private Key Popup
+                private_key_open: {
+                    private_key_popup: false,
+                },
             });
         }
     }
@@ -777,7 +787,12 @@ export default class Wallet extends React.Component {
         this.setState({
             history_overflow_active: false,
             history_key: '',
-            create_key_active: true
+            create_key_active: true,
+
+            // Close Private Key Popup
+            private_key_open: {
+                private_key_popup: false,
+            },
         });
     }
 
@@ -834,8 +849,15 @@ export default class Wallet extends React.Component {
                                     keys: json2['keys'],
                                     is_loading: false,
                                     import_modal_active: false,
+
+                                    // Close History Modal
                                     history_overflow_active: false,
-                                    history_key: ''
+                                    history_key: '',
+
+                                    // Close Private Key Popup
+                                    private_key_open: {
+                                        private_key_popup: false,
+                                    },
                                 });
                                 this.prepareDisplay();
                                 this.prepareDisplayPendingTx();
@@ -855,14 +877,21 @@ export default class Wallet extends React.Component {
             this.setState({
                 main_alert_popup: true,
                 main_alert_popup_text: 'Invalid private key',
+
+                // Close Private Key Popup
+                private_key_open: {
+                    private_key_popup: false,
+                },
             });
         }
         this.setState({
             history_overflow_active: false,
             history_key: '',
+
+            // Close Private Key Popup
             private_key_open: {
                 private_key_popup: false,
-            }
+            },
         });
     }
 
