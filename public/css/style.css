@@ -560,6 +560,9 @@ body{
   position: relative;
   top: -2px;
   opacity: .5;
+  -webkit-transition: all 0.07s ease-in;
+  -moz-transition: all 0.07s ease-in;
+  transition: all 0.07s ease-in;
 }
 .single-key .key-label::-webkit-input-placeholder { /* Chrome/Opera/Safari */
   opacity: .8;
