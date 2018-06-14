@@ -691,3 +691,15 @@
   background: rgba(0, 231, 255, .8);
   display: inline-block;
 }
+
+/* Media Queries */
+@media (min-width: 1480px) {
+  .keys-container .sidebar-opened {
+    width: 100%;
+  }
+}
+@media (min-width: 1200px) {
+  .container {
+    width: 970px;
+  }
+}

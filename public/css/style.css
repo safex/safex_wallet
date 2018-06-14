@@ -589,15 +589,3 @@ input::-webkit-inner-spin-button {
     text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 4px #0ec8c1, 0 0 5px #0ec8c1, 0 0 6px #0ec8c1, 0 0 7px #0ec8c1, 0 0 8px #0ec8c1;
   }
 }
-
-/* Media Queries */
-@media (min-width: 1480px) {
-  .keys-container .sidebar-opened {
-    width: 100%;
-  }
-}
-@media (min-width: 1200px) {
-  .container {
-    width: 970px;
-  }
-}
