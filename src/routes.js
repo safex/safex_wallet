@@ -1,4 +1,4 @@
-import { IndexRoute, Router, Route, hashHistory } from 'react-router';
+import { Router, Route, hashHistory } from 'react-router';
 import React from 'react';
 
 import SelectWallet from './components/entry/SelectWallet';

@@ -11,7 +11,6 @@ export default class Navigation extends React.Component {
             bitcoin_price: 0,
         }
         this.getPrices = this.getPrices.bind(this);
-
     }
 
     componentDidMount() {
@@ -36,10 +35,9 @@ export default class Navigation extends React.Component {
         .then(resp => resp.json())
         .then((resp) => {
             try {
-                console.log(resp.price_usd)
                 var safex = 0.02;
                 if (resp.price_usd !== null) {
-                    safex = parseFloat(resp.price_usd).toFixed(5);
+                    safex = parseFloat(resp.price_usd).toFixed(8);
                     this.setState({safex_price: safex});
                 }
                 localStorage.setItem('safex_price', safex);
@@ -62,13 +60,11 @@ export default class Navigation extends React.Component {
                 console.log(e);
             }
         });
-
     }
 
 
     render() {
-
-        return (<nav className="navbar navbar-default">
+        return (<nav className="navbar navbar-default fadeInDown">
             <div className="container">
                 <div className="navbar-header">
                     <button type="button" className="navbar-toggle collapsed" data-toggle="collapse"
@@ -81,14 +77,15 @@ export default class Navigation extends React.Component {
                     </button>
                     <span className="navbar-brand" href="#">
                         <img src="images/logo.png" alt="Logo"/>
-
                     </span>
                 </div>
 
                 <div className="collapse navbar-collapse" id="navbar-collapse">
                     <ul className="nav navbar-nav navbar-right wallet-nav">
                         <li>
-                            <Link to="/wallet" activeClassName="activeLink" onlyActiveOnIndex>Wallet</Link>
+                            <Link activeClassName="activeLink" onlyActiveOnIndex>
+                                Wallet &nbsp;v0.0.7
+                            </Link>
                         </li>
                     </ul>
                     {/*<div onClick={this.setHomeView}*/}

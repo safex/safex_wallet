@@ -25,7 +25,12 @@ function createWindow() {
         height: 768,
         minWidth: 1024,
         minHeight: 768,
+        webPreferences: {
+            webSecurity: false
+        }
     });
+
+    // mainWindow.setResizable(false);
 
     // and load the index.html of the app.
     const startUrl = process.env.ELECTRON_START_URL || url.format({
@@ -51,9 +56,9 @@ function createWindow() {
     });
     
     const template = [{
-        label: "Safex Wallet 0.0.6",
+        label: "Safex Wallet 0.0.7",
         submenu: [
-            { label: "About Safex Wallet v0.0.6", selector: "orderFrontStandardAboutPanel:" },
+            { label: "About Safex Wallet v0.0.7", selector: "orderFrontStandardAboutPanel:" },
             { type: "separator" },
             { label: "Quit", accelerator: "Command+Q", click: function() { app.quit(); }}
         ]}, {
