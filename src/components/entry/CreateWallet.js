@@ -47,7 +47,7 @@ export default class CreateWallet extends React.Component {
             key_json['btc_bal'] = 0;
             key_json['pending_safex_bal'] = 0;
             key_json['pending_btc_bal'] = 0;
-            key_json['label'] = '';
+            key_json['label'] = 'Enter your label here';
 
             const key_array = [];
             key_array.push(key_json);

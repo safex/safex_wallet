@@ -10,18 +10,16 @@
   font-style: normal;
   font-weight: 400;
 }
-
 @font-face {
   font-family: 'Gotham Light';
   src: url('../fonts/GOTHAM-LIGHT.eot'); /* IE9 Compat Modes */
   src: url('../fonts/GOTHAM-LIGHT.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('../fonts/GOTHAM-LIGHT.woff') format('woff'), /* Modern Browsers */
-       url('../fonts/GOTHAM-LIGHT.ttf')  format('truetype'), /* Safari, Android, iOS */
-       url('../fonts/GOTHAM-LIGHT.svg#0fdc6c734a7ca54436fb28af9ab2f202') format('svg'); /* Legacy iOS */
+  url('../fonts/GOTHAM-LIGHT.woff') format('woff'), /* Modern Browsers */
+  url('../fonts/GOTHAM-LIGHT.ttf')  format('truetype'), /* Safari, Android, iOS */
+  url('../fonts/GOTHAM-LIGHT.svg#0fdc6c734a7ca54436fb28af9ab2f202') format('svg'); /* Legacy iOS */
   font-style:   normal;
   font-weight:  200;
 }
-
 @font-face {
   font-family: 'Brandon Grotesque';
   src: url('../fonts/BrandonGrotesque-Regular.eot');
@@ -32,7 +30,6 @@
   font-weight: normal;
   font-style: normal;
 }
-
 @font-face {
   font-family: 'Brandon Grotesque';
   src: url('../fonts/BrandonGrotesque-Thin.eot');
@@ -43,7 +40,6 @@
   font-weight: 100;
   font-style: normal;
 }
-
 @font-face {
   font-family: 'Brandon Grotesque';
   src: url('../fonts/BrandonGrotesque-Bold.eot');
@@ -54,9 +50,11 @@
   font-weight: bold;
   font-style: normal;
 }
-
-textarea, input:focus, button { outline-color: transparent;
-  outline-style: none; box-shadow: none !important;}
+textarea, input:focus, button {
+  outline-color: transparent;
+  outline-style: none;
+  box-shadow: none !important;
+}
 html, body, body #root, body #root > div{
   height:100%;
 }
@@ -72,7 +70,6 @@ body{
 ::-webkit-scrollbar {
   display: none;
 }
-
 .wallet-page {
   overflow: hidden;
   animation-duration: 1s;
@@ -87,19 +84,6 @@ input::-webkit-inner-spin-button {
   /* display: none; <- Crashes Chrome on hover */
   -webkit-appearance: none;
   margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
-}
-
-.overflow.messageModal p {
-  background: none;
-  border: none;
-  text-transform: initial;
-  text-align: left;
-  padding: 0;
-  margin: 0;
-  line-height: 1.2;
-}
-.version-number{
-  color: #fff;
 }
 
 /* Buttons and Transitions */

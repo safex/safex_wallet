@@ -671,7 +671,7 @@ export default class Wallet extends React.Component {
         key_json['pending_safex_bal'] = 0;
         key_json['pending_btc_bal'] = 0;
         key_json['archived'] = false;
-        key_json['label'] = e.target.label.value;
+        key_json['label'] = e.target.label.value || 'Enter your label here';
 
         try {
             var json = JSON.parse(localStorage.getItem('wallet'));
@@ -811,7 +811,7 @@ export default class Wallet extends React.Component {
             key_json['pending_safex_bal'] = 0;
             key_json['pending_btc_bal'] = 0;
             key_json['archived'] = false;
-            key_json['label'] = e.target.label.value;
+            key_json['label'] = e.target.label.value || 'Enter your label here';
 
             try {
                 var json = JSON.parse(localStorage.getItem('wallet'));
