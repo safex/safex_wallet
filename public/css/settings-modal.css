@@ -1,0 +1,126 @@
+.settingsModal {
+  color: #fff;
+}
+.settingsModal .form-group {
+  width: 100%;
+  margin-bottom: 10px;
+}
+.sendModal .keys-btn,
+.settingsModal .keys-btn {
+  display: block;
+  margin-bottom: 20px;
+  border: 1px solid rgba(0, 231, 255, 1);
+  border-radius: 10px;
+  background: rgba(10, 26, 45, .82);
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 12px;
+  padding: 6px 6px 5px;
+  width: 100%;
+}
+.settingsModal .keys-btn .blue-text {
+  color: #00c8f3;
+  text-transform: initial;
+}
+.settingsModal .submit-wrap {
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(102, 132, 146, .7);
+  padding-left: 0;
+  padding-right: 0;
+}
+.settingsModal .reset-btn {
+  display: block;
+  border: 1px solid rgba(0, 231, 255, 1);
+  border-radius: 10px;
+  background: transparent;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 12px;
+  padding: 6px 1px 5px;
+  width: 60%;
+  margin: 10px auto;
+}
+.settingsModal .submit-btn {
+  display: block;
+  border: 1px solid #0ec8c1;
+  border-radius: 10px;
+  background: #0ec8c1;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 12px;
+  padding: 6px 1px 5px;
+  width: 60%;
+  margin: 10px auto;
+  font-weight: 600;
+}
+.settingsModal .logout-btn {
+  display: block;
+  border: 1px solid #c80e4b;
+  border-radius: 10px;
+  background: #c80e4b;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 12px;
+  padding: 6px 1px 5px;
+  width: 70%;
+  margin: 20px auto;
+  font-weight: 600;
+}
+.settingsModal label{
+  width: 100%;
+  text-align: right;
+}
+.settingsModal .info-wrap  {
+  height: 53px;
+  margin-bottom: 10px;
+}
+.settingsModal .info-wrap .info-text {
+  position: relative;
+  border: 1px solid #327A9B;
+  border-radius: 8px;
+  background: url(../images/info-bg.png);
+  background-size: 100% 100%;
+  background-repeat: repeat-y;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 17px;
+  padding: 6px 8px 8px 8px;
+  margin-right: 0;
+  opacity: 0;
+  visibility: hidden;
+  height: 100%;
+  transition: all ease 0.2s;
+  -o-transition: all ease 0.2s;
+  -moz-transition: all ease 0.2s;
+  -webkit-transition: all ease 0.2s;
+}
+.settingsModal .info-wrap .info-text.active {
+  visibility: visible;
+  opacity: 1;
+}
+.settingsModal .info-wrap .info-text:hover {
+  outline: 0px none;
+  -webkit-box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5) !important;
+  box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5) !important;
+  border: 1px solid #00e7ff !important;
+}
+.settingsModal .info-wrap .info-text p {
+  background: transparent;
+  border: 0px none;
+  margin-right: 0;
+  padding: 0 15px 0 0;
+  font-size: 15px;
+  margin-bottom: 0;
+  text-transform: initial;
+  line-height: 1.3;
+  /*color: #ff9600;*/
+  color: #00d1ff;
+}
+.settingsModal .info-wrap .info-text .close {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  color: #fff;
+  opacity: 1;
+  font-size: 16px;
+}

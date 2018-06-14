@@ -92,13 +92,19 @@ export default class ImportWallet extends React.Component {
         localStorage.setItem('wallet_path', walletPath);
 
         if (!this.state.path) {
-            alert(`You must select a wallet file first`);
+            this.setState({
+                walletImportAlerts: true,
+                walletImportAlertsText: `You must select a wallet file first`
+            });
             return;
         }
 
         const targetPassword = e.target.password.value;
         if (!targetPassword) {
-            alert(`You must enter password for the wallet file`);
+            this.setState({
+                walletImportAlerts: true,
+                walletImportAlertsText: `You must enter password for the wallet file`
+            });
             return;
         }
 
@@ -139,7 +145,10 @@ export default class ImportWallet extends React.Component {
                 return fs.writeFile(walletPath, targetWallet.encrypted, {flag: 'wx'}, (err) => {
                     if (err) {
                         console.error(err);
-                        alert(err.message);
+                        this.setState({
+                            walletImportAlerts: true,
+                            walletImportAlertsText: err.message
+                        });
                         return;
                     }
 
@@ -207,7 +216,10 @@ export default class ImportWallet extends React.Component {
                 const duplicatesMessage = importedCount < targetKeys.length
                     ? ` (found ${targetKeys.length - importedCount} duplicates)`
                     : '';
-                alert(`Imported ${importedCount} out of ${targetKeys.length} keys${duplicatesMessage}.`);
+                this.setState({
+                    walletImportAlerts: true,
+                    walletImportAlertsText: `Imported ${importedCount} out of ${targetKeys.length} keys${duplicatesMessage}.`
+                });
 
                 localStorage.setItem('encrypted_wallet', reEncrypted);
                 localStorage.setItem('password', currentPassword);
@@ -223,7 +235,7 @@ export default class ImportWallet extends React.Component {
             <div className="col-xs-12 fileandpass currentwallet">
                 <p>Login for your current wallet:</p>
                 <input type="password" name="current_password" placeholder="Enter Password"
-                       className={this.state.wrongCurrentPassword ? 'form-control shake' : 'form-control'} />
+                    className={this.state.wrongCurrentPassword ? 'form-control shake' : 'form-control'} />
             </div>
         );
 
@@ -238,15 +250,15 @@ export default class ImportWallet extends React.Component {
                 <div className="col-xs-12 Import-wallet">
                     <form className="form-group" onSubmit={this.handleSubmit}>
                         <FileInput name="fileInput" accept=".dat" placeholder="wallet.dat" className="inputClass"
-                                   onChange={this.handleChange}/>
+                            onChange={this.handleChange}/>
 
                         <div className="col-xs-12 fileandpass">
                             <p>Selected File:</p>
                             <p className="filename">{this.state.filename}</p>
                             <input type="password"
-                                   className={this.state.wrongTargetPassword ? 'form-control shake' : 'form-control'}
-                                   name="password"
-                                   placeholder="Enter Password"/>
+                                className={this.state.wrongTargetPassword ? 'form-control shake' : 'form-control'}
+                                name="password"
+                                placeholder="Enter Password"/>
                         </div>
 
                         {currentWalletPass}

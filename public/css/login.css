@@ -1,0 +1,229 @@
+.Login-logo {
+  text-align: center;
+}
+.Login-logo h2 {
+  display: inline-block;
+  width: 100%;
+  font-weight: 300;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin-bottom: 0;
+  margin-top: 30px;
+}
+.Login-logo h3 {
+  display: inline-block;
+  width: 100%;
+  font-size: 28px;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin-top: 10px;
+}
+.Login-logo p {
+  display: inline-block;
+  width: 100%;
+  font-size: 14px;
+  color: #fff;
+}
+.Login-logo img {
+  margin: auto;
+  display: block;
+  max-width: 200px;
+}
+.Login-form form {
+  background: url(../images/login-bg.png);
+  background-size: contain;
+  background-repeat: repeat-x;
+  display: block;
+  max-width: 440px;
+  margin: auto;
+  margin-bottom: 20px;
+  padding: 100px 40px 35px;
+  text-align: center;
+  border-radius: 15px;
+}
+.login-wrap {
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+.login-wrap .col-xs-12 {
+  background: url('../images/login-bg.png');
+  background-size: contain;
+  display: block;
+  padding-bottom: 20px;
+}
+.App-intro {
+  height: calc(90% - 100px);
+  margin-top: 40px;
+}
+.Login-form{
+  height: calc(90% - 100px);
+  margin-top: 40px;
+}
+.Create-wallet-form {
+  margin-top: 20px;
+}
+.App-intro img {
+  display: block;
+  margin: auto;
+}
+.App-intro .col-xs-6 a{
+  color: #5ACFFA;
+  text-decoration: none;
+}
+.App-intro .col-xs-6 a > div {
+  padding-top: 55px;
+  padding-bottom: 35px;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  min-height: 389px;
+  margin-bottom: 0;
+}
+.App-intro .col-xs-6 a > div > img{
+  height: 190px;
+  margin: auto;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+.App-intro .col-xs-6 .btn,
+.Login-form .btn {
+  width: 90%;
+  border: 0px none;
+  border-radius: 0px;
+  box-shadow: none;
+  background: transparent;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 26px;
+  letter-spacing: 4px;
+  font-weight: 600;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  transition: all 0.4s;
+}
+.Login-form .btn:hover {
+  box-shadow: 0 0 30px 0 rgba(0, 199, 236, 0.5);
+}
+.App-intro .col-xs-6 .btn:focus,
+.Login-form .btn:focus {
+  outline: 0px none;
+}
+.App-intro .col-xs-6 .btn img,
+.Login-form .btn img {
+  display: inline-block;
+  margin-left: 5px;
+  height: 25px;
+  position: relative;
+  top: -3px;
+}
+.App-intro .col-xs-6 p {
+  font-family: Helvetica, sans-serif;
+  margin-bottom: 0px;
+  color: rgba(255,255,255, .63);
+  font-size: 15px;
+}
+.Intro-footer{
+  position: absolute;
+  bottom: 0;
+  width: auto;
+  text-align: left;
+}
+.Intro-footer img {
+  margin: 0 0 10px;
+}
+.Intro-footer p {
+  width: 100%;
+  color: rgba(255,255,255, .5);
+}
+.Login-form input {
+  margin-bottom: 10px;
+  border-radius: 10px;
+  text-align: center;
+  border: 1px solid transparent;
+  background: url(../images/clipboard.png);
+  background-size: 101% 100%;
+  background-position: -1px 0px;
+  padding: 20px 15px;
+  line-height: 60px;
+  height: 60px;
+  font-size: 18px;
+  color: #fff;
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+.Login-form input:focus {
+  outline: 0px none;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 10px rgba(84, 188, 217, 1) !important;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 10px rgba(84, 188, 217, 1) !important;
+  border: 1px solid #54BCD9;
+}
+.Login-form input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  opacity: .8;
+  color: #fff;
+}
+.Login-form input::-moz-placeholder { /* Firefox 19+ */
+  opacity: .8;
+  color: #fff;
+}
+.Login-form input:-moz-placeholder { /* Firefox 18- */
+  opacity: .8;
+  color: #fff;
+}
+.Login-form input:-ms-input-placeholder { /* IE 10+ */
+  opacity: .8;
+  color: #fff;
+}
+.Login-form .btn {
+  width: 100%;
+  color: #fff;
+  border-radius: 0px;
+  padding: 15px 10px;
+  margin-top: 15px;
+  margin-bottom: 0px;
+}
+.Login-form .btn:focus,
+.Login-form .btn:active {
+  outline: none;
+  background: none;
+  color: #fff;
+}
+.Login-form > p {
+  color: #00C9FF;
+}
+.Create-wallet-form form {
+  margin-top: 0;
+}
+.back-button {
+  text-transform: uppercase;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  background: url(../images/back-btn-bg.png);
+  background-repeat: repeat-y;
+  background-position: left center;
+  padding: 4px 9px;
+  cursor: pointer;
+  position: absolute;
+  top: 50px;
+  right: 0;
+  border: 0px none;
+  border-radius: 10px;
+  min-width: 112px;
+}
+.back-button:focus {
+  outline: 0px none;
+  color: #fff;
+  text-decoration: none;
+}
+.back-button:hover{
+  color:#fff;
+  text-decoration: none;
+}
+.back-button img{
+  display: inline-block;
+  position: relative;
+  top: -3px;
+}

@@ -465,7 +465,7 @@ export default class SelectWallet extends React.Component {
                             the future and that is why this step exists.
                         </p>
                         <form onSubmit={this.walletResetDlEncrypted}>
-                            <label><input name="checkbox" type="checkbox"/> I understand that this is my last chance to
+                            <label><input name="checkbox" type="checkbox"/>I understand that this is my last chance to
                                 backup my wallet file after this it will be deleted</label>
                             <button type="submit" className="submit-btn button-shine">Proceed</button>
                         </form>
