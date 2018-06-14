@@ -2408,7 +2408,7 @@ export default class Wallet extends React.Component {
                     </div>
                 </div>
 
-                <div className='container keys-container'>
+                <div className="container keys-container fadeIn">
                     <div className={this.state.settings_active || this.state.send_overflow_active || this.state.dividend_active || this.state.affiliate_active
                         ? 'col-xs-12 sidebar-opened keys-wrap fadeIn'
                         : 'col-xs-12 keys-wrap fadeIn'}>
