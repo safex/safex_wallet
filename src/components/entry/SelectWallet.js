@@ -172,6 +172,8 @@ export default class SelectWallet extends React.Component {
         fileDownload(niceKeys, date + '_unsafex.txt');
 
         this.setState({
+            walletResetModal1: false,
+            walletResetModal2unencrypted: false,
             walletResetModalDlUnencrypted: true
         });
     }
