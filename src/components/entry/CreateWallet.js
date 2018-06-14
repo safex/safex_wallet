@@ -14,7 +14,7 @@ export default class CreateWallet extends React.Component {
         this.state = {
             walletExists: false,
             wrong_password: false
-        }
+        };
 
         this.wrongPassword = this.wrongPassword.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
