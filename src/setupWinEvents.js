@@ -1,5 +1,5 @@
-const electron = require('electron')
-const app = electron.app
+const electron = require('electron');
+const app = electron.app;
 
 module.exports = {
     handleSquirrelEvent: function () {

@@ -335,6 +335,13 @@ body{
 .Import-wallet input[name="fileInput"] {
   z-index: 999999 !important;
   padding: 50px !important;
+  cursor: pointer;
+}
+.Import-wallet .currentwallet {
+	margin-top: 10px;
+}
+.Import-wallet .currentwallet p {
+	margin-bottom: 5px;
 }
 .Import-wallet input[name="fileInput"]:hover {
   cursor: pointer;

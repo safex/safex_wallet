@@ -1,10 +1,10 @@
 import React from 'react';
 import {Link} from 'react-router';
+import {decryptWalletData, DEFAULT_WALLET_PATH, downloadWallet, loadWalletFromFile} from '../../utils/wallet';
 
-var fs = window.require('fs');
-var os = window.require('os');
-var fileDownload = require('react-file-download');
-import { decrypt } from '../../utils/utils';
+const fs = window.require('fs');
+const os = window.require('os');
+const fileDownload = require('react-file-download');
 
 export default class SelectWallet extends React.Component {
 
@@ -44,28 +44,28 @@ export default class SelectWallet extends React.Component {
         this.wrongPassword = this.wrongPassword.bind(this);
     }
 
-    //check the filesystem for default location of the safexwallet.dat file
-    //if not make it
-    componentDidMount() {
-
+    componentWillMount() {
+        this.tryLoadWalletFromDisk();
     }
 
-    componentWillMount() {
-        var home_dir = os.homedir();
-        fs.readFile(home_dir + '/safexwallet.dat', (err, fd) => {
-            if (err) {
-                //if the error is that No File exists, let's step through and make the file
-                if (err.code === 'ENOENT') {
-                    console.log('error');
-                    this.setState({walletExists: false});
+    tryLoadWalletFromDisk() {
+        const walletPath = DEFAULT_WALLET_PATH;
 
-                }
-            } else {
-                localStorage.setItem('encrypted_wallet', fd);
-                localStorage.setItem('wallet_path', home_dir + '/safexwallet.dat');
-                this.setState({walletExists: true});
+        loadWalletFromFile(walletPath, (err, encrypted) => {
+            if (err) {
+                console.error(err);
+                alert(err.message);
+                return;
             }
 
+            if (!encrypted) {
+                this.setState({walletExists: false});
+                return;
+            }
+
+            localStorage.setItem('encrypted_wallet', encrypted);
+            localStorage.setItem('wallet_path', walletPath);
+            this.setState({walletExists: true});
         });
     }
 
@@ -149,48 +149,33 @@ export default class SelectWallet extends React.Component {
     walletResetDlUnencrypted(e) {
         e.preventDefault();
 
-        var crypto = require('crypto'),
-            algorithm = 'aes-256-ctr',
-            password = e.target.password.value;
-
         localStorage.setItem('password', e.target.password.value);
 
-        var cipher_text = localStorage.getItem('encrypted_wallet');
-        var decrypted_wallet = decrypt(cipher_text, algorithm, password);
-
+        let wallet;
         try {
-            var parse_wallet = JSON.parse(decrypted_wallet);
-
-            console.log(parse_wallet)
-
-            if (parse_wallet['version'] === '1') {
-                localStorage.setItem('wallet', decrypted_wallet);
-
-                var wallet_data = JSON.parse(localStorage.getItem('wallet'));
-                var nice_keys = "";
-                var keys = wallet_data['keys'];
-                keys.map((key) => {
-                    nice_keys += "private key: " + key.private_key + '\n';
-                    nice_keys += "public key: " + key.public_key + '\n';
-                    nice_keys += '\n';
-                });
-                var date = Date.now();
-                fileDownload(nice_keys, date + 'unsafex.txt');
-
-                this.setState({
-                    walletResetModal1: false,
-                    walletResetModal2unencrypted: false,
-                    walletResetModalDlUnencrypted: true
-                })
-            } else {
-                this.wrongPassword();
-                console.log('wrong password');
-            }
-
-        } catch (e) {
-            this.wrongPassword();
-            console.log('error parsing wallet');
+            wallet = decryptWalletData();
         }
+        catch (err) {
+            console.error(err);
+            this.wrongPassword();
+            return;
+        }
+
+        let niceKeys = '';
+        const keys = wallet['keys'];
+        keys.map((key) => {
+            niceKeys += "private key: " + key.private_key + '\n';
+            niceKeys += "public key: " + key.public_key + '\n';
+            niceKeys += '\n';
+        });
+        const date = Date.now();
+        fileDownload(niceKeys, date + '_unsafex.txt');
+
+        this.setState({
+            walletResetModal1: false,
+            walletResetModal2unencrypted: false,
+            walletResetModalDlUnencrypted: true
+        });
     }
 
     //This is the step2 of the encrypted and step3 of the unencrypted route
@@ -209,20 +194,17 @@ export default class SelectWallet extends React.Component {
     //This leads to Done page in both routes
     walletResetStep2(e) {
         e.preventDefault();
+
         if (e.target.checkbox.checked) {
-            var home_dir = os.homedir();
-            fs.readFile(home_dir + '/safexwallet.dat', (err, fd) => {
+            const walletPath = DEFAULT_WALLET_PATH;
+            downloadWallet(walletPath, (err) => {
                 if (err) {
-                    //if the error is that No File exists, let's step through and make the file
-                    if (err.code === 'ENOENT') {
-                        console.log('error');
-                    }
+                    alert(err.message);
                 } else {
-                    var date = Date.now();
-                    fileDownload(fd, date + 'safexwallet.dat');
-                    fs.unlink(home_dir + '/safexwallet.dat', (err) => {
+                    fs.unlink(DEFAULT_WALLET_PATH, (err) => {
                         if (err) {
-                            alert('there was an issue resetting the wallet')
+                            alert('There was an issue resetting the wallet');
+                            console.error(err);
                         } else {
                             this.setState({
                                 walletResetModal1: false,
@@ -231,11 +213,10 @@ export default class SelectWallet extends React.Component {
                                 walletResetModalDlEncrypted: false,
                                 walletResetModalDone: true,
                                 walletExists: false
-                            })
+                            });
                         }
-                    })
+                    });
                 }
-
             });
         }
     }
@@ -282,10 +263,12 @@ export default class SelectWallet extends React.Component {
                             this.state.walletResetModalDlEncrypted ||
                             this.state.walletResetModalDlUnencrypted ||
                             this.state.walletResetNoWallet
-                            ?
-                                <button className="back-button wallet-reset-button" onClick={this.walletResetClose}>Wallet Reset</button>
-                            :
-                                <button className="back-button wallet-reset-button" onClick={this.walletResetStart}>Wallet Reset</button>
+                                ?
+                                <button className="back-button wallet-reset-button"
+                                        onClick={this.walletResetClose}>Wallet Reset</button>
+                                :
+                                <button className="back-button wallet-reset-button"
+                                        onClick={this.walletResetStart}>Wallet Reset</button>
                         }
                     </div>
                     <div className="col-xs-8 col-xs-offset-2 App-intro">
@@ -323,7 +306,9 @@ export default class SelectWallet extends React.Component {
                         <h2>Safex</h2>
                         <h3>Wallet</h3>
                         <p>v0.0.7</p>
-                        <button className="back-button wallet-reset-button" onClick={this.walletResetNoWallet}>Wallet Reset</button>
+                        <button className="back-button wallet-reset-button" onClick={this.walletResetNoWallet}>Wallet
+                            Reset
+                        </button>
                     </div>
                     <div className="col-xs-8 col-xs-offset-2 App-intro">
                         <div className="row text-center">
@@ -331,7 +316,7 @@ export default class SelectWallet extends React.Component {
                                 <Link to="/createwallet">
                                     <div className="col-xs-12">
                                         <img src="images/safex-icon-circle.png" alt="Safex Icon Circle"/>
-                                        <button className="btn btn-default button-neon-blue">New Wallet </button>
+                                        <button className="btn btn-default button-neon-blue">New Wallet</button>
                                         <p>Create a new Wallet</p>
                                     </div>
                                 </Link>
@@ -340,7 +325,7 @@ export default class SelectWallet extends React.Component {
                                 <Link to="/importwallet">
                                     <div className="col-xs-12">
                                         <img src="images/import-main.png" alt="Safex Icon Circle"/>
-                                        <button className="btn btn-default button-neon-green">Import </button>
+                                        <button className="btn btn-default button-neon-green">Import</button>
                                         <p>Import a safexwallet .dat file</p>
                                     </div>
                                 </Link>
@@ -366,9 +351,11 @@ export default class SelectWallet extends React.Component {
                             <span onClick={this.walletResetClose} className="close">X</span>
                         </h3>
                         <p>
-                            This feature is only if you want to delete a wallet and start over. This is not for upgrading wallet versions.
+                            This feature is only if you want to delete a wallet and start over. This is not for
+                            upgrading wallet versions.
                         </p>
-                        <button className="keys-btn button-shine" onClick={this.walletResetWarning1Proceed}>Proceed</button>
+                        <button className="keys-btn button-shine" onClick={this.walletResetWarning1Proceed}>Proceed
+                        </button>
                     </div>
                 </div>
                 <div className={this.state.walletResetWarning2
@@ -381,7 +368,8 @@ export default class SelectWallet extends React.Component {
                         <p>
                             This is not necessary for upgrading wallet versions.
                         </p>
-                        <button className="keys-btn button-shine" onClick={this.walletResetWarning2Proceed}>Proceed</button>
+                        <button className="keys-btn button-shine" onClick={this.walletResetWarning2Proceed}>Proceed
+                        </button>
                     </div>
                 </div>
                 <div className={this.state.walletResetWarning3
@@ -394,7 +382,8 @@ export default class SelectWallet extends React.Component {
                         <p>
                             PROCEED WITH CAUTION THIS PROCESS WILL DELETE YOUR EXISTING WALLET..
                         </p>
-                        <button className="keys-btn button-shine" onClick={this.walletResetWarning3Proceed}>Proceed</button>
+                        <button className="keys-btn button-shine" onClick={this.walletResetWarning3Proceed}>Proceed
+                        </button>
                     </div>
                 </div>
                 <div className={this.state.walletResetWarning4
@@ -405,9 +394,12 @@ export default class SelectWallet extends React.Component {
                             <span onClick={this.walletResetClose} className="close">X</span>
                         </h3>
                         <p>
-                            This procedure will reset the wallet. It will take you through steps to backup the existing wallet. Then the existing wallet will be deleted to make room for a new one. PROCEED WITH CAUTION!!
+                            This procedure will reset the wallet. It will take you through steps to backup the existing
+                            wallet. Then the existing wallet will be deleted to make room for a new one. PROCEED WITH
+                            CAUTION!!
                         </p>
-                        <button className="keys-btn button-shine" onClick={this.walletResetWarning4Proceed}>Proceed</button>
+                        <button className="keys-btn button-shine" onClick={this.walletResetWarning4Proceed}>Proceed
+                        </button>
                     </div>
                 </div>
                 <div className={this.state.walletResetWarning5
@@ -420,7 +412,8 @@ export default class SelectWallet extends React.Component {
                         <p>
                             If you pushed this by mistake hit the white "x" to cancel wallet reset.
                         </p>
-                        <button className="keys-btn button-shine" onClick={this.walletResetWarning5Proceed}>Proceed</button>
+                        <button className="keys-btn button-shine" onClick={this.walletResetWarning5Proceed}>Proceed
+                        </button>
                     </div>
                 </div>
                 <div className={this.state.walletResetModal1
@@ -431,10 +424,12 @@ export default class SelectWallet extends React.Component {
                             <span onClick={this.walletResetClose} className="close">X</span>
                         </h3>
                         <p>
-                            You do not need to do this for upgrading wallet versions. If you have your password and want to backup your keys unencrypted press proceed, otherwise press skip.
+                            You do not need to do this for upgrading wallet versions. If you have your password and want
+                            to backup your keys unencrypted press proceed, otherwise press skip.
                         </p>
                         <button className="keys-btn button-shine" onClick={this.walletResetStep1Skip}>Skip</button>
-                        <button className="keys-btn button-shine" onClick={this.walletResetStep1Proceed}>Proceed</button>
+                        <button className="keys-btn button-shine" onClick={this.walletResetStep1Proceed}>Proceed
+                        </button>
                     </div>
                 </div>
                 <div className={this.state.walletResetModal2unencrypted
@@ -447,10 +442,12 @@ export default class SelectWallet extends React.Component {
                         <form className="form-group text-center" onSubmit={this.walletResetDlUnencrypted}>
                             {
                                 this.state.wrong_password
-                                ?
-                                    <input className="form-control password-btn shake" type="password" name="password" placeholder="Enter Password" />
-                                :
-                                    <input className="form-control password-btn text-center" type="password" name="password" placeholder="Enter Password" />
+                                    ?
+                                    <input className="form-control password-btn shake" type="password" name="password"
+                                           placeholder="Enter Password"/>
+                                    :
+                                    <input className="form-control password-btn text-center" type="password"
+                                           name="password" placeholder="Enter Password"/>
                             }
                             <button className="keys-btn button-shine" type="submit">Proceed</button>
                         </form>
@@ -464,10 +461,12 @@ export default class SelectWallet extends React.Component {
                             <span onClick={this.walletResetClose} className="close">X</span>
                         </h3>
                         <p>
-                            During this stage you will be able to backup your encrypted wallet file. You may need it in the future and that is why this step exists.
+                            During this stage you will be able to backup your encrypted wallet file. You may need it in
+                            the future and that is why this step exists.
                         </p>
                         <form onSubmit={this.walletResetDlEncrypted}>
-                            <label><input name="checkbox" type="checkbox" /> I understand that this is my last chance to backup my wallet file after this it will be deleted</label>
+                            <label><input name="checkbox" type="checkbox"/> I understand that this is my last chance to
+                                backup my wallet file after this it will be deleted</label>
                             <button type="submit" className="submit-btn button-shine">Proceed</button>
                         </form>
                     </div>
@@ -480,10 +479,16 @@ export default class SelectWallet extends React.Component {
                             <span onClick={this.walletResetClose} className="close">X</span>
                         </h3>
                         <p>
-                            This is second confirmation. When you check the box and proceed you will be able to backup your encrypted wallet. After this there is no turning back your wallet will be deleted so that you can make a new one. In this step you'll backup your encrypted wallet that was already in the wallet. During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists. AFTER THIS THERE IS NO TURNING BACK, YOUR WALLET WILL BE DELETED HIT THE 'X' TO GET OUT OF THIS
+                            This is second confirmation. When you check the box and proceed you will be able to backup
+                            your encrypted wallet. After this there is no turning back your wallet will be deleted so
+                            that you can make a new one. In this step you'll backup your encrypted wallet that was
+                            already in the wallet. During this stage you will be able to backup your encrypted wallet
+                            file. You may need it in the future that is why this step exists. AFTER THIS THERE IS NO
+                            TURNING BACK, YOUR WALLET WILL BE DELETED HIT THE 'X' TO GET OUT OF THIS
                         </p>
                         <form onSubmit={this.walletResetStep2}>
-                            <label><input name="checkbox" type="checkbox" /> I understand that this is my last chance to backup my wallet file after this it will be deleted</label>
+                            <label><input name="checkbox" type="checkbox"/> I understand that this is my last chance to
+                                backup my wallet file after this it will be deleted</label>
                             <button type="submit" className="submit-btn button-shine">Proceed</button>
                         </form>
                     </div>
@@ -518,6 +523,6 @@ export default class SelectWallet extends React.Component {
 
 SelectWallet.contextTypes = {
     router: React.PropTypes.object.isRequired
-}
+};
 
 //if wallet is found main image is new wallet found

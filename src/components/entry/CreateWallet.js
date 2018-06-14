@@ -1,12 +1,11 @@
 import React from 'react';
-import crypto from 'crypto';
-var fs = window.require('fs');
-var os = window.require('os');
-var bs58 = require('bs58');
-var bitcoin = window.require('bitcoinjs-lib');
-import { encrypt} from '../../utils/utils';
-import { genkey } from '../../utils/keys';
+const fs = window.require('fs');
+const os = window.require('os');
 import {Link} from 'react-router';
+
+import {encrypt} from '../../utils/utils';
+import {genkey} from '../../utils/keys';
+import {DEFAULT_WALLET_PATH} from '../../utils/wallet';
 
 export default class CreateWallet extends React.Component {
     constructor(props) {
@@ -15,7 +14,7 @@ export default class CreateWallet extends React.Component {
         this.state = {
             walletExists: false,
             wrong_password: false
-        }
+        };
 
         this.wrongPassword = this.wrongPassword.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -29,7 +28,7 @@ export default class CreateWallet extends React.Component {
             this.setState({
                 wrong_password: false
             });
-        }, 1000)
+        }, 1000);
     }
 
     //here we create the wallet file in the default location after prompting for a password and creating the encrypted file.
@@ -37,11 +36,11 @@ export default class CreateWallet extends React.Component {
         e.preventDefault();
 
         if (e.target.password1.value.length > 0 && e.target.password1.value === e.target.password2.value) {
-            var key_pair = genkey();
+            const key_pair = genkey();
 
-            var address = key_pair.getAddress();
+            const address = key_pair.getAddress();
 
-            var key_json = {};
+            const key_json = {};
             key_json['public_key'] = address;
             key_json['private_key'] = key_pair.toWIF();
             key_json['safex_bal'] = 0;
@@ -50,36 +49,34 @@ export default class CreateWallet extends React.Component {
             key_json['pending_btc_bal'] = 0;
             key_json['label'] = '';
 
-            var key_array = [];
+            const key_array = [];
             key_array.push(key_json);
 
-            var json = {};
+            const json = {};
 
             json['version'] = '1';
             json['keys'] = key_array;
 
             console.log(json);
 
-            var crypto = require('crypto'),
-                algorithm = 'aes-256-ctr',
-                password = e.target.password1.value;
+            const algorithm = 'aes-256-ctr';
+            const password = e.target.password1.value;
+            const cipher_text = encrypt(JSON.stringify(json), algorithm, password);
 
-            var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
-
-            var home_dir = os.homedir();
-
-            fs.writeFile(home_dir + '/safexwallet.dat', cipher_text, (err) => {
+            const walletPath = DEFAULT_WALLET_PATH;
+            
+            fs.writeFile(walletPath, cipher_text, (err) => {
                 if (err) {
-                    console.log(err)
+                    console.error(err);
+                    alert(`Failed to write wallet to ${walletPath}: ${err.message}`);
                 } else {
                     localStorage.setItem('password', password);
                     localStorage.setItem('wallet', JSON.stringify(json));
 
-                    localStorage.setItem('wallet_path', home_dir + '/safexwallet.dat');
+                    localStorage.setItem('wallet_path', walletPath);
                     this.context.router.push('/wallet');
                 }
             });
-
         } else {
             this.wrongPassword();
         }
@@ -129,4 +126,4 @@ export default class CreateWallet extends React.Component {
 
 CreateWallet.contextTypes = {
     router: React.PropTypes.object.isRequired
-}
+};
