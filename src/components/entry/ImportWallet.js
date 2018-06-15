@@ -5,26 +5,12 @@ import {
     decryptWalletData,
     DEFAULT_WALLET_PATH,
     loadAndDecryptWalletFromFile,
-    loadWalletFromFile
+    loadWalletFromFile,
+    flashField
 } from '../../utils/wallet';
 import {encrypt} from '../../utils/utils';
 
 const fs = window.require('fs');
-
-/**
- * Quickly switch on and off a field on a component
- * TODO: Move to some kind of utilities file, use accross the project
- */
-function flashField(target, field, duration = 1000) {
-    target.setState({
-        [field]: true
-    });
-    setTimeout(() => {
-        target.setState({
-            [field]: false
-        });
-    }, duration);
-}
 
 export default class ImportWallet extends React.Component {
     constructor(props) {
@@ -96,6 +82,7 @@ export default class ImportWallet extends React.Component {
                 walletImportAlerts: true,
                 walletImportAlertsText: `You must select a wallet file first`
             });
+            this.wrongTargetPassword();
             return;
         }
 
@@ -105,6 +92,7 @@ export default class ImportWallet extends React.Component {
                 walletImportAlerts: true,
                 walletImportAlertsText: `You must enter password for the wallet file`
             });
+            this.wrongTargetPassword();
             return;
         }
 
@@ -112,13 +100,13 @@ export default class ImportWallet extends React.Component {
         if (this.state.currentEncryptedWallet) {
             currentPassword = e.target.current_password && e.target.current_password.value;
             if (!currentPassword) {
-                this.wrongCurrentPassword();
                 this.setState({
                     walletImportAlerts: true,
                     walletImportAlertsText: `You must enter password for your current wallet. If you want ` 
                     + `to throw it away and replace it with this new one, go back `
                     + `and click "RESET WALLET" in the top right corner first.`
                 });
+                this.wrongCurrentPassword();
                 return;
             }
         }

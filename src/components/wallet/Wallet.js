@@ -10,7 +10,13 @@ import QRCode from 'qrcode.react';
 
 import {toHexString, encrypt, safexPayload, decrypt} from '../../utils/utils';
 import {genkey} from '../../utils/keys';
-import {decryptWalletData, downloadWallet, loadAndDecryptWalletFromFile} from '../../utils/wallet';
+import {
+    decryptWalletData,
+    downloadWallet,
+    loadAndDecryptWalletFromFile,
+    flashField,
+    openMainAlert
+} from '../../utils/wallet';
 
 import Navigation from '../Navigation';
 import KeyLabel from "../KeyLabel";
@@ -85,9 +91,9 @@ export default class Wallet extends React.Component {
             dividend_active: false,
             affiliate_active: false,
             import_wrap_glow: false,
-            wrong_old_password: false,
-            wrong_new_password: false,
-            wrong_repeat_password: false,
+            wrongOldPassword: false,
+            wrongNewPassword: false,
+            wrongRepeatPassword: false,
             transfer_key_to_archive: false,
             transfer_key_to_home: false,
             info_popup: false,
@@ -255,10 +261,9 @@ export default class Wallet extends React.Component {
                 this.setState({
                     btc_sync: false,
                     safex_sync: false,
-                    main_alert_popup: true,
-                    main_alert_popup_text: 'Unable to fetch average fee',
                     status_text: 'Sync error, please refresh'
                 });
+                this.openMainAlertPopup('Unable to fetch average fee');
             });
     }
 
@@ -626,10 +631,7 @@ export default class Wallet extends React.Component {
 
         var btc = require('bitcoinjs-lib');
         if (amount <= 0.1) {
-            this.setState({
-                main_alert_popup: true,
-                main_alert_popup_text: 'Transaction not processed - Amount is too low.',
-            });
+            this.openMainAlertPopup('Transaction not processed - Amount is too low.');
             return;
         }
 
@@ -676,10 +678,7 @@ export default class Wallet extends React.Component {
         try {
             var json = JSON.parse(localStorage.getItem('wallet'));
         } catch (e) {
-            this.setState({
-                main_alert_popup: true,
-                main_alert_popup_text: 'Error parsing the wallet data.',
-            });
+            this.openMainAlertPopup('Error parsing the wallet data.');
         }
 
         json['keys'].push(key_json);
@@ -692,10 +691,7 @@ export default class Wallet extends React.Component {
 
         fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
             if (err) {
-                this.setState({
-                    main_alert_popup: true,
-                    main_alert_popup_text: 'Problem communicating to the wallet file.',
-                });
+                this.openMainAlertPopup('Problem communicating to the wallet file.');
             } else {
                 localStorage.setItem('wallet', JSON.stringify(json));
                 try {
@@ -717,9 +713,8 @@ export default class Wallet extends React.Component {
                 } catch (e) {
                     this.setState({
                         create_key_active: false,
-                        main_alert_popup: true,
-                        main_alert_popup_text: 'An error adding a key to the wallet. Please contact team@safex.io',
                     });
+                    this.openMainAlertPopup('An error adding a key to the wallet. Please contact team@safex.io');
                 }
             }
         });
@@ -759,9 +754,8 @@ export default class Wallet extends React.Component {
                             history_overflow_active: false,
                             history_key: '',
                             import_modal_active: false,
-                            main_alert_popup: true,
-                            main_alert_popup_text: 'Key exists',
                         });
+                        this.openMainAlertPopup('Key exists');
                         console.log('Key exists');
                     }
                 }
@@ -773,14 +767,13 @@ export default class Wallet extends React.Component {
                 history_overflow_active: false,
                 history_key: '',
                 import_modal_active: false,
-                main_alert_popup: true,
-                main_alert_popup_text: 'Invalid private key',
 
                 // Close Private Key Popup
                 private_key_open: {
                     private_key_popup: false,
                 },
             });
+            this.openMainAlertPopup('Invalid private key');
         }
     }
 
@@ -876,14 +869,12 @@ export default class Wallet extends React.Component {
             }
         } catch (e) {
             this.setState({
-                main_alert_popup: true,
-                main_alert_popup_text: 'Invalid private key',
-
                 // Close Private Key Popup
                 private_key_open: {
                     private_key_popup: false,
                 },
             });
+            this.openMainAlertPopup('Invalid private key');
         }
         this.setState({
             history_overflow_active: false,
@@ -937,11 +928,8 @@ export default class Wallet extends React.Component {
             private_key_open: {
                 private_key_popup: false,
             },
-
-            // Open Main Alert Popup
-            main_alert_popup: true,
-            main_alert_popup_text: "This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the 'import key' feature in another wallet. Press OK to proceed.",
         });
+        this.openMainAlertPopup('This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the \'import key\' feature in another wallet. Press OK to proceed.');
     }
 
     exportEncryptedWallet() {
@@ -971,12 +959,8 @@ export default class Wallet extends React.Component {
             private_key_open: {
                 private_key_popup: false,
             },
-
-            // Open Main Alert Popup
-            main_alert_popup: true,
-            main_alert_popup_text: "This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is not for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the 'import key' feature in another wallet. Press OK to proceed.",
-
         });
+        this.openMainAlertPopup('This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is not for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the \'import key\' feature in another wallet. Press OK to proceed.');
     }
 
     exportUnencryptedWallet() {
@@ -1319,10 +1303,7 @@ export default class Wallet extends React.Component {
                     } else {
                         // Failed to load wallet
                         console.error(err);
-                        this.setState({
-                            main_alert_popup: true,
-                            main_alert_popup_text: err.message,
-                        });
+                        this.openMainAlertPopup(err.message);
                         this.wrongOldPassword();
                     }
                 });
@@ -1351,6 +1332,9 @@ export default class Wallet extends React.Component {
     closeSettingsModal() {
         this.setState({
             settings_active: false,
+
+            // Close Settings Form Popup
+            info_popup: false
         });
     }
 
@@ -1779,10 +1763,7 @@ export default class Wallet extends React.Component {
 
             fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
                 if (err) {
-                    this.setState({
-                        main_alert_popup: true,
-                        main_alert_popup_text: "Problem communicating to the wallet file.",
-                    });
+                    this.openMainAlertPopup('Problem communicating to the wallet file.');
                 } else {
                     localStorage.setItem('wallet', JSON.stringify(json));
                     try {
@@ -1801,19 +1782,13 @@ export default class Wallet extends React.Component {
                             is_loading: false
                         });
                     } catch (e) {
-                        this.setState({
-                            main_alert_popup: true,
-                            main_alert_popup_text: "An error adding a key to the wallet. Please contact team@safex.io",
-                        });
+                        this.openMainAlertPopup('An error adding a key to the wallet. Please contact team@safex.io');
                     }
 
                 }
             });
         } catch (e) {
-            this.setState({
-                main_alert_popup: true,
-                main_alert_popup_text: "Error parsing the wallet data.",
-            });
+            this.openMainAlertPopup('Error parsing the wallet data.');
         }
         this.setState({
             transfer_key_to_archive: true,
@@ -1845,10 +1820,7 @@ export default class Wallet extends React.Component {
 
             fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
                 if (err) {
-                    this.setState({
-                        main_alert_popup: true,
-                        main_alert_popup_text: "Problem communicating to the wallet file.",
-                    });
+                    this.openMainAlertPopup('Problem communicating to the wallet file.');
                 } else {
                     localStorage.setItem('wallet', JSON.stringify(json));
                     try {
@@ -1868,18 +1840,12 @@ export default class Wallet extends React.Component {
                         });
                         this.prepareDisplay(json.keys[index]);
                     } catch (e) {
-                        this.setState({
-                            main_alert_popup: true,
-                            main_alert_popup_text: "An error occured while adding a key to the wallet. Please contact team@safex.io",
-                        });
+                        this.openMainAlertPopup('An error occured while adding a key to the wallet. Please contact team@safex.io');
                     }
                 }
             });
         } catch (e) {
-            this.setState({
-                main_alert_popup: true,
-                main_alert_popup_text: "Error parsing the wallet data",
-            });
+            this.openMainAlertPopup('Error parsing the wallet data');
         }
         this.setState({
             transfer_key_to_home: true,
@@ -2036,36 +2002,15 @@ export default class Wallet extends React.Component {
     }
 
     wrongOldPassword() {
-        this.setState({
-            wrong_old_password: true
-        });
-        setTimeout(() => {
-            this.setState({
-                wrong_old_password: false
-            });
-        }, 1000)
+        flashField(this, 'wrongOldPassword');
     }
 
     wrongNewPassword() {
-        this.setState({
-            wrong_new_password: true
-        });
-        setTimeout(() => {
-            this.setState({
-                wrong_new_password: false
-            });
-        }, 1000)
+        flashField(this, 'wrongNewPassword');
     }
 
     wrongRepeatPassword() {
-        this.setState({
-            wrong_repeat_password: true
-        });
-        setTimeout(() => {
-            this.setState({
-                wrong_repeat_password: false
-            });
-        }, 1000)
+        flashField(this, 'wrongRepeatPassword');
     }
 
     saveLabel(e) {
@@ -2076,6 +2021,10 @@ export default class Wallet extends React.Component {
 
     editLabel(label, key) {
         // console.log(label, key);
+    }
+
+    openMainAlertPopup(message) {
+        openMainAlert(this, message)
     }
 
     render() {
@@ -2559,33 +2508,15 @@ export default class Wallet extends React.Component {
                         <form onSubmit={this.changePassword} onChange={this.closeSettingsInfoPopup}>
                             <div className="form-group">
                                 <label htmlFor="old_pass">Old Password:</label>
-                                {
-                                    this.state.wrong_old_password
-                                    ?
-                                        <input type="password" className="form-control shake password-input" id="old_pass" name="old_pass" />
-                                    :
-                                        <input type="password" className="form-control password-input" id="old_pass" name="old_pass" />
-                                }
+                                <input type="password" className={this.state.wrongOldPassword ? 'form-control shake password-input' : 'form-control password-input'} id="old_pass" name="old_pass" />
                             </div>
                             <div className="form-group">
                                 <label htmlFor="new_pass">New Password:</label>
-                                {
-                                    this.state.wrong_new_password
-                                    ?
-                                        <input type="password" className="form-control shake password-input" id="new_pass" name="new_pass" />
-                                    :
-                                        <input type="password" className="form-control password-input" id="new_pass" name="new_pass" />
-                                }
+                                <input type="password" className={this.state.wrongNewPassword ? 'form-control shake password-input' : 'form-control password-input'} id="new_pass" name="new_pass" />
                             </div>
                             <div className="form-group">
                                 <label htmlFor="repeat_pass">Repeat Password:</label>
-                                {
-                                    this.state.wrong_repeat_password
-                                    ?
-                                        <input type="password" className="form-control shake password-input" id="repeat_pass" name="repeat_pass" />
-                                    :
-                                        <input type="password" className="form-control password-input" id="repeat_pass" name="repeat_pass" />
-                                }
+                                <input type="password" className={this.state.wrongRepeatPassword ? 'form-control shake password-input' : 'form-control password-input'} id="repeat_pass" name="repeat_pass" />
                             </div>
                             <div className="col-xs-12 submit-wrap">
                                 <div className="row">

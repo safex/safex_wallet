@@ -117,11 +117,37 @@ function loadAndDecryptWalletFromFile(walletPath, password, callback) {
     });
 }
 
+/**
+ * Quickly switch on and off a field on a component
+ */
+function flashField(target, field, duration = 1000) {
+    target.setState({
+        [field]: true
+    });
+    setTimeout(() => {
+        target.setState({
+            [field]: false
+        });
+    }, duration);
+}
+
+/**
+ * Open Main Alert Popup
+ */
+function openMainAlert(target, alert) {
+    target.setState({
+        main_alert_popup: true,
+        main_alert_popup_text: alert,
+    });
+}
+
 module.exports = {
     WALLET_FILENAME,
     DEFAULT_WALLET_PATH,
     downloadWallet,
     decryptWalletData,
     loadWalletFromFile,
-    loadAndDecryptWalletFromFile
+    loadAndDecryptWalletFromFile,
+    flashField,
+    openMainAlert
 };

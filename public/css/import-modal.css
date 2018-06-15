@@ -85,6 +85,7 @@
   color: #fff;
   opacity: 1;
   font-size: 19px;
+  font-family: "Brandon Grotesque Bold", Helvetica, Arial,sans-serif;
 }
 .importModal .importModalInner input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
   opacity: .8;
