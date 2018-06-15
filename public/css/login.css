@@ -12,6 +12,7 @@
   margin-top: 30px;
 }
 .Login-logo h3 {
+  font-family: "Brandon Grotesque Thin", Helvetica, Arial,sans-serif;
   display: inline-block;
   width: 100%;
   font-size: 28px;
@@ -88,6 +89,7 @@
 }
 .App-intro .col-xs-6 .btn,
 .Login-form .btn {
+  font-family: "Brandon Grotesque Bold", Helvetica, Arial,sans-serif;
   width: 90%;
   border: 0px none;
   border-radius: 0px;

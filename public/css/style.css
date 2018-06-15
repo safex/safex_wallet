@@ -31,7 +31,7 @@
   font-style: normal;
 }
 @font-face {
-  font-family: 'Brandon Grotesque';
+  font-family: 'Brandon Grotesque Thin';
   src: url('../fonts/BrandonGrotesque-Thin.eot');
   src: url('../fonts/BrandonGrotesque-Thin.eot?#iefix') format('embedded-opentype'),
   url('../fonts/BrandonGrotesque-Thin.woff') format('woff'),
@@ -41,7 +41,7 @@
   font-style: normal;
 }
 @font-face {
-  font-family: 'Brandon Grotesque';
+  font-family: 'Brandon Grotesque Bold';
   src: url('../fonts/BrandonGrotesque-Bold.eot');
   src: url('../fonts/BrandonGrotesque-Bold.eot?#iefix') format('embedded-opentype'),
   url('../fonts/BrandonGrotesque-Bold.woff') format('woff'),
