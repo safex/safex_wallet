@@ -30,7 +30,6 @@ export default class ImportWallet extends React.Component {
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.walletImportAlertsClose = this.walletImportAlertsClose.bind(this);
-        this.openWalletImportAlert = this.openWalletImportAlert.bind(this);
     }
     
     wrongCurrentPassword() {

@@ -141,6 +141,9 @@ function openMainAlert(target, alert) {
     });
 }
 
+/**
+ * Open Wallet Import Alerts
+ */
 function walletImportAlert(target, alert) {
     target.setState({
         walletImportAlerts: true,
