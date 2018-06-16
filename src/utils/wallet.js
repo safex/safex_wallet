@@ -144,11 +144,16 @@ function openMainAlert(target, alert) {
 /**
  * Open Wallet Import Alerts
  */
-function walletImportAlert(target, alert) {
+function walletImportAlert(target, alert, duration) {
     target.setState({
         walletImportAlerts: true,
         walletImportAlertsText: alert
     });
+    setTimeout(() => {
+        target.setState({
+            walletImportAlerts: false
+        });
+    }, duration);
 }
 
 module.exports = {
