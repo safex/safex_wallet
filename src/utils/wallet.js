@@ -156,6 +156,28 @@ function walletImportAlert(target, alert, duration) {
     }, duration);
 }
 
+/**
+ * Open Wallet Reset Popup
+ */
+function walletResetModal(target, step, alert) {
+    target.setState({
+        [step]: true,
+        walletResetModalText: alert,
+    });
+}
+
+/**
+ * Open next wallet reset step and close the previous step
+ */
+function walletResetModalStep(target, step, closedStep, alert) {
+    target.setState({
+        [step]: true,
+        [closedStep]: false,
+        walletResetModalText: alert,
+    });
+}
+
+
 module.exports = {
     WALLET_FILENAME,
     DEFAULT_WALLET_PATH,
@@ -165,5 +187,7 @@ module.exports = {
     loadAndDecryptWalletFromFile,
     flashField,
     openMainAlert,
-    walletImportAlert
+    walletImportAlert,
+    walletResetModal,
+    walletResetModalStep
 };
