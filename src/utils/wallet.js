@@ -141,6 +141,13 @@ function openMainAlert(target, alert) {
     });
 }
 
+function walletImportAlert(target, alert) {
+    target.setState({
+        walletImportAlerts: true,
+        walletImportAlertsText: alert
+    });
+}
+
 module.exports = {
     WALLET_FILENAME,
     DEFAULT_WALLET_PATH,
@@ -149,5 +156,6 @@ module.exports = {
     loadWalletFromFile,
     loadAndDecryptWalletFromFile,
     flashField,
-    openMainAlert
+    openMainAlert,
+    walletImportAlert
 };
