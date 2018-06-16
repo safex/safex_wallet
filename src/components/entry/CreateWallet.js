@@ -5,7 +5,7 @@ import {Link} from 'react-router';
 
 import {encrypt} from '../../utils/utils';
 import {genkey} from '../../utils/keys';
-import {DEFAULT_WALLET_PATH} from '../../utils/wallet';
+import {DEFAULT_WALLET_PATH, flashField} from '../../utils/wallet';
 
 export default class CreateWallet extends React.Component {
     constructor(props) {
@@ -13,29 +13,26 @@ export default class CreateWallet extends React.Component {
 
         this.state = {
             walletExists: false,
-            wrong_password: false
+            wrongPassword: false,
+            wrongRepeatPassword: false,
         };
 
-        this.wrongPassword = this.wrongPassword.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     wrongPassword() {
-        this.setState({
-            wrong_password: true
-        });
-        setTimeout(() => {
-            this.setState({
-                wrong_password: false
-            });
-        }, 1000);
+        flashField(this, 'wrongPassword');
+    }
+
+    wrongRepeatPassword() {
+        flashField(this, 'wrongRepeatPassword');
     }
 
     //here we create the wallet file in the default location after prompting for a password and creating the encrypted file.
     handleSubmit(e) {
         e.preventDefault();
 
-        if (e.target.password1.value.length > 0 && e.target.password1.value === e.target.password2.value) {
+        if (e.target.create_password.value.length > 0 && e.target.create_password.value === e.target.repeat_password.value) {
             const key_pair = genkey();
 
             const address = key_pair.getAddress();
@@ -60,7 +57,7 @@ export default class CreateWallet extends React.Component {
             console.log(json);
 
             const algorithm = 'aes-256-ctr';
-            const password = e.target.password1.value;
+            const password = e.target.create_password.value;
             const cipher_text = encrypt(JSON.stringify(json), algorithm, password);
 
             const walletPath = DEFAULT_WALLET_PATH;
@@ -77,8 +74,12 @@ export default class CreateWallet extends React.Component {
                     this.context.router.push('/wallet');
                 }
             });
-        } else {
+        } else if (e.target.create_password.value.length === 0) {
             this.wrongPassword();
+        }
+
+        if ((e.target.create_password.value.length > 0 && e.target.repeat_password.value.length === 0) || (e.target.repeat_password.value.length > 0 && e.target.repeat_password.value !== e.target.create_password.value)) {
+            this.wrongRepeatPassword();
         }
     }
 
@@ -93,20 +94,8 @@ export default class CreateWallet extends React.Component {
                 </div>
                 <div className="col-xs-12 Login-form Create-wallet-form">
                     <form className="form-group" onSubmit={this.handleSubmit}>
-                        {
-                            this.state.wrong_password
-                            ?
-                                <div>
-                                    <input className="form-control shake" type="password" name="password1" placeholder="Enter Password" />
-                                    <input className="form-control shake" type="password" name="password2" placeholder="Repeat Password" />
-                                </div>
-
-                            :
-                                <div>
-                                    <input className="form-control" type="password" name="password1" placeholder="Enter Password" />
-                                    <input className="form-control" type="password" name="password2" placeholder="Repeat Password" />
-                                </div>
-                        }
+                        <input className={this.state.wrongPassword ? 'form-control shake' : 'form-control'} type="password" name="create_password" placeholder="Enter Password" />
+                        <input className={this.state.wrongRepeatPassword ? 'form-control shake' : 'form-control'} type="password" name="repeat_password" placeholder="Repeat Password" />
                         <button className="btn btn-default button-neon-blue" type="submit">CREATE </button>
                     </form>
                     <p className="text-center">
