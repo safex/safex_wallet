@@ -5,7 +5,11 @@ import {Link} from 'react-router';
 
 import {encrypt} from '../../utils/utils';
 import {genkey} from '../../utils/keys';
-import {DEFAULT_WALLET_PATH, flashField} from '../../utils/wallet';
+import {
+    DEFAULT_WALLET_PATH,
+    flashField,
+    walletImportAlert,
+} from '../../utils/wallet';
 
 export default class CreateWallet extends React.Component {
     constructor(props) {
@@ -26,6 +30,10 @@ export default class CreateWallet extends React.Component {
 
     wrongRepeatPassword() {
         flashField(this, 'wrongRepeatPassword');
+    }
+
+    openWalletImportAlert(message, duration) {
+        walletImportAlert(this, message, duration)
     }
 
     //here we create the wallet file in the default location after prompting for a password and creating the encrypted file.
@@ -65,7 +73,7 @@ export default class CreateWallet extends React.Component {
             fs.writeFile(walletPath, cipher_text, (err) => {
                 if (err) {
                     console.error(err);
-                    alert(`Failed to write wallet to ${walletPath}: ${err.message}`);
+                    this.openWalletImportAlert(`Failed to write wallet to ${walletPath}: ${err.message}`, 5000);
                 } else {
                     localStorage.setItem('password', password);
                     localStorage.setItem('wallet', JSON.stringify(json));
@@ -76,10 +84,12 @@ export default class CreateWallet extends React.Component {
             });
         } else if (e.target.create_password.value.length === 0) {
             this.wrongPassword();
+            this.openWalletImportAlert(`Wrong password`, 5000);
         }
 
         if ((e.target.create_password.value.length > 0 && e.target.repeat_password.value.length === 0) || (e.target.repeat_password.value.length > 0 && e.target.repeat_password.value !== e.target.create_password.value)) {
             this.wrongRepeatPassword();
+            this.openWalletImportAlert(`Wrong repeated password`, 5000);
         }
     }
 
@@ -107,6 +117,17 @@ export default class CreateWallet extends React.Component {
                 <div className="col-xs-12 text-center Intro-footer">
                     <img src="images/footer-logo.png" alt="Safex Icon Footer"/>
                     <p className="text-center">2014-2018 All Rights Reserved Safe Exchange Developers &copy;</p>
+                </div>
+
+                <div className={this.state.walletImportAlerts
+                    ? 'overflow sendModal walletResetModal active'
+                    : 'overflow sendModal walletResetModal'}>
+                    <div className="container">
+                        <h3>Create Wallet
+                            <span onClick={this.walletImportAlertsClose} className="close">X</span>
+                        </h3>
+                        <p>{this.state.walletImportAlertsText}</p>
+                    </div>
                 </div>
             </div>
         );

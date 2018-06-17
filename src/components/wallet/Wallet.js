@@ -945,7 +945,7 @@ export default class Wallet extends React.Component {
     exportEncryptedWallet() {
         return downloadWallet(localStorage.getItem('wallet_path'), err => {
             if (err) {
-                alert(err.message);
+                this.openMainAlertPopup(err.message);
             }
 
             this.setState({

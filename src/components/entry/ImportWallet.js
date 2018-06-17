@@ -48,7 +48,7 @@ export default class ImportWallet extends React.Component {
         return loadWalletFromFile(DEFAULT_WALLET_PATH, (err, currentEncryptedWallet) => {
             if (err) {
                 console.error(err);
-                alert(err.message);
+                this.openWalletImportAlert(err.message, 5000);
                 return;
             }
 

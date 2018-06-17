@@ -1,7 +1,11 @@
 import React from 'react';
 import {Link} from 'react-router';
 
-import { decryptWalletData, flashField } from '../../utils/wallet';
+import {
+    decryptWalletData,
+    flashField,
+    walletImportAlert
+} from '../../utils/wallet';
 
 export default class Login extends React.Component {
     constructor(props) {
@@ -18,6 +22,10 @@ export default class Login extends React.Component {
         flashField(this, 'wrongPassword');
     }
 
+    openWalletImportAlert(message, duration) {
+        walletImportAlert(this, message, duration)
+    }
+
     handleSubmit(e) {
         e.preventDefault();
 
@@ -30,6 +38,7 @@ export default class Login extends React.Component {
         catch (err) {
             console.error(err);
             this.wrongPassword();
+            this.openWalletImportAlert('Wrong password', 5000);
             return;
         }
 
@@ -56,6 +65,17 @@ export default class Login extends React.Component {
                 <div className="col-xs-12 text-center Intro-footer">
                     <img src="images/footer-logo.png" alt="Safex Icon Footer"/>
                     <p className="text-center">2014-2018 All Rights Reserved Safe Exchange Developers &copy;</p>
+                </div>
+
+                <div className={this.state.walletImportAlerts
+                    ? 'overflow sendModal walletResetModal active'
+                    : 'overflow sendModal walletResetModal'}>
+                    <div className="container">
+                        <h3>Wallet Login
+                            <span onClick={this.walletImportAlertsClose} className="close">X</span>
+                        </h3>
+                        <p>{this.state.walletImportAlertsText}</p>
+                    </div>
                 </div>
             </div>
         );
