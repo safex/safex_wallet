@@ -169,6 +169,7 @@ export default class Wallet extends React.Component {
     logout() {
         localStorage.clear();
         this.setState({
+            sidebar_open: false,
             // Close Settings Modal
             settings_active: false,
 
