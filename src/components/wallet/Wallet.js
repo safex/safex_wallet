@@ -412,7 +412,7 @@ export default class Wallet extends React.Component {
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
                     this.setState({
-                        sidebar_opened: true,
+                        sidebar_open: true,
                         transaction_being_sent: false,
                         send_receive_popup: true,
                         send_receive_info: 'Network communication error, please try again later'
@@ -430,7 +430,7 @@ export default class Wallet extends React.Component {
         } else if(this.state.send_coin === 'btc') {
             try {  //open the modal by setting transaction_being_sent
                 this.setState({
-                    sidebar_opened: true,
+                    sidebar_open: true,
                     transaction_being_sent: true,
                     settings_active: false,
                 });
@@ -466,7 +466,7 @@ export default class Wallet extends React.Component {
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
                     this.setState({
-                        sidebar_opened: true,
+                        sidebar_open: true,
                         transaction_being_sent: false,
                         send_receive_popup: true,
                         send_receive_info: 'Network communication error, please try again later'
@@ -514,7 +514,7 @@ export default class Wallet extends React.Component {
             .then(resp => resp.text())
             .then((resp) => {
                 this.setState({
-                    sidebar_opened: true,
+                    sidebar_open: true,
                     transaction_sent: true,
                     transaction_being_sent: false,
                     txid: resp,
@@ -578,6 +578,7 @@ export default class Wallet extends React.Component {
                         .then((resp) => {
                             if (resp === "") {
                                 this.setState({
+                                    sidebar_open: false,
                                     send_receive_popup: true,
                                     send_receive_info: 'There was an error with the transaction',
                                     send_overflow_active: false,
@@ -586,14 +587,13 @@ export default class Wallet extends React.Component {
                                 });
                                 setTimeout(() => {
                                     this.setState({
-                                        sidebar_opened: true,
                                         transaction_being_sent: false,
                                     });
                                 }, 1000);
                                 throw "There was an error with the transaction.";
                             }
                             this.setState({
-                                sidebar_opened: true,
+                                sidebar_open: true,
                                 transaction_sent: true,
                                 transaction_being_sent: false,
                                 txid: resp
@@ -609,7 +609,7 @@ export default class Wallet extends React.Component {
                     });
                     setTimeout(() => {
                         this.setState({
-                            sidebar_opened: true,
+                            sidebar_open: true,
                             transaction_being_sent: false,
                         });
                     }, 1000);
@@ -659,7 +659,7 @@ export default class Wallet extends React.Component {
             .then((resp) => {
 
                 this.setState({
-                    sidebar_opened: true,
+                    sidebar_open: true,
                     transaction_sent: true,
                     transaction_being_sent: false,
                     txid: resp
@@ -1369,6 +1369,8 @@ export default class Wallet extends React.Component {
 
     closeCoinModal() {
         this.setState({
+            sidebar_open: false,
+
             send_overflow_active: false,
             send_to: '',
             send_keys: {
