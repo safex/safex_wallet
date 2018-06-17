@@ -23,6 +23,7 @@ export default class SelectWallet extends React.Component {
             error: null,
             isLoading: true,
             walletExists: false,
+            walletResetModal: false,
             walletResetModal1: false,
             walletResetModalText: '',
             walletResetModal2unencrypted: false,
@@ -92,7 +93,8 @@ export default class SelectWallet extends React.Component {
 
     //This happens when you click wallet reset on the main screen
     walletResetStart() {
-        this.openWalletResetModal('walletResetWarning1', 'This feature is only if you want to delete a wallet and start over. This is not for upgrading wallet versions.');
+        this.openWalletResetModal('walletResetModal', 'This feature is only if you want to delete a wallet and start over. This is not for upgrading wallet versions.');
+        this.openWalletResetModalStep('walletResetWarning1', '', 'This feature is only if you want to delete a wallet and start over. This is not for upgrading wallet versions.');
     }
 
     walletResetWarning1Proceed() {
@@ -129,6 +131,7 @@ export default class SelectWallet extends React.Component {
     }
 
     walletResetNoWallet() {
+        this.openWalletResetModal('walletResetModal', '');
         this.openWalletResetModal('walletResetNoWallet', 'There in no wallet.');
     }
 
@@ -211,6 +214,7 @@ export default class SelectWallet extends React.Component {
     //This closes every modal
     walletResetClose() {
         this.setState({
+            walletResetModal: false,
             walletResetWarning1: false,
             walletResetWarning2: false,
             walletResetWarning3: false,
@@ -237,24 +241,7 @@ export default class SelectWallet extends React.Component {
                         <h2>Safex</h2>
                         <h3>Wallet</h3>
                         <p>v0.0.7</p>
-                        {
-                            this.state.walletResetWarning1 ||
-                            this.state.walletResetWarning2 ||
-                            this.state.walletResetWarning3 ||
-                            this.state.walletResetWarning4 ||
-                            this.state.walletResetWarning5 ||
-                            this.state.walletResetModal1 ||
-                            this.state.walletResetModal2 ||
-                            this.state.walletResetModal2unencrypted ||
-                            this.state.walletResetModalDone ||
-                            this.state.walletResetModalDlEncrypted ||
-                            this.state.walletResetModalDlUnencrypted ||
-                            this.state.walletResetNoWallet
-                            ?
-                                <button className="back-button wallet-reset-button" onClick={this.walletResetClose}>Wallet Reset</button>
-                            :
-                                <button className="back-button wallet-reset-button" onClick={this.walletResetStart}>Wallet Reset</button>
-                        }
+                        <button className="back-button wallet-reset-button" onClick={this.state.walletResetModal ? this.walletResetClose : this.walletResetStart}>Wallet Reset</button>
                     </div>
                     <div className="col-xs-8 col-xs-offset-2 App-intro">
                         <div className="row text-center">
@@ -291,7 +278,7 @@ export default class SelectWallet extends React.Component {
                         <h2>Safex</h2>
                         <h3>Wallet</h3>
                         <p>v0.0.7</p>
-                        <button className="back-button wallet-reset-button" onClick={this.walletResetNoWallet}>Wallet
+                        <button className="back-button wallet-reset-button" onClick={this.state.walletResetModal ? this.walletResetClose : this.walletResetNoWallet}>Wallet
                             Reset
                         </button>
                     </div>
@@ -328,143 +315,171 @@ export default class SelectWallet extends React.Component {
         return (
             <div>
                 {show_options}
-                <div className={this.state.walletResetWarning1
+                <div className={this.state.walletResetModal
                     ? 'overflow sendModal walletResetModal active'
                     : 'overflow sendModal walletResetModal'}>
                     <div className="container">
-                        <h3>Wallet Reset
-                            <span onClick={this.walletResetClose} className="close">X</span>
-                        </h3>
-                        <p>{this.state.walletResetModalText}</p>
-                        <button className="keys-btn button-shine" onClick={this.walletResetWarning1Proceed}>Proceed
-                        </button>
-                    </div>
-                </div>
-                <div className={this.state.walletResetWarning2
-                    ? 'overflow sendModal walletResetModal active'
-                    : 'overflow sendModal walletResetModal'}>
-                    <div className="container">
-                        <h3>Wallet Reset
-                            <span onClick={this.walletResetClose} className="close">X</span>
-                        </h3>
-                        <p>{this.state.walletResetModalText}</p>
-                        <button className="keys-btn button-shine" onClick={this.walletResetWarning2Proceed}>Proceed
-                        </button>
-                    </div>
-                </div>
-                <div className={this.state.walletResetWarning3
-                    ? 'overflow sendModal walletResetModal active'
-                    : 'overflow sendModal walletResetModal'}>
-                    <div className="container">
-                        <h3>Wallet Reset
-                            <span onClick={this.walletResetClose} className="close">X</span>
-                        </h3>
-                        <p>{this.state.walletResetModalText}</p>
-                        <button className="keys-btn button-shine" onClick={this.walletResetWarning3Proceed}>Proceed
-                        </button>
-                    </div>
-                </div>
-                <div className={this.state.walletResetWarning4
-                    ? 'overflow sendModal walletResetModal active'
-                    : 'overflow sendModal walletResetModal'}>
-                    <div className="container">
-                        <h3>Wallet Reset
-                            <span onClick={this.walletResetClose} className="close">X</span>
-                        </h3>
-                        <p>{this.state.walletResetModalText}</p>
-                        <button className="keys-btn button-shine" onClick={this.walletResetWarning4Proceed}>Proceed
-                        </button>
-                    </div>
-                </div>
-                <div className={this.state.walletResetWarning5
-                    ? 'overflow sendModal walletResetModal active'
-                    : 'overflow sendModal walletResetModal'}>
-                    <div className="container">
-                        <h3>Wallet Reset
-                            <span onClick={this.walletResetClose} className="close">X</span>
-                        </h3>
-                        <p>{this.state.walletResetModalText}</p>
-                        <button className="keys-btn button-shine" onClick={this.walletResetWarning5Proceed}>Proceed
-                        </button>
-                    </div>
-                </div>
-                <div className={this.state.walletResetModal1
-                    ? 'overflow sendModal walletResetModal active'
-                    : 'overflow sendModal walletResetModal'}>
-                    <div className="container">
-                        <h3>Back Up Unencrypted Keys
-                            <span onClick={this.walletResetClose} className="close">X</span>
-                        </h3>
-                        <p>{this.state.walletResetModalText}</p>
-                        <button className="keys-btn button-shine" onClick={this.walletResetStep1Skip}>Skip</button>
-                        <button className="keys-btn button-shine" onClick={this.walletResetStep1Proceed}>Proceed
-                        </button>
-                    </div>
-                </div>
-                <div className={this.state.walletResetModal2unencrypted
-                    ? 'overflow sendModal walletResetModal active'
-                    : 'overflow sendModal walletResetModal'}>
-                    <div className="container">
-                        <h3>Wallet Reset Step 2
-                            <span onClick={this.walletResetClose} className="close">X</span>
-                        </h3>
-                        <form className="form-group text-center" onSubmit={this.walletResetDlUnencrypted}>
-                            <input className={this.state.wrong_password ? 'form-control password-btn shake' : 'form-control password-btn'} type="password" name="password" placeholder="Enter Password"/>
-                            <button className="keys-btn button-shine" type="submit">Proceed</button>
-                        </form>
-                    </div>
-                </div>
-                <div className={this.state.walletResetModalDlUnencrypted
-                    ? 'overflow sendModal walletResetModal active'
-                    : 'overflow sendModal walletResetModal'}>
-                    <div className="container">
-                        <h3>Download Encrypted Wallet
-                            <span onClick={this.walletResetClose} className="close">X</span>
-                        </h3>
-                        <p>{this.state.walletResetModalText}</p>
-                        <form onSubmit={this.walletResetDlEncrypted}>
-                            <label>
-                                <input name="checkbox" type="checkbox"/>I understand that this is my last chance to
-                                backup my wallet file after this it will be deleted
-                            </label>
-                            <button type="submit" className="submit-btn button-shine">Proceed</button>
-                        </form>
-                    </div>
-                </div>
-                <div className={this.state.walletResetModalDlEncrypted
-                    ? 'overflow sendModal walletResetModal active'
-                    : 'overflow sendModal walletResetModal'}>
-                    <div className="container">
-                        <h3>Downloading Encrypted Wallet
-                            <span onClick={this.walletResetClose} className="close">X</span>
-                        </h3>
-                        <p>{this.state.walletResetModalText}</p>
-                        <form onSubmit={this.walletResetStep2}>
-                            <label><input name="checkbox" type="checkbox"/> I understand that this is my last chance to
-                                backup my wallet file after this it will be deleted</label>
-                            <button type="submit" className="submit-btn button-shine">Proceed</button>
-                        </form>
-                    </div>
-                </div>
-                <div className={this.state.walletResetModalDone
-                    ? 'overflow sendModal walletResetModal active'
-                    : 'overflow sendModal walletResetModal'}>
-                    <div className="container">
-                        <h3>Wallet Reset Done
-                            <span onClick={this.walletResetClose} className="close">X</span>
-                        </h3>
-                        <p>{this.state.walletResetModalText}</p>
-                        <button className="keys-btn button-shine" onClick={this.walletResetClose}>Done</button>
-                    </div>
-                </div>
-                <div className={this.state.walletResetNoWallet
-                    ? 'overflow sendModal walletResetModal active'
-                    : 'overflow sendModal walletResetModal'}>
-                    <div className="container">
-                        <h3>Wallet Reset
-                            <span onClick={this.walletResetClose} className="close">X</span>
-                        </h3>
-                        <p>{this.state.walletResetModalText}</p>
+                        {
+                            this.state.walletResetWarning1
+                            ?
+                                <div>
+                                    <h3>Wallet Reset
+                                        <span onClick={this.walletResetClose} className="close">X</span>
+                                    </h3>
+                                    <p>{this.state.walletResetModalText}</p>
+                                    <button className="keys-btn button-shine" onClick={this.walletResetWarning1Proceed}>Proceed
+                                    </button>
+                                </div>
+                            :
+                                <div></div>
+                        }
+                        {
+                            this.state.walletResetWarning2
+                            ?
+                                <div>
+                                    <h3>Wallet Reset
+                                        <span onClick={this.walletResetClose} className="close">X</span>
+                                    </h3>
+                                    <p>{this.state.walletResetModalText}</p>
+                                    <button className="keys-btn button-shine" onClick={this.walletResetWarning2Proceed}>Proceed
+                                    </button>
+                                </div>
+                            :
+                                <div></div>
+                        }
+                        {
+                            this.state.walletResetWarning3
+                            ?
+                                <div>
+                                    <h3>Wallet Reset
+                                        <span onClick={this.walletResetClose} className="close">X</span>
+                                    </h3>
+                                    <p>{this.state.walletResetModalText}</p>
+                                    <button className="keys-btn button-shine" onClick={this.walletResetWarning3Proceed}>Proceed
+                                    </button>
+                                </div>
+                            :
+                                <div></div>
+                        }
+                        {
+                            this.state.walletResetWarning4
+                            ?
+                                <div>
+                                    <h3>Wallet Reset
+                                        <span onClick={this.walletResetClose} className="close">X</span>
+                                    </h3>
+                                    <p>{this.state.walletResetModalText}</p>
+                                    <button className="keys-btn button-shine" onClick={this.walletResetWarning4Proceed}>Proceed
+                                    </button>
+                                </div>
+                            :
+                                <div></div>
+                        }
+                        {
+                            this.state.walletResetWarning5
+                            ?
+                                <div>
+                                    <h3>Wallet Reset
+                                        <span onClick={this.walletResetClose} className="close">X</span>
+                                    </h3>
+                                    <p>{this.state.walletResetModalText}</p>
+                                    <button className="keys-btn button-shine" onClick={this.walletResetWarning5Proceed}>Proceed
+                                    </button>
+                                </div>
+                            :
+                                <div></div>
+                        }
+                        {
+                            this.state.walletResetModal1
+                            ?
+                                <div>
+                                    <h3>Back Up Unencrypted Keys
+                                        <span onClick={this.walletResetClose} className="close">X</span>
+                                    </h3>
+                                    <p>{this.state.walletResetModalText}</p>
+                                    <button className="keys-btn button-shine" onClick={this.walletResetStep1Skip}>Skip</button>
+                                    <button className="keys-btn button-shine" onClick={this.walletResetStep1Proceed}>Proceed
+                                    </button>
+                                </div>
+                            :
+                                <div></div>
+                        }
+                        {
+                            this.state.walletResetModal2unencrypted
+                            ?
+                                <div>
+                                    <h3>Wallet Reset Step 2
+                                        <span onClick={this.walletResetClose} className="close">X</span>
+                                    </h3>
+                                    <form className="form-group text-center" onSubmit={this.walletResetDlUnencrypted}>
+                                        <input className={this.state.wrong_password ? 'form-control password-btn shake' : 'form-control password-btn'} type="password" name="password" placeholder="Enter Password"/>
+                                        <button className="keys-btn button-shine" type="submit">Proceed</button>
+                                    </form>
+                                </div>
+                            :
+                                <div></div>
+                        }
+                        {
+                            this.state.walletResetModalDlUnencrypted
+                            ?
+                                <div>
+                                    <h3>Download Encrypted Wallet
+                                        <span onClick={this.walletResetClose} className="close">X</span>
+                                    </h3>
+                                    <p>{this.state.walletResetModalText}</p>
+                                    <form onSubmit={this.walletResetDlEncrypted}>
+                                        <label>
+                                            <input name="checkbox" type="checkbox"/>I understand that this is my last chance to
+                                            backup my wallet file after this it will be deleted
+                                        </label>
+                                        <button type="submit" className="submit-btn button-shine">Proceed</button>
+                                    </form>
+                                </div>
+                            :
+                                <div></div>
+                        }
+                        {
+                            this.state.walletResetModalDlEncrypted
+                            ?
+                                <div>
+                                    <h3>Downloading Encrypted Wallet
+                                        <span onClick={this.walletResetClose} className="close">X</span>
+                                    </h3>
+                                    <p>{this.state.walletResetModalText}</p>
+                                    <form onSubmit={this.walletResetStep2}>
+                                        <label><input name="checkbox" type="checkbox"/> I understand that this is my last chance to
+                                            backup my wallet file after this it will be deleted</label>
+                                        <button type="submit" className="submit-btn button-shine">Proceed</button>
+                                    </form>
+                                </div>
+                            :
+                                <div></div>
+                        }
+                        {
+                            this.state.walletResetModalDone
+                            ?
+                                <div>
+                                    <h3>Wallet Reset Done
+                                        <span onClick={this.walletResetClose} className="close">X</span>
+                                    </h3>
+                                    <p>{this.state.walletResetModalText}</p>
+                                    <button className="keys-btn button-shine" onClick={this.walletResetClose}>Done</button>
+                                </div>
+                            :
+                                <div></div>
+                        }
+                        {
+                            this.state.walletResetNoWallet
+                            ?
+                                <div>
+                                    <h3>Wallet Reset
+                                        <span onClick={this.walletResetClose} className="close">X</span>
+                                    </h3>
+                                    <p>{this.state.walletResetModalText}</p>
+                                </div>
+                            :
+                                <div></div>
+                        }
                     </div>
                 </div>
             </div>
