@@ -28,18 +28,23 @@
 .overflow.sendModal > form > .col-xs-12 {
   height: 100%;
 }
-.overflow.sendModal > form h3 {
-  text-align: center;
+.overflow.sendModal > form h3,
+.overflow.sendModal .container .head h3 {
+  text-align: left;
   color: #fff;
   text-transform: uppercase;
   font-size: 21px;
   display: inline-block;
   margin-top: 0px;
+  margin-left: 15px;
   margin-bottom: 0;
-  text-indent: 27px;
   width: 100%;
 }
-.overflow.settingsModal .form-wrap .head h3,
+.overflow .transactionSent .head h3,
+.overflow .transactionBeingSent .head h3 {
+  text-align: center !important;
+}
+.overflow .settingsModal .form-wrap .head h3,
 .overflow.affiliateModal form h3,
 .overflow.dividendModal form h3 {
   text-align: left;

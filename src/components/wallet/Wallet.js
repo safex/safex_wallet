@@ -84,6 +84,7 @@ export default class Wallet extends React.Component {
                 display_private_key: '',
                 private_key_popup: false,
             },
+            sidebar_open: false,
             settings_active: false,
             refreshTimer: 0,
             refreshInterval: '',
@@ -410,6 +411,7 @@ export default class Wallet extends React.Component {
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
                     this.setState({
+                        sidebar_opened: true,
                         transaction_being_sent: false,
                         send_receive_popup: true,
                         send_receive_info: 'Network communication error, please try again later'
@@ -427,6 +429,7 @@ export default class Wallet extends React.Component {
         } else if(this.state.send_coin === 'btc') {
             try {  //open the modal by setting transaction_being_sent
                 this.setState({
+                    sidebar_opened: true,
                     transaction_being_sent: true,
                     settings_active: false,
                 });
@@ -462,6 +465,7 @@ export default class Wallet extends React.Component {
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
                     this.setState({
+                        sidebar_opened: true,
                         transaction_being_sent: false,
                         send_receive_popup: true,
                         send_receive_info: 'Network communication error, please try again later'
@@ -509,6 +513,7 @@ export default class Wallet extends React.Component {
             .then(resp => resp.text())
             .then((resp) => {
                 this.setState({
+                    sidebar_opened: true,
                     transaction_sent: true,
                     transaction_being_sent: false,
                     txid: resp,
@@ -580,12 +585,14 @@ export default class Wallet extends React.Component {
                                 });
                                 setTimeout(() => {
                                     this.setState({
+                                        sidebar_opened: true,
                                         transaction_being_sent: false,
                                     });
                                 }, 1000);
                                 throw "There was an error with the transaction.";
                             }
                             this.setState({
+                                sidebar_opened: true,
                                 transaction_sent: true,
                                 transaction_being_sent: false,
                                 txid: resp
@@ -601,6 +608,7 @@ export default class Wallet extends React.Component {
                     });
                     setTimeout(() => {
                         this.setState({
+                            sidebar_opened: true,
                             transaction_being_sent: false,
                         });
                     }, 1000);
@@ -650,6 +658,7 @@ export default class Wallet extends React.Component {
             .then((resp) => {
 
                 this.setState({
+                    sidebar_opened: true,
                     transaction_sent: true,
                     transaction_being_sent: false,
                     txid: resp
@@ -1151,6 +1160,7 @@ export default class Wallet extends React.Component {
 
         if ((this.state.send_coin === 'safex' && this.state.send_fee > key_btc_bal) | (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal)) {
             this.setState({
+                sidebar_open: false,
                 send_receive_popup: true,
                 send_receive_info: 'You do not have enough BITCOIN to cover the fee',
                 send_overflow_active: false,
@@ -1160,6 +1170,7 @@ export default class Wallet extends React.Component {
             });
         } else if (this.state.send_coin === 'safex' && this.state.send_amount > key_safex_bal) {
             this.setState({
+                sidebar_open: false,
                 send_receive_popup: true,
                 send_receive_info: 'You do not have enough SAFEX to cover this transaction',
                 send_overflow_active: false,
@@ -1169,6 +1180,7 @@ export default class Wallet extends React.Component {
             });
         } else if (this.state.send_coin === 'safex' && (this.state.send_amount === '' || this.state.send_amount === 0 || isNaN(this.state.send_amount))) {
             this.setState({
+                sidebar_open: false,
                 send_receive_popup: true,
                 send_receive_info: 'Invalid SAFEX amount',
                 send_overflow_active: false,
@@ -1178,6 +1190,7 @@ export default class Wallet extends React.Component {
             })
         } else if (this.state.send_coin === 'btc' && (this.state.send_amount === '' || parseFloat(this.state.send_amount) === 0 || isNaN(this.state.send_total))) {
             this.setState({
+                sidebar_open: false,
                 send_receive_popup: true,
                 send_receive_info: 'Invalid BITCOIN amount',
                 send_overflow_active: false,
@@ -1187,6 +1200,7 @@ export default class Wallet extends React.Component {
             })
         } else if (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal) {
             this.setState({
+                sidebar_open: false,
                 send_receive_popup: true,
                 send_receive_info: 'You do not have enough BITCOIN to cover this transaction',
                 send_overflow_active: false,
@@ -1196,6 +1210,7 @@ export default class Wallet extends React.Component {
             });
         } else if (e.target.destination.value === '') {
             this.setState({
+                sidebar_open: false,
                 send_receive_popup: true,
                 send_receive_info: 'Destination field is empty',
                 send_overflow_active: false,
@@ -1205,6 +1220,7 @@ export default class Wallet extends React.Component {
             });
         } else if (e.target.destination.value === e.target.public_key.value) {
             this.setState({
+                sidebar_open: false,
                 send_receive_popup: true,
                 send_receive_info: 'Invalid sending address',
                 send_overflow_active: false,
@@ -1216,6 +1232,7 @@ export default class Wallet extends React.Component {
             try {
                 bitcore.Address.fromString(e.target.destination.value);
                 this.setState({
+                    sidebar_open: true,
                     send_overflow_active: true,
                     send_to: e.target.destination.value,
                     send_keys: {
@@ -1229,6 +1246,7 @@ export default class Wallet extends React.Component {
                 })
             } catch (e) {
                 this.setState({
+                    sidebar_open: false,
                     send_receive_popup: true,
                     send_receive_info: 'Destination address is invalid',
                     send_overflow_active: false,
@@ -1331,6 +1349,7 @@ export default class Wallet extends React.Component {
 
     closeSettingsModal() {
         this.setState({
+            sidebar_open: false,
             settings_active: false,
 
             // Close Settings Form Popup
@@ -1367,6 +1386,7 @@ export default class Wallet extends React.Component {
     closeSuccessModal(e) {
         e.preventDefault();
         this.setState({
+            sidebar_open: false,
             transaction_sent: false,
 
             // Close Coin Modal
@@ -1393,6 +1413,7 @@ export default class Wallet extends React.Component {
     openSettingsModal(e) {
         e.preventDefault();
         this.setState({
+            sidebar_open: true,
             settings_active: true,
 
             // Close Success Modal
@@ -1898,6 +1919,7 @@ export default class Wallet extends React.Component {
     openDividendModal(e) {
         e.preventDefault();
         this.setState({
+            sidebar_open: true,
             dividend_active: true,
 
             // Close Success Modal
@@ -1925,6 +1947,7 @@ export default class Wallet extends React.Component {
 
     closeDividendModal() {
         this.setState({
+            sidebar_open: false,
             dividend_active: false
         });
     }
@@ -1932,6 +1955,7 @@ export default class Wallet extends React.Component {
     openAffiliateModal(e) {
         e.preventDefault();
         this.setState({
+            sidebar_open: true,
             affiliate_active: true,
 
             // Close Success Modal
@@ -1959,6 +1983,7 @@ export default class Wallet extends React.Component {
 
     closeAffiliateModal() {
         this.setState({
+            sidebar_open: false,
             affiliate_active: false
         });
     }
@@ -2379,229 +2404,242 @@ export default class Wallet extends React.Component {
                     </div>
                 </div>
 
-                <div className={this.state.send_overflow_active && this.state.transaction_sent === false
+                <div className={this.state.sidebar_open
                     ? 'overflow sendModal active'
                     : 'overflow sendModal'}>
-                    <form className="container" onSubmit={this.sendCoins}>
-                        <div className="head">
-                            <h3>Sending </h3>
-                            <span className="close" onClick={this.closeCoinModal}>X</span>
-                        </div>
-                        <div className="currency">
-                            <span>Currency:</span>
-                            <img className={this.state.send_coin === 'safex'
-                                ? 'coin'
-                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                 onClick={this.sendCoinChoose.bind(this, 'safex')}
-                                 src="images/coin-white.png" alt="Safex Coin"/>
-                            <img className={this.state.send_coin === 'btc'
-                                ? 'coin'
-                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                 onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
-                                 alt="Bitcoin Coin"/>
-                        </div>
-                        <div className="input-group">
-                            <label htmlFor="from">From:</label>
-                            <textarea name="from" className="form-control" readOnly aria-describedby="basic-addon1" value={this.state.send_keys.public_key}>
-                            </textarea>
-                        </div>
-                        <div className="input-group">
-                            <label htmlFor="destination">To:</label>
-                            <textarea name="destination" className="form-control" readOnly aria-describedby="basic-addon1" value={this.state.send_to}>
-                            </textarea>
-                        </div>
-                        <input type="hidden" readOnly name="private_key"
-                            value={this.state.send_keys.private_key} />
-                        <input type="hidden" readOnly name="public_key"
-                            value={this.state.send_keys.public_key} />
-                        <div className="form-group">
-                            <label htmlFor="amount">Amount:</label>
-                            <input readOnly name="amount" value={this.state.send_amount}/>
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="fee">Fee(BTC):</label>
-                            <input readOnly name="fee" value={this.state.send_fee}/>
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="total">Total:</label>
-                            <input readOnly name="total" value={this.state.send_total} />
-                        </div>
-                        <button className="confirm-btn button-shine-green" type="submit" disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
-                            {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}
-                        </button>
-                    </form>
-                </div>
-                <div className={this.state.transaction_sent
-                    ? 'overflow sendModal active'
-                    : 'overflow sendModal'}>
-                    <form className="container" onSubmit={this.closeSuccessModal}>
-                        <div className="head">
-                            <h3>Sent </h3>
-                            <span className="close" onClick={this.closeSuccessModal}>X</span>
-                        </div>
-                        <div className="currency">
-                            <span>Currency:</span>
-                            <img className={this.state.send_coin === 'safex'
-                                ? 'coin'
-                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                onClick={this.sendCoinChoose.bind(this, 'safex')}
-                                src="images/coin-white.png" alt="Safex Coin"/>
-                            <img className={this.state.send_coin === 'btc'
-                                ? 'coin'
-                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
-                                alt="Bitcoin Coin"/>
-                        </div>
-                        <div className="input-group">
-                            <label htmlFor="from">From:</label>
-                            <textarea name="from" className="form-control" readOnly
-                                value={this.state.send_keys.public_key} placeholder="Address"
-                                aria-describedby="basic-addon1">
-                            </textarea>
-                        </div>
-                        <div className="input-group">
-                            <label htmlFor="destination">To:</label>
-                            <textarea name="destination" className="form-control" readOnly
-                                value={this.state.send_to} placeholder="Address"
-                                aria-describedby="basic-addon1">
-                            </textarea>
-                        </div>
-                        <div className="input-group">
-                            <label htmlFor="txid">TX ID:</label>
-                            <textarea name="txid" className="form-control" readOnly
-                                value={this.state.txid}  placeholder="Address"
-                                aria-describedby="basic-addon1" rows="3">
-                            </textarea>
-                        </div>
-                        <input type="hidden" readOnly name="private_key"
-                           value={this.state.send_keys.private_key} />
-                        <input type="hidden" readOnly name="public_key"
-                           value={this.state.send_keys.public_key} />
-                        <div className="form-group">
-                            <label htmlFor="amount">Amount:</label>
-                            <input readOnly name="amount" value={this.state.send_amount} />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="fee">Fee(BTC):</label>
-                            <input readOnly name="fee" value={this.state.send_fee} />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="total">Total:</label>
-                            <input readOnly name="total" value={this.state.send_total} />
-                        </div>
-                        <button type="submit" className="sent-close button-shine">Close</button>
-                    </form>
-                </div>
-                <div className={this.state.settings_active && this.state.send_overflow_active === false
-                    ? 'overflow sendModal settingsModal active'
-                    : 'overflow sendModal settingsModal'}>
-                    <div className="container form-wrap">
-                        <div className="head">
-                            <img src="images/mixer.png" alt="Transfer Icon"/>
-                            <h3>
-                                User<br />
-                                Settings
-                            </h3>
-                            <span className="close" onClick={this.closeSettingsModal}>X</span>
-                        </div>
-
-                        <form onSubmit={this.changePassword} onChange={this.closeSettingsInfoPopup}>
-                            <div className="form-group">
-                                <label htmlFor="old_pass">Old Password:</label>
-                                <input type="password" className={this.state.wrongOldPassword ? 'form-control shake password-input' : 'form-control password-input'} id="old_pass" name="old_pass" />
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="new_pass">New Password:</label>
-                                <input type="password" className={this.state.wrongNewPassword ? 'form-control shake password-input' : 'form-control password-input'} id="new_pass" name="new_pass" />
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="repeat_pass">Repeat Password:</label>
-                                <input type="password" className={this.state.wrongRepeatPassword ? 'form-control shake password-input' : 'form-control password-input'} id="repeat_pass" name="repeat_pass" />
-                            </div>
-                            <div className="col-xs-12 submit-wrap">
-                                <div className="row">
-                                    <button className="reset-btn button-shine" type="reset" onClick={this.resetSettingsForm}>Reset</button>
-                                    <button className="submit-btn button-shine-green" type="submit">Submit</button>
+                    {
+                        this.state.send_overflow_active && this.state.transaction_sent === false
+                        ?
+                            <form className="container transactionBeingSent" onSubmit={this.sendCoins}>
+                                <div className="head">
+                                    <h3>Sending </h3>
+                                    <span className="close" onClick={this.closeCoinModal}>X</span>
                                 </div>
-                                <div className="info-wrap">
-                                    <div className={this.state.info_popup
-                                        ? 'info-text active'
-                                        : 'info-text'}>
-                                        <p>{this.state.info_text}</p>
-                                        <span className="close" onClick={this.closeSettingsInfoPopup}>X</span>
+                                <div className="currency">
+                                    <span>Currency:</span>
+                                    <img className={this.state.send_coin === 'safex'
+                                        ? 'coin'
+                                        : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
+                                         onClick={this.sendCoinChoose.bind(this, 'safex')}
+                                         src="images/coin-white.png" alt="Safex Coin"/>
+                                    <img className={this.state.send_coin === 'btc'
+                                        ? 'coin'
+                                        : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
+                                         onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
+                                         alt="Bitcoin Coin"/>
+                                </div>
+                                <div className="input-group">
+                                    <label htmlFor="from">From:</label>
+                                    <textarea name="from" className="form-control" readOnly aria-describedby="basic-addon1" value={this.state.send_keys.public_key}>
+                            </textarea>
+                                </div>
+                                <div className="input-group">
+                                    <label htmlFor="destination">To:</label>
+                                    <textarea name="destination" className="form-control" readOnly aria-describedby="basic-addon1" value={this.state.send_to}>
+                            </textarea>
+                                </div>
+                                <input type="hidden" readOnly name="private_key"
+                                       value={this.state.send_keys.private_key} />
+                                <input type="hidden" readOnly name="public_key"
+                                       value={this.state.send_keys.public_key} />
+                                <div className="form-group">
+                                    <label htmlFor="amount">Amount:</label>
+                                    <input readOnly name="amount" value={this.state.send_amount}/>
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="fee">Fee(BTC):</label>
+                                    <input readOnly name="fee" value={this.state.send_fee}/>
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="total">Total:</label>
+                                    <input readOnly name="total" value={this.state.send_total} />
+                                </div>
+                                <button className="confirm-btn button-shine-green" type="submit" disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
+                                    {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}
+                                </button>
+                            </form>
+                        :
+                            <div></div>
+                    }
+                    {   this.state.transaction_sent
+                        ?
+                            <form className="container transactionSent" onSubmit={this.closeSuccessModal}>
+                                <div className="head">
+                                    <h3>Sent </h3>
+                                    <span className="close" onClick={this.closeSuccessModal}>X</span>
+                                </div>
+                                <div className="currency">
+                                    <span>Currency:</span>
+                                    <img className={this.state.send_coin === 'safex'
+                                        ? 'coin'
+                                        : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
+                                         onClick={this.sendCoinChoose.bind(this, 'safex')}
+                                         src="images/coin-white.png" alt="Safex Coin"/>
+                                    <img className={this.state.send_coin === 'btc'
+                                        ? 'coin'
+                                        : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
+                                         onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
+                                         alt="Bitcoin Coin"/>
+                                </div>
+                                <div className="input-group">
+                                    <label htmlFor="from">From:</label>
+                                    <textarea name="from" className="form-control" readOnly
+                                        value={this.state.send_keys.public_key} placeholder="Address"
+                                        aria-describedby="basic-addon1">
+                            </textarea>
+                                </div>
+                                <div className="input-group">
+                                    <label htmlFor="destination">To:</label>
+                                    <textarea name="destination" className="form-control" readOnly
+                                        value={this.state.send_to} placeholder="Address"
+                                        aria-describedby="basic-addon1">
+                            </textarea>
+                                </div>
+                                <div className="input-group">
+                                    <label htmlFor="txid">TX ID:</label>
+                                    <textarea name="txid" className="form-control" readOnly
+                                        value={this.state.txid}  placeholder="Address"
+                                        aria-describedby="basic-addon1" rows="3">
+                            </textarea>
+                                </div>
+                                <input type="hidden" readOnly name="private_key"
+                                       value={this.state.send_keys.private_key} />
+                                <input type="hidden" readOnly name="public_key"
+                                       value={this.state.send_keys.public_key} />
+                                <div className="form-group">
+                                    <label htmlFor="amount">Amount:</label>
+                                    <input readOnly name="amount" value={this.state.send_amount} />
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="fee">Fee(BTC):</label>
+                                    <input readOnly name="fee" value={this.state.send_fee} />
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="total">Total:</label>
+                                    <input readOnly name="total" value={this.state.send_total} />
+                                </div>
+                                <button type="submit" className="sent-close button-shine">Close</button>
+                            </form>
+                        :
+                            <div></div>
+                    }
+                    {
+                        this.state.settings_active && this.state.send_overflow_active === false
+                        ?
+                            <div className="container form-wrap settingsModal">
+                                <div className="head">
+                                    <img src="images/mixer.png" alt="Transfer Icon"/>
+                                    <h3>
+                                        User<br />
+                                        Settings
+                                    </h3>
+                                    <span className="close" onClick={this.closeSettingsModal}>X</span>
+                                </div>
+
+                                <form onSubmit={this.changePassword} onChange={this.closeSettingsInfoPopup}>
+                                    <div className="form-group">
+                                        <label htmlFor="old_pass">Old Password:</label>
+                                        <input type="password" className={this.state.wrongOldPassword ? 'form-control shake password-input' : 'form-control password-input'} id="old_pass" name="old_pass" />
                                     </div>
-                                </div>
+                                    <div className="form-group">
+                                        <label htmlFor="new_pass">New Password:</label>
+                                        <input type="password" className={this.state.wrongNewPassword ? 'form-control shake password-input' : 'form-control password-input'} id="new_pass" name="new_pass" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="repeat_pass">Repeat Password:</label>
+                                        <input type="password" className={this.state.wrongRepeatPassword ? 'form-control shake password-input' : 'form-control password-input'} id="repeat_pass" name="repeat_pass" />
+                                    </div>
+                                    <div className="col-xs-12 submit-wrap">
+                                        <div className="row">
+                                            <button className="reset-btn button-shine" type="reset" onClick={this.resetSettingsForm}>Reset</button>
+                                            <button className="submit-btn button-shine-green" type="submit">Submit</button>
+                                        </div>
+                                        <div className="info-wrap">
+                                            <div className={this.state.info_popup
+                                                ? 'info-text active'
+                                                : 'info-text'}>
+                                                <p>{this.state.info_text}</p>
+                                                <span className="close" onClick={this.closeSettingsInfoPopup}>X</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                                <button className="keys-btn button-shine" onClick={this.openExportEncryptedWallet}>Export Encrypted Wallet <span className="blue-text">(.dat)</span></button>
+                                <button className="keys-btn button-shine" onClick={this.openExportUnencryptedWalletPopup}>Export Unencrypted Keys</button>
+                                <button className="logout-btn button-shine-red" onClick={this.logout}>Logout</button>
                             </div>
-                        </form>
-                        <button className="keys-btn button-shine" onClick={this.openExportEncryptedWallet}>Export Encrypted Wallet <span className="blue-text">(.dat)</span></button>
-                        <button className="keys-btn button-shine" onClick={this.openExportUnencryptedWalletPopup}>Export Unencrypted Keys</button>
-                        <button className="logout-btn button-shine-red" onClick={this.logout}>Logout</button>
-                    </div>
-                </div>
-                <div className={this.state.dividend_active
-                    ? 'overflow sendModal dividendModal active'
-                    : 'overflow sendModal dividendModal'}>
-                    <form className="container" onChange={this.safexDividendOnChange.bind(this)}>
-                        <div className="head">
-                            <img src="images/dividend-logo.png" alt="Transfer Icon"/>
-                            <h3>
-                                Dividend<br />
-                                Calculator
-                            </h3>
-                            <span className="close" onClick={this.closeDividendModal}>X</span>
-                        </div>
+                        :
+                            <div></div>
+                    }
+                    {
+                        this.state.dividend_active
+                        ?
+                            <form className="container" onChange={this.safexDividendOnChange.bind(this)}>
+                                <div className="head">
+                                    <img src="images/dividend-logo.png" alt="Transfer Icon"/>
+                                    <h3>
+                                        Dividend<br />
+                                        Calculator
+                                    </h3>
+                                    <span className="close" onClick={this.closeDividendModal}>X</span>
+                                </div>
 
-                        <div className="form-group">
-                            <label>
-                                Projected Marketplace Volume $
-                            </label>
-                            <input type="number" name="total_trade_volume" value={this.state.totalTradeVolume}/>
-                        </div>
-                        <div className="form-group">
-                            <label>
-                                Marketplace Fee %
-                            </label>
-                            <input type="number" name="marketplace_fee" value={this.state.marketplaceFee}/>
-                        </div>
-                        <div className="form-group">
-                            <label>
-                                Safex Market Cap $
-                            </label>
-                            <input type="number" name="safex_market_cap" value={this.state.safexMarketCap}/>
-                        </div>
-                        <div className="form-group">
-                            <label>
-                                Number of SAFEX Held
-                            </label>
-                            <input type="number" name="safex_holdings" value={this.state.safexHolding}/>
-                        </div>
-                        <div className="form-group">
-                            <label>
-                                Cost of Safex Holdings $
-                            </label>
-                            <input type="number" name="safex_holdings_by_market" value={this.state.holdingsByMarket} readOnly/>
-                        </div>
-                        <div className="form-group">
-                            <label>
-                                Annual Return on Investment %
-                            </label>
-                            <input type="number" name="safex_dividend_yield" value={isNaN(this.state.safexDividendYield) ? '0' : this.state.safexDividendYield}/>
-                        </div>
-                    </form>
-                </div>
-                <div className={this.state.affiliate_active
-                    ? 'overflow sendModal affiliateModal active'
-                    : 'overflow sendModal affiliateModal'}>
-                    <form className="container">
-                        <div className="head">
-                            <img src="images/affiliate-logo.png" alt="Transfer Icon"/>
-                            <h3>
-                                Affiliate<br />
-                                System
-                            </h3>
-                            <span className="close" onClick={this.closeAffiliateModal}>X</span>
-                        </div>
-                    </form>
+                                <div className="form-group">
+                                    <label>
+                                        Projected Marketplace Volume $
+                                    </label>
+                                    <input type="number" name="total_trade_volume" value={this.state.totalTradeVolume}/>
+                                </div>
+                                <div className="form-group">
+                                    <label>
+                                        Marketplace Fee %
+                                    </label>
+                                    <input type="number" name="marketplace_fee" value={this.state.marketplaceFee}/>
+                                </div>
+                                <div className="form-group">
+                                    <label>
+                                        Safex Market Cap $
+                                    </label>
+                                    <input type="number" name="safex_market_cap" value={this.state.safexMarketCap}/>
+                                </div>
+                                <div className="form-group">
+                                    <label>
+                                        Number of SAFEX Held
+                                    </label>
+                                    <input type="number" name="safex_holdings" value={this.state.safexHolding}/>
+                                </div>
+                                <div className="form-group">
+                                    <label>
+                                        Cost of Safex Holdings $
+                                    </label>
+                                    <input type="number" name="safex_holdings_by_market" value={this.state.holdingsByMarket} readOnly/>
+                                </div>
+                                <div className="form-group">
+                                    <label>
+                                        Annual Return on Investment %
+                                    </label>
+                                    <input type="number" name="safex_dividend_yield" value={isNaN(this.state.safexDividendYield) ? '0' : this.state.safexDividendYield}/>
+                                </div>
+                            </form>
+                        :
+                            <div></div>
+                    }
+                    {
+                        this.state.affiliate_active
+                        ?
+                            <form className="container">
+                                <div className="head">
+                                    <img src="images/affiliate-logo.png" alt="Transfer Icon"/>
+                                    <h3>
+                                        Affiliate<br />
+                                        System
+                                    </h3>
+                                    <span className="close" onClick={this.closeAffiliateModal}>X</span>
+                                </div>
+                            </form>
+                        :
+                            <div></div>
+                    }
                 </div>
                 <div className="key-buttons status fadeInUp">
                     <div className="container">
