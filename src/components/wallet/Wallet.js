@@ -1110,6 +1110,7 @@ export default class Wallet extends React.Component {
     openHistoryModal(e) {
         document.getElementById("history_txs").innerHTML = "<h5>Loading...</h5>";
         this.setState({
+            sidebar_open: false,
             history_overflow_active: true,
 
             // Close Success Modal
