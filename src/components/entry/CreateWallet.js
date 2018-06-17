@@ -22,6 +22,7 @@ export default class CreateWallet extends React.Component {
         };
 
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.walletImportAlertsClose = this.walletImportAlertsClose.bind(this);
     }
 
     wrongPassword() {
@@ -34,6 +35,13 @@ export default class CreateWallet extends React.Component {
 
     openWalletImportAlert(message, duration) {
         walletImportAlert(this, message, duration)
+    }
+
+    walletImportAlertsClose() {
+        this.setState({
+            walletImportAlerts: false,
+            walletImportAlertsText: ''
+        });
     }
 
     //here we create the wallet file in the default location after prompting for a password and creating the encrypted file.
@@ -123,7 +131,7 @@ export default class CreateWallet extends React.Component {
                     ? 'overflow sendModal walletResetModal active'
                     : 'overflow sendModal walletResetModal'}>
                     <div className="container">
-                        <h3>Create Wallet
+                        <h3>Create New Wallet
                             <span onClick={this.walletImportAlertsClose} className="close">X</span>
                         </h3>
                         <p>{this.state.walletImportAlertsText}</p>

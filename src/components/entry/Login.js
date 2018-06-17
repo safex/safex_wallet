@@ -16,6 +16,7 @@ export default class Login extends React.Component {
         };
 
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.walletImportAlertsClose = this.walletImportAlertsClose.bind(this);
     }
 
     wrongPassword() {
@@ -23,7 +24,14 @@ export default class Login extends React.Component {
     }
 
     openWalletImportAlert(message, duration) {
-        walletImportAlert(this, message, duration)
+        walletImportAlert(this, message, duration);
+    }
+
+    walletImportAlertsClose() {
+        this.setState({
+            walletImportAlerts: false,
+            walletImportAlertsText: ''
+        });
     }
 
     handleSubmit(e) {
