@@ -118,7 +118,7 @@ function loadAndDecryptWalletFromFile(walletPath, password, callback) {
 }
 
 /**
- * Quickly switch on and off glow on a component
+ * Quickly switch on and off animation on a field component
  */
 function flashField(target, field, duration = 1000) {
     target.setState({
