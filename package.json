@@ -99,7 +99,8 @@
     },
     "linux": {
       "target": [
-        "deb"
+        "deb",
+        "rpm"
       ],
       "category": "Utility",
       "icon": "public/images/icons/"
