@@ -1,0 +1,114 @@
+.wallet-nav {
+  margin-right: 160px;
+}
+.navbar-default {
+  height: 85px;
+  background: url('../images/menu-bg.png');
+  background-size: cover;
+  background-position: center center;
+  border: none;
+  border-radius: 0px;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid rgba(0, 126, 162, .52);
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+.navbar-default .coin-amounts {
+  padding-bottom: 5px;
+  margin-right: -25px;
+}
+.navbar-default .navbar-brand img {
+  height: 40px;
+  position: relative;
+  top: 2px;
+}
+.navbar-default .navbar-brand span {
+  margin-top: 5px;
+  color: #fff;
+}
+.navbar-default .navbar-nav > li {
+  color: #fff;
+  text-transform: uppercase;
+}
+.navbar-default .navbar-nav > li > a {
+  color: #fff !important;
+  padding-top: 19px;
+  text-transform: uppercase;
+}
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > li > a:focus,
+.navbar-default .navbar-nav > li > a:active, {
+  outline: 0px none;
+  color: #fff;
+  text-transform: uppercase;
+}
+.navbar-default .navbar-nav > li > span.currency {
+  color: rgba(255, 255, 255, .84);
+  letter-spacing: 1px;
+}
+.navbar-default .navbar-nav > li > span.amount {
+  color: #12bedd;
+  letter-spacing: 1px;
+}
+.coin-amounts li {
+  margin-right: 10px;
+}
+.nav > li > a > img {
+  height: 25px;
+  margin-left: 5px;
+}
+.wallet-tabs-wrap {
+  position: relative;
+}
+.wallet-tabs {
+  position: absolute;
+  top: -94px;
+  right: 15px;
+  animation-duration: 1s;
+  animation-delay: 1.9s;
+  animation-fill-mode: both;
+}
+.wallet-tabs .btn {
+  background: transparent;
+  border: 1px solid #b7b7b7;
+  padding: 3px 12px 2px;
+  border-radius: 5px;
+  text-shadow: none;
+  color: #fff;
+  text-transform: uppercase;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-right: 10px;
+  font-size: 13px;
+  width: 82px;
+}
+.wallet-tabs .btn:last-child {
+  margin-right: 0;
+}
+.wallet-tabs .btn:hover {
+  background: transparent;
+  border: 1px solid #00e7ff;
+  color: #fff;
+}
+.wallet-tabs .btn:focus {
+  background: transparent;
+  outline: 0px none;
+  color: #fff;
+  border: 1px solid #00e7ff;
+}
+.wallet-tabs .btn.active {
+  background: rgba(18, 190, 221, .4);
+  border: 1px solid #00e7ff;
+}
+.wallet-tabs .btn.glow-active {
+  background: rgba(0, 231, 255, .9);
+  border: 1px solid #00e7ff;
+  box-shadow: 0 0 30px 0 rgba(0, 199, 236, 0.5);
+  -moz-box-shadow: 0 0 30px 0 rgba(0, 199, 236, 0.5);
+  -webkit-transition: all 0.2s ease-out;
+  -moz-transition: all 0.2s ease-out;
+  transition: all 0.2s ease-out;
+  color: #fff;
+  transform: scale(1.13);
+}

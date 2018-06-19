@@ -1,15 +1,22 @@
 import React from 'react';
 import axios from 'axios';
 
-var fileDownload = require('react-file-download');
-var fs = window.require('fs');
-var os = window.require('os');
-var bs58 = require('bs58');
-var bitcoin = window.require('bitcoinjs-lib');
-var bitcore = window.require('bitcore-lib');
+const fileDownload = require('react-file-download');
+const fs = window.require('fs');
+const os = window.require('os');
+const bitcoin = window.require('bitcoinjs-lib');
+const bitcore = window.require('bitcore-lib');
+import QRCode from 'qrcode.react';
+
 import {toHexString, encrypt, safexPayload, decrypt} from '../../utils/utils';
 import {genkey} from '../../utils/keys';
-import QRCode from 'qrcode.react';
+import {
+    decryptWalletData,
+    downloadWallet,
+    loadAndDecryptWalletFromFile,
+    flashField,
+    openMainAlert
+} from '../../utils/wallet';
 
 import Navigation from '../Navigation';
 import KeyLabel from "../KeyLabel";
@@ -77,6 +84,7 @@ export default class Wallet extends React.Component {
                 display_private_key: '',
                 private_key_popup: false,
             },
+            sidebar_open: false,
             settings_active: false,
             refreshTimer: 0,
             refreshInterval: '',
@@ -84,9 +92,9 @@ export default class Wallet extends React.Component {
             dividend_active: false,
             affiliate_active: false,
             import_wrap_glow: false,
-            wrong_old_password: false,
-            wrong_new_password: false,
-            wrong_repeat_password: false,
+            wrongOldPassword: false,
+            wrongNewPassword: false,
+            wrongRepeatPassword: false,
             transfer_key_to_archive: false,
             transfer_key_to_home: false,
             info_popup: false,
@@ -100,7 +108,7 @@ export default class Wallet extends React.Component {
             create_key_active: false,
             import_modal_active: false,
             savedLabel: ''
-        }
+        };
 
         this.createKey = this.createKey.bind(this);
         this.importKey = this.importKey.bind(this);
@@ -161,6 +169,7 @@ export default class Wallet extends React.Component {
     logout() {
         localStorage.clear();
         this.setState({
+            sidebar_open: false,
             // Close Settings Modal
             settings_active: false,
 
@@ -190,7 +199,7 @@ export default class Wallet extends React.Component {
         else {
             clearInterval(this.state.refreshInterval);
         }
-    }
+    };
 
     componentWillMount() {
         axios({method: 'post', url: 'https://safex.io/api/price/'}).then(res => {
@@ -225,7 +234,7 @@ export default class Wallet extends React.Component {
         });
 
         try {
-            var json = JSON.parse(localStorage.getItem('wallet'));
+            const json = JSON.parse(localStorage.getItem('wallet'));
             this.setState({wallet: json, keys: json['keys']});
         } catch (e) {
             this.setState({
@@ -254,10 +263,9 @@ export default class Wallet extends React.Component {
                 this.setState({
                     btc_sync: false,
                     safex_sync: false,
-                    main_alert_popup: true,
-                    main_alert_popup_text: 'Unable to fetch average fee',
                     status_text: 'Sync error, please refresh'
                 });
+                this.openMainAlertPopup('Unable to fetch average fee');
             });
     }
 
@@ -404,6 +412,7 @@ export default class Wallet extends React.Component {
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
                     this.setState({
+                        sidebar_open: true,
                         transaction_being_sent: false,
                         send_receive_popup: true,
                         send_receive_info: 'Network communication error, please try again later'
@@ -421,6 +430,7 @@ export default class Wallet extends React.Component {
         } else if(this.state.send_coin === 'btc') {
             try {  //open the modal by setting transaction_being_sent
                 this.setState({
+                    sidebar_open: true,
                     transaction_being_sent: true,
                     settings_active: false,
                 });
@@ -456,6 +466,7 @@ export default class Wallet extends React.Component {
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
                     this.setState({
+                        sidebar_open: true,
                         transaction_being_sent: false,
                         send_receive_popup: true,
                         send_receive_info: 'Network communication error, please try again later'
@@ -503,6 +514,7 @@ export default class Wallet extends React.Component {
             .then(resp => resp.text())
             .then((resp) => {
                 this.setState({
+                    sidebar_open: true,
                     transaction_sent: true,
                     transaction_being_sent: false,
                     txid: resp,
@@ -566,6 +578,7 @@ export default class Wallet extends React.Component {
                         .then((resp) => {
                             if (resp === "") {
                                 this.setState({
+                                    sidebar_open: false,
                                     send_receive_popup: true,
                                     send_receive_info: 'There was an error with the transaction',
                                     send_overflow_active: false,
@@ -580,6 +593,7 @@ export default class Wallet extends React.Component {
                                 throw "There was an error with the transaction.";
                             }
                             this.setState({
+                                sidebar_open: true,
                                 transaction_sent: true,
                                 transaction_being_sent: false,
                                 txid: resp
@@ -595,6 +609,7 @@ export default class Wallet extends React.Component {
                     });
                     setTimeout(() => {
                         this.setState({
+                            sidebar_open: true,
                             transaction_being_sent: false,
                         });
                     }, 1000);
@@ -625,10 +640,7 @@ export default class Wallet extends React.Component {
 
         var btc = require('bitcoinjs-lib');
         if (amount <= 0.1) {
-            this.setState({
-                main_alert_popup: true,
-                main_alert_popup_text: 'Transaction not processed - Amount is too low.',
-            });
+            this.openMainAlertPopup('Transaction not processed - Amount is too low.');
             return;
         }
 
@@ -647,6 +659,7 @@ export default class Wallet extends React.Component {
             .then((resp) => {
 
                 this.setState({
+                    sidebar_open: true,
                     transaction_sent: true,
                     transaction_being_sent: false,
                     txid: resp
@@ -670,15 +683,12 @@ export default class Wallet extends React.Component {
         key_json['pending_safex_bal'] = 0;
         key_json['pending_btc_bal'] = 0;
         key_json['archived'] = false;
-        key_json['label'] = e.target.label.value;
+        key_json['label'] = e.target.label.value || 'Enter your label here';
 
         try {
             var json = JSON.parse(localStorage.getItem('wallet'));
         } catch (e) {
-            this.setState({
-                main_alert_popup: true,
-                main_alert_popup_text: 'Error parsing the wallet data.',
-            });
+            this.openMainAlertPopup('Error parsing the wallet data.');
         }
 
         json['keys'].push(key_json);
@@ -691,10 +701,7 @@ export default class Wallet extends React.Component {
 
         fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
             if (err) {
-                this.setState({
-                    main_alert_popup: true,
-                    main_alert_popup_text: 'Problem communicating to the wallet file.',
-                });
+                this.openMainAlertPopup('Problem communicating to the wallet file.');
             } else {
                 localStorage.setItem('wallet', JSON.stringify(json));
                 try {
@@ -716,9 +723,8 @@ export default class Wallet extends React.Component {
                 } catch (e) {
                     this.setState({
                         create_key_active: false,
-                        main_alert_popup: true,
-                        main_alert_popup_text: 'An error adding a key to the wallet. Please contact team@safex.io',
                     });
+                    this.openMainAlertPopup('An error adding a key to the wallet. Please contact team@safex.io');
                 }
             }
         });
@@ -758,9 +764,8 @@ export default class Wallet extends React.Component {
                             history_overflow_active: false,
                             history_key: '',
                             import_modal_active: false,
-                            main_alert_popup: true,
-                            main_alert_popup_text: 'Key exists',
                         });
+                        this.openMainAlertPopup('Key exists');
                         console.log('Key exists');
                     }
                 }
@@ -772,14 +777,13 @@ export default class Wallet extends React.Component {
                 history_overflow_active: false,
                 history_key: '',
                 import_modal_active: false,
-                main_alert_popup: true,
-                main_alert_popup_text: 'Invalid private key',
 
                 // Close Private Key Popup
                 private_key_open: {
                     private_key_popup: false,
                 },
             });
+            this.openMainAlertPopup('Invalid private key');
         }
     }
 
@@ -810,7 +814,7 @@ export default class Wallet extends React.Component {
             key_json['pending_safex_bal'] = 0;
             key_json['pending_btc_bal'] = 0;
             key_json['archived'] = false;
-            key_json['label'] = e.target.label.value;
+            key_json['label'] = e.target.label.value || 'Enter your label here';
 
             try {
                 var json = JSON.parse(localStorage.getItem('wallet'));
@@ -875,14 +879,12 @@ export default class Wallet extends React.Component {
             }
         } catch (e) {
             this.setState({
-                main_alert_popup: true,
-                main_alert_popup_text: 'Invalid private key',
-
                 // Close Private Key Popup
                 private_key_open: {
                     private_key_popup: false,
                 },
             });
+            this.openMainAlertPopup('Invalid private key');
         }
         this.setState({
             history_overflow_active: false,
@@ -936,36 +938,27 @@ export default class Wallet extends React.Component {
             private_key_open: {
                 private_key_popup: false,
             },
-
-            // Open Main Alert Popup
-            main_alert_popup: true,
-            main_alert_popup_text: "This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the 'import key' feature in another wallet. Press OK to proceed.",
         });
+        this.openMainAlertPopup('This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the \'import key\' feature in another wallet. Press OK to proceed.');
     }
 
     exportEncryptedWallet() {
-        fs.readFile(localStorage.getItem('wallet_path'), (err, fd) => {
+        return downloadWallet(localStorage.getItem('wallet_path'), err => {
             if (err) {
-                //if the error is that No File exists, let's step through and make the file
-                if (err.code === 'ENOENT') {
-                    console.log('error');
-                }
-            } else {
-                var date = Date.now();
-                fileDownload(fd, date + 'safexwallet.dat');
+                this.openMainAlertPopup(err.message);
             }
-        });
 
-        this.setState({
-            main_alert_popup: false,
-        });
-
-        setTimeout(() => {
             this.setState({
-                export_encrypted_wallet: false
-            })
-        }, 300);
-    }
+                main_alert_popup: false,
+            });
+
+            setTimeout(() => {
+                this.setState({
+                    export_encrypted_wallet: false
+                })
+            }, 300);
+        });
+     }
 
     openExportUnencryptedWalletPopup() {
         this.setState({
@@ -976,12 +969,8 @@ export default class Wallet extends React.Component {
             private_key_open: {
                 private_key_popup: false,
             },
-
-            // Open Main Alert Popup
-            main_alert_popup: true,
-            main_alert_popup_text: "This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is not for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the 'import key' feature in another wallet. Press OK to proceed.",
-
         });
+        this.openMainAlertPopup('This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is not for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the \'import key\' feature in another wallet. Press OK to proceed.');
     }
 
     exportUnencryptedWallet() {
@@ -1121,6 +1110,7 @@ export default class Wallet extends React.Component {
     openHistoryModal(e) {
         document.getElementById("history_txs").innerHTML = "<h5>Loading...</h5>";
         this.setState({
+            sidebar_open: false,
             history_overflow_active: true,
 
             // Close Success Modal
@@ -1172,6 +1162,7 @@ export default class Wallet extends React.Component {
 
         if ((this.state.send_coin === 'safex' && this.state.send_fee > key_btc_bal) | (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal)) {
             this.setState({
+                sidebar_open: false,
                 send_receive_popup: true,
                 send_receive_info: 'You do not have enough BITCOIN to cover the fee',
                 send_overflow_active: false,
@@ -1181,6 +1172,7 @@ export default class Wallet extends React.Component {
             });
         } else if (this.state.send_coin === 'safex' && this.state.send_amount > key_safex_bal) {
             this.setState({
+                sidebar_open: false,
                 send_receive_popup: true,
                 send_receive_info: 'You do not have enough SAFEX to cover this transaction',
                 send_overflow_active: false,
@@ -1190,6 +1182,7 @@ export default class Wallet extends React.Component {
             });
         } else if (this.state.send_coin === 'safex' && (this.state.send_amount === '' || this.state.send_amount === 0 || isNaN(this.state.send_amount))) {
             this.setState({
+                sidebar_open: false,
                 send_receive_popup: true,
                 send_receive_info: 'Invalid SAFEX amount',
                 send_overflow_active: false,
@@ -1199,6 +1192,7 @@ export default class Wallet extends React.Component {
             })
         } else if (this.state.send_coin === 'btc' && (this.state.send_amount === '' || parseFloat(this.state.send_amount) === 0 || isNaN(this.state.send_total))) {
             this.setState({
+                sidebar_open: false,
                 send_receive_popup: true,
                 send_receive_info: 'Invalid BITCOIN amount',
                 send_overflow_active: false,
@@ -1208,6 +1202,7 @@ export default class Wallet extends React.Component {
             })
         } else if (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal) {
             this.setState({
+                sidebar_open: false,
                 send_receive_popup: true,
                 send_receive_info: 'You do not have enough BITCOIN to cover this transaction',
                 send_overflow_active: false,
@@ -1217,6 +1212,7 @@ export default class Wallet extends React.Component {
             });
         } else if (e.target.destination.value === '') {
             this.setState({
+                sidebar_open: false,
                 send_receive_popup: true,
                 send_receive_info: 'Destination field is empty',
                 send_overflow_active: false,
@@ -1226,6 +1222,7 @@ export default class Wallet extends React.Component {
             });
         } else if (e.target.destination.value === e.target.public_key.value) {
             this.setState({
+                sidebar_open: false,
                 send_receive_popup: true,
                 send_receive_info: 'Invalid sending address',
                 send_overflow_active: false,
@@ -1237,6 +1234,7 @@ export default class Wallet extends React.Component {
             try {
                 bitcore.Address.fromString(e.target.destination.value);
                 this.setState({
+                    sidebar_open: true,
                     send_overflow_active: true,
                     send_to: e.target.destination.value,
                     send_keys: {
@@ -1250,6 +1248,7 @@ export default class Wallet extends React.Component {
                 })
             } catch (e) {
                 this.setState({
+                    sidebar_open: false,
                     send_receive_popup: true,
                     send_receive_info: 'Destination address is invalid',
                     send_overflow_active: false,
@@ -1278,82 +1277,54 @@ export default class Wallet extends React.Component {
         if (new_pass.length > 0) {
             //check that the new password matches the repeated password
             if (new_pass === repeat_pass) {
-                //read from the expected path the encrypted wallet
-                fs.readFile(localStorage.getItem('wallet_path'), (err, fd) => {
-                    if (err) {
-                        //if the error is that No File exists, let's step through and make the file
-                        if (err.code === 'ENOENT') {
-                            this.setState({
-                                main_alert_popup: true,
-                                main_alert_popup_text: "No wallet was found.",
+                loadAndDecryptWalletFromFile(localStorage.getItem('wallet_path'), now_pass, (err, wallet) => {
+                    if (!wallet) {
+                        err = new Error(`No wallet was found`);
+                    }
+
+                    if (!err) {
+                        const decrypted_wallet_str = JSON.stringify(wallet.decrypted);
+
+                        const crypto = require('crypto');
+                        const hash1 = crypto.createHash('sha256');
+                        const hash2 = crypto.createHash('sha256');
+
+                        //hash the wallet on the path
+                        hash1.update(decrypted_wallet_str);
+
+                        //hash the wallet in localstorage
+                        hash2.update(localStorage.getItem('wallet'));
+
+                        //check that both hashes the active wallet and encrypted wallet are identical
+                        if (hash1.toString() === hash2.toString()) {
+                            //encrypt the wallet data with the new password
+                            const algorithm = 'aes-256-ctr';
+                            const password = new_pass;
+                            const encrypted_wallet = encrypt(decrypted_wallet_str, algorithm, password);
+
+                            //write the new file to the path
+                            fs.writeFile(localStorage.getItem('wallet_path'), encrypted_wallet, (err) => {
+                                if (err) {
+                                    this.setState({
+                                        info_popup: true,
+                                        info_text: 'There was a problem writing the new encrypted file to disk'
+                                    });
+                                } else {
+                                    //set the active password and wallet to the new file
+                                    localStorage.setItem('password', new_pass);
+                                    localStorage.setItem('wallet', decrypted_wallet_str);
+                                    this.setState({
+                                        info_popup: true,
+                                        info_text: 'Password has been changed. Write it down, keep it safe.'
+                                    });
+                                }
                             });
                         }
                     } else {
-                        //prepare to decrypt the wallet file from the path
-                        var crypto = require('crypto'),
-                            algorithm = 'aes-256-ctr',
-                            password = now_pass;
-
-                        //decrypt the wallet
-                        var decrypted_wallet = decrypt(fd.toString(), algorithm, password);
-
-                        //try to parse the decrypted wallet that it is valid
-                        try {
-                            var parse_wallet = JSON.parse(decrypted_wallet);
-
-                            //check the version number of the wallet
-                            if (parse_wallet['version'] === '1') {
-                                const hash1 = crypto.createHash('sha256');
-                                const hash2 = crypto.createHash('sha256');
-
-                                //hash the wallet on the path
-                                hash1.update(decrypted_wallet);
-
-                                //hash the wallet in localstorage
-                                hash2.update(localStorage.getItem('wallet'));
-
-                                //check that both hashes the active wallet and encrypted wallet are identical
-                                if (hash1.toString() === hash2.toString()) {
-                                    var password = new_pass;
-
-                                    //encrypt the wallet data with the new password
-                                    var encrypted_wallet = encrypt(decrypted_wallet, algorithm, password);
-
-                                    //write the new file to the path
-                                    fs.writeFile(localStorage.getItem('wallet_path'), encrypted_wallet, (err) => {
-                                        if (err) {
-                                            this.setState({
-                                                info_popup: true,
-                                                info_text: 'There was a problem writing the new encrypted file to disk'
-                                            });
-                                        } else {
-                                            //set the active password and wallet to the new file
-                                            localStorage.setItem('password', new_pass);
-                                            localStorage.setItem('wallet', decrypted_wallet);
-                                            this.setState({
-                                                info_popup: true,
-                                                info_text: 'Password has been changed. Write it down, keep it safe.'
-                                            });
-                                            document.getElementById('old_pass').value = '';
-                                            document.getElementById('new_pass').value = '';
-                                            document.getElementById('repeat_pass').value = '';
-                                        }
-                                    });
-                                }
-                            } else {
-                                this.setState({
-                                    info_popup: true,
-                                    info_text: 'Wrong password'
-                                });
-                                this.wrongOldPassword();
-                            }
-                        } catch (e) {
-                            this.setState({
-                                info_popup: true,
-                                info_text: 'Wrong password'
-                            });
-                            this.wrongOldPassword();
-                        }
+                        // Failed to load wallet
+                        console.error(err);
+                        this.openMainAlertPopup(err.message);
+                        this.wrongOldPassword();
                     }
                 });
             } else {
@@ -1380,7 +1351,11 @@ export default class Wallet extends React.Component {
 
     closeSettingsModal() {
         this.setState({
+            sidebar_open: false,
             settings_active: false,
+
+            // Close Settings Form Popup
+            info_popup: false
         });
     }
 
@@ -1394,6 +1369,8 @@ export default class Wallet extends React.Component {
 
     closeCoinModal() {
         this.setState({
+            sidebar_open: false,
+
             send_overflow_active: false,
             send_to: '',
             send_keys: {
@@ -1413,6 +1390,7 @@ export default class Wallet extends React.Component {
     closeSuccessModal(e) {
         e.preventDefault();
         this.setState({
+            sidebar_open: false,
             transaction_sent: false,
 
             // Close Coin Modal
@@ -1439,6 +1417,7 @@ export default class Wallet extends React.Component {
     openSettingsModal(e) {
         e.preventDefault();
         this.setState({
+            sidebar_open: true,
             settings_active: true,
 
             // Close Success Modal
@@ -1809,10 +1788,7 @@ export default class Wallet extends React.Component {
 
             fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
                 if (err) {
-                    this.setState({
-                        main_alert_popup: true,
-                        main_alert_popup_text: "Problem communicating to the wallet file.",
-                    });
+                    this.openMainAlertPopup('Problem communicating to the wallet file.');
                 } else {
                     localStorage.setItem('wallet', JSON.stringify(json));
                     try {
@@ -1831,19 +1807,13 @@ export default class Wallet extends React.Component {
                             is_loading: false
                         });
                     } catch (e) {
-                        this.setState({
-                            main_alert_popup: true,
-                            main_alert_popup_text: "An error adding a key to the wallet. Please contact team@safex.io",
-                        });
+                        this.openMainAlertPopup('An error adding a key to the wallet. Please contact team@safex.io');
                     }
 
                 }
             });
         } catch (e) {
-            this.setState({
-                main_alert_popup: true,
-                main_alert_popup_text: "Error parsing the wallet data.",
-            });
+            this.openMainAlertPopup('Error parsing the wallet data.');
         }
         this.setState({
             transfer_key_to_archive: true,
@@ -1875,10 +1845,7 @@ export default class Wallet extends React.Component {
 
             fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
                 if (err) {
-                    this.setState({
-                        main_alert_popup: true,
-                        main_alert_popup_text: "Problem communicating to the wallet file.",
-                    });
+                    this.openMainAlertPopup('Problem communicating to the wallet file.');
                 } else {
                     localStorage.setItem('wallet', JSON.stringify(json));
                     try {
@@ -1898,18 +1865,12 @@ export default class Wallet extends React.Component {
                         });
                         this.prepareDisplay(json.keys[index]);
                     } catch (e) {
-                        this.setState({
-                            main_alert_popup: true,
-                            main_alert_popup_text: "An error occured while adding a key to the wallet. Please contact team@safex.io",
-                        });
+                        this.openMainAlertPopup('An error occured while adding a key to the wallet. Please contact team@safex.io');
                     }
                 }
             });
         } catch (e) {
-            this.setState({
-                main_alert_popup: true,
-                main_alert_popup_text: "Error parsing the wallet data",
-            });
+            this.openMainAlertPopup('Error parsing the wallet data');
         }
         this.setState({
             transfer_key_to_home: true,
@@ -1962,6 +1923,7 @@ export default class Wallet extends React.Component {
     openDividendModal(e) {
         e.preventDefault();
         this.setState({
+            sidebar_open: true,
             dividend_active: true,
 
             // Close Success Modal
@@ -1989,6 +1951,7 @@ export default class Wallet extends React.Component {
 
     closeDividendModal() {
         this.setState({
+            sidebar_open: false,
             dividend_active: false
         });
     }
@@ -1996,6 +1959,7 @@ export default class Wallet extends React.Component {
     openAffiliateModal(e) {
         e.preventDefault();
         this.setState({
+            sidebar_open: true,
             affiliate_active: true,
 
             // Close Success Modal
@@ -2023,6 +1987,7 @@ export default class Wallet extends React.Component {
 
     closeAffiliateModal() {
         this.setState({
+            sidebar_open: false,
             affiliate_active: false
         });
     }
@@ -2066,36 +2031,15 @@ export default class Wallet extends React.Component {
     }
 
     wrongOldPassword() {
-        this.setState({
-            wrong_old_password: true
-        });
-        setTimeout(() => {
-            this.setState({
-                wrong_old_password: false
-            });
-        }, 1000)
+        flashField(this, 'wrongOldPassword');
     }
 
     wrongNewPassword() {
-        this.setState({
-            wrong_new_password: true
-        });
-        setTimeout(() => {
-            this.setState({
-                wrong_new_password: false
-            });
-        }, 1000)
+        flashField(this, 'wrongNewPassword');
     }
 
     wrongRepeatPassword() {
-        this.setState({
-            wrong_repeat_password: true
-        });
-        setTimeout(() => {
-            this.setState({
-                wrong_repeat_password: false
-            });
-        }, 1000)
+        flashField(this, 'wrongRepeatPassword');
     }
 
     saveLabel(e) {
@@ -2106,6 +2050,10 @@ export default class Wallet extends React.Component {
 
     editLabel(label, key) {
         // console.log(label, key);
+    }
+
+    openMainAlertPopup(message) {
+        openMainAlert(this, message)
     }
 
     render() {
@@ -2438,7 +2386,7 @@ export default class Wallet extends React.Component {
                     </div>
                 </div>
 
-                <div className='container keys-container'>
+                <div className="container keys-container fadeIn">
                     <div className={this.state.settings_active || this.state.send_overflow_active || this.state.dividend_active || this.state.affiliate_active
                         ? 'col-xs-12 sidebar-opened keys-wrap fadeIn'
                         : 'col-xs-12 keys-wrap fadeIn'}>
@@ -2460,247 +2408,242 @@ export default class Wallet extends React.Component {
                     </div>
                 </div>
 
-                <div className={this.state.send_overflow_active && this.state.transaction_sent === false
+                <div className={this.state.sidebar_open
                     ? 'overflow sendModal active'
                     : 'overflow sendModal'}>
-                    <form className="container" onSubmit={this.sendCoins}>
-                        <div className="head">
-                            <h3>Sending </h3>
-                            <span className="close" onClick={this.closeCoinModal}>X</span>
-                        </div>
-                        <div className="currency">
-                            <span>Currency:</span>
-                            <img className={this.state.send_coin === 'safex'
-                                ? 'coin'
-                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                 onClick={this.sendCoinChoose.bind(this, 'safex')}
-                                 src="images/coin-white.png" alt="Safex Coin"/>
-                            <img className={this.state.send_coin === 'btc'
-                                ? 'coin'
-                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                 onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
-                                 alt="Bitcoin Coin"/>
-                        </div>
-                        <div className="input-group">
-                            <label htmlFor="from">From:</label>
-                            <textarea name="from" className="form-control" readOnly aria-describedby="basic-addon1" value={this.state.send_keys.public_key}>
-                            </textarea>
-                        </div>
-                        <div className="input-group">
-                            <label htmlFor="destination">To:</label>
-                            <textarea name="destination" className="form-control" readOnly aria-describedby="basic-addon1" value={this.state.send_to}>
-                            </textarea>
-                        </div>
-                        <input type="hidden" readOnly name="private_key"
-                            value={this.state.send_keys.private_key} />
-                        <input type="hidden" readOnly name="public_key"
-                            value={this.state.send_keys.public_key} />
-                        <div className="form-group">
-                            <label htmlFor="amount">Amount:</label>
-                            <input readOnly name="amount" value={this.state.send_amount}/>
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="fee">Fee(BTC):</label>
-                            <input readOnly name="fee" value={this.state.send_fee}/>
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="total">Total:</label>
-                            <input readOnly name="total" value={this.state.send_total} />
-                        </div>
-                        <button className="confirm-btn button-shine-green" type="submit" disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
-                            {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}
-                        </button>
-                    </form>
-                </div>
-                <div className={this.state.transaction_sent
-                    ? 'overflow sendModal active'
-                    : 'overflow sendModal'}>
-                    <form className="container" onSubmit={this.closeSuccessModal}>
-                        <div className="head">
-                            <h3>Sent </h3>
-                            <span className="close" onClick={this.closeSuccessModal}>X</span>
-                        </div>
-                        <div className="currency">
-                            <span>Currency:</span>
-                            <img className={this.state.send_coin === 'safex'
-                                ? 'coin'
-                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                onClick={this.sendCoinChoose.bind(this, 'safex')}
-                                src="images/coin-white.png" alt="Safex Coin"/>
-                            <img className={this.state.send_coin === 'btc'
-                                ? 'coin'
-                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
-                                alt="Bitcoin Coin"/>
-                        </div>
-                        <div className="input-group">
-                            <label htmlFor="from">From:</label>
-                            <textarea name="from" className="form-control" readOnly
-                                value={this.state.send_keys.public_key} placeholder="Address"
-                                aria-describedby="basic-addon1">
-                            </textarea>
-                        </div>
-                        <div className="input-group">
-                            <label htmlFor="destination">To:</label>
-                            <textarea name="destination" className="form-control" readOnly
-                                value={this.state.send_to} placeholder="Address"
-                                aria-describedby="basic-addon1">
-                            </textarea>
-                        </div>
-                        <div className="input-group">
-                            <label htmlFor="txid">TX ID:</label>
-                            <textarea name="txid" className="form-control" readOnly
-                                value={this.state.txid}  placeholder="Address"
-                                aria-describedby="basic-addon1" rows="3">
-                            </textarea>
-                        </div>
-                        <input type="hidden" readOnly name="private_key"
-                           value={this.state.send_keys.private_key} />
-                        <input type="hidden" readOnly name="public_key"
-                           value={this.state.send_keys.public_key} />
-                        <div className="form-group">
-                            <label htmlFor="amount">Amount:</label>
-                            <input readOnly name="amount" value={this.state.send_amount} />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="fee">Fee(BTC):</label>
-                            <input readOnly name="fee" value={this.state.send_fee} />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="total">Total:</label>
-                            <input readOnly name="total" value={this.state.send_total} />
-                        </div>
-                        <button type="submit" className="sent-close button-shine">Close</button>
-                    </form>
-                </div>
-                <div className={this.state.settings_active && this.state.send_overflow_active === false
-                    ? 'overflow sendModal settingsModal active'
-                    : 'overflow sendModal settingsModal'}>
-                    <div className="container form-wrap">
-                        <div className="head">
-                            <img src="images/mixer.png" alt="Transfer Icon"/>
-                            <h3>
-                                User<br />
-                                Settings
-                            </h3>
-                            <span className="close" onClick={this.closeSettingsModal}>X</span>
-                        </div>
-
-                        <form onSubmit={this.changePassword} onChange={this.closeSettingsInfoPopup}>
-                            <div className="form-group">
-                                <label htmlFor="old_pass">Old Password:</label>
-                                {
-                                    this.state.wrong_old_password
-                                    ?
-                                        <input type="password" className="form-control shake password-input" id="old_pass" name="old_pass" />
-                                    :
-                                        <input type="password" className="form-control password-input" id="old_pass" name="old_pass" />
-                                }
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="new_pass">New Password:</label>
-                                {
-                                    this.state.wrong_new_password
-                                    ?
-                                        <input type="password" className="form-control shake password-input" id="new_pass" name="new_pass" />
-                                    :
-                                        <input type="password" className="form-control password-input" id="new_pass" name="new_pass" />
-                                }
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="repeat_pass">Repeat Password:</label>
-                                {
-                                    this.state.wrong_repeat_password
-                                    ?
-                                        <input type="password" className="form-control shake password-input" id="repeat_pass" name="repeat_pass" />
-                                    :
-                                        <input type="password" className="form-control password-input" id="repeat_pass" name="repeat_pass" />
-                                }
-                            </div>
-                            <div className="col-xs-12 submit-wrap">
-                                <div className="row">
-                                    <button className="reset-btn button-shine" type="reset" onClick={this.resetSettingsForm}>Reset</button>
-                                    <button className="submit-btn button-shine-green" type="submit">Submit</button>
+                    {
+                        this.state.send_overflow_active && this.state.transaction_sent === false
+                        ?
+                            <form className="container transactionBeingSent" onSubmit={this.sendCoins}>
+                                <div className="head">
+                                    <h3>Sending </h3>
+                                    <span className="close" onClick={this.closeCoinModal}>X</span>
                                 </div>
-                                <div className="info-wrap">
-                                    <div className={this.state.info_popup
-                                        ? 'info-text active'
-                                        : 'info-text'}>
-                                        <p>{this.state.info_text}</p>
-                                        <span className="close" onClick={this.closeSettingsInfoPopup}>X</span>
+                                <div className="currency">
+                                    <span>Currency:</span>
+                                    <img className={this.state.send_coin === 'safex'
+                                        ? 'coin'
+                                        : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
+                                         onClick={this.sendCoinChoose.bind(this, 'safex')}
+                                         src="images/coin-white.png" alt="Safex Coin"/>
+                                    <img className={this.state.send_coin === 'btc'
+                                        ? 'coin'
+                                        : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
+                                         onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
+                                         alt="Bitcoin Coin"/>
+                                </div>
+                                <div className="input-group">
+                                    <label htmlFor="from">From:</label>
+                                    <textarea name="from" className="form-control" readOnly aria-describedby="basic-addon1" value={this.state.send_keys.public_key}>
+                            </textarea>
+                                </div>
+                                <div className="input-group">
+                                    <label htmlFor="destination">To:</label>
+                                    <textarea name="destination" className="form-control" readOnly aria-describedby="basic-addon1" value={this.state.send_to}>
+                            </textarea>
+                                </div>
+                                <input type="hidden" readOnly name="private_key"
+                                       value={this.state.send_keys.private_key} />
+                                <input type="hidden" readOnly name="public_key"
+                                       value={this.state.send_keys.public_key} />
+                                <div className="form-group">
+                                    <label htmlFor="amount">Amount:</label>
+                                    <input readOnly name="amount" value={this.state.send_amount}/>
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="fee">Fee(BTC):</label>
+                                    <input readOnly name="fee" value={this.state.send_fee}/>
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="total">Total:</label>
+                                    <input readOnly name="total" value={this.state.send_total} />
+                                </div>
+                                <button className="confirm-btn button-shine-green" type="submit" disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
+                                    {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}
+                                </button>
+                            </form>
+                        :
+                            <div></div>
+                    }
+                    {   this.state.transaction_sent
+                        ?
+                            <form className="container transactionSent" onSubmit={this.closeSuccessModal}>
+                                <div className="head">
+                                    <h3>Sent </h3>
+                                    <span className="close" onClick={this.closeSuccessModal}>X</span>
+                                </div>
+                                <div className="currency">
+                                    <span>Currency:</span>
+                                    <img className={this.state.send_coin === 'safex'
+                                        ? 'coin'
+                                        : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
+                                         onClick={this.sendCoinChoose.bind(this, 'safex')}
+                                         src="images/coin-white.png" alt="Safex Coin"/>
+                                    <img className={this.state.send_coin === 'btc'
+                                        ? 'coin'
+                                        : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
+                                         onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
+                                         alt="Bitcoin Coin"/>
+                                </div>
+                                <div className="input-group">
+                                    <label htmlFor="from">From:</label>
+                                    <textarea name="from" className="form-control" readOnly
+                                        value={this.state.send_keys.public_key} placeholder="Address"
+                                        aria-describedby="basic-addon1">
+                            </textarea>
+                                </div>
+                                <div className="input-group">
+                                    <label htmlFor="destination">To:</label>
+                                    <textarea name="destination" className="form-control" readOnly
+                                        value={this.state.send_to} placeholder="Address"
+                                        aria-describedby="basic-addon1">
+                            </textarea>
+                                </div>
+                                <div className="input-group">
+                                    <label htmlFor="txid">TX ID:</label>
+                                    <textarea name="txid" className="form-control" readOnly
+                                        value={this.state.txid}  placeholder="Address"
+                                        aria-describedby="basic-addon1" rows="3">
+                            </textarea>
+                                </div>
+                                <input type="hidden" readOnly name="private_key"
+                                       value={this.state.send_keys.private_key} />
+                                <input type="hidden" readOnly name="public_key"
+                                       value={this.state.send_keys.public_key} />
+                                <div className="form-group">
+                                    <label htmlFor="amount">Amount:</label>
+                                    <input readOnly name="amount" value={this.state.send_amount} />
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="fee">Fee(BTC):</label>
+                                    <input readOnly name="fee" value={this.state.send_fee} />
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="total">Total:</label>
+                                    <input readOnly name="total" value={this.state.send_total} />
+                                </div>
+                                <button type="submit" className="sent-close button-shine">Close</button>
+                            </form>
+                        :
+                            <div></div>
+                    }
+                    {
+                        this.state.settings_active && this.state.send_overflow_active === false
+                        ?
+                            <div className="container form-wrap settingsModal">
+                                <div className="head">
+                                    <img src="images/mixer.png" alt="Transfer Icon"/>
+                                    <h3>
+                                        User<br />
+                                        Settings
+                                    </h3>
+                                    <span className="close" onClick={this.closeSettingsModal}>X</span>
+                                </div>
+
+                                <form onSubmit={this.changePassword} onChange={this.closeSettingsInfoPopup}>
+                                    <div className="form-group">
+                                        <label htmlFor="old_pass">Old Password:</label>
+                                        <input type="password" className={this.state.wrongOldPassword ? 'form-control shake password-input' : 'form-control password-input'} id="old_pass" name="old_pass" />
                                     </div>
-                                </div>
+                                    <div className="form-group">
+                                        <label htmlFor="new_pass">New Password:</label>
+                                        <input type="password" className={this.state.wrongNewPassword ? 'form-control shake password-input' : 'form-control password-input'} id="new_pass" name="new_pass" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="repeat_pass">Repeat Password:</label>
+                                        <input type="password" className={this.state.wrongRepeatPassword ? 'form-control shake password-input' : 'form-control password-input'} id="repeat_pass" name="repeat_pass" />
+                                    </div>
+                                    <div className="col-xs-12 submit-wrap">
+                                        <div className="row">
+                                            <button className="reset-btn button-shine" type="reset" onClick={this.resetSettingsForm}>Reset</button>
+                                            <button className="submit-btn button-shine-green" type="submit">Submit</button>
+                                        </div>
+                                        <div className="info-wrap">
+                                            <div className={this.state.info_popup
+                                                ? 'info-text active'
+                                                : 'info-text'}>
+                                                <p>{this.state.info_text}</p>
+                                                <span className="close" onClick={this.closeSettingsInfoPopup}>X</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                                <button className="keys-btn button-shine" onClick={this.openExportEncryptedWallet}>Export Encrypted Wallet <span className="blue-text">(.dat)</span></button>
+                                <button className="keys-btn button-shine" onClick={this.openExportUnencryptedWalletPopup}>Export Unencrypted Keys</button>
+                                <button className="logout-btn button-shine-red" onClick={this.logout}>Logout</button>
                             </div>
-                        </form>
-                        <button className="keys-btn button-shine" onClick={this.openExportEncryptedWallet}>Export Encrypted Wallet <span className="blue-text">(.dat)</span></button>
-                        <button className="keys-btn button-shine" onClick={this.openExportUnencryptedWalletPopup}>Export Unencrypted Keys</button>
-                        <button className="logout-btn button-shine-red" onClick={this.logout}>Logout</button>
-                    </div>
-                </div>
-                <div className={this.state.dividend_active
-                    ? 'overflow sendModal dividendModal active'
-                    : 'overflow sendModal dividendModal'}>
-                    <form className="container" onChange={this.safexDividendOnChange.bind(this)}>
-                        <div className="head">
-                            <img src="images/dividend-logo.png" alt="Transfer Icon"/>
-                            <h3>
-                                Dividend<br />
-                                Calculator
-                            </h3>
-                            <span className="close" onClick={this.closeDividendModal}>X</span>
-                        </div>
+                        :
+                            <div></div>
+                    }
+                    {
+                        this.state.dividend_active
+                        ?
+                            <form className="container" onChange={this.safexDividendOnChange.bind(this)}>
+                                <div className="head">
+                                    <img src="images/dividend-logo.png" alt="Transfer Icon"/>
+                                    <h3>
+                                        Dividend<br />
+                                        Calculator
+                                    </h3>
+                                    <span className="close" onClick={this.closeDividendModal}>X</span>
+                                </div>
 
-                        <div className="form-group">
-                            <label>
-                                Projected Marketplace Volume $
-                            </label>
-                            <input type="number" name="total_trade_volume" value={this.state.totalTradeVolume}/>
-                        </div>
-                        <div className="form-group">
-                            <label>
-                                Marketplace Fee %
-                            </label>
-                            <input type="number" name="marketplace_fee" value={this.state.marketplaceFee}/>
-                        </div>
-                        <div className="form-group">
-                            <label>
-                                Safex Market Cap $
-                            </label>
-                            <input type="number" name="safex_market_cap" value={this.state.safexMarketCap}/>
-                        </div>
-                        <div className="form-group">
-                            <label>
-                                Number of SAFEX Held
-                            </label>
-                            <input type="number" name="safex_holdings" value={this.state.safexHolding}/>
-                        </div>
-                        <div className="form-group">
-                            <label>
-                                Cost of Safex Holdings $
-                            </label>
-                            <input type="number" name="safex_holdings_by_market" value={this.state.holdingsByMarket} readOnly/>
-                        </div>
-                        <div className="form-group">
-                            <label>
-                                Annual Return on Investment %
-                            </label>
-                            <input type="number" name="safex_dividend_yield" value={isNaN(this.state.safexDividendYield) ? '0' : this.state.safexDividendYield}/>
-                        </div>
-                    </form>
-                </div>
-                <div className={this.state.affiliate_active
-                    ? 'overflow sendModal affiliateModal active'
-                    : 'overflow sendModal affiliateModal'}>
-                    <form className="container">
-                        <div className="head">
-                            <img src="images/affiliate-logo.png" alt="Transfer Icon"/>
-                            <h3>
-                                Affiliate<br />
-                                System
-                            </h3>
-                            <span className="close" onClick={this.closeAffiliateModal}>X</span>
-                        </div>
-                    </form>
+                                <div className="form-group">
+                                    <label>
+                                        Projected Marketplace Volume $
+                                    </label>
+                                    <input type="number" name="total_trade_volume" value={this.state.totalTradeVolume}/>
+                                </div>
+                                <div className="form-group">
+                                    <label>
+                                        Marketplace Fee %
+                                    </label>
+                                    <input type="number" name="marketplace_fee" value={this.state.marketplaceFee}/>
+                                </div>
+                                <div className="form-group">
+                                    <label>
+                                        Safex Market Cap $
+                                    </label>
+                                    <input type="number" name="safex_market_cap" value={this.state.safexMarketCap}/>
+                                </div>
+                                <div className="form-group">
+                                    <label>
+                                        Number of SAFEX Held
+                                    </label>
+                                    <input type="number" name="safex_holdings" value={this.state.safexHolding}/>
+                                </div>
+                                <div className="form-group">
+                                    <label>
+                                        Cost of Safex Holdings $
+                                    </label>
+                                    <input type="number" name="safex_holdings_by_market" value={this.state.holdingsByMarket} readOnly/>
+                                </div>
+                                <div className="form-group">
+                                    <label>
+                                        Annual Return on Investment %
+                                    </label>
+                                    <input type="number" name="safex_dividend_yield" value={isNaN(this.state.safexDividendYield) ? '0' : this.state.safexDividendYield}/>
+                                </div>
+                            </form>
+                        :
+                            <div></div>
+                    }
+                    {
+                        this.state.affiliate_active
+                        ?
+                            <form className="container">
+                                <div className="head">
+                                    <img src="images/affiliate-logo.png" alt="Transfer Icon"/>
+                                    <h3>
+                                        Affiliate<br />
+                                        System
+                                    </h3>
+                                    <span className="close" onClick={this.closeAffiliateModal}>X</span>
+                                </div>
+                            </form>
+                        :
+                            <div></div>
+                    }
                 </div>
                 <div className="key-buttons status fadeInUp">
                     <div className="container">

@@ -1,0 +1,235 @@
+/* Status container */
+.status {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 22, 40, 0.9);
+  border-top: 1px solid rgba(0, 126, 162, .52);
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 89px;
+  z-index: 10000;
+  animation-duration: 1s;
+  animation-delay: .8s;
+  animation-fill-mode: both;
+}
+.status .container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  height: 46px;
+}
+.status .status-left-wrap {
+  text-align: left;
+  border-radius: 0px;
+  background: transparent;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 17px;
+  padding: 0;
+  margin-right: 0;
+  width: 265px;
+}
+.status .status-left-wrap img {
+  position: relative;
+  top: -3px;
+}
+.status span {
+  padding-right: 5px;
+  letter-spacing: 1px;
+  font-size: 13px;
+  position: relative;
+  top: -3px;
+}
+.status span:first-child {
+  padding-left: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, .4);
+  text-transform: capitalize;
+  letter-spacing: 1px;
+}
+.status span.status-red:after {
+  content:"\2b24";
+  color: #f00;
+  position: relative;
+  top: -2px;
+  font-size:12px;
+  margin-left: 5px;
+}
+.status span.status-green:after {
+  content:"\2b24";
+  color: #0ec884;
+  position: relative;
+  top: -2px;
+  font-size: 12px;
+  margin-left: 5px;
+}
+.status .sync-span {
+  padding-left: 7px;
+  padding-right: 0;
+  position: relative;
+  top: -2px;
+}
+.status .import-form-wrap {
+  width: 465px;
+  border: 1px solid rgba(0, 231, 255, .44);
+  border-radius: 8px;
+  position: relative;
+  height: 46px;
+  background: url(../images/import-form-bg.png);
+  -webkit-transition: all 0.2s ease-out;
+  -moz-transition: all 0.2s ease-out;
+  transition: all 0.2s ease-out;
+}
+.status .import-form-wrap.active {
+  box-shadow: 0 0 15px 0 rgba(0, 199, 236, 0.5);
+}
+.status .import-form-wrap form {
+  width: auto;
+  position: relative;
+  height: 46px;
+  display: inline-block;
+  float: left;
+}
+.status .import-form-wrap input {
+  background: transparent;
+  color: #fff;
+  padding: 10px;
+  line-height: 24px;
+  font-size: 17px;
+  border: 0px none;
+  width: 310px;
+  position: relative;
+  top: 0px;
+  margin-right: 5px;
+}
+.import-form-wrap input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  opacity: .8;
+  color: #fff;
+}
+.import-form-wrap input::-moz-placeholder { /* Firefox 19+ */
+  opacity: .8;
+  color: #fff;
+}
+.import-form-wrap input:-moz-placeholder { /* Firefox 18- */
+  opacity: .8;
+  color: #fff;
+}
+.import-form-wrap input:-ms-input-placeholder { /* IE 10+ */
+  opacity: .8;
+  color: #fff;
+}
+.status .import-form-wrap button {
+  font-family: "Brandon Grotesque Bold", Helvetica, Arial,sans-serif;
+  border: 1px solid #327A9B;
+  background-color: #12bedd;
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 2px;
+  margin-right: 5px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  top: -1px;
+}
+.status .import-form-wrap button:hover {
+  background-color: rgba(18, 190, 221, 1);
+}
+.status .import-form-wrap .create-btn {
+  float: left;
+  display: inline-block;
+  position: relative;
+  top: 5px;
+  background: transparent;
+  border: 1px solid rgba(178, 178, 178, .44);
+  margin-left: 1px;
+  height: 34px;
+  width: 34px;
+}
+.status .import-form-wrap .create-btn img {
+  height: 20px;
+  position: relative;
+  top: -2px;
+  left: -4px;
+}
+.status .right-options {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 225px;
+  padding-left: 10px;
+}
+.status .right-options button {
+  padding: 7px;
+  background: transparent;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(178, 178, 178, .44);
+  border-radius: 5px;
+  z-index: 10000;
+}
+.status .right-options button:hover {
+  background-color: rgba(18, 190, 221, 1);
+}
+.status .right-options .settings-btn-active:hover,
+.status .right-options .aff-btn-active:hover,
+.status .right-options .dividend-btn-active:hover{
+  background-color: transparent;
+}
+.status .right-options .refresh-btn img,
+.settings img {
+  max-width: 30px;
+  height: auto;
+}
+.status .right-options .refresh-btn span {
+  display: none;
+}
+.status .right-options .refresh-btn.disabled span {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(0,0,0,0.7);
+  padding-right: 0px;
+  border-radius: 5px;
+}
+.status .right-options .refresh-btn.disabled span p {
+  line-height: 44px;
+  margin: 0;
+  position: relative;
+  left: 2px;
+  font-weight: 600;
+  font-size: 15px;
+}
+.status .right-options .refresh-btn.disabled:hover {
+  background-color: transparent;
+}
+.key-buttons > .row > .col-xs-12 {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+.key-buttons .row .col-xs-12 > button, .key-buttons .row .col-xs-12 > form {
+  display:inline-block;
+  margin-right:10px;
+  margin-bottom:10px;
+}
+.key-buttons .row .col-xs-12 > button:last-child {
+  margin-right:0;
+}
+.key-buttons .row .col-xs-12 > form{
+  flex-grow: 1;
+  display: flex;
+}
+.key-buttons .row .col-xs-12 > form > input{
+  flex-grow: 1;
+}
