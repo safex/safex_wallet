@@ -2671,11 +2671,11 @@ export default class Wallet extends React.Component {
                             {
                                 this.state.affiliate_active
                                     ?
-                                    <button className="aff-btn aff-btn-active button-shine" title="Affiliate System" onClick={this.closeAffiliateModal}>
+                                    <button className="aff-btn aff-btn-active button-shine" title="Affiliate System" onClick={this.closeAffiliateModal} disabled>
                                         <img src="images/world-blue.png" alt="World Logo"/>
                                     </button>
                                     :
-                                    <button className="aff-btn button-shine" title="Affiliate System" onClick={this.openAffiliateModal}>
+                                    <button className="aff-btn button-shine" title="Affiliate System" onClick={this.openAffiliateModal} disabled>
                                         <img src="images/world.png" alt="World Logo"/>
                                     </button>
                             }
@@ -2683,11 +2683,11 @@ export default class Wallet extends React.Component {
                             {
                                 this.state.dividend_active
                                     ?
-                                    <button className="dividend-btn dividend-btn-active button-shine" title="Dividend Calculator" onClick={this.closeDividendModal}>
+                                    <button className="dividend-btn dividend-btn-active button-shine" title="Dividend Calculator" onClick={this.closeDividendModal} disabled>
                                         <img src="images/calculator-blue.png" alt="Calculator Logo"/>
                                     </button>
                                     :
-                                    <button className="dividend-btn button-shine" title="Dividend Calculator" onClick={this.openDividendModal}>
+                                    <button className="dividend-btn button-shine" title="Dividend Calculator" onClick={this.openDividendModal} disabled>
                                         <img src="images/calculator.png" alt="Calculator Logo"/>
                                     </button>
                             }

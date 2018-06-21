@@ -98,7 +98,11 @@ export default class KeyLabel extends React.Component {
     render() {
         return (
             <div>
-                <button className="edit-label-btn" onClick={this.toggleEditing} title="Click to edit Key Label">
+                <button
+                    className="edit-label-btn"
+                    // onClick={this.toggleEditing}
+                    disabled
+                    title="Click to edit Key Label">
                     <img
                         src="images/edit.png"
                         alt="Edit Logo"
