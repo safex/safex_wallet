@@ -2390,7 +2390,7 @@ export default class Wallet extends React.Component {
                     <div className={this.state.settings_active || this.state.send_overflow_active || this.state.dividend_active || this.state.affiliate_active
                         ? 'col-xs-12 sidebar-opened keys-wrap fadeIn'
                         : 'col-xs-12 keys-wrap fadeIn'}>
-                        <div className="row">
+                        <div className={this.state.history_overflow_active ? "row row-hidden" : "row"}>
                             {table}
                         </div>
                     </div>

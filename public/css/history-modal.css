@@ -1,6 +1,6 @@
 .overflow.historyModal {
   /*background: url(../images/sidebar-bg.png);*/
-  background: #03233a;
+  /*background: rgba(3, 35, 58, .95);*/
   position: absolute;
   top: 85px;
   left: 0;
@@ -21,7 +21,8 @@
 .overflow.historyModal h3 {
   color: #fff;
   text-align: center;
-  margin-bottom: 20px;
+  margin-top: 23px;
+  margin-bottom: 17px;
 }
 .overflow.historyModal p {
   color: #fff;
@@ -120,7 +121,7 @@
   right: 90px;
   top: 35px;
   max-width: 95px;
-  opacity: .2;
+  opacity: .7;
 }
 .historyModal .close {
   color: #fff;

@@ -39,6 +39,16 @@
   -webkit-transition: width .3s;
   transition: width .3s;
 }
+.keys-container .keys-wrap .row {
+  opacity: 1;
+  transition: all ease 0.2s;
+  -o-transition: all ease 0.2s;
+  -moz-transition: all ease 0.2s;
+  -webkit-transition: all ease 0.2s;
+}
+.keys-container .keys-wrap .row.row-hidden {
+  opacity: 0;
+}
 .keys-container .keys-wrap .row:hover .key-wrap:not(.hidden-xs) {
   margin-bottom: 0;
 }
