@@ -81,7 +81,7 @@ export default class Navigation extends React.Component {
                 </div>
 
                 <div className="collapse navbar-collapse" id="navbar-collapse">
-                    <ul className="nav navbar-nav navbar-right wallet-nav">
+                    <ul className="nav navbar-nav navbar-right wallet-nav fadeIn">
                         <li>
                             <Link activeClassName="activeLink" onlyActiveOnIndex>
                                 Wallet &nbsp;v0.0.7

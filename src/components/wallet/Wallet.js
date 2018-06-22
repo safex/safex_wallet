@@ -2671,11 +2671,11 @@ export default class Wallet extends React.Component {
                             {
                                 this.state.affiliate_active
                                     ?
-                                    <button className="aff-btn aff-btn-active button-shine" title="Affiliate System" onClick={this.closeAffiliateModal} disabled>
+                                    <button className="aff-btn aff-btn-active button-shine" title="Affiliate System (Under development)" onClick={this.closeAffiliateModal} disabled>
                                         <img src="images/world-blue.png" alt="World Logo"/>
                                     </button>
                                     :
-                                    <button className="aff-btn button-shine" title="Affiliate System" onClick={this.openAffiliateModal} disabled>
+                                    <button className="aff-btn button-shine" title="Affiliate System (Under development)" onClick={this.openAffiliateModal} disabled>
                                         <img src="images/world.png" alt="World Logo"/>
                                     </button>
                             }

@@ -1,5 +1,8 @@
 .wallet-nav {
   margin-right: 160px;
+  animation-duration: 1s;
+  animation-delay: 1.9s;
+  animation-fill-mode: both;
 }
 .navbar-default {
   height: 85px;
