@@ -2683,11 +2683,11 @@ export default class Wallet extends React.Component {
                             {
                                 this.state.dividend_active
                                     ?
-                                    <button className="dividend-btn dividend-btn-active button-shine" title="Dividend Calculator" onClick={this.closeDividendModal} disabled>
+                                    <button className="dividend-btn dividend-btn-active button-shine" title="Dividend Calculator (Under development)" onClick={this.closeDividendModal} disabled>
                                         <img src="images/calculator-blue.png" alt="Calculator Logo"/>
                                     </button>
                                     :
-                                    <button className="dividend-btn button-shine" title="Dividend Calculator" onClick={this.openDividendModal} disabled>
+                                    <button className="dividend-btn button-shine" title="Dividend Calculator (Under development)" onClick={this.openDividendModal} disabled>
                                         <img src="images/calculator.png" alt="Calculator Logo"/>
                                     </button>
                             }
