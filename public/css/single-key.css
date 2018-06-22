@@ -96,6 +96,10 @@
   padding-left: 10px;
   padding-right: 7px;
 }
+.single-key button[disabled]:hover,
+.single-key html input[disabled]:hover {
+  cursor: not-allowed;
+}
 .single-key .edit-label-btn img {
   width: 16px;
   position: relative;

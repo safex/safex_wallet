@@ -178,9 +178,20 @@
 .status .right-options button:hover {
   background-color: rgba(18, 190, 221, 1);
 }
-.status .right-options .settings-btn-active:hover,
-.status .right-options .aff-btn-active:hover,
-.status .right-options .dividend-btn-active:hover{
+.status .right-options button[disabled]:hover,
+.status .right-options html input[disabled]:hover {
+  background-color: transparent;
+  cursor: not-allowed;
+  box-shadow: none !important;
+}
+.status .right-options button[disabled]:before,
+.status .right-options html input[disabled]:before {
+  box-shadow: none;
+}
+/*.status .right-options .aff-btn-active:hover,*/
+/*.status .right-options .dividend-btn-active:hover,*/
+.status .right-options .settings-btn-active:hover
+{
   background-color: transparent;
 }
 .status .right-options .refresh-btn img,

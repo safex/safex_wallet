@@ -543,31 +543,31 @@ input::-webkit-inner-spin-button {
 }
 @keyframes neon-blue {
   from {
-    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 5px #228DFF, 0 0 7px #00d1ff, 0 0 9px #00d1ff, 0 0 11px #00d1ff, 0 0 13px #00d1ff;
+    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 5px rgba(34, 141, 255, .4), 0 0 7px rgba(34, 141, 255, .4), 0 0 9px rgba(34, 141, 255, .4), 0 0 11px rgba(34, 141, 255, .4), 0 0 13px rgba(34, 141, 255, .4);
   }
   to {
-    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 4px #228DFF, 0 0 5px #00d1ff, 0 0 6px #00d1ff, 0 0 7px #00d1ff, 0 0 8px #00d1ff;
+    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 5px #228DFF, 0 0 7px #00d1ff, 0 0 9px #00d1ff, 0 0 1px #00d1ff, 0 0 13px #00d1ff;
   }
 }
 @-moz-keyframes neon-blue {
   from {
-    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 5px #228DFF, 0 0 7px #00d1ff, 0 0 9px #00d1ff, 0 0 11px #00d1ff, 0 0 13px #00d1ff;
+    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 5px rgba(34, 141, 255, .4), 0 0 7px rgba(34, 141, 255, .4), 0 0 9px rgba(34, 141, 255, .4), 0 0 11px rgba(34, 141, 255, .4), 0 0 13px rgba(34, 141, 255, .4);
   }
   to {
-    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 4px #228DFF, 0 0 5px #00d1ff, 0 0 6px #00d1ff, 0 0 7px #00d1ff, 0 0 8px #00d1ff;
+    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 5px #228DFF, 0 0 7px #00d1ff, 0 0 9px #00d1ff, 0 0 1px #00d1ff, 0 0 13px #00d1ff;
   }
 }
 @-webkit-keyframes neon-blue {
   from {
-    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 5px #228DFF, 0 0 7px #00d1ff, 0 0 9px #00d1ff, 0 0 11px #00d1ff, 0 0 13px #00d1ff;
+    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 5px rgba(34, 141, 255, .4), 0 0 7px rgba(34, 141, 255, .4), 0 0 9px rgba(34, 141, 255, .4), 0 0 11px rgba(34, 141, 255, .4), 0 0 13px rgba(34, 141, 255, .4);
   }
   to {
-    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 4px #228DFF, 0 0 5px #00d1ff, 0 0 6px #00d1ff, 0 0 7px #00d1ff, 0 0 8px #00d1ff;
+    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 5px #228DFF, 0 0 7px #00d1ff, 0 0 9px #00d1ff, 0 0 1px #00d1ff, 0 0 13px #00d1ff;
   }
 }
 @keyframes neon-green {
   from {
-    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 5px #0ec8c1, 0 0 7px #0ec8c1, 0 0 9px #0ec8c1, 0 0 11px #0ec8c1, 0 0 13px #0ec8c1;
+    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 5px rgba(14, 200, 193, .4), 0 0 7px rgba(14, 200, 193, .4), 0 0 9px rgba(14, 200, 193, .4), 0 0 11px rgba(14, 200, 193, .4), 0 0 13px rgba(14, 200, 193, .4);
   }
   to {
     text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 4px #0ec8c1, 0 0 5px #0ec8c1, 0 0 6px #0ec8c1, 0 0 7px #0ec8c1, 0 0 8px #0ec8c1;
@@ -575,7 +575,7 @@ input::-webkit-inner-spin-button {
 }
 @-moz-keyframes neon-green {
   from {
-    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 5px #0ec8c1, 0 0 7px #0ec8c1, 0 0 9px #0ec8c1, 0 0 11px #0ec8c1, 0 0 13px #0ec8c1;
+    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 5px rgba(14, 200, 193, .4), 0 0 7px rgba(14, 200, 193, .4), 0 0 9px rgba(14, 200, 193, .4), 0 0 11px rgba(14, 200, 193, .4), 0 0 13px rgba(14, 200, 193, .4);
   }
   to {
     text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 4px #0ec8c1, 0 0 5px #0ec8c1, 0 0 6px #0ec8c1, 0 0 7px #0ec8c1, 0 0 8px #0ec8c1;
@@ -583,7 +583,7 @@ input::-webkit-inner-spin-button {
 }
 @-webkit-keyframes neon-green {
   from {
-    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 5px #0ec8c1, 0 0 7px #0ec8c1, 0 0 9px #0ec8c1, 0 0 11px #0ec8c1, 0 0 13px #0ec8c1;
+    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 5px rgba(14, 200, 193, .4), 0 0 7px rgba(14, 200, 193, .4), 0 0 9px rgba(14, 200, 193, .4), 0 0 11px rgba(14, 200, 193, .4), 0 0 13px rgba(14, 200, 193, .4);
   }
   to {
     text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 4px #0ec8c1, 0 0 5px #0ec8c1, 0 0 6px #0ec8c1, 0 0 7px #0ec8c1, 0 0 8px #0ec8c1;
