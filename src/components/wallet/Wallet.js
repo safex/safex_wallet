@@ -1241,6 +1241,7 @@ export default class Wallet extends React.Component {
                         public_key: e.target.public_key.value,
                         private_key: e.target.private_key.value
                     },
+                    settings_active: false,
                     dividend_active: false,
                     affiliate_active: false,
                     send_receive_popup: false,
@@ -1419,6 +1420,9 @@ export default class Wallet extends React.Component {
         this.setState({
             sidebar_open: true,
             settings_active: true,
+
+            // Close Send Coin Modal
+            transaction_being_sent: false,
 
             // Close Success Modal
             transaction_sent: false,
