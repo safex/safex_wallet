@@ -1160,76 +1160,132 @@ export default class Wallet extends React.Component {
             }
         });
 
-        if ((this.state.send_coin === 'safex' && this.state.send_fee > key_btc_bal) | (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal)) {
-            this.setState({
-                sidebar_open: false,
-                send_receive_popup: true,
-                send_receive_info: 'You do not have enough BITCOIN to cover the fee',
-                send_overflow_active: false,
-                settings_active: false,
-                affiliate_active: false,
-                dividend_active: false,
-            });
+        if ((this.state.send_coin === 'safex' && this.state.send_fee > key_btc_bal) || (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal)) {
+            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                this.setState({
+                    sidebar_open: true,
+                    send_receive_popup: true,
+                    send_receive_info: 'You do not have enough BITCOIN to cover the fee'
+                });
+            } else {
+                this.setState({
+                    sidebar_open: false,
+                    send_receive_popup: true,
+                    send_receive_info: 'You do not have enough BITCOIN to cover the fee',
+                    send_overflow_active: false,
+                    settings_active: false,
+                    affiliate_active: false,
+                    dividend_active: false,
+                });
+            }
         } else if (this.state.send_coin === 'safex' && this.state.send_amount > key_safex_bal) {
-            this.setState({
-                sidebar_open: false,
-                send_receive_popup: true,
-                send_receive_info: 'You do not have enough SAFEX to cover this transaction',
-                send_overflow_active: false,
-                settings_active: false,
-                affiliate_active: false,
-                dividend_active: false,
-            });
+            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                this.setState({
+                    sidebar_open: true,
+                    send_receive_popup: true,
+                    send_receive_info: 'You do not have enough SAFEX to cover this transaction'
+                });
+            } else {
+                this.setState({
+                    sidebar_open: false,
+                    send_receive_popup: true,
+                    send_receive_info: 'You do not have enough SAFEX to cover this transaction',
+                    send_overflow_active: false,
+                    settings_active: false,
+                    affiliate_active: false,
+                    dividend_active: false,
+                });
+            }
         } else if (this.state.send_coin === 'safex' && (this.state.send_amount === '' || this.state.send_amount === 0 || isNaN(this.state.send_amount))) {
-            this.setState({
-                sidebar_open: false,
-                send_receive_popup: true,
-                send_receive_info: 'Invalid SAFEX amount',
-                send_overflow_active: false,
-                settings_active: false,
-                affiliate_active: false,
-                dividend_active: false,
-            })
+            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                this.setState({
+                    sidebar_open: true,
+                    send_receive_popup: true,
+                    send_receive_info: 'Invalid SAFEX amount'
+                });
+            } else {
+                this.setState({
+                    sidebar_open: false,
+                    send_receive_popup: true,
+                    send_receive_info: 'Invalid SAFEX amount',
+                    send_overflow_active: false,
+                    settings_active: false,
+                    affiliate_active: false,
+                    dividend_active: false,
+                })
+            }
         } else if (this.state.send_coin === 'btc' && (this.state.send_amount === '' || parseFloat(this.state.send_amount) === 0 || isNaN(this.state.send_total))) {
-            this.setState({
-                sidebar_open: false,
-                send_receive_popup: true,
-                send_receive_info: 'Invalid BITCOIN amount',
-                send_overflow_active: false,
-                settings_active: false,
-                affiliate_active: false,
-                dividend_active: false,
-            })
+            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                this.setState({
+                    sidebar_open: true,
+                    send_receive_popup: true,
+                    send_receive_info: 'Invalid BITCOIN amount'
+                });
+            } else {
+                this.setState({
+                    sidebar_open: false,
+                    send_receive_popup: true,
+                    send_receive_info: 'Invalid BITCOIN amount',
+                    send_overflow_active: false,
+                    settings_active: false,
+                    affiliate_active: false,
+                    dividend_active: false,
+                })
+            }
         } else if (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal) {
-            this.setState({
-                sidebar_open: false,
-                send_receive_popup: true,
-                send_receive_info: 'You do not have enough BITCOIN to cover this transaction',
-                send_overflow_active: false,
-                settings_active: false,
-                affiliate_active: false,
-                dividend_active: false,
-            });
+            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                this.setState({
+                    sidebar_open: true,
+                    send_receive_popup: true,
+                    send_receive_info: 'You do not have enough BITCOIN to cover this transaction'
+                });
+            } else {
+                this.setState({
+                    sidebar_open: false,
+                    send_receive_popup: true,
+                    send_receive_info: 'You do not have enough BITCOIN to cover this transaction',
+                    send_overflow_active: false,
+                    settings_active: false,
+                    affiliate_active: false,
+                    dividend_active: false,
+                });
+            }
         } else if (e.target.destination.value === '') {
-            this.setState({
-                sidebar_open: false,
-                send_receive_popup: true,
-                send_receive_info: 'Destination field is empty',
-                send_overflow_active: false,
-                settings_active: false,
-                affiliate_active: false,
-                dividend_active: false,
-            });
+            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                this.setState({
+                    sidebar_open: true,
+                    send_receive_popup: true,
+                    send_receive_info: 'Destination field is empty'
+                });
+            } else {
+                this.setState({
+                    sidebar_open: false,
+                    send_receive_popup: true,
+                    send_receive_info: 'Destination field is empty',
+                    send_overflow_active: false,
+                    settings_active: false,
+                    affiliate_active: false,
+                    dividend_active: false,
+                });
+            }
         } else if (e.target.destination.value === e.target.public_key.value) {
-            this.setState({
-                sidebar_open: false,
-                send_receive_popup: true,
-                send_receive_info: 'Invalid sending address',
-                send_overflow_active: false,
-                settings_active: false,
-                affiliate_active: false,
-                dividend_active: false,
-            });
+            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                this.setState({
+                    sidebar_open: true,
+                    send_receive_popup: true,
+                    send_receive_info: 'Invalid sending address'
+                });
+            } else {
+                this.setState({
+                    sidebar_open: false,
+                    send_receive_popup: true,
+                    send_receive_info: 'Invalid sending address',
+                    send_overflow_active: false,
+                    settings_active: false,
+                    affiliate_active: false,
+                    dividend_active: false,
+                });
+            }
         } else {
             try {
                 bitcore.Address.fromString(e.target.destination.value);
@@ -1248,15 +1304,23 @@ export default class Wallet extends React.Component {
                     send_receive_info: ''
                 })
             } catch (e) {
-                this.setState({
-                    sidebar_open: false,
-                    send_receive_popup: true,
-                    send_receive_info: 'Destination address is invalid',
-                    send_overflow_active: false,
-                    settings_active: false,
-                    affiliate_active: false,
-                    dividend_active: false,
-                });
+                if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                    this.setState({
+                        sidebar_open: true,
+                        send_receive_popup: true,
+                        send_receive_info: 'Destination address is invalid'
+                    });
+                } else {
+                    this.setState({
+                        sidebar_open: false,
+                        send_receive_popup: true,
+                        send_receive_info: 'Destination address is invalid',
+                        send_overflow_active: false,
+                        settings_active: false,
+                        affiliate_active: false,
+                        dividend_active: false,
+                    });
+                }
             }
         }
     }
