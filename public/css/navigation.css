@@ -103,6 +103,9 @@
 .wallet-tabs .btn.active {
   background: rgba(18, 190, 221, .4);
   border: 1px solid #00e7ff;
+  -webkit-transition: all 0.2s ease-out;
+  -moz-transition: all 0.2s ease-out;
+  transition: all 0.2s ease-out;
 }
 .wallet-tabs .btn.glow-active {
   background: rgba(0, 231, 255, .9);

@@ -93,13 +93,17 @@ input::-webkit-inner-spin-button {
   color: #00c7ec;
   border: 1px solid #00c7ec;
   border-radius: 5px;
-  box-shadow: 0 0 0 0 transparent;
+  -webkit-box-shadow: 0 0 0 0 transparent !important;
+  -moz-box-shadow: 0 0 0 0 transparent !important;
+  box-shadow: 0 0 0 0 transparent !important;
   -webkit-transition: all 0.2s ease-in;
   -moz-transition: all 0.2s ease-in;
   transition: all 0.2s ease-in;
 }
 .button-shine:hover {
   color: white;
+  -webkit-box-shadow: 0 0 30px 0 rgba(0, 199, 236, 0.5) !important;
+  -moz-box-shadow: 0 0 30px 0 rgba(0, 199, 236, 0.5) !important;
   box-shadow: 0 0 30px 0 rgba(0, 199, 236, 0.5) !important;
   -webkit-transition: all 0.2s ease-out;
   -moz-transition: all 0.2s ease-out;
