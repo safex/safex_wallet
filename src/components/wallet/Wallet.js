@@ -2032,10 +2032,6 @@ export default class Wallet extends React.Component {
         openMainAlert(this, message)
     }
 
-    openMainAlertPopup(message) {
-        openMainAlert(this, message)
-    }
-
     setCoinModalOpenSettings(alert) {
         coinModalOpenSettings(this, alert)
     }
