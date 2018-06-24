@@ -177,6 +177,31 @@ function walletResetModalStep(target, step, closedStep, alert) {
     });
 }
 
+/**
+ * Send Coins validation settings when sidebar is opened
+ */
+function coinModalOpenSettings(target, alert) {
+    target.setState({
+        sidebar_open: true,
+        send_receive_popup: true,
+        send_receive_info: alert
+    });
+}
+
+/**
+ * Send Coins validation settings when sidebar is closed
+ */
+function coinModalClosedSettings(target, alert) {
+    target.setState({
+        sidebar_open: false,
+        send_receive_popup: true,
+        send_receive_info: alert,
+        send_overflow_active: false,
+        settings_active: false,
+        affiliate_active: false,
+        dividend_active: false,
+    });
+}
 
 module.exports = {
     WALLET_FILENAME,
@@ -189,5 +214,7 @@ module.exports = {
     openMainAlert,
     walletImportAlert,
     walletResetModal,
-    walletResetModalStep
+    walletResetModalStep,
+    coinModalOpenSettings,
+    coinModalClosedSettings
 };
