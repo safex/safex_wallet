@@ -2096,7 +2096,6 @@ export default class Wallet extends React.Component {
                                 <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
                                     onClick={this.openSendReceive.bind(this, key, 'send')}
                                     className={this.state.collapse_open.key === key && this.state.collapse_open.receive_open ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
-
                                     {
                                         this.state.collapse_open.key === key && this.state.collapse_open.receive_open
                                         ?
@@ -2115,7 +2114,6 @@ export default class Wallet extends React.Component {
                                             }
                                             </span>
                                     }
-
                                     <span>SEND</span>
                                 </button>
                                 <button className="receive-btn button-shine-green" onClick={this.openSendReceive.bind(this, key, 'receive')}>
@@ -2266,18 +2264,19 @@ export default class Wallet extends React.Component {
                             </div>
                             {
                                 this.state.send_overflow_active && this.state.transaction_sent === false
-                                ?
-                                    <button type="submit" className="form-send-submit button-shine">
+                                    ?
+                                    <button type="submit" className="form-send-submit button-shine"
+                                            disabled={this.state.transaction_sent ? 'disabled' : ''}>
                                         <img src="images/outgoing.png" alt="Outgoing Icon"/>
                                         Send
                                     </button>
-                                :
-                                    <button type="submit" className="form-send-submit button-shine">
+                                    :
+                                    <button type="submit" className="form-send-submit button-shine"
+                                            disabled={this.state.transaction_sent ? 'disabled' : ''}>
                                         <img src="images/outgoing-blue.png" alt="Outgoing Icon"/>
                                         Send
                                     </button>
                             }
-
                             <div className="send_receive_popup_wrap">
                                 <div className={this.state.send_receive_popup
                                     ?  'send_receive_info active'
@@ -2506,7 +2505,9 @@ export default class Wallet extends React.Component {
                                     <label htmlFor="total">Total:</label>
                                     <input readOnly name="total" value={this.state.send_total} />
                                 </div>
-                                <button type="submit" className="sent-close button-shine">Close</button>
+                                <button type="submit" className="sent-close button-shine">
+                                    Close
+                                </button>
                             </form>
                         :
                             <div></div>
