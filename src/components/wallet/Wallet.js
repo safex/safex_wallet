@@ -413,6 +413,7 @@ export default class Wallet extends React.Component {
                                 keys,
                                 source);
                         });
+                    this.refreshWallet();
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
                     this.setState({
@@ -1222,7 +1223,16 @@ export default class Wallet extends React.Component {
                     affiliate_active: false,
                     send_receive_popup: false,
                     send_receive_info: ''
-                })
+                });
+                if (this.state.transaction_sent) {
+                    if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                        document.getElementById("send-submit-btn").setAttribute('disabled', 'disabled');
+                        this.setCoinModalOpenSettings('Cannot send transaction, this key has a pending minus');
+                    } else {
+                        document.getElementById("send-submit-btn").setAttribute('disabled', 'disabled');
+                        this.setCoinModalClosedSettings('Cannot send transaction, this key has a pending minus');
+                    }
+                }
             } catch (e) {
                 if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
                     this.setCoinModalOpenSettings('Destination address is invalid');
@@ -2265,14 +2275,16 @@ export default class Wallet extends React.Component {
                             {
                                 this.state.send_overflow_active && this.state.transaction_sent === false
                                     ?
-                                    <button type="submit" className="form-send-submit button-shine"
-                                            disabled={this.state.transaction_sent ? 'disabled' : ''}>
+                                    <button type="submit"
+                                        className="form-send-submit button-shine"
+                                        id="send-submit-btn">
                                         <img src="images/outgoing.png" alt="Outgoing Icon"/>
                                         Send
                                     </button>
                                     :
-                                    <button type="submit" className="form-send-submit button-shine"
-                                            disabled={this.state.transaction_sent ? 'disabled' : ''}>
+                                    <button type="submit"
+                                        className="form-send-submit button-shine"
+                                        id="send-submit-btn">
                                         <img src="images/outgoing-blue.png" alt="Outgoing Icon"/>
                                         Send
                                     </button>
