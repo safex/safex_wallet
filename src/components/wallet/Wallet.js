@@ -633,7 +633,10 @@ export default class Wallet extends React.Component {
                     setTimeout(() => {
                         this.prepareDisplayPendingTx();
                         this.prepareDisplay();
-                    }, 2000);
+                    }, 1500);
+                    this.prepareDisplayPendingTx();
+                    this.prepareDisplay();
+                    this.closeSendReceiveModal();
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
                     if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
@@ -694,6 +697,9 @@ export default class Wallet extends React.Component {
                         this.prepareDisplayPendingTx();
                         this.prepareDisplay();
                     }, 1500);
+                    this.prepareDisplayPendingTx();
+                    this.prepareDisplay();
+                    this.closeSendReceiveModal();
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
                     if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
