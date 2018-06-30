@@ -8,10 +8,9 @@ const bitcoin = window.require('bitcoinjs-lib');
 const bitcore = window.require('bitcore-lib');
 import QRCode from 'qrcode.react';
 
-import {toHexString, encrypt, safexPayload, decrypt} from '../../utils/utils';
+import {encrypt, safexPayload} from '../../utils/utils';
 import {genkey} from '../../utils/keys';
 import {
-    decryptWalletData,
     downloadWallet,
     loadAndDecryptWalletFromFile,
     flashField,
@@ -416,19 +415,21 @@ export default class Wallet extends React.Component {
                     this.refreshWallet();
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
-                    this.setState({
-                        sidebar_open: true,
-                        transaction_being_sent: false,
-                        send_receive_popup: true,
-                        send_receive_info: 'Network communication error, please try again later'
-                    });
+                    if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                        this.setCoinModalOpenSettings('Network communication error, please try again later');
+                    } else {
+                        this.setCoinModalClosedSettings('Network communication error, please try again later');
+                    }
+                    throw 'Network communication error, please try again later';
                 }
             } catch (e) {
                 //this is triggered if the destination address is not a valid bitcoin address
-                this.setState({
-                    send_receive_popup: true,
-                    send_receive_info: 'Invalid destination address'
-                });
+                if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                    this.setCoinModalOpenSettings('Invalid destination address');
+                } else {
+                    this.setCoinModalClosedSettings('Invalid destination address');
+                }
+                throw 'Invalid destination address';
             }
 
             //if safex is not selected then it must be Bitcoin
@@ -468,21 +469,24 @@ export default class Wallet extends React.Component {
                                 keys,
                                 source);
                         });
+                    this.refreshWallet();
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
-                    this.setState({
-                        sidebar_open: true,
-                        transaction_being_sent: false,
-                        send_receive_popup: true,
-                        send_receive_info: 'Network communication error, please try again later'
-                    });
+                    if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                        this.setCoinModalOpenSettings('Network communication error, please try again later');
+                    } else {
+                        this.setCoinModalClosedSettings('Network communication error, please try again later');
+                    }
+                    throw 'Network communication error, please try again later';
                 }
             } catch (e) {
                 //this is triggered if the destination address is not a valid bitcoin address
-                this.setState({
-                    send_receive_popup: true,
-                    send_receive_info: 'Invalid destination address'
-                });
+                if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                    this.setCoinModalOpenSettings('Invalid destination address');
+                } else {
+                    this.setCoinModalClosedSettings('Invalid destination address');
+                }
+                throw 'Invalid destination address';
             }
         }
     }
@@ -524,6 +528,10 @@ export default class Wallet extends React.Component {
                     transaction_being_sent: false,
                     txid: resp,
                 });
+                setTimeout(() => {
+                    this.prepareDisplay();
+                    this.prepareDisplayPendingTx();
+                }, 1000);
             });
     }
 
@@ -582,14 +590,11 @@ export default class Wallet extends React.Component {
                         .then(resp => resp.text())
                         .then((resp) => {
                             if (resp === "") {
-                                this.setState({
-                                    sidebar_open: false,
-                                    send_receive_popup: true,
-                                    send_receive_info: 'There was an error with the transaction',
-                                    send_overflow_active: false,
-                                    settings_active: false,
-                                    affiliate_active: false
-                                });
+                                if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                                    this.setCoinModalOpenSettings('There was an error with the transaction');
+                                } else {
+                                    this.setCoinModalClosedSettings('There was an error with the transaction');
+                                }
                                 setTimeout(() => {
                                     this.setState({
                                         transaction_being_sent: false,
@@ -601,17 +606,19 @@ export default class Wallet extends React.Component {
                                 sidebar_open: true,
                                 transaction_sent: true,
                                 transaction_being_sent: false,
-                                txid: resp
+                                txid: resp,
                             });
+                            setTimeout(() => {
+                                this.prepareDisplay();
+                                this.prepareDisplayPendingTx();
+                            }, 1000);
                         })
                 } else {
-                    this.setState({
-                        send_receive_popup: true,
-                        send_receive_info: 'Error with transaction',
-                        send_overflow_active: false,
-                        settings_active: false,
-                        affiliate_active: false
-                    });
+                    if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                        this.setCoinModalOpenSettings('Error with transaction');
+                    } else {
+                        this.setCoinModalClosedSettings('Error with transaction');
+                    }
                     setTimeout(() => {
                         this.setState({
                             sidebar_open: true,
@@ -662,13 +669,20 @@ export default class Wallet extends React.Component {
         fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
             .then(resp => resp.text())
             .then((resp) => {
-
                 this.setState({
                     sidebar_open: true,
                     transaction_sent: true,
                     transaction_being_sent: false,
-                    txid: resp
+                    txid: resp,
+
+                    // Close Send Receive Modal
+                    collapse_open: {
+                        send_open: false,
+                        receive_open: false
+                    },
                 });
+                this.prepareDisplay();
+                this.prepareDisplayPendingTx();
             });
     }
 
@@ -1021,7 +1035,7 @@ export default class Wallet extends React.Component {
                         send_open: true,
                         receive_open: false
                     },
-                    send_public_key: this.state.keys[key].public_key
+                    send_public_key: this.state.keys[key].public_key,
                 });
             }
 
@@ -1034,6 +1048,9 @@ export default class Wallet extends React.Component {
                     },
                     send_public_key: ''
                 });
+                if (this.state.send_overflow_active) {
+                    this.closeCoinModal();
+                }
             }
 
             if (!this.state.collapse_open.send_open && this.state.collapse_open.key === key) {
@@ -1075,6 +1092,9 @@ export default class Wallet extends React.Component {
                     },
                     send_receive_popup: false,
                 });
+                if (this.state.send_overflow_active) {
+                    this.closeCoinModal();
+                }
             }
         }
         this.setState({
@@ -1157,11 +1177,15 @@ export default class Wallet extends React.Component {
         e.preventDefault();
         var key_btc_bal = 0;
         var key_safex_bal = 0;
+        var pending_safex_bal = 0;
+        var pending_btc_bal = 0;
 
         this.state.keys.map(key => {
             if (key.public_key === e.target.public_key.value) {
                 key_btc_bal = key.btc_bal;
                 key_safex_bal = key.safex_bal;
+                pending_safex_bal = key.pending_safex_bal;
+                pending_btc_bal = key.pending_btc_bal;
             }
         });
 
@@ -1207,6 +1231,12 @@ export default class Wallet extends React.Component {
             } else {
                 this.setCoinModalClosedSettings('Invalid sending address');
             }
+        } else if (pending_safex_bal < 0 || pending_btc_bal < 0) {
+            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                this.setCoinModalOpenSettings('Cannot send transaction, this key has a pending minus');
+            } else {
+                this.setCoinModalClosedSettings('Cannot send transaction, this key has a pending minus');
+            }
         } else {
             try {
                 bitcore.Address.fromString(e.target.destination.value);
@@ -1221,18 +1251,14 @@ export default class Wallet extends React.Component {
                     settings_active: false,
                     dividend_active: false,
                     affiliate_active: false,
+                    transaction_sent: false,
                     send_receive_popup: false,
                     send_receive_info: ''
                 });
-                if (this.state.transaction_sent) {
-                    if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
-                        document.getElementById("send-submit-btn").setAttribute('disabled', 'disabled');
-                        this.setCoinModalOpenSettings('Cannot send transaction, this key has a pending minus');
-                    } else {
-                        document.getElementById("send-submit-btn").setAttribute('disabled', 'disabled');
-                        this.setCoinModalClosedSettings('Cannot send transaction, this key has a pending minus');
-                    }
-                }
+                setTimeout(() => {
+                    this.prepareDisplayPendingTx();
+                    this.prepareDisplay();
+                }, 1500)
             } catch (e) {
                 if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
                     this.setCoinModalOpenSettings('Destination address is invalid');
@@ -2229,6 +2255,8 @@ export default class Wallet extends React.Component {
                             <input type="hidden" name="which" readOnly value={this.state.send_coin} />
                             <input type="hidden" name="private_key" readOnly value={keys[key].private_key} />
                             <input type="hidden" name="public_key" readOnly value={keys[key].public_key} />
+                            <input type="hidden" name="pending_safex_bal" readOnly value={keys[key].pending_safex_bal} />
+                            <input type="hidden" name="pending_btc_bal" readOnly value={keys[key].pending_btc_bal} />
                             <div className="input-group">
                                 <span className="input-group-addon" id="basic-addon1">From:</span>
                                 <input name="from" type="text" className="form-control" placeholder="From"
@@ -2274,17 +2302,17 @@ export default class Wallet extends React.Component {
                             </div>
                             {
                                 this.state.send_overflow_active && this.state.transaction_sent === false
-                                    ?
+                                ?
                                     <button type="submit"
-                                        className="form-send-submit button-shine"
-                                        id="send-submit-btn">
+                                        name="form_send_submit"
+                                        className="form-send-submit button-shine">
                                         <img src="images/outgoing.png" alt="Outgoing Icon"/>
                                         Send
                                     </button>
-                                    :
+                                :
                                     <button type="submit"
-                                        className="form-send-submit button-shine"
-                                        id="send-submit-btn">
+                                        name="form_send_submit"
+                                        className="form-send-submit button-shine">
                                         <img src="images/outgoing-blue.png" alt="Outgoing Icon"/>
                                         Send
                                     </button>
@@ -2430,12 +2458,12 @@ export default class Wallet extends React.Component {
                                 <div className="input-group">
                                     <label htmlFor="from">From:</label>
                                     <textarea name="from" className="form-control" readOnly aria-describedby="basic-addon1" value={this.state.send_keys.public_key}>
-                            </textarea>
+                                    </textarea>
                                 </div>
                                 <div className="input-group">
                                     <label htmlFor="destination">To:</label>
                                     <textarea name="destination" className="form-control" readOnly aria-describedby="basic-addon1" value={this.state.send_to}>
-                            </textarea>
+                                    </textarea>
                                 </div>
                                 <input type="hidden" readOnly name="private_key"
                                        value={this.state.send_keys.private_key} />
@@ -2453,7 +2481,7 @@ export default class Wallet extends React.Component {
                                     <label htmlFor="total">Total:</label>
                                     <input readOnly name="total" value={this.state.send_total} />
                                 </div>
-                                <button className="confirm-btn button-shine-green" type="submit" disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
+                                <button className="confirm-btn button-shine-green" type="submit">
                                     {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}
                                 </button>
                             </form>

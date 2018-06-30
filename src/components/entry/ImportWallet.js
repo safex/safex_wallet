@@ -31,7 +31,7 @@ export default class ImportWallet extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.walletImportAlertsClose = this.walletImportAlertsClose.bind(this);
     }
-    
+
     wrongCurrentPassword() {
         flashField(this, 'wrongCurrentPassword');
     }
@@ -83,14 +83,18 @@ export default class ImportWallet extends React.Component {
         localStorage.setItem('wallet_path', walletPath);
 
         if (!this.state.path) {
-            this.openWalletImportAlert(`You must select a wallet file first`, 5000);
+            if (this.state.walletImportAlerts === false) {
+                this.openWalletImportAlert(`You must select a wallet file first`, 5000);
+            }
             this.wrongTargetPassword();
             return;
         }
 
         const targetPassword = e.target.password.value;
         if (!targetPassword) {
-            this.openWalletImportAlert(`You must enter password for the wallet file`, 5000);
+            if (this.state.walletImportAlerts === false) {
+                this.openWalletImportAlert(`You must enter password for the wallet file`, 5000);
+            }
             this.wrongTargetPassword();
             return;
         }
@@ -99,8 +103,10 @@ export default class ImportWallet extends React.Component {
         if (this.state.currentEncryptedWallet) {
             currentPassword = e.target.current_password && e.target.current_password.value;
             if (!currentPassword) {
-                this.openWalletImportAlert(`You must enter password for your current wallet. 
-                If you want to throw it away and replace it with this new one, go back and click "RESET WALLET" in the top right corner first.`, 12000);
+                if (this.state.walletImportAlerts === false) {
+                    this.openWalletImportAlert(`You must enter password for your current wallet. 
+                    If you want to throw it away and replace it with this new one, go back and click "RESET WALLET" in the top right corner first.`, 12000);
+                }
                 this.wrongCurrentPassword();
                 return;
             }
@@ -112,7 +118,9 @@ export default class ImportWallet extends React.Component {
             }
             if (err) {
                 console.error(err);
-                this.openWalletImportAlert('Failed to load target wallet: ' + err.message, 5000);
+                if (this.state.walletImportAlerts === false) {
+                    this.openWalletImportAlert('Failed to load target wallet: ' + err.message, 5000);
+                }
                 this.wrongTargetPassword();
                 return;
             }
@@ -146,7 +154,9 @@ export default class ImportWallet extends React.Component {
                 decrypted = decryptWalletData(this.state.currentEncryptedWallet, currentPassword);
             }
             catch (err) {
-                this.openWalletImportAlert('Failed to access your current wallet: ' + err.message, 5000);
+                if (this.state.walletImportAlerts === false) {
+                    this.openWalletImportAlert('Failed to access your current wallet: ' + err.message, 5000);
+                }
                 this.wrongCurrentPassword();
                 return;
             }
@@ -178,7 +188,9 @@ export default class ImportWallet extends React.Component {
 
             return fs.writeFile(walletPath, reEncrypted, (err) => {
                 if (err) {
-                    this.openWalletImportAlert(err.message, 5000);
+                    if (this.state.walletImportAlerts === false) {
+                        this.openWalletImportAlert(err.message, 5000);
+                    }
                     return;
                 }
 
@@ -187,7 +199,9 @@ export default class ImportWallet extends React.Component {
                 const duplicatesMessage = importedCount < targetKeys.length
                     ? ` (found ${targetKeys.length - importedCount} duplicates)`
                     : '';
-                this.openWalletImportAlert(`Imported ${importedCount} out of ${targetKeys.length} keys${duplicatesMessage}.`, 4000);
+                if (this.state.walletImportAlerts === false) {
+                    this.openWalletImportAlert(`Imported ${importedCount} out of ${targetKeys.length} keys${duplicatesMessage}.`, 4000);
+                }
 
                 localStorage.setItem('encrypted_wallet', reEncrypted);
                 localStorage.setItem('password', currentPassword);

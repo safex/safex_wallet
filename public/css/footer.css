@@ -181,7 +181,7 @@
 .status .right-options button[disabled]:hover,
 .status .right-options html input[disabled]:hover {
   background-color: transparent;
-  cursor: not-allowed;
+  cursor: pointer;
   box-shadow: none !important;
 }
 .status .right-options button[disabled]:before,

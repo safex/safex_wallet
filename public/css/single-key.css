@@ -108,7 +108,7 @@
 }
 .single-key button[disabled]:hover,
 .single-key html input[disabled]:hover {
-  cursor: not-allowed;
+  cursor: pointer;
 }
 .single-key .edit-label-btn img {
   width: 16px;
