@@ -373,124 +373,6 @@ export default class Wallet extends React.Component {
         });
     }
 
-    sendCoins(e) {
-        e.preventDefault();
-        //check whether Bitcoin or Safex is selected
-        if (this.state.send_coin === 'safex') {
-            //open the modal by setting transaction_being_sent
-            try {
-                this.setState({
-                    transaction_being_sent: true,
-                    settings_active: false,
-                });
-
-                //set the signing key for the transaction
-                var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
-                //set the source of the transaction
-                var source = e.target.public_key.value;
-                //set the amount provided by the user
-                var amount = e.target.amount.value;
-                //set the fee provided by the user
-                var fee = e.target.fee.value;
-                //set the destination provided by the user
-                var destination = e.target.destination.value;
-
-                //here we will check to make sure that the destination is a valid bitcoin address
-                var address = bitcore.Address.fromString(destination);
-                var address2 = bitcore.Address.fromString(source);
-
-                //here we try to get the unspent transactions from the source we send from
-                try {
-                    fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
-                        .then(resp => resp.json())
-                        .then((resp) => {
-                            //enter into the safex transaction method
-                            this.formSafexTransaction(resp,
-                                amount,
-                                parseFloat((fee * 100000000).toFixed(0)),
-                                destination,
-                                keys,
-                                source);
-                        });
-                    this.refreshWallet();
-                } catch (e) {
-                    //if the fetch fails then we have a network problem and can't get unspent transaction history
-                    if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
-                        this.setCoinModalOpenSettings('Network communication error, please try again later');
-                    } else {
-                        this.setCoinModalClosedSettings('Network communication error, please try again later');
-                    }
-                    throw 'Network communication error, please try again later';
-                }
-            } catch (e) {
-                //this is triggered if the destination address is not a valid bitcoin address
-                if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
-                    this.setCoinModalOpenSettings('Invalid destination address');
-                } else {
-                    this.setCoinModalClosedSettings('Invalid destination address');
-                }
-                throw 'Invalid destination address';
-            }
-
-            //if safex is not selected then it must be Bitcoin
-        } else if(this.state.send_coin === 'btc') {
-            try {  //open the modal by setting transaction_being_sent
-                this.setState({
-                    sidebar_open: true,
-                    transaction_being_sent: true,
-                    settings_active: false,
-                });
-
-                //set the signing key for the transaction
-                var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
-                //set the source of the transaction
-                var source = e.target.public_key.value;
-                //set the amount provided by the user
-                var amount = e.target.amount.value;
-                //set the fee provided by the user
-                var fee = e.target.fee.value;
-                //set the destination provided by the user
-                var destination = e.target.destination.value;
-
-                //here we will check to make sure that the destination is a valid bitcoin address
-
-                var address = bitcore.Address.fromString(destination);
-                var address2 = bitcore.Address.fromString(source);
-                //here we try to get the unspent transactions from the source we send from
-                try {
-                    fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
-                        .then(resp => resp.json())
-                        .then((resp) => {
-                            //enter into the bitcoin transaction method
-                            this.formBitcoinTransaction(resp,
-                                parseFloat((amount * 100000000).toFixed(0)),
-                                parseFloat((fee * 100000000).toFixed(0)),
-                                destination,
-                                keys,
-                                source);
-                        });
-                    this.refreshWallet();
-                } catch (e) {
-                    //if the fetch fails then we have a network problem and can't get unspent transaction history
-                    if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
-                        this.setCoinModalOpenSettings('Network communication error, please try again later');
-                    } else {
-                        this.setCoinModalClosedSettings('Network communication error, please try again later');
-                    }
-                    throw 'Network communication error, please try again later';
-                }
-            } catch (e) {
-                //this is triggered if the destination address is not a valid bitcoin address
-                if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
-                    this.setCoinModalOpenSettings('Invalid destination address');
-                } else {
-                    this.setCoinModalClosedSettings('Invalid destination address');
-                }
-                throw 'Invalid destination address';
-            }
-        }
-    }
-
     formBitcoinTransaction(utxos, amount, fee, destination, key, source) {
         var running_total = 0;
         var tx = new bitcoin.TransactionBuilder();
@@ -522,16 +404,23 @@ export default class Wallet extends React.Component {
         fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
             .then(resp => resp.text())
             .then((resp) => {
-                this.setState({
-                    sidebar_open: true,
-                    transaction_sent: true,
-                    transaction_being_sent: false,
-                    txid: resp,
-                });
+                setTimeout(() => {
+                    this.setState({
+                        sidebar_open: true,
+                        transaction_sent: true,
+                        transaction_being_sent: false,
+                        txid: resp,
+                    });
+                    this.prepareDisplay();
+                    this.prepareDisplayPendingTx();
+                }, 2000);
                 setTimeout(() => {
                     this.prepareDisplay();
                     this.prepareDisplayPendingTx();
-                }, 1000);
+                }, 1500);
+                this.prepareDisplay();
+                this.prepareDisplayPendingTx();
+                this.closeSendReceiveModal();
             });
     }
 
@@ -602,16 +491,23 @@ export default class Wallet extends React.Component {
                                 }, 1000);
                                 throw "There was an error with the transaction.";
                             }
-                            this.setState({
-                                sidebar_open: true,
-                                transaction_sent: true,
-                                transaction_being_sent: false,
-                                txid: resp,
-                            });
+                            setTimeout(() => {
+                                this.setState({
+                                    sidebar_open: true,
+                                    transaction_sent: true,
+                                    transaction_being_sent: false,
+                                    txid: resp,
+                                });
+                                this.prepareDisplay();
+                                this.prepareDisplayPendingTx();
+                            }, 2000);
                             setTimeout(() => {
                                 this.prepareDisplay();
                                 this.prepareDisplayPendingTx();
-                            }, 1000);
+                            }, 1500);
+                            this.prepareDisplay();
+                            this.prepareDisplayPendingTx();
+                            this.closeSendReceiveModal();
                         })
                 } else {
                     if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
@@ -669,21 +565,254 @@ export default class Wallet extends React.Component {
         fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
             .then(resp => resp.text())
             .then((resp) => {
-                this.setState({
-                    sidebar_open: true,
-                    transaction_sent: true,
-                    transaction_being_sent: false,
-                    txid: resp,
+                setTimeout(() => {
+                    this.setState({
+                        sidebar_open: true,
+                        transaction_sent: true,
+                        transaction_being_sent: false,
+                        txid: resp,
 
-                    // Close Send Receive Modal
-                    collapse_open: {
-                        send_open: false,
-                        receive_open: false
-                    },
-                });
+                        // Close Send Receive Modal
+                        collapse_open: {
+                            send_open: false,
+                            receive_open: false
+                        },
+                    });
+                    this.prepareDisplay();
+                    this.prepareDisplayPendingTx();
+                }, 2500);
+                setTimeout(() => {
+                    this.prepareDisplay();
+                    this.prepareDisplayPendingTx();
+                }, 1500);
                 this.prepareDisplay();
                 this.prepareDisplayPendingTx();
+                this.closeSendReceiveModal();
             });
+    }
+
+    sendCoins(e) {
+        e.preventDefault();
+        //check whether Bitcoin or Safex is selected
+        if (this.state.send_coin === 'safex') {
+            //open the modal by setting transaction_being_sent
+            try {
+                this.setState({
+                    transaction_being_sent: true,
+                    settings_active: false,
+                });
+
+                //set the signing key for the transaction
+                var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
+                //set the source of the transaction
+                var source = e.target.public_key.value;
+                //set the amount provided by the user
+                var amount = e.target.amount.value;
+                //set the fee provided by the user
+                var fee = e.target.fee.value;
+                //set the destination provided by the user
+                var destination = e.target.destination.value;
+
+                //here we will check to make sure that the destination is a valid bitcoin address
+                var address = bitcore.Address.fromString(destination);
+                var address2 = bitcore.Address.fromString(source);
+
+                //here we try to get the unspent transactions from the source we send from
+                try {
+                    fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
+                        .then(resp => resp.json())
+                        .then((resp) => {
+                            //enter into the safex transaction method
+                            this.formSafexTransaction(resp,
+                                amount,
+                                parseFloat((fee * 100000000).toFixed(0)),
+                                destination,
+                                keys,
+                                source);
+                        });
+                    setTimeout(() => {
+                        this.prepareDisplayPendingTx();
+                        this.prepareDisplay();
+                    }, 2000);
+                } catch (e) {
+                    //if the fetch fails then we have a network problem and can't get unspent transaction history
+                    if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                        this.setCoinModalOpenSettings('Network communication error, please try again later');
+                    } else {
+                        this.setCoinModalClosedSettings('Network communication error, please try again later');
+                    }
+                    throw 'Network communication error, please try again later';
+                }
+            } catch (e) {
+                //this is triggered if the destination address is not a valid bitcoin address
+                if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                    this.setCoinModalOpenSettings('Invalid destination address');
+                } else {
+                    this.setCoinModalClosedSettings('Invalid destination address');
+                }
+                throw 'Invalid destination address';
+            }
+
+            //if safex is not selected then it must be Bitcoin
+        } else if(this.state.send_coin === 'btc') {
+            try {  //open the modal by setting transaction_being_sent
+                this.setState({
+                    sidebar_open: true,
+                    transaction_being_sent: true,
+                    settings_active: false,
+                });
+
+                //set the signing key for the transaction
+                var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
+                //set the source of the transaction
+                var source = e.target.public_key.value;
+                //set the amount provided by the user
+                var amount = e.target.amount.value;
+                //set the fee provided by the user
+                var fee = e.target.fee.value;
+                //set the destination provided by the user
+                var destination = e.target.destination.value;
+
+                //here we will check to make sure that the destination is a valid bitcoin address
+
+                var address = bitcore.Address.fromString(destination);
+                var address2 = bitcore.Address.fromString(source);
+                //here we try to get the unspent transactions from the source we send from
+                try {
+                    fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
+                        .then(resp => resp.json())
+                        .then((resp) => {
+                            //enter into the bitcoin transaction method
+                            this.formBitcoinTransaction(resp,
+                                parseFloat((amount * 100000000).toFixed(0)),
+                                parseFloat((fee * 100000000).toFixed(0)),
+                                destination,
+                                keys,
+                                source);
+                        });
+                    setTimeout(() => {
+                        this.prepareDisplayPendingTx();
+                        this.prepareDisplay();
+                    }, 1500);
+                } catch (e) {
+                    //if the fetch fails then we have a network problem and can't get unspent transaction history
+                    if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                        this.setCoinModalOpenSettings('Network communication error, please try again later');
+                    } else {
+                        this.setCoinModalClosedSettings('Network communication error, please try again later');
+                    }
+                    throw 'Network communication error, please try again later';
+                }
+            } catch (e) {
+                //this is triggered if the destination address is not a valid bitcoin address
+                if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                    this.setCoinModalOpenSettings('Invalid destination address');
+                } else {
+                    this.setCoinModalClosedSettings('Invalid destination address');
+                }
+                throw 'Invalid destination address';
+            }
+        }
+    }
+
+    //Activates send_overflow_active state which opens Modal screen displaying transaction pre-confirmation information
+    openCoinModal(e) {
+        e.preventDefault();
+        var key_btc_bal = 0;
+        var key_safex_bal = 0;
+        var pending_safex_bal = 0;
+        var pending_btc_bal = 0;
+
+        this.state.keys.map(key => {
+            if (key.public_key === e.target.public_key.value) {
+                key_btc_bal = key.btc_bal;
+                key_safex_bal = key.safex_bal;
+                pending_safex_bal = key.pending_safex_bal;
+                pending_btc_bal = key.pending_btc_bal;
+            }
+        });
+
+        if ((this.state.send_coin === 'safex' && this.state.send_fee > key_btc_bal) || (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal)) {
+            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                this.setCoinModalOpenSettings('You do not have enough BITCOIN to cover the fee');
+            } else {
+                this.setCoinModalClosedSettings('You do not have enough BITCOIN to cover the fee');
+            }
+        } else if (this.state.send_coin === 'safex' && this.state.send_amount > key_safex_bal) {
+            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                this.setCoinModalOpenSettings('You do not have enough SAFEX to cover this transaction');
+            } else {
+                this.setCoinModalClosedSettings('You do not have enough SAFEX to cover this transaction');
+            }
+        } else if (this.state.send_coin === 'safex' && (this.state.send_amount === '' || this.state.send_amount === 0 || isNaN(this.state.send_amount))) {
+            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                this.setCoinModalOpenSettings('Invalid SAFEX amount');
+            } else {
+                this.setCoinModalClosedSettings('Invalid SAFEX amount');
+            }
+        } else if (this.state.send_coin === 'btc' && (this.state.send_amount === '' || parseFloat(this.state.send_amount) === 0 || isNaN(this.state.send_total))) {
+            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                this.setCoinModalOpenSettings('Invalid BITCOIN amount');
+            } else {
+                this.setCoinModalClosedSettings('Invalid BITCOIN amount');
+            }
+        } else if (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal) {
+            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                this.setCoinModalOpenSettings('You do not have enough BITCOIN to cover this transaction');
+            } else {
+                this.setCoinModalClosedSettings('You do not have enough BITCOIN to cover this transaction');
+            }
+        } else if (e.target.destination.value === '') {
+            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                this.setCoinModalOpenSettings('Destination field is empty');
+            } else {
+                this.setCoinModalClosedSettings('Destination field is empty');
+            }
+        } else if (e.target.destination.value === e.target.public_key.value) {
+            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                this.setCoinModalOpenSettings('Invalid sending address');
+            } else {
+                this.setCoinModalClosedSettings('Invalid sending address');
+            }
+        } else if (pending_safex_bal < 0 || pending_btc_bal < 0) {
+            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                this.setCoinModalOpenSettings('Cannot send transaction, this key has a pending minus. Please try again later.');
+            } else {
+                this.setCoinModalClosedSettings('Cannot send transaction, this key has a pending minus. Please try again later.');
+            }
+            this.closeCoinModal;
+            this.prepareDisplay();
+            this.prepareDisplayPendingTx();
+        } else {
+            try {
+                bitcore.Address.fromString(e.target.destination.value);
+                this.setState({
+                    sidebar_open: true,
+                    send_overflow_active: true,
+                    send_to: e.target.destination.value,
+                    send_keys: {
+                        public_key: e.target.public_key.value,
+                        private_key: e.target.private_key.value
+                    },
+                    settings_active: false,
+                    dividend_active: false,
+                    affiliate_active: false,
+                    transaction_sent: false,
+                    send_receive_popup: false,
+                    send_receive_info: ''
+                });
+                setTimeout(() => {
+                    this.prepareDisplayPendingTx();
+                    this.prepareDisplay();
+                }, 1500)
+            } catch (e) {
+                if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                    this.setCoinModalOpenSettings('Destination address is invalid');
+                } else {
+                    this.setCoinModalClosedSettings('Destination address is invalid');
+                }
+            }
+        }
     }
 
     createKey(e) {
@@ -1170,103 +1299,6 @@ export default class Wallet extends React.Component {
             },
         })
         this.listTransactions(this.state.keys[e].public_key);
-    }
-
-    //Activates send_overflow_active state which opens Modal screen displaying transaction pre-confirmation information
-    openCoinModal(e) {
-        e.preventDefault();
-        var key_btc_bal = 0;
-        var key_safex_bal = 0;
-        var pending_safex_bal = 0;
-        var pending_btc_bal = 0;
-
-        this.state.keys.map(key => {
-            if (key.public_key === e.target.public_key.value) {
-                key_btc_bal = key.btc_bal;
-                key_safex_bal = key.safex_bal;
-                pending_safex_bal = key.pending_safex_bal;
-                pending_btc_bal = key.pending_btc_bal;
-            }
-        });
-
-        if ((this.state.send_coin === 'safex' && this.state.send_fee > key_btc_bal) || (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal)) {
-            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
-                this.setCoinModalOpenSettings('You do not have enough BITCOIN to cover the fee');
-            } else {
-                this.setCoinModalClosedSettings('You do not have enough BITCOIN to cover the fee');
-            }
-        } else if (this.state.send_coin === 'safex' && this.state.send_amount > key_safex_bal) {
-            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
-                this.setCoinModalOpenSettings('You do not have enough SAFEX to cover this transaction');
-            } else {
-                this.setCoinModalClosedSettings('You do not have enough SAFEX to cover this transaction');
-            }
-        } else if (this.state.send_coin === 'safex' && (this.state.send_amount === '' || this.state.send_amount === 0 || isNaN(this.state.send_amount))) {
-            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
-                this.setCoinModalOpenSettings('Invalid SAFEX amount');
-            } else {
-                this.setCoinModalClosedSettings('Invalid SAFEX amount');
-            }
-        } else if (this.state.send_coin === 'btc' && (this.state.send_amount === '' || parseFloat(this.state.send_amount) === 0 || isNaN(this.state.send_total))) {
-            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
-                this.setCoinModalOpenSettings('Invalid BITCOIN amount');
-            } else {
-                this.setCoinModalClosedSettings('Invalid BITCOIN amount');
-            }
-        } else if (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal) {
-            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
-                this.setCoinModalOpenSettings('You do not have enough BITCOIN to cover this transaction');
-            } else {
-                this.setCoinModalClosedSettings('You do not have enough BITCOIN to cover this transaction');
-            }
-        } else if (e.target.destination.value === '') {
-            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
-                this.setCoinModalOpenSettings('Destination field is empty');
-            } else {
-                this.setCoinModalClosedSettings('Destination field is empty');
-            }
-        } else if (e.target.destination.value === e.target.public_key.value) {
-            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
-                this.setCoinModalOpenSettings('Invalid sending address');
-            } else {
-                this.setCoinModalClosedSettings('Invalid sending address');
-            }
-        } else if (pending_safex_bal < 0 || pending_btc_bal < 0) {
-            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
-                this.setCoinModalOpenSettings('Cannot send transaction, this key has a pending minus');
-            } else {
-                this.setCoinModalClosedSettings('Cannot send transaction, this key has a pending minus');
-            }
-        } else {
-            try {
-                bitcore.Address.fromString(e.target.destination.value);
-                this.setState({
-                    sidebar_open: true,
-                    send_overflow_active: true,
-                    send_to: e.target.destination.value,
-                    send_keys: {
-                        public_key: e.target.public_key.value,
-                        private_key: e.target.private_key.value
-                    },
-                    settings_active: false,
-                    dividend_active: false,
-                    affiliate_active: false,
-                    transaction_sent: false,
-                    send_receive_popup: false,
-                    send_receive_info: ''
-                });
-                setTimeout(() => {
-                    this.prepareDisplayPendingTx();
-                    this.prepareDisplay();
-                }, 1500)
-            } catch (e) {
-                if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
-                    this.setCoinModalOpenSettings('Destination address is invalid');
-                } else {
-                    this.setCoinModalClosedSettings('Destination address is invalid');
-                }
-            }
-        }
     }
 
     closeSendReceivePopup() {
@@ -2322,7 +2354,7 @@ export default class Wallet extends React.Component {
                                     ?  'send_receive_info active'
                                     :  'send_receive_info'}>
                                     <p>{this.state.send_receive_info}</p>
-                                    <span className="close" onClick={this.closeSendReceivePopup}>X</span>
+                                    <span className="close" onClick={keys[key].pending_btc_bal < 0 || keys[key].pending_safex_bal < 0 ? this.closeSendReceiveModal : this.closeSendReceivePopup}>X</span>
                                 </div>
                             </div>
                         </div>
