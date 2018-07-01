@@ -252,10 +252,10 @@ export default class Wallet extends React.Component {
         this.refreshWallet();
         this.getFee();
 
-        // this.refreshWalletInterval = setInterval(() => {
-        //     this.prepareDisplay();
-        //     this.prepareDisplayPendingTx();
-        // }, 1800000);
+        this.refreshWalletInterval = setInterval(() => {
+            this.prepareDisplay();
+            this.prepareDisplayPendingTx();
+        }, 1800000);
 
         // this.prepareDisplayInterval = setInterval(() => {
         //     this.prepareDisplay();
@@ -2193,7 +2193,7 @@ export default class Wallet extends React.Component {
                             <div>
                                 <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
                                     onClick={this.openSendReceive.bind(this, key, 'send')}
-                                    className={this.state.collapse_open.key === key && this.state.collapse_open.receive_open ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
+                                    className={this.state.collapse_open.key === key && this.state.collapse_open.receive_open || this.state.send_disabled ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
                                     {
                                         this.state.collapse_open.key === key && this.state.collapse_open.receive_open
                                         ?
