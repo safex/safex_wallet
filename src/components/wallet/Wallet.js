@@ -252,10 +252,10 @@ export default class Wallet extends React.Component {
         this.refreshWallet();
         this.getFee();
 
-        // this.prepareDisplayInterval = setInterval(() => {
+        // this.refreshWalletInterval = setInterval(() => {
         //     this.prepareDisplay();
         //     this.prepareDisplayPendingTx();
-        // }, 1 800 000);
+        // }, 1800000);
 
         // this.prepareDisplayInterval = setInterval(() => {
         //     this.prepareDisplay();
@@ -430,6 +430,9 @@ export default class Wallet extends React.Component {
                     this.prepareDisplayInterval = setInterval(() => {
                         this.prepareDisplay();
                         this.prepareDisplayPendingTx();
+                        this.setState({
+                            send_disabled: true,
+                        });
                         console.log('refresh');
                     }, 200);
                     this.closeSendReceiveModal();
@@ -510,6 +513,9 @@ export default class Wallet extends React.Component {
                                 } else {
                                     this.setCoinModalClosedSettings('There was an error with the transaction');
                                 }
+                                this.setState({
+                                    send_disabled: false,
+                                });
                                 setTimeout(() => {
                                     this.setState({
                                         transaction_being_sent: false,
@@ -528,6 +534,9 @@ export default class Wallet extends React.Component {
                                 this.prepareDisplayInterval = setInterval(() => {
                                     this.prepareDisplay();
                                     this.prepareDisplayPendingTx();
+                                    this.setState({
+                                        send_disabled: true,
+                                    });
                                     console.log('refresh');
                                 }, 200);
                                 this.closeSendReceiveModal();
@@ -2162,11 +2171,10 @@ export default class Wallet extends React.Component {
                             <div>
                                 <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
                                     onClick={this.openSendReceive.bind(this, key, 'send')}
-                                    className={(this.state.collapse_open.key === key && this.state.transaction_being_sent) ||
-                                    (this.state.collapse_open.key === key && this.state.send_disabled)? 'send-btn button-shine disabled-btn' : 'send-btn button-shine active'}>
+                                    className={this.state.collapse_open.key === key && this.state.transaction_being_sent || this.state.send_disabled ? 'send-btn button-shine disabled-btn' : 'send-btn button-shine active'}>
                                     <span className="img-wrap">
                                         {
-                                            this.state.collapse_open.key === key && this.state.transaction_being_sent || this.state.send_disabled
+                                            this.state.collapse_open.key === key && this.state.transaction_being_sent
                                             ?
                                                 <img src="images/outbox-gray.png" alt="Outbox Logo"/>
                                             :
@@ -2185,11 +2193,9 @@ export default class Wallet extends React.Component {
                             <div>
                                 <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
                                     onClick={this.openSendReceive.bind(this, key, 'send')}
-                                    className={(this.state.collapse_open.key === key && this.state.collapse_open.receive_open) ||
-                                    (this.state.collapse_open.key === key && this.state.send_disabled) ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
+                                    className={this.state.collapse_open.key === key && this.state.collapse_open.receive_open ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
                                     {
-                                        (this.state.collapse_open.key === key && this.state.collapse_open.receive_open) ||
-                                        (this.state.collapse_open.key === key && this.state.send_disabled)
+                                        this.state.collapse_open.key === key && this.state.collapse_open.receive_open
                                         ?
                                             <span className="img-wrap">
                                                 <img src="images/outbox-gray.png" alt="Outbox Logo"/>
