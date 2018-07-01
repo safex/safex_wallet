@@ -630,12 +630,6 @@ export default class Wallet extends React.Component {
                                 keys,
                                 source);
                         });
-                    setTimeout(() => {
-                        this.prepareDisplayPendingTx();
-                        this.prepareDisplay();
-                    }, 1500);
-                    this.prepareDisplayPendingTx();
-                    this.prepareDisplay();
                     this.closeSendReceiveModal();
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
@@ -693,12 +687,6 @@ export default class Wallet extends React.Component {
                                 keys,
                                 source);
                         });
-                    setTimeout(() => {
-                        this.prepareDisplayPendingTx();
-                        this.prepareDisplay();
-                    }, 1500);
-                    this.prepareDisplayPendingTx();
-                    this.prepareDisplay();
                     this.closeSendReceiveModal();
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
@@ -787,8 +775,10 @@ export default class Wallet extends React.Component {
                 this.setCoinModalClosedSettings('Cannot send transaction, this key has a pending minus. Please try again later.');
             }
             this.closeCoinModal;
-            this.prepareDisplay();
-            this.prepareDisplayPendingTx();
+            this.prepareDisplayInterval = setInterval(() => {
+                this.prepareDisplay();
+                this.prepareDisplayPendingTx();
+            }, 1000);
         } else {
             try {
                 bitcore.Address.fromString(e.target.destination.value);
@@ -807,10 +797,7 @@ export default class Wallet extends React.Component {
                     send_receive_popup: false,
                     send_receive_info: ''
                 });
-                setTimeout(() => {
-                    this.prepareDisplayPendingTx();
-                    this.prepareDisplay();
-                }, 1500)
+                clearInterval(this.prepareDisplayInterval);
             } catch (e) {
                 if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
                     this.setCoinModalOpenSettings('Destination address is invalid');
