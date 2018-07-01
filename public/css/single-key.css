@@ -297,6 +297,10 @@
 .single-key .single-key-btns-wrap .receive-btn.disabled {
   background: rgba(190, 190, 190, .44);
 }
+.single-key .single-key-btns-wrap .send-btn.disabled-btn {
+  background: rgba(190, 190, 190, .44);
+  pointer-events: none;
+}
 .single-key .pull-right button:disabled {
   opacity: 0.8;
   background: rgba(190, 190, 190, .44);
@@ -354,6 +358,11 @@
   border: 1px solid rgba(0, 231, 255, .44);
   border-radius: 8px;
   line-height: 1.2;
+}
+.form-send button:disabled {
+  background: rgba(190, 190, 190, .44);
+  border: 1px solid rgba(190, 190, 190, .1);
+  pointer-events: none;
 }
 .form-send .form-send-submit img {
   position: relative;

@@ -85,6 +85,7 @@ export default class Wallet extends React.Component {
                 display_private_key: '',
                 private_key_popup: false,
             },
+            send_disabled: false,
             sidebar_open: false,
             settings_active: false,
             refreshTimer: 0,
@@ -250,6 +251,17 @@ export default class Wallet extends React.Component {
     componentDidMount() {
         this.refreshWallet();
         this.getFee();
+
+        // this.prepareDisplayInterval = setInterval(() => {
+        //     this.prepareDisplay();
+        //     this.prepareDisplayPendingTx();
+        // }, 1 800 000);
+
+        // this.prepareDisplayInterval = setInterval(() => {
+        //     this.prepareDisplay();
+        //     this.prepareDisplayPendingTx();
+        //     console.log('Timer')
+        // }, 1000);
     }
 
     componentWillUnmount() {
@@ -377,8 +389,10 @@ export default class Wallet extends React.Component {
         var running_total = 0;
         var tx = new bitcoin.TransactionBuilder();
         var inputs_num = 0;
-        utxos.forEach(txn => {
+        var pending_safex_bal = document.getElementById('pending_safex_bal').value;
+        var pending_btc_bal = document.getElementById('pending_btc_bal').value;
 
+        utxos.forEach(txn => {
             if (!txn.confirmations > 0) {
 
             } else {
@@ -390,6 +404,7 @@ export default class Wallet extends React.Component {
                 }
             }
         });
+
         tx.addOutput(destination, amount);
 
         if ((running_total - (amount + fee)) > 0) {
@@ -404,23 +419,32 @@ export default class Wallet extends React.Component {
         fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
             .then(resp => resp.text())
             .then((resp) => {
+                this.setState({
+                    sidebar_open: true,
+                    transaction_sent: true,
+                    transaction_being_sent: false,
+                    send_disabled: true,
+                    txid: resp,
+                });
+                if (pending_safex_bal >= 0 || pending_btc_bal >= 0) {
+                    this.prepareDisplayInterval = setInterval(() => {
+                        this.prepareDisplay();
+                        this.prepareDisplayPendingTx();
+                        console.log('refresh');
+                    }, 200);
+                    this.closeSendReceiveModal();
+                } else {
+                    clearInterval(this.prepareDisplayInterval);
+                }
                 setTimeout(() => {
+                    clearInterval(this.prepareDisplayInterval);
+                    this.prepareDisplay();
+                    this.prepareDisplayPendingTx();
+                    console.log('clear refresh');
                     this.setState({
-                        sidebar_open: true,
-                        transaction_sent: true,
-                        transaction_being_sent: false,
-                        txid: resp,
+                        send_disabled: false,
                     });
-                    this.prepareDisplay();
-                    this.prepareDisplayPendingTx();
-                }, 2000);
-                setTimeout(() => {
-                    this.prepareDisplay();
-                    this.prepareDisplayPendingTx();
-                }, 1500);
-                this.prepareDisplay();
-                this.prepareDisplayPendingTx();
-                this.closeSendReceiveModal();
+                }, 4000);
             });
     }
 
@@ -430,6 +454,8 @@ export default class Wallet extends React.Component {
         var inputs_num = 0;
         var check = 0;
         var checks = [source, destination];
+        var pending_safex_bal = document.getElementById('pending_safex_bal').value;
+        var pending_btc_bal = document.getElementById('pending_btc_bal').value;
 
         utxos.forEach(txn => {
             if (running_total < (700 + fee)) {
@@ -488,26 +514,35 @@ export default class Wallet extends React.Component {
                                     this.setState({
                                         transaction_being_sent: false,
                                     });
-                                }, 1000);
+                                }, 500);
                                 throw "There was an error with the transaction.";
                             }
+                            this.setState({
+                                sidebar_open: true,
+                                transaction_sent: true,
+                                transaction_being_sent: false,
+                                send_disabled: true,
+                                txid: resp,
+                            });
+                            if (pending_safex_bal >= 0 || pending_btc_bal >= 0) {
+                                this.prepareDisplayInterval = setInterval(() => {
+                                    this.prepareDisplay();
+                                    this.prepareDisplayPendingTx();
+                                    console.log('refresh');
+                                }, 200);
+                                this.closeSendReceiveModal();
+                            } else {
+                                clearInterval(this.prepareDisplayInterval);
+                            }
                             setTimeout(() => {
+                                clearInterval(this.prepareDisplayInterval);
+                                this.prepareDisplay();
+                                this.prepareDisplayPendingTx();
                                 this.setState({
-                                    sidebar_open: true,
-                                    transaction_sent: true,
-                                    transaction_being_sent: false,
-                                    txid: resp,
+                                    send_disabled: false,
                                 });
-                                this.prepareDisplay();
-                                this.prepareDisplayPendingTx();
-                            }, 2000);
-                            setTimeout(() => {
-                                this.prepareDisplay();
-                                this.prepareDisplayPendingTx();
-                            }, 1500);
-                            this.prepareDisplay();
-                            this.prepareDisplayPendingTx();
-                            this.closeSendReceiveModal();
+                                console.log('clear refresh');
+                            }, 4000);
                         })
                 } else {
                     if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
@@ -515,12 +550,10 @@ export default class Wallet extends React.Component {
                     } else {
                         this.setCoinModalClosedSettings('Error with transaction');
                     }
-                    setTimeout(() => {
-                        this.setState({
-                            sidebar_open: true,
-                            transaction_being_sent: false,
-                        });
-                    }, 1000);
+                    this.setState({
+                        sidebar_open: true,
+                        transaction_being_sent: false,
+                    });
                 }
             });
     }
@@ -565,26 +598,18 @@ export default class Wallet extends React.Component {
         fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
             .then(resp => resp.text())
             .then((resp) => {
-                setTimeout(() => {
-                    this.setState({
-                        sidebar_open: true,
-                        transaction_sent: true,
-                        transaction_being_sent: false,
-                        txid: resp,
+                this.setState({
+                    sidebar_open: true,
+                    transaction_sent: true,
+                    transaction_being_sent: false,
+                    txid: resp,
 
-                        // Close Send Receive Modal
-                        collapse_open: {
-                            send_open: false,
-                            receive_open: false
-                        },
-                    });
-                    this.prepareDisplay();
-                    this.prepareDisplayPendingTx();
-                }, 2500);
-                setTimeout(() => {
-                    this.prepareDisplay();
-                    this.prepareDisplayPendingTx();
-                }, 1500);
+                    // Close Send Receive Modal
+                    collapse_open: {
+                        send_open: false,
+                        receive_open: false
+                    },
+                });
                 this.prepareDisplay();
                 this.prepareDisplayPendingTx();
                 this.closeSendReceiveModal();
@@ -598,8 +623,10 @@ export default class Wallet extends React.Component {
             //open the modal by setting transaction_being_sent
             try {
                 this.setState({
+                    sidebar_open: true,
                     transaction_being_sent: true,
                     settings_active: false,
+                    send_disabled: true,
                 });
 
                 //set the signing key for the transaction
@@ -630,7 +657,6 @@ export default class Wallet extends React.Component {
                                 keys,
                                 source);
                         });
-                    this.closeSendReceiveModal();
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
                     if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
@@ -657,6 +683,7 @@ export default class Wallet extends React.Component {
                     sidebar_open: true,
                     transaction_being_sent: true,
                     settings_active: false,
+                    send_disabled: true,
                 });
 
                 //set the signing key for the transaction
@@ -687,7 +714,6 @@ export default class Wallet extends React.Component {
                                 keys,
                                 source);
                         });
-                    this.closeSendReceiveModal();
                 } catch (e) {
                     //if the fetch fails then we have a network problem and can't get unspent transaction history
                     if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
@@ -775,10 +801,6 @@ export default class Wallet extends React.Component {
                 this.setCoinModalClosedSettings('Cannot send transaction, this key has a pending minus. Please try again later.');
             }
             this.closeCoinModal;
-            this.prepareDisplayInterval = setInterval(() => {
-                this.prepareDisplay();
-                this.prepareDisplayPendingTx();
-            }, 1000);
         } else {
             try {
                 bitcore.Address.fromString(e.target.destination.value);
@@ -797,7 +819,6 @@ export default class Wallet extends React.Component {
                     send_receive_popup: false,
                     send_receive_info: ''
                 });
-                clearInterval(this.prepareDisplayInterval);
             } catch (e) {
                 if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
                     this.setCoinModalOpenSettings('Destination address is invalid');
@@ -2141,9 +2162,17 @@ export default class Wallet extends React.Component {
                             <div>
                                 <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
                                     onClick={this.openSendReceive.bind(this, key, 'send')}
-                                    className="send-btn button-shine active">
+                                    className={(this.state.collapse_open.key === key && this.state.transaction_being_sent) ||
+                                    (this.state.collapse_open.key === key && this.state.send_disabled)? 'send-btn button-shine disabled-btn' : 'send-btn button-shine active'}>
                                     <span className="img-wrap">
-                                        <img src="images/outbox-white.png" alt="Outbox Logo"/>
+                                        {
+                                            this.state.collapse_open.key === key && this.state.transaction_being_sent || this.state.send_disabled
+                                            ?
+                                                <img src="images/outbox-gray.png" alt="Outbox Logo"/>
+                                            :
+                                                <img src="images/outbox-white.png" alt="Outbox Logo"/>
+                                        }
+
                                     </span>
                                     <span>SEND</span>
                                 </button>
@@ -2156,9 +2185,11 @@ export default class Wallet extends React.Component {
                             <div>
                                 <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
                                     onClick={this.openSendReceive.bind(this, key, 'send')}
-                                    className={this.state.collapse_open.key === key && this.state.collapse_open.receive_open ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
+                                    className={(this.state.collapse_open.key === key && this.state.collapse_open.receive_open) ||
+                                    (this.state.collapse_open.key === key && this.state.send_disabled) ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
                                     {
-                                        this.state.collapse_open.key === key && this.state.collapse_open.receive_open
+                                        (this.state.collapse_open.key === key && this.state.collapse_open.receive_open) ||
+                                        (this.state.collapse_open.key === key && this.state.send_disabled)
                                         ?
                                             <span className="img-wrap">
                                                 <img src="images/outbox-gray.png" alt="Outbox Logo"/>
@@ -2280,8 +2311,8 @@ export default class Wallet extends React.Component {
                             <input type="hidden" name="which" readOnly value={this.state.send_coin} />
                             <input type="hidden" name="private_key" readOnly value={keys[key].private_key} />
                             <input type="hidden" name="public_key" readOnly value={keys[key].public_key} />
-                            <input type="hidden" name="pending_safex_bal" readOnly value={keys[key].pending_safex_bal} />
-                            <input type="hidden" name="pending_btc_bal" readOnly value={keys[key].pending_btc_bal} />
+                            <input type="hidden" name="pending_safex_bal" readOnly value={keys[key].pending_safex_bal} id="pending_safex_bal" />
+                            <input type="hidden" name="pending_btc_bal" readOnly value={keys[key].pending_btc_bal} id="pending_btc_bal" />
                             <div className="input-group">
                                 <span className="input-group-addon" id="basic-addon1">From:</span>
                                 <input name="from" type="text" className="form-control" placeholder="From"
@@ -2330,14 +2361,16 @@ export default class Wallet extends React.Component {
                                 ?
                                     <button type="submit"
                                         name="form_send_submit"
-                                        className="form-send-submit button-shine">
+                                        className="form-send-submit button-shine"
+                                        disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
                                         <img src="images/outgoing.png" alt="Outgoing Icon"/>
                                         Send
                                     </button>
                                 :
                                     <button type="submit"
                                         name="form_send_submit"
-                                        className="form-send-submit button-shine">
+                                        className="form-send-submit button-shine"
+                                        disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
                                         <img src="images/outgoing-blue.png" alt="Outgoing Icon"/>
                                         Send
                                     </button>
