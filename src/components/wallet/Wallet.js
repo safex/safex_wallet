@@ -2174,7 +2174,7 @@ export default class Wallet extends React.Component {
                                     className={this.state.collapse_open.key === key && this.state.transaction_being_sent ? 'send-btn button-shine disabled-btn' : 'send-btn button-shine active'}>
                                     <span className="img-wrap">
                                         {
-                                            this.state.collapse_open.key === key && this.state.transaction_being_sent
+                                            this.state.collapse_open.key === key && this.state.transaction_being_sent || this.state.send_disabled
                                             ?
                                                 <img src="images/outbox-gray.png" alt="Outbox Logo"/>
                                             :
@@ -2195,7 +2195,7 @@ export default class Wallet extends React.Component {
                                     onClick={this.openSendReceive.bind(this, key, 'send')}
                                     className={this.state.collapse_open.key === key && this.state.collapse_open.receive_open || this.state.send_disabled ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
                                     {
-                                        this.state.collapse_open.key === key && this.state.collapse_open.receive_open || this.state.transaction_being_sent
+                                        this.state.collapse_open.key === key && this.state.collapse_open.receive_open || this.state.transaction_being_sent || this.state.send_disabled
                                         ?
                                             <span className="img-wrap">
                                                 <img src="images/outbox-gray.png" alt="Outbox Logo"/>
