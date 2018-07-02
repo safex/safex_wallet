@@ -2169,9 +2169,9 @@ export default class Wallet extends React.Component {
                         this.state.collapse_open.send_open && this.state.collapse_open.key === key
                         ?
                             <div>
-                                <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
+                                <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 || this.state.send_disabled === false ? '' : 'disabled'}
                                     onClick={this.openSendReceive.bind(this, key, 'send')}
-                                    className={this.state.collapse_open.key === key && this.state.transaction_being_sent || this.state.send_disabled ? 'send-btn button-shine disabled-btn' : 'send-btn button-shine active'}>
+                                    className={this.state.collapse_open.key === key && this.state.transaction_being_sent ? 'send-btn button-shine disabled-btn' : 'send-btn button-shine active'}>
                                     <span className="img-wrap">
                                         {
                                             this.state.collapse_open.key === key && this.state.transaction_being_sent
@@ -2195,7 +2195,7 @@ export default class Wallet extends React.Component {
                                     onClick={this.openSendReceive.bind(this, key, 'send')}
                                     className={this.state.collapse_open.key === key && this.state.collapse_open.receive_open || this.state.send_disabled ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
                                     {
-                                        this.state.collapse_open.key === key && this.state.collapse_open.receive_open
+                                        this.state.collapse_open.key === key && this.state.collapse_open.receive_open || this.state.transaction_being_sent
                                         ?
                                             <span className="img-wrap">
                                                 <img src="images/outbox-gray.png" alt="Outbox Logo"/>
