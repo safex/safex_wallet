@@ -2504,7 +2504,7 @@ export default class Wallet extends React.Component {
                             <form className="container transactionBeingSent" onSubmit={this.sendCoins}>
                                 <div className="head">
                                     <h3>Sending </h3>
-                                    <span className="close" onClick={this.closeCoinModal}>X</span>
+                                    <span className={this.state.transaction_being_sent ? 'close disabled' : 'close'} onClick={this.closeCoinModal}>X</span>
                                 </div>
                                 <div className="currency">
                                     <span>Currency:</span>
