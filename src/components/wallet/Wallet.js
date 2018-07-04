@@ -2545,7 +2545,7 @@ export default class Wallet extends React.Component {
                                     <label htmlFor="total">Total:</label>
                                     <input readOnly name="total" value={this.state.send_total} />
                                 </div>
-                                <button className="confirm-btn button-shine-green" type="submit">
+                                <button className={this.state.transaction_being_sent ? 'confirm-btn button-shine-green disabled' : 'confirm-btn button-shine-green'} type="submit">
                                     {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}
                                 </button>
                             </form>

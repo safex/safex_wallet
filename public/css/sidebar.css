@@ -161,6 +161,9 @@
   padding: 6px 1px 5px;
   width: 70%;
 }
+.overflow.sendModal .confirm-btn.disabled {
+  pointer-events: none;
+}
 .overflow.sendModal .input-group {
   width: 100%;
 }
