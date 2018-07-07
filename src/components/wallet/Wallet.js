@@ -423,6 +423,22 @@ export default class Wallet extends React.Component {
         fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
             .then(resp => resp.text())
             .then((resp) => {
+                if (resp === "") {
+                    if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                        this.setCoinModalOpenSettings('There was an error with the transaction');
+                    } else {
+                        this.setCoinModalClosedSettings('There was an error with the transaction');
+                    }
+                    this.setState({
+                        send_disabled: false,
+                    });
+                    setTimeout(() => {
+                        this.setState({
+                            transaction_being_sent: false,
+                        });
+                    }, 500);
+                    throw "There was an error with the transaction.";
+                }
                 this.setState({
                     sidebar_open: true,
                     transaction_sent: true,
@@ -1133,7 +1149,7 @@ export default class Wallet extends React.Component {
                 })
             }, 300);
         });
-     }
+    }
 
     openExportUnencryptedWalletPopup() {
         this.setState({
@@ -1540,13 +1556,17 @@ export default class Wallet extends React.Component {
 
         if (this.state.send_coin === 'safex') {
             var send_total = parseFloat(send_amount);
+            this.setState({
+                send_fee: send_fee,
+                send_total: send_total.toFixed(0)
+            });
         } else {
             var send_total = parseFloat(send_fee) + parseFloat(send_amount);
+            this.setState({
+                send_fee: send_fee,
+                send_total: send_total.toFixed(8)
+            });
         }
-        this.setState({
-            send_fee: send_fee,
-            send_total: send_total.toFixed(8)
-        });
     }
 
     //This is protection against way too small fees
@@ -2175,7 +2195,7 @@ export default class Wallet extends React.Component {
                             <div>
                                 <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 || this.state.send_disabled === false ? '' : 'disabled'}
                                     onClick={this.openSendReceive.bind(this, key, 'send')}
-                                    className={this.state.collapse_open.key === key && this.state.transaction_being_sent ? 'send-btn button-shine disabled-btn' : 'send-btn button-shine active'}>
+                                    className={this.state.collapse_open.key === key && this.state.transaction_being_sent || this.state.send_disabled ? 'send-btn button-shine disabled-btn' : 'send-btn button-shine active'}>
                                     <span className="img-wrap">
                                         {
                                             this.state.collapse_open.key === key && this.state.transaction_being_sent || this.state.send_disabled
@@ -2197,7 +2217,7 @@ export default class Wallet extends React.Component {
                             <div>
                                 <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
                                     onClick={this.openSendReceive.bind(this, key, 'send')}
-                                    className={this.state.collapse_open.key === key && this.state.collapse_open.receive_open || this.state.send_disabled ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
+                                    className={this.state.collapse_open.key === key && this.state.collapse_open.receive_open || this.state.send_disabled ? 'send-btn button-shine disabled-btn' : 'send-btn button-shine'}>
                                     {
                                         this.state.collapse_open.key === key && this.state.collapse_open.receive_open || this.state.transaction_being_sent || this.state.send_disabled
                                         ?
@@ -2349,7 +2369,7 @@ export default class Wallet extends React.Component {
                             <div className="form-group">
                                 <label htmlFor="fee">Fee(BTC):</label>
                                 <input type="number" name="fee" onChange={this.sendFeeOnChange}
-                                    onBlur={this.sendFeeOnBlur} readOnly value={this.state.send_fee}/>
+                                    onBlur={this.sendFeeOnBlur} value={this.state.send_fee}/>
                             </div>
                             <div className="form-group fee-buttons">
                                 <span className={this.state.active_fee === 'slow'
@@ -2581,26 +2601,26 @@ export default class Wallet extends React.Component {
                                     <textarea name="from" className="form-control" readOnly
                                         value={this.state.send_keys.public_key} placeholder="Address"
                                         aria-describedby="basic-addon1">
-                            </textarea>
+                                    </textarea>
                                 </div>
                                 <div className="input-group">
                                     <label htmlFor="destination">To:</label>
                                     <textarea name="destination" className="form-control" readOnly
                                         value={this.state.send_to} placeholder="Address"
                                         aria-describedby="basic-addon1">
-                            </textarea>
+                                    </textarea>
                                 </div>
                                 <div className="input-group">
                                     <label htmlFor="txid">TX ID:</label>
                                     <textarea name="txid" className="form-control" readOnly
                                         value={this.state.txid}  placeholder="Address"
                                         aria-describedby="basic-addon1" rows="3">
-                            </textarea>
+                                    </textarea>
                                 </div>
                                 <input type="hidden" readOnly name="private_key"
-                                       value={this.state.send_keys.private_key} />
+                                    value={this.state.send_keys.private_key} />
                                 <input type="hidden" readOnly name="public_key"
-                                       value={this.state.send_keys.public_key} />
+                                   value={this.state.send_keys.public_key} />
                                 <div className="form-group">
                                     <label htmlFor="amount">Amount:</label>
                                     <input readOnly name="amount" value={this.state.send_amount} />
@@ -2763,11 +2783,11 @@ export default class Wallet extends React.Component {
                         <div className="right-options">
                             {
                                 this.state.affiliate_active
-                                    ?
+                                ?
                                     <button className="aff-btn aff-btn-active button-shine" title="Affiliate System (Under development)" onClick={this.closeAffiliateModal} disabled>
                                         <img src="images/world-blue.png" alt="World Logo"/>
                                     </button>
-                                    :
+                                :
                                     <button className="aff-btn button-shine" title="Affiliate System (Under development)" onClick={this.openAffiliateModal} disabled>
                                         <img src="images/world.png" alt="World Logo"/>
                                     </button>
@@ -2775,11 +2795,11 @@ export default class Wallet extends React.Component {
 
                             {
                                 this.state.dividend_active
-                                    ?
+                                ?
                                     <button className="dividend-btn dividend-btn-active button-shine" title="Dividend Calculator (Under development)" onClick={this.closeDividendModal} disabled>
                                         <img src="images/calculator-blue.png" alt="Calculator Logo"/>
                                     </button>
-                                    :
+                                :
                                     <button className="dividend-btn button-shine" title="Dividend Calculator (Under development)" onClick={this.openDividendModal} disabled>
                                         <img src="images/calculator.png" alt="Calculator Logo"/>
                                     </button>
@@ -2787,11 +2807,11 @@ export default class Wallet extends React.Component {
 
                             {
                                 this.state.settings_active
-                                    ?
+                                ?
                                     <button className="settings button-shine settings-btn-active" onClick={this.closeSettingsModal} title="Settings">
                                         <img src="images/settings-blue.png" alt="Mixer Logo"/>
                                     </button>
-                                    :
+                                :
                                     <button className="settings button-shine" onClick={this.openSettingsModal} title="Settings">
                                         <img src="images/settings.png" alt="Mixer Logo"/>
                                     </button>
@@ -2799,11 +2819,11 @@ export default class Wallet extends React.Component {
 
                             {
                                 this.state.refreshTimer === 0
-                                    ?
+                                ?
                                     <button className="refresh-btn button-shine"  onClick={this.refreshWallet} title="Refresh">
                                         <img src="images/refresh.png" alt="Refresh Logo"/>
                                     </button>
-                                    :
+                                :
                                     <button className="refresh-btn button-shine disabled" title="Refresh">
                                         <img src="images/refresh-blue.png" alt="Refresh Logo"/>
                                         <span><p>{this.state.refreshTimer + 's'}</p></span>
@@ -2841,9 +2861,9 @@ export default class Wallet extends React.Component {
                                         </div>
                                         {
                                             this.state.create_key_active
-                                            ?
+                                                ?
                                                 <button type="submit" className="button-shine" title="Create Key">Create Key</button>
-                                            :
+                                                :
                                                 <button type="submit" disabled="disabled" className="button-shine" title="Create Key"></button>
                                         }
                                     </div>
@@ -2870,11 +2890,11 @@ export default class Wallet extends React.Component {
                                 <div className="mainAlertProceedWrap">
                                     {
                                         this.state.export_unencrypted_wallet && this.state.export_encrypted_wallet === false
-                                        ?
+                                            ?
                                             <button className="mainAlertProceed active" onClick={this.exportUnencryptedWallet}>
                                                 Ok
                                             </button>
-                                        :
+                                            :
                                             <button className="mainAlertProceed">
                                                 Ok
                                             </button>
