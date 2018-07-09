@@ -59,6 +59,7 @@ export default class SelectWallet extends React.Component {
     }
 
     tryLoadWalletFromDisk() {
+
         const walletPath = DEFAULT_WALLET_PATH;
 
         loadWalletFromFile(walletPath, (err, encrypted) => {
@@ -69,13 +70,13 @@ export default class SelectWallet extends React.Component {
             }
 
             if (!encrypted) {
-                this.setState({walletExists: false});
+                this.setState({walletExists: false, isLoading: false});
                 return;
             }
 
             localStorage.setItem('encrypted_wallet', encrypted);
             localStorage.setItem('wallet_path', walletPath);
-            this.setState({walletExists: true});
+            this.setState({walletExists: true, isLoading: false});
         });
     }
 
