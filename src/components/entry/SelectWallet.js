@@ -70,13 +70,19 @@ export default class SelectWallet extends React.Component {
             }
 
             if (!encrypted) {
-                this.setState({walletExists: false, isLoading: false});
+                this.setState({
+                    walletExists: false,
+                    isLoading: false
+                });
                 return;
             }
 
             localStorage.setItem('encrypted_wallet', encrypted);
             localStorage.setItem('wallet_path', walletPath);
-            this.setState({walletExists: true, isLoading: false});
+            this.setState({
+                walletExists: true,
+                isLoading: false
+            });
         });
     }
 
@@ -235,87 +241,96 @@ export default class SelectWallet extends React.Component {
         const wallet_exists = this.state.walletExists;
         let show_options;
 
-        if (wallet_exists) {
-            show_options = (
-                <div className="container">
-                    <div className="col-xs-12 Login-logo">
-                        <h2>Safex</h2>
-                        <h3>Wallet</h3>
-                        <p>v0.0.7</p>
-                        <button className="back-button wallet-reset-button" onClick={this.state.walletResetModal ? this.walletResetClose : this.walletResetStart}>Wallet Reset</button>
-                    </div>
-                    <div className="col-xs-8 col-xs-offset-2 App-intro">
-                        <div className="row text-center">
-                            <div className="col-xs-6 login-wrap fadeInDown">
-                                <Link to="/login">
-                                    <div className="col-xs-12">
-                                        <img src="images/safex-icon-circle.png" alt="Safex Icon Circle"/>
-                                        <button className="btn btn-default button-neon-blue">Login</button>
-                                        <p>Enter your password</p>
-                                    </div>
-                                </Link>
-                            </div>
-                            <div className="col-xs-6 importwallet-wrap fadeInDown">
-                                <Link to="/importwallet">
-                                    <div className="col-xs-12">
-                                        <img src="images/import-main.png" alt="Safex Icon Circle"/>
-                                        <button className="btn btn-default button-neon-green">Import</button>
-                                        <p>Import your wallet or recover from backup file</p>
-                                    </div>
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-xs-12 text-center Intro-footer">
-                        <img src="images/footer-logo.png" alt="Safex Icon Footer"/>
-                        <p className="text-center">2014-2018 All Rights Reserved Safe Exchange Developers &copy;</p>
-                    </div>
+        if (this.state.isLoading) {
+            return (
+                <div className="spinner-wrap">
+                    <div className="lds-dual-ring"></div>
                 </div>
-            );
+            )
         } else {
-            show_options = (
-                <div className="container">
-                    <div className="col-xs-12 Login-logo">
-                        <h2>Safex</h2>
-                        <h3>Wallet</h3>
-                        <p>v0.0.7</p>
-                        <button className="back-button wallet-reset-button" onClick={this.state.walletResetModal ? this.walletResetClose : this.walletResetNoWallet}>Wallet
-                            Reset
-                        </button>
-                    </div>
-                    <div className="col-xs-8 col-xs-offset-2 App-intro">
-                        <div className="row text-center">
-                            <div className="col-xs-6 login-wrap fadeInDown">
-                                <Link to="/createwallet">
-                                    <div className="col-xs-12">
-                                        <img src="images/safex-icon-circle.png" alt="Safex Icon Circle"/>
-                                        <button className="btn btn-default button-neon-blue">New Wallet</button>
-                                        <p>Create a new Wallet</p>
-                                    </div>
-                                </Link>
-                            </div>
-                            <div className="col-xs-6 importwallet-wrap fadeInDown">
-                                <Link to="/importwallet">
-                                    <div className="col-xs-12">
-                                        <img src="images/import-main.png" alt="Safex Icon Circle"/>
-                                        <button className="btn btn-default button-neon-green">Import</button>
-                                        <p>Import a safexwallet .dat file</p>
-                                    </div>
-                                </Link>
+            if (wallet_exists) {
+                show_options = (
+                    <div className="container">
+                        <div className="col-xs-12 Login-logo">
+                            <h2>Safex</h2>
+                            <h3>Wallet</h3>
+                            <p>v0.0.7</p>
+                            <button className="back-button wallet-reset-button" onClick={this.state.walletResetModal ? this.walletResetClose : this.walletResetStart}>Wallet Reset</button>
+                        </div>
+                        <div className="col-xs-8 col-xs-offset-2 App-intro">
+                            <div className="row text-center">
+                                <div className="col-xs-6 login-wrap fadeInDown">
+                                    <Link to="/login">
+                                        <div className="col-xs-12">
+                                            <img src="images/safex-icon-circle.png" alt="Safex Icon Circle"/>
+                                            <button className="btn btn-default button-neon-blue">Login</button>
+                                            <p>Enter your password</p>
+                                        </div>
+                                    </Link>
+                                </div>
+                                <div className="col-xs-6 importwallet-wrap fadeInDown">
+                                    <Link to="/importwallet">
+                                        <div className="col-xs-12">
+                                            <img src="images/import-main.png" alt="Safex Icon Circle"/>
+                                            <button className="btn btn-default button-neon-green">Import</button>
+                                            <p>Import your wallet or recover from backup file</p>
+                                        </div>
+                                    </Link>
+                                </div>
                             </div>
                         </div>
+                        <div className="col-xs-12 text-center Intro-footer">
+                            <img src="images/footer-logo.png" alt="Safex Icon Footer"/>
+                            <p className="text-center">2014-2018 All Rights Reserved Safe Exchange Developers &copy;</p>
+                        </div>
                     </div>
-                    <div className="col-xs-12 text-center Intro-footer">
-                        <img src="images/footer-logo.png" alt="Safex Icon Footer"/>
-                        <p className="text-center">2014-2018 All Rights Reserved Safe Exchange Developers &copy;</p>
+                );
+            } else {
+                show_options = (
+                    <div className="container">
+                        <div className="col-xs-12 Login-logo">
+                            <h2>Safex</h2>
+                            <h3>Wallet</h3>
+                            <p>v0.0.7</p>
+                            <button className="back-button wallet-reset-button" onClick={this.state.walletResetModal ? this.walletResetClose : this.walletResetNoWallet}>Wallet
+                                Reset
+                            </button>
+                        </div>
+                        <div className="col-xs-8 col-xs-offset-2 App-intro">
+                            <div className="row text-center">
+                                <div className="col-xs-6 login-wrap fadeInDown">
+                                    <Link to="/createwallet">
+                                        <div className="col-xs-12">
+                                            <img src="images/safex-icon-circle.png" alt="Safex Icon Circle"/>
+                                            <button className="btn btn-default button-neon-blue">New Wallet</button>
+                                            <p>Create a new Wallet</p>
+                                        </div>
+                                    </Link>
+                                </div>
+                                <div className="col-xs-6 importwallet-wrap fadeInDown">
+                                    <Link to="/importwallet">
+                                        <div className="col-xs-12">
+                                            <img src="images/import-main.png" alt="Safex Icon Circle"/>
+                                            <button className="btn btn-default button-neon-green">Import</button>
+                                            <p>Import a safexwallet .dat file</p>
+                                        </div>
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-xs-12 text-center Intro-footer">
+                            <img src="images/footer-logo.png" alt="Safex Icon Footer"/>
+                            <p className="text-center">2014-2018 All Rights Reserved Safe Exchange Developers &copy;</p>
+                        </div>
                     </div>
-                </div>
-            );
+                );
+            }
         }
 
         return (
             <div>
                 {show_options}
+
                 <div className={this.state.walletResetModal
                     ? 'overflow sendModal walletResetModal active'
                     : 'overflow sendModal walletResetModal'}>
