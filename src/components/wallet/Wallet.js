@@ -128,7 +128,6 @@ export default class Wallet extends React.Component {
         this.closeHistoryModal = this.closeHistoryModal.bind(this);
         this.sendAmountOnChange = this.sendAmountOnChange.bind(this);
         this.sendFeeOnChange = this.sendFeeOnChange.bind(this);
-        this.sendFeeOnBlur = this.sendFeeOnBlur.bind(this);
         this.sendTotalAdjustCoinChange = this.sendTotalAdjustCoinChange.bind(this);
         this.closeSuccessModal = this.closeSuccessModal.bind(this);
         this.openDividendModal = this.openDividendModal.bind(this);
@@ -1567,19 +1566,10 @@ export default class Wallet extends React.Component {
                 send_total: send_total.toFixed(8)
             });
         }
-    }
 
-    //This is protection against way too small fees
-    sendFeeOnBlur(e) {
-        var send_fee;
-        if (this.state.send_fee <= 0.00001) {
-            send_fee = 0.00001;
-        } else {
-            send_fee = this.state.send_fee;
+        if (this.state.send_amount <= 0.00001) {
+            this.state.send_amount === 0.00001;
         }
-        this.setState({
-            send_fee: send_fee
-        })
     }
 
     //This fires the currency selection method and sets the currency state
@@ -1610,13 +1600,23 @@ export default class Wallet extends React.Component {
                 active_fee: 'fast'
             });
         } else {
-            var send_total = parseFloat(this.state.average_fee) / 4 + 0.00001;
-            this.setState({
-                send_amount: 0.00001.toFixed(8),
-                send_fee: parseFloat(parseFloat(this.state.average_fee) / 4).toFixed(8),
-                send_total: send_total.toFixed(8),
-                active_fee: 'fast'
-            });
+            if (parseFloat(parseFloat(this.state.average_fee) / 4) > 0.00001) {
+                var send_total = parseFloat(this.state.average_fee) / 4 + 0.00001;
+                this.setState({
+                    send_amount: 0.00001.toFixed(8),
+                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 4).toFixed(8),
+                    send_total: send_total.toFixed(8),
+                    active_fee: 'fast'
+                });
+            } else {
+                var send_total = 0.00002;
+                this.setState({
+                    send_amount: 0.00001.toFixed(8),
+                    send_fee: 0.00001.toFixed(8),
+                    send_total: send_total.toFixed(8),
+                    active_fee: 'fast'
+                });
+            }
         }
     }
 
@@ -1624,45 +1624,90 @@ export default class Wallet extends React.Component {
         var coin = this.state.send_coin;
         if (coin === 'safex') {
             if (speed === 'fast') {
-                this.setState({
-                    send_fee: parseFloat(this.state.average_fee).toFixed(8),
-                    active_fee: speed
-                });
+                if (parseFloat(this.state.average_fee) > 0.00001) {
+                    this.setState({
+                        send_fee: parseFloat(this.state.average_fee).toFixed(8),
+                        active_fee: speed
+                    });
+                } else {
+                    this.setState({
+                        send_fee: 0.00001.toFixed(8),
+                        active_fee: speed
+                    });
+                }
             }
             if (speed === 'med') {
-                this.setState({
-                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 2).toFixed(8),
-                    active_fee: speed
-                });
+                if (parseFloat(parseFloat(this.state.average_fee) / 2) > 0.00001) {
+                    this.setState({
+                        send_fee: parseFloat(parseFloat(this.state.average_fee) / 2).toFixed(8),
+                        active_fee: speed
+                    });
+                } else {
+                    this.setState({
+                        send_fee: 0.00001.toFixed(8),
+                        active_fee: speed
+                    });
+                }
             }
             if (speed === 'slow') {
-                this.setState({
-                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 4).toFixed(8),
-                    active_fee: speed
-                });
+                if (parseFloat(parseFloat(this.state.average_fee) / 4) > 0.00001) {
+                    this.setState({
+                        send_fee: parseFloat(parseFloat(this.state.average_fee) / 4).toFixed(8),
+                        active_fee: speed
+                    });
+                } else {
+                    this.setState({
+                        send_fee: 0.00001.toFixed(8),
+                        active_fee: speed
+                    });
+                }
             }
         }
         if (coin === 'btc') {
             if (speed === 'fast') {
-                this.setState({
-                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 4).toFixed(8),
-                    send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.average_fee) / 4).toFixed(8),
-                    active_fee: speed
-                });
+                if (parseFloat(parseFloat(this.state.average_fee) / 4) > 0.00001) {
+                    this.setState({
+                        send_fee:   parseFloat(parseFloat(this.state.average_fee) / 4).toFixed(8),
+                        send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.average_fee) / 4).toFixed(8),
+                        active_fee: speed
+                    });
+                } else {
+                    this.setState({
+                        send_fee:   0.00001.toFixed(8),
+                        send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.send_fee)).toFixed(8),
+                        active_fee: speed
+                    });
+                }
             }
             if (speed === 'med') {
-                this.setState({
-                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 6).toFixed(8),
-                    send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.average_fee) / 6).toFixed(8),
-                    active_fee: speed
-                });
+                if (parseFloat(parseFloat(this.state.average_fee) / 6) > 0.00001) {
+                    this.setState({
+                        send_fee:   parseFloat(parseFloat(this.state.average_fee) / 6).toFixed(8),
+                        send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.average_fee) / 6).toFixed(8),
+                        active_fee: speed
+                    });
+                } else {
+                    this.setState({
+                        send_fee:   0.00001.toFixed(8),
+                        send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.send_fee)).toFixed(8),
+                        active_fee: speed
+                    });
+                }
             }
             if (speed === 'slow') {
-                this.setState({
-                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 8).toFixed(8),
-                    send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.average_fee) / 8).toFixed(8),
-                    active_fee: speed
-                });
+                if (parseFloat(parseFloat(this.state.average_fee) / 8) > 0.00001) {
+                    this.setState({
+                        send_fee:   parseFloat(parseFloat(this.state.average_fee) / 8).toFixed(8),
+                        send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.average_fee) / 8).toFixed(8),
+                        active_fee: speed
+                    });
+                } else {
+                    this.setState({
+                        send_fee:   0.00001.toFixed(8),
+                        send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.send_fee)).toFixed(8),
+                        active_fee: speed
+                    });
+                }
             }
         }
     }
@@ -2369,7 +2414,7 @@ export default class Wallet extends React.Component {
                             <div className="form-group">
                                 <label htmlFor="fee">Fee(BTC):</label>
                                 <input type="number" name="fee" onChange={this.sendFeeOnChange}
-                                    onBlur={this.sendFeeOnBlur} value={this.state.send_fee}/>
+                                   value={this.state.send_fee}/>
                             </div>
                             <div className="form-group fee-buttons">
                                 <span className={this.state.active_fee === 'slow'
