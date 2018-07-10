@@ -54,7 +54,7 @@ export default class SelectWallet extends React.Component {
         this.wrongPassword = this.wrongPassword.bind(this);
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.tryLoadWalletFromDisk();
     }
 
