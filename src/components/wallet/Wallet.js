@@ -176,6 +176,12 @@ export default class Wallet extends React.Component {
             // Close Settings Modal
             settings_active: false,
 
+            // Close Send Receive Modal
+            collapse_open: {
+                send_open: false,
+                receive_open: false
+            },
+
             loging_out: true,
         });
         setTimeout(() => {
@@ -1128,6 +1134,9 @@ export default class Wallet extends React.Component {
             private_key_open: {
                 private_key_popup: false,
             },
+
+            // Close settings alert popup
+            info_popup: false,
         });
         this.openMainAlertPopup('This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the \'import key\' feature in another wallet. Press OK to proceed.');
     }
@@ -1139,7 +1148,7 @@ export default class Wallet extends React.Component {
             }
 
             this.setState({
-                main_alert_popup: false,
+                main_alert_popup: false
             });
 
             setTimeout(() => {
@@ -1159,6 +1168,9 @@ export default class Wallet extends React.Component {
             private_key_open: {
                 private_key_popup: false,
             },
+
+            // Close settings alert popup
+            info_popup: false,
         });
         this.openMainAlertPopup('This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is not for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the \'import key\' feature in another wallet. Press OK to proceed.');
     }
@@ -1272,7 +1284,7 @@ export default class Wallet extends React.Component {
             // Close Send Receive Popup
             send_receive_popup: false,
             send_receive_info: ''
-        })
+        });
     }
 
     showPrivateModal(e) {
@@ -1674,7 +1686,7 @@ export default class Wallet extends React.Component {
                 } else {
                     this.setState({
                         send_fee:   0.00001.toFixed(8),
-                        send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.send_fee)).toFixed(8),
+                        send_total: parseFloat(parseFloat(this.state.send_amount) + 0.00001).toFixed(8),
                         active_fee: speed
                     });
                 }
@@ -1689,7 +1701,7 @@ export default class Wallet extends React.Component {
                 } else {
                     this.setState({
                         send_fee:   0.00001.toFixed(8),
-                        send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.send_fee)).toFixed(8),
+                        send_total: parseFloat(parseFloat(this.state.send_amount) + 0.00001).toFixed(8),
                         active_fee: speed
                     });
                 }
@@ -1704,7 +1716,7 @@ export default class Wallet extends React.Component {
                 } else {
                     this.setState({
                         send_fee:   0.00001.toFixed(8),
-                        send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.send_fee)).toFixed(8),
+                        send_total: parseFloat(parseFloat(this.state.send_amount) + 0.00001).toFixed(8),
                         active_fee: speed
                     });
                 }
@@ -2395,7 +2407,7 @@ export default class Wallet extends React.Component {
                             </div>
                             <div className="input-group">
                                 <span className="input-group-addon" id="basic-addon1">To:</span>
-                                <input name="destination" type="text" className="form-control" placeholder="Address"
+                                <input name="destination" type="text" className="form-control" id="to" placeholder="Address"
                                     aria-describedby="basic-addon1" onChange={this.closeSendReceivePopup} />
                             </div>
                         </div>
