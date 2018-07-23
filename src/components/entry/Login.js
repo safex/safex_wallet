@@ -66,7 +66,7 @@ export default class Login extends React.Component {
                 </div>
                 <div className="col-xs-12 Login-form">
                     <form className="form-group" onSubmit={this.handleSubmit}>
-                        <input className={this.state.wrongPassword ? 'form-control shake' : 'form-control'} type="password" name="password" placeholder="Enter Password" />
+                        <input className={this.state.wrongPassword ? 'form-control shake' : 'form-control'} type="password" name="password" placeholder="Enter Password" autoFocus />
                         <button className="btn btn-default button-neon-blue" type="submit">Proceed </button>
                     </form>
                 </div>

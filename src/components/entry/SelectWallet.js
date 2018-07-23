@@ -428,7 +428,11 @@ export default class SelectWallet extends React.Component {
                                         <span onClick={this.walletResetClose} className="close">X</span>
                                     </h3>
                                     <form className="form-group text-center" onSubmit={this.walletResetDlUnencrypted}>
-                                        <input className={this.state.wrong_password ? 'form-control password-btn shake' : 'form-control password-btn'} type="password" name="password" placeholder="Enter Password"/>
+                                        <input className={this.state.wrong_password ? 'form-control password-btn shake' : 'form-control password-btn'}
+                                            type="password"
+                                            name="password"
+                                            placeholder="Enter Password"
+                                            autoFocus />
                                         <button className="keys-btn button-shine" type="submit">Proceed</button>
                                     </form>
                                 </div>

@@ -240,7 +240,8 @@ export default class ImportWallet extends React.Component {
                             <input type="password"
                                 className={this.state.wrongTargetPassword ? 'form-control shake' : 'form-control'}
                                 name="password"
-                                placeholder="Enter Password"/>
+                                placeholder="Enter Password"
+                                autoFocus />
                         </div>
 
                         {currentWalletPass}
