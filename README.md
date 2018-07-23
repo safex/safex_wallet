@@ -4,7 +4,7 @@ Official repository for SAFEX electron wallet.
 
 ## Releases
 
-You can download [SAFEX Wallet](https://github.com/safex/safex_wallet/releases) on the github release page or on [Safex.io](https://safex.io)
+You can download [SAFEX Wallet](https://github.com/safex/safex_wallet/releases) on the github release page or on [Safex.io/safexwallet](https://safex.io/safexwallet)
 
 Available for Mac, Windows (64, 32) and Linux.
 
