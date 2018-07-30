@@ -52,7 +52,7 @@ export default class Navigation extends React.Component {
             try {
                 var btc = 0;
                 if (resp[0].symbol === 'BTC') {
-                    btc = resp[0].price_usd
+                    btc = parseFloat(resp[0].price_usd).toFixed(2);
                     localStorage.setItem('btc_price', btc);
                     this.setState({bitcoin_price: btc});
                 }
