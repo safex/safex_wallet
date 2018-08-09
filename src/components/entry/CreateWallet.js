@@ -112,7 +112,7 @@ export default class CreateWallet extends React.Component {
                 </div>
                 <div className="col-xs-12 Login-form Create-wallet-form">
                     <form className="form-group" onSubmit={this.handleSubmit}>
-                        <input className={this.state.wrongPassword ? 'form-control shake' : 'form-control'} type="password" name="create_password" placeholder="Enter Password" />
+                        <input className={this.state.wrongPassword ? 'form-control shake' : 'form-control'} type="password" name="create_password" placeholder="Enter Password" autoFocus />
                         <input className={this.state.wrongRepeatPassword ? 'form-control shake' : 'form-control'} type="password" name="repeat_password" placeholder="Repeat Password" />
                         <button className="btn btn-default button-neon-blue" type="submit">CREATE </button>
                     </form>

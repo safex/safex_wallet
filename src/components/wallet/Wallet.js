@@ -53,6 +53,7 @@ export default class Wallet extends React.Component {
             active_fee: 'fast',
             safex_price: 0,
             btc_price: 0,
+            fee_in_btc: true,
 
             //Dividend calculator
             totalTradeVolume: 500000000,
@@ -167,6 +168,7 @@ export default class Wallet extends React.Component {
         this.editLabel = this.editLabel.bind(this);
         this.openCreateKey = this.openCreateKey.bind(this);
         this.amountChange = this.amountChange.bind(this);
+        this.convertBtcToDollars = this.convertBtcToDollars.bind(this);
     }
 
     logout() {
@@ -654,117 +656,124 @@ export default class Wallet extends React.Component {
         e.preventDefault();
         //check whether Bitcoin or Safex is selected
         if (this.state.send_coin === 'safex') {
-            //open the modal by setting transaction_being_sent
-            try {
-                this.setState({
-                    sidebar_open: true,
-                    transaction_being_sent: true,
-                    settings_active: false,
-                    send_disabled: true,
-                });
-
-                //set the signing key for the transaction
-                var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
-                //set the source of the transaction
-                var source = e.target.public_key.value;
-                //set the amount provided by the user
-                var amount = e.target.amount.value;
-                //set the fee provided by the user
-                var fee = e.target.fee.value;
-                //set the destination provided by the user
-                var destination = e.target.destination.value;
-
-                //here we will check to make sure that the destination is a valid bitcoin address
-                var address = bitcore.Address.fromString(destination);
-                var address2 = bitcore.Address.fromString(source);
-
-                //here we try to get the unspent transactions from the source we send from
+            if (this.state.fee_in_btc) {
+                //open the modal by setting transaction_being_sent
                 try {
-                    fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
-                        .then(resp => resp.json())
-                        .then((resp) => {
-                            //enter into the safex transaction method
-                            this.formSafexTransaction(resp,
-                                amount,
-                                parseFloat((fee * 100000000).toFixed(0)),
-                                destination,
-                                keys,
-                                source);
-                        });
-                } catch (e) {
-                    //if the fetch fails then we have a network problem and can't get unspent transaction history
-                    if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
-                        this.setCoinModalOpenSettings('Network communication error, please try again later');
-                    } else {
-                        this.setCoinModalClosedSettings('Network communication error, please try again later');
-                    }
-                    throw 'Network communication error, please try again later';
-                }
-            } catch (e) {
-                //this is triggered if the destination address is not a valid bitcoin address
-                if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
-                    this.setCoinModalOpenSettings('Invalid destination address');
-                } else {
-                    this.setCoinModalClosedSettings('Invalid destination address');
-                }
-                throw 'Invalid destination address';
-            }
+                    this.setState({
+                        sidebar_open: true,
+                        transaction_being_sent: true,
+                        settings_active: false,
+                        send_disabled: true
+                    });
 
+                    //set the signing key for the transaction
+                    var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
+                    //set the source of the transaction
+                    var source = e.target.public_key.value;
+                    //set the amount provided by the user
+                    var amount = e.target.amount.value;
+                    //set the fee provided by the user
+                    var fee = e.target.fee.value;
+                    //set the destination provided by the user
+                    var destination = e.target.destination.value;
+
+                    //here we will check to make sure that the destination is a valid bitcoin address
+                    var address = bitcore.Address.fromString(destination);
+                    var address2 = bitcore.Address.fromString(source);
+
+                    //here we try to get the unspent transactions from the source we send from
+                    try {
+                        fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
+                            .then(resp => resp.json())
+                            .then((resp) => {
+                                //enter into the safex transaction method
+                                this.formSafexTransaction(resp,
+                                    amount,
+                                    parseFloat((fee * 100000000).toFixed(0)),
+                                    destination,
+                                    keys,
+                                    source);
+                            });
+                    } catch (e) {
+                        //if the fetch fails then we have a network problem and can't get unspent transaction history
+                        if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                            this.setCoinModalOpenSettings('Network communication error, please try again later');
+                        } else {
+                            this.setCoinModalClosedSettings('Network communication error, please try again later');
+                        }
+                        throw 'Network communication error, please try again later';
+                    }
+                } catch (e) {
+                    //this is triggered if the destination address is not a valid bitcoin address
+                    if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                        this.setCoinModalOpenSettings('Invalid destination address');
+                    } else {
+                        this.setCoinModalClosedSettings('Invalid destination address');
+                    }
+                    throw 'Invalid destination address';
+                }
+            } else {
+                this.setCoinModalOpenSettings('Please convert the transaction to BTC to proceed');
+            }
             //if safex is not selected then it must be Bitcoin
         } else if(this.state.send_coin === 'btc') {
-            try {  //open the modal by setting transaction_being_sent
-                this.setState({
-                    sidebar_open: true,
-                    transaction_being_sent: true,
-                    settings_active: false,
-                    send_disabled: true,
-                });
+            if (this.state.fee_in_btc) {
+                try {  //open the modal by setting transaction_being_sent
+                    this.setState({
+                        sidebar_open: true,
+                        transaction_being_sent: true,
+                        settings_active: false,
+                        send_disabled: true,
+                    });
 
-                //set the signing key for the transaction
-                var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
-                //set the source of the transaction
-                var source = e.target.public_key.value;
-                //set the amount provided by the user
-                var amount = e.target.amount.value;
-                //set the fee provided by the user
-                var fee = e.target.fee.value;
-                //set the destination provided by the user
-                var destination = e.target.destination.value;
+                    //set the signing key for the transaction
+                    var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
+                    //set the source of the transaction
+                    var source = e.target.public_key.value;
+                    //set the amount provided by the user
+                    var amount = e.target.amount.value;
+                    //set the fee provided by the user
+                    var fee = e.target.fee.value;
+                    //set the destination provided by the user
+                    var destination = e.target.destination.value;
 
-                //here we will check to make sure that the destination is a valid bitcoin address
+                    //here we will check to make sure that the destination is a valid bitcoin address
 
-                var address = bitcore.Address.fromString(destination);
-                var address2 = bitcore.Address.fromString(source);
-                //here we try to get the unspent transactions from the source we send from
-                try {
-                    fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
-                        .then(resp => resp.json())
-                        .then((resp) => {
-                            //enter into the bitcoin transaction method
-                            this.formBitcoinTransaction(resp,
-                                parseFloat((amount * 100000000).toFixed(0)),
-                                parseFloat((fee * 100000000).toFixed(0)),
-                                destination,
-                                keys,
-                                source);
-                        });
-                } catch (e) {
-                    //if the fetch fails then we have a network problem and can't get unspent transaction history
-                    if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
-                        this.setCoinModalOpenSettings('Network communication error, please try again later');
-                    } else {
-                        this.setCoinModalClosedSettings('Network communication error, please try again later');
+                    var address = bitcore.Address.fromString(destination);
+                    var address2 = bitcore.Address.fromString(source);
+                    //here we try to get the unspent transactions from the source we send from
+                    try {
+                        fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
+                            .then(resp => resp.json())
+                            .then((resp) => {
+                                //enter into the bitcoin transaction method
+                                this.formBitcoinTransaction(resp,
+                                    parseFloat((amount * 100000000).toFixed(0)),
+                                    parseFloat((fee * 100000000).toFixed(0)),
+                                    destination,
+                                    keys,
+                                    source);
+                            });
+                    } catch (e) {
+                        //if the fetch fails then we have a network problem and can't get unspent transaction history
+                        if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                            this.setCoinModalOpenSettings('Network communication error, please try again later');
+                        } else {
+                            this.setCoinModalClosedSettings('Network communication error, please try again later');
+                        }
+                        throw 'Network communication error, please try again later';
                     }
-                    throw 'Network communication error, please try again later';
+                } catch (e) {
+                    //this is triggered if the destination address is not a valid bitcoin address
+                    if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                        this.setCoinModalOpenSettings('Invalid destination address');
+                    } else {
+                        this.setCoinModalClosedSettings('Invalid destination address');
+                    }
+                    throw 'Invalid destination address';
                 }
-            } catch (e) {
-                //this is triggered if the destination address is not a valid bitcoin address
-                if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
-                    this.setCoinModalOpenSettings('Invalid destination address');
-                } else {
-                    this.setCoinModalClosedSettings('Invalid destination address');
-                }
-                throw 'Invalid destination address';
+            } else {
+                this.setCoinModalOpenSettings('Please convert the transaction to BTC to proceed');
             }
         }
     }
@@ -787,54 +796,60 @@ export default class Wallet extends React.Component {
         });
 
         if ((this.state.send_coin === 'safex' && this.state.send_fee > key_btc_bal) || (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal)) {
-            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+            if (this.sidebar_open) {
                 this.setCoinModalOpenSettings('You do not have enough BITCOIN to cover the fee');
             } else {
                 this.setCoinModalClosedSettings('You do not have enough BITCOIN to cover the fee');
             }
         } else if (this.state.send_coin === 'safex' && this.state.send_amount > key_safex_bal) {
-            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+            if (this.sidebar_open) {
                 this.setCoinModalOpenSettings('You do not have enough SAFEX to cover this transaction');
             } else {
                 this.setCoinModalClosedSettings('You do not have enough SAFEX to cover this transaction');
             }
         } else if (this.state.send_coin === 'safex' && (this.state.send_amount === '' || this.state.send_amount === 0 || isNaN(this.state.send_amount))) {
-            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+            if (this.sidebar_open) {
                 this.setCoinModalOpenSettings('Invalid SAFEX amount');
             } else {
                 this.setCoinModalClosedSettings('Invalid SAFEX amount');
             }
         } else if (this.state.send_coin === 'btc' && (this.state.send_amount === '' || parseFloat(this.state.send_amount) === 0 || isNaN(this.state.send_total))) {
-            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+            if (this.sidebar_open) {
                 this.setCoinModalOpenSettings('Invalid BITCOIN amount');
             } else {
                 this.setCoinModalClosedSettings('Invalid BITCOIN amount');
             }
         } else if (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal) {
-            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+            if (this.sidebar_open) {
                 this.setCoinModalOpenSettings('You do not have enough BITCOIN to cover this transaction');
             } else {
                 this.setCoinModalClosedSettings('You do not have enough BITCOIN to cover this transaction');
             }
         } else if (e.target.destination.value === '') {
-            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+            if (this.sidebar_open) {
                 this.setCoinModalOpenSettings('Destination field is empty');
             } else {
                 this.setCoinModalClosedSettings('Destination field is empty');
             }
         } else if (e.target.destination.value === e.target.public_key.value) {
-            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+            if (this.sidebar_open) {
                 this.setCoinModalOpenSettings('Invalid sending address');
             } else {
                 this.setCoinModalClosedSettings('Invalid sending address');
             }
         } else if (pending_safex_bal < 0 || pending_btc_bal < 0) {
-            if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+            if (this.sidebar_open) {
                 this.setCoinModalOpenSettings('Cannot send transaction, this key has a pending minus. Please try again later.');
             } else {
                 this.setCoinModalClosedSettings('Cannot send transaction, this key has a pending minus. Please try again later.');
             }
             this.closeCoinModal;
+        } else if (this.state.fee_in_btc === false) {
+            if (this.sidebar_open) {
+                this.setCoinModalOpenSettings('Please convert the transaction to BTC to proceed');
+            } else {
+                this.setCoinModalClosedSettings('Please convert the transaction to BTC to proceed');
+            }
         } else {
             try {
                 bitcore.Address.fromString(e.target.destination.value);
@@ -1587,7 +1602,8 @@ export default class Wallet extends React.Component {
     //This fires the currency selection method and sets the currency state
     sendCoinChoose(coin) {
         this.setState({
-            send_coin: coin
+            send_coin: coin,
+            fee_in_btc: true
         });
         this.sendTotalAdjustCoinChange(coin);
     }
@@ -1766,7 +1782,7 @@ export default class Wallet extends React.Component {
                 var date_time = 0;
                 var safex_confirmations = '';
                 var btc_reference_address = '';
-                var btc_confirmations = ''
+                var btc_confirmations = '';
                 var btc_amount = '';
                 var btc_amount_arr = [];
                 var scriptPubKey = [];
@@ -1817,12 +1833,13 @@ export default class Wallet extends React.Component {
                             return el.n === 0;
                         });
 
-                        btc_amount = btc_amount_arr[0]['value']
+                        btc_amount = btc_amount_arr[0]['value'];
                     }
 
-                    if (scriptPubKey.length > 0 && scriptPubKey[0] !== undefined) {
+                    if (scriptPubKey.length > 0 && scriptPubKey !== undefined) {
                         btc_send_addr = scriptPubKey[0];
                         btc_receive_addr = scriptPubKey[1];
+                        console.log(scriptPubKey[1])
                     }
 
                     if (btc_send_addr[0] !== undefined && btc_send_addr[0].length) {
@@ -1904,7 +1921,7 @@ export default class Wallet extends React.Component {
                         </div>`;
                     }
                 });
-                if (response[0].transactions.length === 0 && response[1].txs.length === 0) {
+                if (response[1].txs.length === 0) {
                     render =`<h5>No transaction history</h5>`;
                 }
                 document.getElementById("history_txs").innerHTML = render;
@@ -1912,7 +1929,6 @@ export default class Wallet extends React.Component {
             .catch(function (error) {
                 console.log(error);
                 render += `<h5>Could not fetch transaction history, plese try again later</h5>`
-                document.getElementById("history_txs").innerHTML = render;
             });
 
     }
@@ -2212,6 +2228,13 @@ export default class Wallet extends React.Component {
         coinModalClosedSettings(this, alert)
     }
 
+    convertBtcToDollars() {
+        this.setState({
+            fee_in_btc: !this.state.fee_in_btc,
+            send_fee: parseFloat(this.state.send_fee).toFixed(8)
+        });
+    }
+
     render() {
         const {keys, archive_active, safex_price, btc_price} = this.state;
 
@@ -2250,7 +2273,7 @@ export default class Wallet extends React.Component {
                         this.state.collapse_open.send_open && this.state.collapse_open.key === key
                         ?
                             <div>
-                                <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 || this.state.send_disabled === false ? '' : 'disabled'}
+                                <button disabled={((keys[key].pending_btc_bal >= 0 || keys[key].pending_safex_bal) >= 0 && this.state.average_fee !== 0) || this.state.send_disabled === false ? '' : 'disabled'}
                                     onClick={this.openSendReceive.bind(this, key, 'send')}
                                     className={this.state.collapse_open.key === key && this.state.transaction_being_sent || this.state.send_disabled ? 'send-btn button-shine disabled-btn' : 'send-btn button-shine active'}>
                                     <span className="img-wrap">
@@ -2272,7 +2295,7 @@ export default class Wallet extends React.Component {
                             </div>
                         :
                             <div>
-                                <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
+                                <button disabled={((keys[key].pending_btc_bal >= 0 || keys[key].pending_safex_bal >= 0) && this.state.average_fee !== 0) ? '' : 'disabled'}
                                     onClick={this.openSendReceive.bind(this, key, 'send')}
                                     className={this.state.collapse_open.key === key && this.state.collapse_open.receive_open || this.state.send_disabled ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
                                     {
@@ -2413,20 +2436,36 @@ export default class Wallet extends React.Component {
                         </div>
                         <div className="col-xs-5 send-right">
                             <div className="form-group">
-                                <label htmlFor="amount">Amount
+                                <label htmlFor="amount">Amount&nbsp;
                                     <span className={this.state.send_coin === "safex"
                                     ? ''
                                     : 'hidden-xs hidden-sm hidden-md hidden-lg'}>
-                                        (Safex):
+                                        {
+                                            this.state.fee_in_btc ? '(Safex)' : '($)'
+                                        }
+                                    </span>
+                                    <span className={this.state.send_coin === "btc"
+                                        ? ''
+                                        : 'hidden-xs hidden-sm hidden-md hidden-lg'}>
+                                        {
+                                            this.state.fee_in_btc ? '(BTC)' : '($)'
+                                        }
                                     </span>
                                 </label>
-                                <input type="number" name="amount" id="amount" onChange={this.sendAmountOnChange}
-                                    value={this.state.send_amount}/>
+                                {
+                                    this.state.send_coin === 'safex'
+                                    ?
+                                        <input type="number" name="amount" id="amount" onChange={this.sendAmountOnChange} readOnly={this.state.fee_in_btc ? '' : 'readonly'}
+                                            value={this.state.fee_in_btc ? this.state.send_amount : (this.state.send_amount * this.state.safex_price).toFixed(8)}/>
+                                    :
+                                        <input type="number" name="amount" id="amount" onChange={this.sendAmountOnChange} readOnly={this.state.fee_in_btc ? '' : 'readonly'}
+                                            value={this.state.fee_in_btc ? this.state.send_amount : (this.state.send_amount * this.state.btc_price).toFixed(8)}/>
+                                }
                             </div>
                             <div className="form-group">
-                                <label htmlFor="fee">Fee(BTC):</label>
-                                <input type="number" name="fee" onChange={this.sendFeeOnChange}
-                                   value={this.state.send_fee}/>
+                                <label htmlFor="fee">{this.state.fee_in_btc ? 'Fee (BTC):' : 'Fee ($)'}</label>
+                                <input type="number" name="fee" onChange={this.sendFeeOnChange} readOnly={this.state.fee_in_btc ? '' : 'readonly'}
+                                    value={this.state.fee_in_btc ? this.state.send_fee : (this.state.send_fee * this.state.btc_price).toFixed(8)}/>
                             </div>
                             <div className="form-group fee-buttons">
                                 <span className={this.state.active_fee === 'slow'
@@ -2440,28 +2479,55 @@ export default class Wallet extends React.Component {
                                     : 'fast-btn button-shine'} onClick={this.feeChange.bind(this, 'fast')}>Fast</span>
                             </div>
                             <div className="form-group">
-                                <label htmlFor="total" className="total-label">Total:</label>
-                                <input className="total-input" type="number" name="total" readOnly value={this.state.send_total} />
+                                <label htmlFor="total" className="total-label">
+                                    Total&nbsp;
+                                    <span className={this.state.send_coin === "safex"
+                                        ? ''
+                                        : 'hidden-xs hidden-sm hidden-md hidden-lg'}>
+                                        {
+                                            this.state.fee_in_btc ? '(Safex)' : '($)'
+                                        }
+                                    </span>
+                                    <span className={this.state.send_coin === "btc"
+                                        ? ''
+                                        : 'hidden-xs hidden-sm hidden-md hidden-lg'}>
+                                        {
+                                            this.state.fee_in_btc ? '(BTC)' : '($)'
+                                        }
+                                    </span>
+                                </label>
+                                {
+                                    this.state.send_coin === 'safex'
+                                    ?
+                                        <input className="total-input" type="number" name="total" readOnly value={this.state.fee_in_btc ? this.state.send_total : (this.state.send_total * this.state.safex_price).toFixed(8)} />
+                                    :
+                                        <input className="total-input" type="number" name="total" readOnly value={this.state.fee_in_btc ? this.state.send_total : (this.state.send_total * this.state.btc_price).toFixed(8)} />
+                                }
                             </div>
-                            {
-                                this.state.send_overflow_active && this.state.transaction_sent === false
-                                ?
-                                    <button type="submit"
-                                        name="form_send_submit"
-                                        className="form-send-submit button-shine"
-                                        disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
-                                        <img src="images/outgoing.png" alt="Outgoing Icon"/>
-                                        Send
-                                    </button>
-                                :
-                                    <button type="submit"
-                                        name="form_send_submit"
-                                        className="form-send-submit button-shine"
-                                        disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
-                                        <img src="images/outgoing-blue.png" alt="Outgoing Icon"/>
-                                        Send
-                                    </button>
-                            }
+                            <div className="form-group">
+                                <button type="button" className="btc-convert-btn button-shine" onClick={this.convertBtcToDollars}>
+                                    {this.state.fee_in_btc ? 'Btc to $' : '$ to btc'}
+                                </button>
+                                {
+                                    this.state.send_overflow_active && this.state.transaction_sent === false
+                                        ?
+                                        <button type="submit"
+                                                name="form_send_submit"
+                                                className="form-send-submit button-shine"
+                                                disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
+                                            <img src="images/outgoing.png" alt="Outgoing Icon"/>
+                                            Send
+                                        </button>
+                                        :
+                                        <button type="submit"
+                                                name="form_send_submit"
+                                                className="form-send-submit button-shine"
+                                                disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
+                                            <img src="images/outgoing-blue.png" alt="Outgoing Icon"/>
+                                            Send
+                                        </button>
+                                }
+                            </div>
                             <div className="send_receive_popup_wrap">
                                 <div className={this.state.send_receive_popup
                                     ?  'send_receive_info active'
@@ -2616,15 +2682,27 @@ export default class Wallet extends React.Component {
                                        value={this.state.send_keys.public_key} />
                                 <div className="form-group">
                                     <label htmlFor="amount">Amount:</label>
-                                    <input readOnly name="amount" value={this.state.send_amount}/>
+                                    {
+                                        this.state.send_coin === 'safex'
+                                        ?
+                                            <input readOnly name="amount" value={this.state.fee_in_btc ? this.state.send_amount : (this.state.send_amount * this.state.safex_price).toFixed(8)}/>
+                                        :
+                                            <input readOnly name="amount" value={this.state.fee_in_btc ? this.state.send_amount : (this.state.send_amount * this.state.btc_price).toFixed(8)}/>
+                                    }
                                 </div>
                                 <div className="form-group">
-                                    <label htmlFor="fee">Fee(BTC):</label>
-                                    <input readOnly name="fee" value={this.state.send_fee}/>
+                                    <label htmlFor="fee">{this.state.fee_in_btc ? 'Fee(BTC):' : 'Fee($):'}</label>
+                                    <input readOnly name="fee" value={this.state.fee_in_btc ? this.state.send_fee : (this.state.send_fee * this.state.btc_price).toFixed(8)}/>
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="total">Total:</label>
-                                    <input readOnly name="total" value={this.state.send_total} />
+                                    {
+                                        this.state.send_coin === 'safex'
+                                        ?
+                                            <input readOnly name="total" value={this.state.fee_in_btc ? this.state.send_total : (this.state.send_total * this.state.safex_price).toFixed(8)} />
+                                        :
+                                            <input readOnly name="total" value={this.state.fee_in_btc ? this.state.send_total : (this.state.send_total * this.state.btc_price).toFixed(8)} />
+                                    }
                                 </div>
                                 <button className={this.state.transaction_being_sent ? 'confirm-btn button-shine-green disabled' : 'confirm-btn button-shine-green'} type="submit">
                                     {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}

@@ -32,7 +32,7 @@ This will start webpack dev server and open a browser window. You will not be ab
 
 ## Build:
 
-Run 
+Run
 
 ```
 npm run make-all-installers
@@ -53,9 +53,9 @@ For linux builds, you will need to have `rpmbuild` available on system (`apt-get
 
 ## License
 
-MIT License 
+MIT License
 
-Copyright (c) 2017 Safex Developers 
+Copyright (c) 2017 Safex Developers
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
