@@ -1214,9 +1214,9 @@ export default class Wallet extends React.Component {
         }, 300);
     }
 
-    amountChange(receive_amount) {
+    amountChange = (receive_amount) => {
         this.setState({
-            receive_amount: receive_amount.value
+            receive_amount: receive_amount.target.value
         });
     }
 
@@ -2555,8 +2555,7 @@ export default class Wallet extends React.Component {
                             <input name="receive-address" value={keys[key].public_key}/>
 
                             <label htmlFor="amount">Amount:</label>
-                            <input type="amount" placeholder="1" onChange={this.amountChange}
-                               value={this.state.receive_amount}/>
+                            <input type="amount" placeholder="1" onChange={this.amountChange} value={this.state.receive_amount}/>
                         </div>
                         <div className="col-xs-5 qr-code-wrap">
                             <QRCode value={"bitcoin:" + keys[key].public_key + "?amount=" + this.state.receive_amount}/>
