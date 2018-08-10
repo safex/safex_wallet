@@ -1275,7 +1275,8 @@ export default class Wallet extends React.Component {
                         key: key,
                         send_open: false,
                         receive_open: true
-                    }
+                    },
+                    receive_amount: 0.00000001.toFixed(8),
                 });
             }
             if (this.state.collapse_open.receive_open && this.state.collapse_open.key === key || !this.state.collapse_open.receive_open && this.state.collapse_open.key === key) {
@@ -1289,6 +1290,7 @@ export default class Wallet extends React.Component {
                         receive_open: !this.state.collapse_open.receive_open
                     },
                     send_receive_popup: false,
+                    receive_amount: 0.00000001.toFixed(8),
                 });
                 if (this.state.send_overflow_active) {
                     this.closeCoinModal();
