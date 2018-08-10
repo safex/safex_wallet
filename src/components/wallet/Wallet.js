@@ -2505,7 +2505,8 @@ export default class Wallet extends React.Component {
                                 }
                             </div>
                             <div className="form-group">
-                                <button type="button" className="btc-convert-btn button-shine" onClick={this.convertBtcToDollars}>
+                                <button type="button" className="btc-convert-btn button-shine" onClick={this.convertBtcToDollars}
+                                    disabled={this.state.send_overflow_active && this.state.transaction_sent === false ? 'disabled' : ''}>
                                     {this.state.fee_in_btc ? 'Btc to $' : '$ to btc'}
                                 </button>
                                 {
