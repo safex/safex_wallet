@@ -452,6 +452,10 @@ export default class Wallet extends React.Component {
                     transaction_being_sent: false,
                     send_disabled: true,
                     txid: resp,
+
+                    // Close main alert popup
+                    main_alert_popup: false,
+                    main_alert_popup_text: '',
                 });
                 if (pending_safex_bal >= 0 || pending_btc_bal >= 0) {
                     this.prepareDisplayInterval = setInterval(() => {
@@ -556,6 +560,10 @@ export default class Wallet extends React.Component {
                                 transaction_being_sent: false,
                                 send_disabled: true,
                                 txid: resp,
+
+                                // Close main alert popup
+                                main_alert_popup: false,
+                                main_alert_popup_text: '',
                             });
                             if (pending_safex_bal >= 0 || pending_btc_bal >= 0) {
                                 this.prepareDisplayInterval = setInterval(() => {
@@ -640,6 +648,10 @@ export default class Wallet extends React.Component {
                     transaction_being_sent: false,
                     txid: resp,
 
+                    // Close main alert popup
+                    main_alert_popup: false,
+                    main_alert_popup_text: '',
+
                     // Close Send Receive Modal
                     collapse_open: {
                         send_open: false,
@@ -663,7 +675,9 @@ export default class Wallet extends React.Component {
                         sidebar_open: true,
                         transaction_being_sent: true,
                         settings_active: false,
-                        send_disabled: true
+                        send_disabled: true,
+                        main_alert_popup: true,
+                        main_alert_popup_text: 'Sending...',
                     });
 
                     //set the signing key for the transaction
@@ -724,6 +738,8 @@ export default class Wallet extends React.Component {
                         transaction_being_sent: true,
                         settings_active: false,
                         send_disabled: true,
+                        main_alert_popup: true,
+                        main_alert_popup_text: 'Sending...',
                     });
 
                     //set the signing key for the transaction
@@ -1128,16 +1144,18 @@ export default class Wallet extends React.Component {
     }
 
     closeMainAlertPopup() {
-        this.setState({
-            main_alert_popup: false,
-        });
-
-        setTimeout(() => {
+        if (this.state.transaction_being_sent === false) {
             this.setState({
-                export_encrypted_wallet: false,
-                export_unencrypted_wallet: false,
+                main_alert_popup: false,
             });
-        }, 300)
+
+            setTimeout(() => {
+                this.setState({
+                    export_encrypted_wallet: false,
+                    export_unencrypted_wallet: false,
+                });
+            }, 300)
+        }
     }
 
     openExportEncryptedWallet() {
@@ -2275,7 +2293,7 @@ export default class Wallet extends React.Component {
                         this.state.collapse_open.send_open && this.state.collapse_open.key === key
                         ?
                             <div>
-                                <button disabled={((keys[key].pending_btc_bal >= 0 || keys[key].pending_safex_bal) >= 0 && this.state.average_fee !== 0) || this.state.send_disabled === false ? '' : 'disabled'}
+                                <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 || this.state.send_disabled === false ? '' : 'disabled'}
                                     onClick={this.openSendReceive.bind(this, key, 'send')}
                                     className={this.state.collapse_open.key === key && this.state.transaction_being_sent || this.state.send_disabled ? 'send-btn button-shine disabled-btn' : 'send-btn button-shine active'}>
                                     <span className="img-wrap">
@@ -2297,7 +2315,7 @@ export default class Wallet extends React.Component {
                             </div>
                         :
                             <div>
-                                <button disabled={((keys[key].pending_btc_bal >= 0 || keys[key].pending_safex_bal >= 0) && this.state.average_fee !== 0) ? '' : 'disabled'}
+                                <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
                                     onClick={this.openSendReceive.bind(this, key, 'send')}
                                     className={this.state.collapse_open.key === key && this.state.collapse_open.receive_open || this.state.send_disabled ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
                                     {
@@ -2515,17 +2533,17 @@ export default class Wallet extends React.Component {
                                     this.state.send_overflow_active && this.state.transaction_sent === false
                                         ?
                                         <button type="submit"
-                                                name="form_send_submit"
-                                                className="form-send-submit button-shine"
-                                                disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
+                                            name="form_send_submit"
+                                            className="form-send-submit button-shine"
+                                            disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
                                             <img src="images/outgoing.png" alt="Outgoing Icon"/>
                                             Send
                                         </button>
                                         :
                                         <button type="submit"
-                                                name="form_send_submit"
-                                                className="form-send-submit button-shine"
-                                                disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
+                                            name="form_send_submit"
+                                            className="form-send-submit button-shine"
+                                            disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
                                             <img src="images/outgoing-blue.png" alt="Outgoing Icon"/>
                                             Send
                                         </button>
@@ -2684,27 +2702,15 @@ export default class Wallet extends React.Component {
                                        value={this.state.send_keys.public_key} />
                                 <div className="form-group">
                                     <label htmlFor="amount">Amount:</label>
-                                    {
-                                        this.state.send_coin === 'safex'
-                                        ?
-                                            <input readOnly name="amount" value={this.state.fee_in_btc ? this.state.send_amount : (this.state.send_amount * this.state.safex_price).toFixed(8)}/>
-                                        :
-                                            <input readOnly name="amount" value={this.state.fee_in_btc ? this.state.send_amount : (this.state.send_amount * this.state.btc_price).toFixed(8)}/>
-                                    }
+                                    <input readOnly name="amount" value={this.state.send_amount}/>
                                 </div>
                                 <div className="form-group">
-                                    <label htmlFor="fee">{this.state.fee_in_btc ? 'Fee(BTC):' : 'Fee($):'}</label>
-                                    <input readOnly name="fee" value={this.state.fee_in_btc ? this.state.send_fee : (this.state.send_fee * this.state.btc_price).toFixed(8)}/>
+                                    <label htmlFor="fee">Fee(BTC):</label>
+                                    <input readOnly name="fee" value={this.state.send_fee}/>
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="total">Total:</label>
-                                    {
-                                        this.state.send_coin === 'safex'
-                                        ?
-                                            <input readOnly name="total" value={this.state.fee_in_btc ? this.state.send_total : (this.state.send_total * this.state.safex_price).toFixed(8)} />
-                                        :
-                                            <input readOnly name="total" value={this.state.fee_in_btc ? this.state.send_total : (this.state.send_total * this.state.btc_price).toFixed(8)} />
-                                    }
+                                    <input readOnly name="total" value={this.state.send_total} />
                                 </div>
                                 <button className={this.state.transaction_being_sent ? 'confirm-btn button-shine-green disabled' : 'confirm-btn button-shine-green'} type="submit">
                                     {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}
@@ -3041,7 +3047,13 @@ export default class Wallet extends React.Component {
                                     </button>
                                 </div>
                         }
-                        <span className="close" onClick={this.closeMainAlertPopup}>X</span>
+                        {
+                            this.state.transaction_being_sent
+                            ?
+                                <span className="close disabled" onClick={this.closeMainAlertPopup}>X</span>
+                            :
+                                <span className="close" onClick={this.closeMainAlertPopup}>X</span>
+                        }
                     </div>
                 </div>
 
