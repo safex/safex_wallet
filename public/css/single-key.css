@@ -77,11 +77,11 @@
   -moz-transition: all ease 0.2s;
   -webkit-transition: all ease 0.2s;
 }
-.single-key .col-xs-7 {
+.single-key .single-key-inner {
   padding-left: 0;
   height: 67px;
 }
-.single-key .col-xs-7 span {
+.single-key .single-key-inner span {
   position: relative;
   bottom: -2px;
   left: 10px;
@@ -144,6 +144,29 @@
   letter-spacing: 0.1em;
   margin: 0px 10px 0px;
   line-height: 1;
+  display: flex;
+  flex-direction: row;
+}
+.single-key .key input {
+  background: transparent;
+  border: 0px none;
+  width: 100%;
+  font-size: 18px;
+  letter-spacing: .5px;
+  margin-left: 10px;
+}
+.single-key .key button {
+  display: inline-block;
+  background: #009dbf;
+  border: 0px none;
+  border-radius: 5px;
+  padding: 0px 7px 1px;
+  font-size: 13px;
+  text-transform: uppercase;
+  line-height: 1;
+  max-height: 21px;
+  margin-top: 3px;
+  color: #fff;
 }
 .single-key .key::selection {
   background: #eee;
@@ -267,8 +290,9 @@
   -webkit-transition: all ease 0.2s;
 }
 .single-key .single-key-btns-wrap {
-  position: relative;
+  position: absolute;
   top: 3px;
+  right: 0;
 }
 .single-key .amounts-wrap {
   background: url(../images/amounts-bg.png) top right;

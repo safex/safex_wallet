@@ -17,7 +17,8 @@
       "name": "Daniel Dabek",
       "url": "https://github.com/ddabek",
       "email": "daniel@safex.io"
-    }, {
+    },
+    {
       "name": "Uroš Mitrović",
       "url": "https://github.com/Kiu0612",
       "email": "uros@balkaneum.com"
@@ -50,7 +51,8 @@
     "bs58": "^4.0.1",
     "electron-context-menu": "^0.9.1",
     "qrcode.react": "^0.7.1",
-    "react": "^15.4.2",
+    "react": "^15.6.2",
+    "react-copy-to-clipboard": "^5.0.1",
     "react-dom": "^15.6.2",
     "react-file-download": "^0.3.4",
     "react-file-input": "^0.2.5",

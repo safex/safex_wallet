@@ -21,6 +21,7 @@ import {
 
 import Navigation from '../Navigation';
 import KeyLabel from "../KeyLabel";
+import {CopyToClipboard} from 'react-copy-to-clipboard';
 
 export default class Wallet extends React.Component {
     constructor(props) {
@@ -110,7 +111,9 @@ export default class Wallet extends React.Component {
             export_encrypted_wallet: false,
             create_key_active: false,
             import_modal_active: false,
-            savedLabel: ''
+            savedLabel: '',
+            value: '',
+            copied: false,
         };
 
         this.createKey = this.createKey.bind(this);
@@ -198,6 +201,7 @@ export default class Wallet extends React.Component {
             this.setState({
                 refreshTimer: 23,
                 refreshInterval: interval,
+                copied: false,
             });
             this.prepareDisplayPendingTx();
         }
@@ -431,13 +435,8 @@ export default class Wallet extends React.Component {
             .then(resp => resp.text())
             .then((resp) => {
                 if (resp === "") {
-                    if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
-                        this.setCoinModalOpenSettings('There was an error with the transaction');
-                        this.closeMainAlertPopup();
-                    } else {
-                        this.setCoinModalClosedSettings('There was an error with the transaction');
-                        this.closeMainAlertPopup();
-                    }
+                    this.setCoinModalOpenSettings('There was an error with the transaction');
+                    this.closeMainAlertPopup();
                     this.setState({
                         send_disabled: false,
                     });
@@ -541,13 +540,8 @@ export default class Wallet extends React.Component {
                         .then(resp => resp.text())
                         .then((resp) => {
                             if (resp === "") {
-                                if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
-                                    this.setCoinModalOpenSettings('There was an error with the transaction');
-                                    this.closeMainAlertPopup();
-                                } else {
-                                    this.setCoinModalClosedSettings('There was an error with the transaction');
-                                    this.closeMainAlertPopup();
-                                }
+                                this.setCoinModalOpenSettings('There was an error with the transaction');
+                                this.closeMainAlertPopup();
                                 this.setState({
                                     send_disabled: false,
                                 });
@@ -2256,6 +2250,10 @@ export default class Wallet extends React.Component {
         });
     }
 
+    copyToClipboard(){
+
+    }
+
     render() {
         const {keys, archive_active, safex_price, btc_price} = this.state;
 
@@ -2265,13 +2263,31 @@ export default class Wallet extends React.Component {
             || (!keys[key].hasOwnProperty('archived') && archive_active === false)
                 ? 'col-xs-12 single-key'
                 : 'col-xs-12 single-key hidden-xs hidden-sm hidden-md hidden-lg'} key={key}>
-                <div className="col-xs-7">
+                <div className="col-xs-8 single-key-inner">
                     <KeyLabel
                         keyReference={keys[key]}
                         keyLabel={keys[key].label}
                         editLabel={this.editLabel}
                     />
-                    <div className="key">{keys[key].public_key}</div>
+                    <div className="key">
+                        {
+                            this.state.copied && keys[key].public_key === key
+                            ?
+                                <CopyToClipboard text={keys[key].public_key} onCopy={() => this.setState({copied: true})} className="button-shine">
+                                    <button>
+                                        Copied
+                                    </button>
+                                </CopyToClipboard>
+                            :
+                                <CopyToClipboard text={keys[key].public_key} onCopy={() => this.setState({copied: true})} className="button-shine">
+                                    <button>
+                                        Copy
+                                    </button>
+                                </CopyToClipboard>
+                        }
+                        <input type="text" value={keys[key].public_key} onChange={({target: {value}}) => this.setState({value, copied: false})} />
+                        <input type="hidden" name="current_public_key" id="current_public_key" readOnly value={keys[key].public_key} />
+                    </div>
                     <span>
                         {
                             keys[key].pending_safex_bal > 0
@@ -2305,7 +2321,6 @@ export default class Wallet extends React.Component {
                                             :
                                                 <img src="images/outbox-white.png" alt="Outbox Logo"/>
                                         }
-
                                     </span>
                                     <span>SEND</span>
                                 </button>
@@ -2532,7 +2547,7 @@ export default class Wallet extends React.Component {
                                 </button>
                                 {
                                     this.state.send_overflow_active && this.state.transaction_sent === false
-                                        ?
+                                    ?
                                         <button type="submit"
                                             name="form_send_submit"
                                             className="form-send-submit button-shine"
@@ -2540,7 +2555,7 @@ export default class Wallet extends React.Component {
                                             <img src="images/outgoing.png" alt="Outgoing Icon"/>
                                             Send
                                         </button>
-                                        :
+                                    :
                                         <button type="submit"
                                             name="form_send_submit"
                                             className="form-send-submit button-shine"
@@ -2707,7 +2722,7 @@ export default class Wallet extends React.Component {
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="fee">Fee(BTC):</label>
-                                    <input readOnly name="fee" value={this.state.send_fee}/>
+                                    <input readOnly name="fee" value={parseFloat(this.state.send_fee).toFixed(8)}/>
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="total">Total:</label>
