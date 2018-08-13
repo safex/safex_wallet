@@ -433,8 +433,10 @@ export default class Wallet extends React.Component {
                 if (resp === "") {
                     if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
                         this.setCoinModalOpenSettings('There was an error with the transaction');
+                        this.closeMainAlertPopup();
                     } else {
                         this.setCoinModalClosedSettings('There was an error with the transaction');
+                        this.closeMainAlertPopup();
                     }
                     this.setState({
                         send_disabled: false,
@@ -541,8 +543,10 @@ export default class Wallet extends React.Component {
                             if (resp === "") {
                                 if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
                                     this.setCoinModalOpenSettings('There was an error with the transaction');
+                                    this.closeMainAlertPopup();
                                 } else {
                                     this.setCoinModalClosedSettings('There was an error with the transaction');
+                                    this.closeMainAlertPopup();
                                 }
                                 this.setState({
                                     send_disabled: false,
@@ -1144,18 +1148,16 @@ export default class Wallet extends React.Component {
     }
 
     closeMainAlertPopup() {
-        if (this.state.transaction_being_sent === false) {
-            this.setState({
-                main_alert_popup: false,
-            });
+        this.setState({
+            main_alert_popup: false,
+        });
 
-            setTimeout(() => {
-                this.setState({
-                    export_encrypted_wallet: false,
-                    export_unencrypted_wallet: false,
-                });
-            }, 300)
-        }
+        setTimeout(() => {
+            this.setState({
+                export_encrypted_wallet: false,
+                export_unencrypted_wallet: false,
+            });
+        }, 300)
     }
 
     openExportEncryptedWallet() {
@@ -1859,7 +1861,6 @@ export default class Wallet extends React.Component {
                     if (scriptPubKey.length > 0 && scriptPubKey !== undefined) {
                         btc_send_addr = scriptPubKey[0];
                         btc_receive_addr = scriptPubKey[1];
-                        console.log(scriptPubKey[1])
                     }
 
                     if (btc_send_addr[0] !== undefined && btc_send_addr[0].length) {
@@ -3057,10 +3058,20 @@ export default class Wallet extends React.Component {
                     </div>
                 </div>
 
-                <div className={this.state.main_alert_popup || this.state.import_modal_active || this.state.create_key_active
-                    ? 'mainAlertBackdrop active'
-                    : 'mainAlertBackdrop'} onClick={this.state.main_alert_popup ? this.closeMainAlertPopup : this.closeImportModal}>
-                </div>
+                {
+                    this.state.transaction_being_sent
+                    ?
+                        <div className={this.state.main_alert_popup || this.state.import_modal_active || this.state.create_key_active
+                            ? 'mainAlertBackdrop active disabled'
+                            : 'mainAlertBackdrop'} onClick={this.state.main_alert_popup ? this.closeMainAlertPopup : this.closeImportModal}>
+                        </div>
+                    :
+                        <div className={this.state.main_alert_popup || this.state.import_modal_active || this.state.create_key_active
+                            ? 'mainAlertBackdrop active'
+                            : 'mainAlertBackdrop'} onClick={this.state.main_alert_popup ? this.closeMainAlertPopup : this.closeImportModal}>
+                        </div>
+                }
+
             </div>
         );
     }
