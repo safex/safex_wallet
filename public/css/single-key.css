@@ -83,7 +83,7 @@
 }
 .single-key .single-key-inner span {
   position: relative;
-  bottom: -2px;
+  bottom: 5px;
   left: 10px;
   color: #00d1ff;
 }
@@ -157,6 +157,8 @@
   letter-spacing: .5px;
   margin-left: 7px;
   padding-top: 0px;
+  position: relative;
+  top: -2px;
 }
 .single-key .key button {
   display: inline-block;
@@ -168,7 +170,7 @@
   text-transform: uppercase;
   line-height: 1;
   max-height: 21px;
-  margin-top: 3px;
+  margin-top: 1px;
   color: #fff;
 }
 .single-key .key::selection {
@@ -234,8 +236,6 @@
   white-space: nowrap;
   font-family: Helvetica, sans-serif;
   font-size: 11.6px;
-  /*border-top-right-radius: 10px;*/
-  /*border-bottom-left-radius: 10px;*/
   text-transform: uppercase;
 }
 .single-key .amounts .amount-btns-wrap {
@@ -312,7 +312,7 @@
   color: #fff;
   text-transform: uppercase;
   font-size: 17px;
-  margin: 12px 15px 10px 0;
+  margin: 15px 15px 10px 0;
 }
 .single-key .single-key-btns-wrap .send-btn {
   background: #12bedd;
@@ -380,10 +380,10 @@
   font-size: 17px;
   margin-top: 0px;
   margin-right: 10px;
-  padding: 6px 10px;
+  padding: 4px 10px 5px;
   border: 1px solid rgba(0, 231, 255, .44);
   border-radius: 8px;
-  line-height: 1.2;
+  line-height: 1.4;
   position: relative;
   top: 1px;
 }
@@ -502,6 +502,7 @@
 }
 .form-send .send-left .input-group{
   width: 100%;
+  margin-bottom: 7px;
 }
 .form-send .send-left .input-group .input-group-addon{
   padding: 0;
@@ -644,7 +645,7 @@
   width: 100%;
   border-radius: 10px;
   display: block;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   border: 1px solid transparent;
   background: rgba(255,255,255,.1);
   border-top-left-radius: 8px !important;
@@ -676,8 +677,8 @@
 .receive canvas {
   margin-top: 20px;
   margin-bottom: 0;
-  width: 100px !important;
-  height: 100px !important;
+  width: 105px !important;
+  height: 105px !important;
   background: #fff;
   padding: 5px;
 }
