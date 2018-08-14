@@ -114,6 +114,7 @@ export default class Wallet extends React.Component {
             savedLabel: '',
             value: '',
             copied: false,
+            current_public_key: '',
         };
 
         this.createKey = this.createKey.bind(this);
@@ -172,6 +173,7 @@ export default class Wallet extends React.Component {
         this.openCreateKey = this.openCreateKey.bind(this);
         this.amountChange = this.amountChange.bind(this);
         this.convertBtcToDollars = this.convertBtcToDollars.bind(this);
+        this.copyToClipboard = this.copyToClipboard.bind(this);
     }
 
     logout() {
@@ -2250,8 +2252,13 @@ export default class Wallet extends React.Component {
         });
     }
 
-    copyToClipboard(){
+    copyToClipboard(e){
+        e.preventDefault();
+        var selected_public_key = e.target.current_public_key.value;
 
+        this.setState({
+            current_public_key: selected_public_key
+        })
     }
 
     render() {
@@ -2270,23 +2277,25 @@ export default class Wallet extends React.Component {
                         editLabel={this.editLabel}
                     />
                     <div className="key">
-                        {
-                            this.state.copied && keys[key].public_key === key
-                            ?
-                                <CopyToClipboard text={keys[key].public_key} onCopy={() => this.setState({copied: true})} className="button-shine">
-                                    <button>
-                                        Copied
-                                    </button>
-                                </CopyToClipboard>
-                            :
-                                <CopyToClipboard text={keys[key].public_key} onCopy={() => this.setState({copied: true})} className="button-shine">
-                                    <button>
-                                        Copy
-                                    </button>
-                                </CopyToClipboard>
-                        }
-                        <input type="text" value={keys[key].public_key} onChange={({target: {value}}) => this.setState({value, copied: false})} />
-                        <input type="hidden" name="current_public_key" id="current_public_key" readOnly value={keys[key].public_key} />
+                        <form onSubmit={this.copyToClipboard}>
+                            {
+                                this.state.copied && keys[key].public_key === this.state.current_public_key
+                                    ?
+                                    <CopyToClipboard text={keys[key].public_key} onCopy={() => this.setState({copied: true})} className="button-shine">
+                                        <button>
+                                            Copied
+                                        </button>
+                                    </CopyToClipboard>
+                                    :
+                                    <CopyToClipboard text={keys[key].public_key} onCopy={() => this.setState({copied: true})} className="button-shine">
+                                        <button>
+                                            Copy
+                                        </button>
+                                    </CopyToClipboard>
+                            }
+                            <input type="text" value={keys[key].public_key} onChange={({target: {value}}) => this.setState({value, copied: false})} />
+                            <input type="hidden" name="current_public_key" id="current_public_key" readOnly value={keys[key].public_key} />
+                        </form>
                     </div>
                     <span>
                         {
