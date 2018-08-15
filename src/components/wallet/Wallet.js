@@ -54,7 +54,7 @@ export default class Wallet extends React.Component {
             active_fee: 'fast',
             safex_price: 0,
             btc_price: 0,
-            fee_in_btc: true,
+            fee_in_$: false,
 
             //Dividend calculator
             totalTradeVolume: 500000000,
@@ -273,6 +273,12 @@ export default class Wallet extends React.Component {
                 console.log('Page refreshed');
             }
         }, 1800000);
+
+        // axios({method: 'get', url: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'}).then(res => {
+        //     console.log(res)
+        // }).catch(function(error) {
+        //     console.log(error);
+        // });
 
         // this.prepareDisplayInterval = setInterval(() => {
         //     this.prepareDisplay();
@@ -668,7 +674,7 @@ export default class Wallet extends React.Component {
         e.preventDefault();
         //check whether Bitcoin or Safex is selected
         if (this.state.send_coin === 'safex') {
-            if (this.state.fee_in_btc) {
+            if (this.state.fee_in_$ === false) {
                 //open the modal by setting transaction_being_sent
                 try {
                     this.setState({
@@ -731,7 +737,7 @@ export default class Wallet extends React.Component {
             }
             //if safex is not selected then it must be Bitcoin
         } else if(this.state.send_coin === 'btc') {
-            if (this.state.fee_in_btc) {
+            if (this.state.fee_in_$ === false) {
                 try {  //open the modal by setting transaction_being_sent
                     this.setState({
                         sidebar_open: true,
@@ -860,7 +866,7 @@ export default class Wallet extends React.Component {
                 this.setCoinModalClosedSettings('Cannot send transaction, this key has a pending minus. Please try again later.');
             }
             this.closeCoinModal;
-        } else if (this.state.fee_in_btc === false) {
+        } else if (this.state.fee_in_$) {
             if (this.sidebar_open) {
                 this.setCoinModalOpenSettings('Please convert the transaction to BTC to proceed');
             } else {
@@ -1584,6 +1590,9 @@ export default class Wallet extends React.Component {
                 send_amount: parseInt(e.target.value),
                 send_total: parseInt(send_total)
             });
+            if (this.state.fee_in_$) {
+                console.log('got here')
+            }
         } else {
             send_total = parseFloat(e.target.value) + parseFloat(send_fee);
             this.setState({
@@ -1621,7 +1630,7 @@ export default class Wallet extends React.Component {
     sendCoinChoose(coin) {
         this.setState({
             send_coin: coin,
-            fee_in_btc: true
+            fee_in_$: false
         });
         this.sendTotalAdjustCoinChange(coin);
     }
@@ -2247,8 +2256,8 @@ export default class Wallet extends React.Component {
 
     convertBtcToDollars() {
         this.setState({
-            fee_in_btc: !this.state.fee_in_btc,
-            send_fee: parseFloat(this.state.send_fee).toFixed(8)
+            fee_in_$: !this.state.fee_in_$,
+            send_fee: parseFloat(this.state.send_fee).toFixed(8),
         });
     }
 
@@ -2280,20 +2289,20 @@ export default class Wallet extends React.Component {
                         <form onSubmit={this.copyToClipboard}>
                             {
                                 this.state.copied && keys[key].public_key === this.state.current_public_key
-                                    ?
+                                ?
                                     <CopyToClipboard text={keys[key].public_key} onCopy={() => this.setState({copied: true})} className="button-shine">
                                         <button>
                                             Copied
                                         </button>
                                     </CopyToClipboard>
-                                    :
+                                :
                                     <CopyToClipboard text={keys[key].public_key} onCopy={() => this.setState({copied: true})} className="button-shine">
                                         <button>
                                             Copy
                                         </button>
                                     </CopyToClipboard>
                             }
-                            <input type="text" value={keys[key].public_key} onChange={({target: {value}}) => this.setState({value, copied: false})} />
+                            <input type="text" value={keys[key].public_key} onChange={({target: {value}}) => this.setState({value, copied: false})} disabled />
                             <input type="hidden" name="current_public_key" id="current_public_key" readOnly value={keys[key].public_key} />
                         </form>
                     </div>
@@ -2486,31 +2495,31 @@ export default class Wallet extends React.Component {
                                     ? ''
                                     : 'hidden-xs hidden-sm hidden-md hidden-lg'}>
                                         {
-                                            this.state.fee_in_btc ? '(Safex)' : '($)'
+                                            this.state.fee_in_$ ? '($)' : '(Safex)'
                                         }
                                     </span>
                                     <span className={this.state.send_coin === "btc"
                                         ? ''
                                         : 'hidden-xs hidden-sm hidden-md hidden-lg'}>
                                         {
-                                            this.state.fee_in_btc ? '(BTC)' : '($)'
+                                            this.state.fee_in_$ ? '($)' : '(BTC)'
                                         }
                                     </span>
                                 </label>
                                 {
                                     this.state.send_coin === 'safex'
                                     ?
-                                        <input type="number" name="amount" id="amount" onChange={this.sendAmountOnChange} readOnly={this.state.fee_in_btc ? '' : 'readonly'}
-                                            value={this.state.fee_in_btc ? this.state.send_amount : (this.state.send_amount * this.state.safex_price).toFixed(8)}/>
+                                        <input type="number" name="amount" id="amount" onChange={this.sendAmountOnChange} readOnly={this.state.fee_in_$ ? 'readonly' : ''}
+                                            value={this.state.fee_in_$ ? (this.state.send_amount * this.state.safex_price).toFixed(8) : this.state.send_amount}/>
                                     :
-                                        <input type="number" name="amount" id="amount" onChange={this.sendAmountOnChange} readOnly={this.state.fee_in_btc ? '' : 'readonly'}
-                                            value={this.state.fee_in_btc ? this.state.send_amount : (this.state.send_amount * this.state.btc_price).toFixed(8)}/>
+                                        <input type="number" name="amount" id="amount" onChange={this.sendAmountOnChange} readOnly={this.state.fee_in_$ ? 'readonly' : ''}
+                                            value={this.state.fee_in_$ ? (this.state.send_amount * this.state.btc_price).toFixed(8) : this.state.send_amount}/>
                                 }
                             </div>
                             <div className="form-group">
-                                <label htmlFor="fee">{this.state.fee_in_btc ? 'Fee (BTC):' : 'Fee ($)'}</label>
-                                <input type="number" name="fee" onChange={this.sendFeeOnChange} readOnly={this.state.fee_in_btc ? '' : 'readonly'}
-                                    value={this.state.fee_in_btc ? this.state.send_fee : (this.state.send_fee * this.state.btc_price).toFixed(8)}/>
+                                <label htmlFor="fee">{this.state.fee_in_$ ? 'Fee ($)' : 'Fee (BTC):'}</label>
+                                <input type="number" name="fee" onChange={this.sendFeeOnChange} readOnly={this.state.fee_in_$ ? 'readonly' : ''}
+                                    value={this.state.fee_in_$ ? (this.state.send_fee * this.state.btc_price).toFixed(8) : this.state.send_fee}/>
                             </div>
                             <div className="form-group fee-buttons">
                                 <span className={this.state.active_fee === 'slow'
@@ -2530,29 +2539,29 @@ export default class Wallet extends React.Component {
                                         ? ''
                                         : 'hidden-xs hidden-sm hidden-md hidden-lg'}>
                                         {
-                                            this.state.fee_in_btc ? '(Safex)' : '($)'
+                                            this.state.fee_in_$ ? '($)' : '(Safex)'
                                         }
                                     </span>
                                     <span className={this.state.send_coin === "btc"
                                         ? ''
                                         : 'hidden-xs hidden-sm hidden-md hidden-lg'}>
                                         {
-                                            this.state.fee_in_btc ? '(BTC)' : '($)'
+                                            this.state.fee_in_$ ? '($)' : '(BTC)'
                                         }
                                     </span>
                                 </label>
                                 {
                                     this.state.send_coin === 'safex'
                                     ?
-                                        <input className="total-input" type="number" name="total" readOnly value={this.state.fee_in_btc ? this.state.send_total : (this.state.send_total * this.state.safex_price).toFixed(8)} />
+                                        <input className="total-input" type="number" name="total" readOnly value={this.state.fee_in_$ ? (this.state.send_total * this.state.safex_price).toFixed(8) : this.state.send_total} />
                                     :
-                                        <input className="total-input" type="number" name="total" readOnly value={this.state.fee_in_btc ? this.state.send_total : (this.state.send_total * this.state.btc_price).toFixed(8)} />
+                                        <input className="total-input" type="number" name="total" readOnly value={this.state.fee_in_$ ? (this.state.send_total * this.state.btc_price).toFixed(8) : this.state.send_total} />
                                 }
                             </div>
                             <div className="form-group">
                                 <button type="button" className="btc-convert-btn button-shine" onClick={this.convertBtcToDollars}
                                     disabled={this.state.send_overflow_active && this.state.transaction_sent === false ? 'disabled' : ''}>
-                                    {this.state.fee_in_btc ? 'Btc to $' : '$ to btc'}
+                                    {this.state.fee_in_$ ? '$ to btc' : 'Btc to $'}
                                 </button>
                                 {
                                     this.state.send_overflow_active && this.state.transaction_sent === false
