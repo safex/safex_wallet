@@ -274,11 +274,11 @@ export default class Wallet extends React.Component {
             }
         }, 1800000);
 
-        // axios({method: 'get', url: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'}).then(res => {
-        //     console.log(res)
-        // }).catch(function(error) {
-        //     console.log(error);
-        // });
+        axios({method: 'get', url: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'}).then(res => {
+            console.log(res)
+        }).catch(function(error) {
+            console.log(error);
+        });
 
         // this.prepareDisplayInterval = setInterval(() => {
         //     this.prepareDisplay();
@@ -1342,7 +1342,9 @@ export default class Wallet extends React.Component {
 
             // Close Send Receive Popup
             send_receive_popup: false,
-            send_receive_info: ''
+            send_receive_info: '',
+
+            copied: false
         });
     }
 
@@ -1390,6 +1392,8 @@ export default class Wallet extends React.Component {
             private_key_open: {
                 private_key_popup: false,
             },
+
+            copied: false
         })
         this.listTransactions(this.state.keys[e].public_key);
     }
@@ -1517,7 +1521,7 @@ export default class Wallet extends React.Component {
     closeHistoryModal() {
         this.setState({
             history_overflow_active: false,
-            history_key: ''
+            history_key: '',
         })
     }
 
@@ -1590,9 +1594,6 @@ export default class Wallet extends React.Component {
                 send_amount: parseInt(e.target.value),
                 send_total: parseInt(send_total)
             });
-            if (this.state.fee_in_$) {
-                console.log('got here')
-            }
         } else {
             send_total = parseFloat(e.target.value) + parseFloat(send_fee);
             this.setState({
@@ -2087,7 +2088,9 @@ export default class Wallet extends React.Component {
 
             // Close Send Receive Popup
             send_receive_popup: false,
-            send_receive_info: ''
+            send_receive_info: '',
+
+            copied: false,
         });
     }
 
@@ -2106,7 +2109,9 @@ export default class Wallet extends React.Component {
 
             // Close Send Receive Popup
             send_receive_popup: false,
-            send_receive_info: ''
+            send_receive_info: '',
+
+            copied: false,
         });
     }
 
