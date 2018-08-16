@@ -274,12 +274,6 @@ export default class Wallet extends React.Component {
             }
         }, 1800000);
 
-        axios({method: 'get', url: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'}).then(res => {
-            console.log(res)
-        }).catch(function(error) {
-            console.log(error);
-        });
-
         // this.prepareDisplayInterval = setInterval(() => {
         //     this.prepareDisplay();
         //     this.prepareDisplayPendingTx();
@@ -1416,10 +1410,6 @@ export default class Wallet extends React.Component {
             //check that the new password matches the repeated password
             if (new_pass === repeat_pass) {
                 loadAndDecryptWalletFromFile(localStorage.getItem('wallet_path'), now_pass, (err, wallet) => {
-                    if (!wallet) {
-                        err = new Error(`No wallet was found`);
-                    }
-
                     if (!err) {
                         const decrypted_wallet_str = JSON.stringify(wallet.decrypted);
 
@@ -1461,7 +1451,10 @@ export default class Wallet extends React.Component {
                     } else {
                         // Failed to load wallet
                         console.error(err);
-                        this.openMainAlertPopup(err.message);
+                        this.setState({
+                            info_popup: true,
+                            info_text: err.message
+                        });
                         this.wrongOldPassword();
                     }
                 });
@@ -2614,7 +2607,7 @@ export default class Wallet extends React.Component {
                             <input name="receive-address" value={keys[key].public_key}/>
 
                             <label htmlFor="amount">Amount:</label>
-                            <input type="amount" placeholder="1" onChange={this.amountChange} value={this.state.receive_amount}/>
+                            <input type="number" name="amount" placeholder="1" onChange={this.amountChange} value={this.state.receive_amount}/>
                         </div>
                         <div className="col-xs-5 qr-code-wrap">
                             <QRCode value={"bitcoin:" + keys[key].public_key + "?amount=" + this.state.receive_amount}/>
