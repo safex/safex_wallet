@@ -30,6 +30,7 @@ export default class KeyLabel extends React.Component {
             setTimeout(() => {
                 this.editLabel.focus();
             }, 100);
+            this.handleSubmit();
         }
     }
 
@@ -90,7 +91,7 @@ export default class KeyLabel extends React.Component {
     }
 
     handleKeyDown(e) {
-        if (event.which === this.ENTER_KEY) {
+        if (e.which === this.ENTER_KEY) {
             this.handleSubmit(e);
         }
     }
@@ -100,7 +101,7 @@ export default class KeyLabel extends React.Component {
             <div>
                 <button
                     className="edit-label-btn"
-                    // onClick={this.toggleEditing}
+                    // onClick={this.state.editing ? this.handleSubmit : this.toggleEditing}
                     disabled
                     title="Click to edit Key Label (Under development)">
                     <img

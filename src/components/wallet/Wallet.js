@@ -896,6 +896,8 @@ export default class Wallet extends React.Component {
 
     createKey(e) {
         e.preventDefault();
+        this.prepareDisplay();
+
         this.setState({is_loading: true});
 
         var key_pair = genkey();
@@ -3015,7 +3017,7 @@ export default class Wallet extends React.Component {
                         <form onSubmit={this.state.import_modal_active ? this.importKey : this.createKey}>
                             <div className="input-group">
                                 <label htmlFor="key-label">Key Label</label>
-                                <input type="text" placeholder="Enter Key Label" name="label" id="label" onChange={this.saveLabel} />
+                                <input type="text" placeholder="Enter Key Label" name="label" id="label" onChange={this.saveLabel} ref={input => input && input.focus()} />
                             </div>
                             {
                                 this.state.import_modal_active
@@ -3036,9 +3038,9 @@ export default class Wallet extends React.Component {
                                         </div>
                                         {
                                             this.state.create_key_active
-                                                ?
+                                            ?
                                                 <button type="submit" className="button-shine" title="Create Key">Create Key</button>
-                                                :
+                                            :
                                                 <button type="submit" disabled="disabled" className="button-shine" title="Create Key"></button>
                                         }
                                     </div>
@@ -3065,11 +3067,11 @@ export default class Wallet extends React.Component {
                                 <div className="mainAlertProceedWrap">
                                     {
                                         this.state.export_unencrypted_wallet && this.state.export_encrypted_wallet === false
-                                            ?
+                                        ?
                                             <button className="mainAlertProceed active" onClick={this.exportUnencryptedWallet}>
                                                 Ok
                                             </button>
-                                            :
+                                        :
                                             <button className="mainAlertProceed">
                                                 Ok
                                             </button>
