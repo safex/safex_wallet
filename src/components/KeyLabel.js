@@ -103,7 +103,7 @@ export default class KeyLabel extends React.Component {
                     className="edit-label-btn"
                     onClick={this.state.editing ? this.handleSubmit : this.toggleEditing}
                     // disabled
-                    title="Click to edit Key Label (Under development)">
+                    title="Click to edit Key Label">
                     <img
                         src="images/edit.png"
                         alt="Edit Logo"
