@@ -101,8 +101,8 @@ export default class KeyLabel extends React.Component {
             <div>
                 <button
                     className="edit-label-btn"
-                    onClick={this.state.editing ? this.handleSubmit : this.toggleEditing}
-                    // disabled
+                    // onClick={this.state.editing ? this.handleSubmit : this.toggleEditing}
+                    disabled
                     title="Click to edit Key Label">
                     <img
                         src="images/edit.png"
@@ -111,7 +111,7 @@ export default class KeyLabel extends React.Component {
                     />
                 </button>
                 <input
-                    ref={el => (this.editLabel = el)}
+                    ref={el => (this.editLabel = el) && el.focus()}
                     disabled={!this.state.editing}
                     className="key-label"
                     value={this.state.editText}
