@@ -2239,7 +2239,7 @@ export default class Wallet extends React.Component {
     }
 
     editLabel(label, key) {
-        // console.log(label, key);
+        key.label = label;
     }
 
     openMainAlertPopup(message) {
