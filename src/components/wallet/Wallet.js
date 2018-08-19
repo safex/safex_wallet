@@ -273,12 +273,6 @@ export default class Wallet extends React.Component {
                 console.log('Page refreshed');
             }
         }, 1800000);
-
-        // this.prepareDisplayInterval = setInterval(() => {
-        //     this.prepareDisplay();
-        //     this.prepareDisplayPendingTx();
-        //     console.log('Timer')
-        // }, 1000);
     }
 
     componentWillUnmount() {
@@ -2631,48 +2625,13 @@ export default class Wallet extends React.Component {
 
         return (
             <div className={this.state.loging_out ? 'wallet-page fadeOutUp' : 'wallet-page'}>
-                <Navigation />
-                <div className="container wallet-tabs-wrap">
-                    <div className="wallet-tabs fadeIn">
-                        {
-                            archive_active
-                            ?
-                                <div>
-                                    {
-                                        this.state.transfer_key_to_home
-                                        ?
-                                            <div onClick={this.setHomeView} className='btn btn-default button-shine glow-active'>
-                                                Home
-                                            </div>
-                                        :
-                                            <div onClick={this.setHomeView} className='btn btn-default button-shine'>
-                                                Home
-                                            </div>
-                                    }
-                                    <div onClick={this.setArchiveView} className='btn btn-default button-shine active'>
-                                        Archive
-                                    </div>
-                                </div>
-                            :
-                                <div>
-                                    <div onClick={this.setHomeView} className='btn btn-default button-shine active'>
-                                        Home
-                                    </div>
-                                    {
-                                        this.state.transfer_key_to_archive
-                                        ?
-                                            <div onClick={this.setArchiveView} className='btn btn-default button-shine glow-active'>
-                                                Archive
-                                            </div>
-                                        :
-                                            <div onClick={this.setArchiveView} className='btn btn-default button-shine'>
-                                                Archive
-                                            </div>
-                                    }
-                                </div>
-                        }
-                    </div>
-                </div>
+                <Navigation
+                    archiveActive={this.state.archive_active}
+                    setHomeView={this.setHomeView}
+                    setArchiveView={this.setArchiveView}
+                    keyToHome={this.state.transfer_key_to_home}
+                    keyToArchive={this.state.transfer_key_to_archive}
+                />
 
                 <div className="container keys-container fadeIn">
                     <div className={this.state.settings_active || this.state.send_overflow_active || this.state.dividend_active || this.state.affiliate_active

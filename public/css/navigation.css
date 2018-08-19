@@ -1,8 +1,12 @@
+#navbar-collapse {
+  padding-right: 0;
+  text-align: right;
+}
 .wallet-nav {
-  margin-right: 160px;
   animation-duration: 1s;
-  animation-delay: 1.9s;
   animation-fill-mode: both;
+  float: none;
+  display: inline-block;
 }
 .navbar-default {
   height: 85px;
@@ -18,8 +22,9 @@
   animation-fill-mode: both;
 }
 .navbar-default .coin-amounts {
-  padding-bottom: 5px;
-  margin-right: -25px;
+  position: relative;
+  right: 5px;
+  bottom: 5px;
 }
 .navbar-default .navbar-brand img {
   height: 40px;
@@ -65,11 +70,11 @@
   position: relative;
 }
 .wallet-tabs {
-  position: absolute;
-  top: -94px;
-  right: 15px;
+  display: inline-block;
+  float: right;
+  text-align: right;
+  padding-top: 6px;
   animation-duration: 1s;
-  animation-delay: 1.9s;
   animation-fill-mode: both;
 }
 .wallet-tabs .btn {

@@ -14,7 +14,6 @@ export default class Navigation extends React.Component {
     }
 
     componentDidMount() {
-
         this.getPrices();
         this.timerID = setInterval(
             () => this.tick(),
@@ -81,21 +80,52 @@ export default class Navigation extends React.Component {
                 </div>
 
                 <div className="collapse navbar-collapse" id="navbar-collapse">
-                    <ul className="nav navbar-nav navbar-right wallet-nav fadeIn">
+                    <ul className="nav navbar-nav wallet-nav fadeIn">
                         <li>
                             <Link activeClassName="activeLink" onlyActiveOnIndex>
                                 Wallet &nbsp;v0.0.7
                             </Link>
                         </li>
                     </ul>
-                    {/*<div onClick={this.setHomeView}*/}
-                         {/*className={archive_active === false ? 'btn btn-default active' : 'btn btn-default'}>*/}
-                        {/*Home*/}
-                    {/*</div>*/}
-                    {/*<div onClick={this.setArchiveView}*/}
-                         {/*className={archive_active === true ? 'btn btn-default active' : 'btn btn-default'}>*/}
-                        {/*Archive*/}
-                    {/*</div>*/}
+                    <div className="wallet-tabs fadeIn">
+                        {
+                            this.props.archiveActive
+                            ?
+                                <div>
+                                    {
+                                        this.props.keyToHome
+                                        ?
+                                            <div onClick={this.props.setHomeView} className='btn btn-default button-shine glow-active'>
+                                                Home
+                                            </div>
+                                        :
+                                            <div onClick={this.props.setHomeView} className='btn btn-default button-shine'>
+                                                Home
+                                            </div>
+                                    }
+                                    <div onClick={this.props.setArchiveView} className='btn btn-default button-shine active'>
+                                        Archive
+                                    </div>
+                                </div>
+                            :
+                                <div>
+                                    <div onClick={this.props.setHomeView} className='btn btn-default button-shine active'>
+                                        Home
+                                    </div>
+                                    {
+                                        this.props.keyToArchive
+                                        ?
+                                            <div onClick={this.props.setArchiveView} className='btn btn-default button-shine glow-active'>
+                                                Archive
+                                            </div>
+                                        :
+                                            <div onClick={this.props.setArchiveView} className='btn btn-default button-shine'>
+                                                Archive
+                                            </div>
+                                    }
+                                </div>
+                        }
+                    </div>
                 </div>
                 <div className="collapse navbar-collapse" id="navbar-collapse">
                     <ul className="nav navbar-nav navbar-right coin-amounts">
