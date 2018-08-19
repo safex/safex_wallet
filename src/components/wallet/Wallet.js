@@ -21,6 +21,7 @@ import {
 
 import Navigation from '../Navigation';
 import KeyLabel from "../KeyLabel";
+import HistoryModal from "../HistoryModal";
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 
 export default class Wallet extends React.Component {
@@ -2642,18 +2643,11 @@ export default class Wallet extends React.Component {
                         </div>
                     </div>
                 </div>
-                <div className={this.state.history_overflow_active
-                    ? 'overflow historyModal fadeIn active'
-                    : 'overflow historyModal'}>
-                    <div className="col-xs-12 history-inner">
-                        <div className="container">
-                            <h3>History <span className="close" onClick={this.closeHistoryModal}>X</span></h3>
-                        </div>
-                        <div id="history_txs">
-                            <h5>Loading...</h5>
-                        </div>
-                    </div>
-                </div>
+
+                <HistoryModal
+                    historyOverflowActive={this.state.history_overflow_active}
+                    closeHistoryModal={this.closeHistoryModal}
+                />
 
                 <div className={this.state.sidebar_open
                     ? 'overflow sendModal active'
