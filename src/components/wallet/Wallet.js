@@ -37,7 +37,6 @@ export default class Wallet extends React.Component {
             wallet: {},
             import_key: '',
             archive_active: false,
-
             //transaction
             send_coin: 'safex',
             send_amount: 1,
@@ -150,6 +149,7 @@ export default class Wallet extends React.Component {
         this.openExportEncryptedWallet = this.openExportEncryptedWallet.bind(this);
         this.exportEncryptedWallet = this.exportEncryptedWallet.bind(this);
         this.getFee = this.getFee.bind(this);
+        this.getPrices = this.getPrices.bind(this);
         this.refreshWallet = this.refreshWallet.bind(this);
         this.feeChange = this.feeChange.bind(this);
         this.openSettingsModal = this.openSettingsModal.bind(this);
@@ -210,6 +210,7 @@ export default class Wallet extends React.Component {
                 copied: false,
             });
             this.prepareDisplayPendingTx();
+            this.getPrices();
         }
     }
 
@@ -268,6 +269,7 @@ export default class Wallet extends React.Component {
     componentDidMount() {
         this.refreshWallet();
         this.getFee();
+        this.getPrices();
 
         this.refreshWalletInterval = setInterval(() => {
             var i;
@@ -281,6 +283,38 @@ export default class Wallet extends React.Component {
 
     componentWillUnmount() {
         clearInterval(this.timerID);
+    }
+
+    getPrices() {
+        fetch('https://safex.io/api/price/', {method: "POST"})
+            .then(resp => resp.json())
+            .then((resp) => {
+                try {
+                    var safex = 0.02;
+                    if (resp.price_usd !== null) {
+                        safex = parseFloat(resp.price_usd).toFixed(8);
+                        this.setState({safex_price: safex});
+                    }
+                    localStorage.setItem('safex_price', safex);
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+
+        fetch('https://api.coinmarketcap.com/v1/ticker/bitcoin/', {method: "GET"})
+            .then(resp => resp.json())
+            .then((resp) => {
+                try {
+                    var btc = 0;
+                    if (resp[0].symbol === 'BTC') {
+                        btc = parseFloat(resp[0].price_usd).toFixed(2);
+                        localStorage.setItem('btc_price', btc);
+                        this.setState({btc_price: btc});
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            });
     }
 
     getFee() {
@@ -2630,11 +2664,14 @@ export default class Wallet extends React.Component {
         return (
             <div className={this.state.loging_out ? 'wallet-page fadeOutUp' : 'wallet-page'}>
                 <Navigation
+                    safexPrice={this.state.safex_price}
+                    btcPrice={this.state.btc_price}
                     archiveActive={this.state.archive_active}
                     setHomeView={this.setHomeView}
                     setArchiveView={this.setArchiveView}
                     keyToHome={this.state.transfer_key_to_home}
                     keyToArchive={this.state.transfer_key_to_archive}
+                    getPrices={this.getPrices}
                 />
 
                 <div className="container keys-container fadeIn">
