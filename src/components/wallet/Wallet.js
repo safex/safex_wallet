@@ -23,6 +23,7 @@ import Navigation from '../Navigation';
 import KeyLabel from "../KeyLabel";
 import HistoryModal from "../HistoryModal";
 import MainAlertPopup from "../MainAlertPopup";
+import ImportModal from "../ImportModal";
 import Footer from "../Footer";
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 
@@ -2915,45 +2916,15 @@ export default class Wallet extends React.Component {
                     refreshWallet={this.refreshWallet}
                 />
 
-                <div className={this.state.import_modal_active || this.state.create_key_active
-                    ? 'importModal active'
-                    : 'importModal'}>
-                    <div className="importModalInner">
-                        <form onSubmit={this.state.import_modal_active ? this.importKey : this.createKey}>
-                            <div className="input-group">
-                                <label htmlFor="key-label">Key Label</label>
-                                <input type="text" placeholder="Enter Key Label" name="label" id="label" onChange={this.saveLabel} ref={input => input && input.focus()} />
-                            </div>
-                            {
-                                this.state.import_modal_active
-                                ?
-                                    <div>
-                                        <div className="input-group">
-                                            <label htmlFor="key">Private Key</label>
-                                            <input name="key" value={this.state.import_key} />
-                                        </div>
-
-                                        <button type="submit" className="button-shine" title="Import Key">Import Key</button>
-                                    </div>
-                                :
-                                    <div>
-                                        <div className="input-group input-group-hidden">
-                                            <label htmlFor="key">Private Key</label>
-                                            <input name="key" value="" disabled="disabled" />
-                                        </div>
-                                        {
-                                            this.state.create_key_active
-                                            ?
-                                                <button type="submit" className="button-shine" title="Create Key">Create Key</button>
-                                            :
-                                                <button type="submit" disabled="disabled" className="button-shine" title="Create Key"></button>
-                                        }
-                                    </div>
-                            }
-                        </form>
-                        <span className="close" onClick={this.closeImportModal}>X</span>
-                    </div>
-                </div>
+                <ImportModal
+                    importModalActive={this.state.import_modal_active}
+                    createKeyActive={this.state.create_key_active}
+                    importKeyState={this.state.import_key}
+                    importKey={this.importKey}
+                    createKey={this.createKey}
+                    saveLabel={this.saveLabel}
+                    closeImportModal={this.closeImportModal}
+                />
 
                 <MainAlertPopup
                     mainAlertPopup={this.state.main_alert_popup}
