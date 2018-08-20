@@ -22,6 +22,7 @@ import {
 import Navigation from '../Navigation';
 import KeyLabel from "../KeyLabel";
 import HistoryModal from "../HistoryModal";
+import MainAlertPopup from "../MainAlertPopup";
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 
 export default class Wallet extends React.Component {
@@ -3003,60 +3004,19 @@ export default class Wallet extends React.Component {
                     </div>
                 </div>
 
-                <div className={this.state.main_alert_popup
-                    ? 'mainAlertPopup active'
-                    : 'mainAlertPopup'}>
-                    <div className="mainAlertPopupInner">
-                        <p>{this.state.main_alert_popup_text}</p>
-                        {
-                            this.state.export_unencrypted_wallet === false && this.state.export_encrypted_wallet
-                            ?
-                                <div className="mainAlertProceedWrap">
-                                    <button className="mainAlertProceed active" onClick={this.exportEncryptedWallet}>
-                                        Ok
-                                    </button>
-                                </div>
-                            :
-                                <div className="mainAlertProceedWrap">
-                                    {
-                                        this.state.export_unencrypted_wallet && this.state.export_encrypted_wallet === false
-                                        ?
-                                            <button className="mainAlertProceed active" onClick={this.exportUnencryptedWallet}>
-                                                Ok
-                                            </button>
-                                        :
-                                            <button className="mainAlertProceed">
-                                                Ok
-                                            </button>
-                                    }
-                                    <button className="mainAlertProceed">
-                                        Ok
-                                    </button>
-                                </div>
-                        }
-                        {
-                            this.state.transaction_being_sent
-                            ?
-                                <span className="close disabled" onClick={this.closeMainAlertPopup}>X</span>
-                            :
-                                <span className="close" onClick={this.closeMainAlertPopup}>X</span>
-                        }
-                    </div>
-                </div>
-
-                {
-                    this.state.transaction_being_sent
-                    ?
-                        <div className={this.state.main_alert_popup || this.state.import_modal_active || this.state.create_key_active
-                            ? 'mainAlertBackdrop active disabled'
-                            : 'mainAlertBackdrop'} onClick={this.state.main_alert_popup ? this.closeMainAlertPopup : this.closeImportModal}>
-                        </div>
-                    :
-                        <div className={this.state.main_alert_popup || this.state.import_modal_active || this.state.create_key_active
-                            ? 'mainAlertBackdrop active'
-                            : 'mainAlertBackdrop'} onClick={this.state.main_alert_popup ? this.closeMainAlertPopup : this.closeImportModal}>
-                        </div>
-                }
+                <MainAlertPopup
+                    mainAlertPopup={this.state.main_alert_popup}
+                    mainAlertPopupText={this.state.main_alert_popup_text}
+                    exportUnencryptedWalletState={this.state.export_unencrypted_wallet}
+                    exportEncryptedWalletState={this.state.export_encrypted_wallet}
+                    exportEncryptedWallet={this.exportEncryptedWallet}
+                    exportUnencryptedWallet={this.exportUnencryptedWallet}
+                    transactionBeingSent={this.state.transaction_being_sent}
+                    importModalActive={this.state.import_modal_active}
+                    createKeyActive={this.state.create_key_active}
+                    closeMainAlertPopup={this.closeMainAlertPopup}
+                    closeImportModal={this.closeImportModal}
+                />
 
             </div>
         );
