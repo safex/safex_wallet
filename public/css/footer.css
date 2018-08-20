@@ -188,10 +188,9 @@
 .status .right-options html input[disabled]:before {
   box-shadow: none;
 }
-/*.status .right-options .aff-btn-active:hover,*/
-/*.status .right-options .dividend-btn-active:hover,*/
-.status .right-options .settings-btn-active:hover
-{
+.status .right-options .aff-btn-active:hover,
+.status .right-options .dividend-btn-active:hover,
+.status .right-options .settings-btn-active:hover {
   background-color: transparent;
 }
 .status .right-options .refresh-btn img,
