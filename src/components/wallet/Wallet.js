@@ -211,6 +211,7 @@ export default class Wallet extends React.Component {
             });
             this.prepareDisplayPendingTx();
             this.getPrices();
+            console.log('Page refreshed');
         }
     }
 
@@ -276,13 +277,10 @@ export default class Wallet extends React.Component {
             for(i=0; i<5; i++) {
                 this.prepareDisplay();
                 this.prepareDisplayPendingTx();
+                this.getPrices();
                 console.log('Page refreshed');
             }
-        }, 1800000);
-    }
-
-    componentWillUnmount() {
-        clearInterval(this.timerID);
+        }, 600000);
     }
 
     getPrices() {

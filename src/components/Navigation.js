@@ -10,18 +10,6 @@ export default class Navigation extends React.Component {
         }
     }
 
-    componentDidMount() {
-        this.props.getPrices();
-        this.timerID = setInterval(
-            () => this.props.getPrices(),
-            600000
-        );
-    }
-
-    componentWillUnmount() {
-        clearInterval(this.timerID);
-    }
-
     render() {
         return (<nav className="navbar navbar-default fadeInDown">
             <div className="container">
