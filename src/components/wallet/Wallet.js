@@ -274,10 +274,10 @@ export default class Wallet extends React.Component {
 
         this.refreshWalletInterval = setInterval(() => {
             var i;
+            this.getPrices();
             for(i=0; i<5; i++) {
                 this.prepareDisplay();
                 this.prepareDisplayPendingTx();
-                this.getPrices();
                 console.log('Page refreshed');
             }
         }, 600000);
