@@ -21,6 +21,10 @@ import {
 
 import Navigation from '../Navigation';
 import KeyLabel from "../KeyLabel";
+import HistoryModal from "../HistoryModal";
+import MainAlertPopup from "../MainAlertPopup";
+import ImportModal from "../ImportModal";
+import Footer from "../Footer";
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 
 export default class Wallet extends React.Component {
@@ -33,7 +37,6 @@ export default class Wallet extends React.Component {
             wallet: {},
             import_key: '',
             archive_active: false,
-
             //transaction
             send_coin: 'safex',
             send_amount: 1,
@@ -146,6 +149,7 @@ export default class Wallet extends React.Component {
         this.openExportEncryptedWallet = this.openExportEncryptedWallet.bind(this);
         this.exportEncryptedWallet = this.exportEncryptedWallet.bind(this);
         this.getFee = this.getFee.bind(this);
+        this.getPrices = this.getPrices.bind(this);
         this.refreshWallet = this.refreshWallet.bind(this);
         this.feeChange = this.feeChange.bind(this);
         this.openSettingsModal = this.openSettingsModal.bind(this);
@@ -206,6 +210,8 @@ export default class Wallet extends React.Component {
                 copied: false,
             });
             this.prepareDisplayPendingTx();
+            this.getPrices();
+            console.log('Page refreshed');
         }
     }
 
@@ -264,25 +270,49 @@ export default class Wallet extends React.Component {
     componentDidMount() {
         this.refreshWallet();
         this.getFee();
+        this.getPrices();
 
         this.refreshWalletInterval = setInterval(() => {
             var i;
+            this.getPrices();
             for(i=0; i<5; i++) {
                 this.prepareDisplay();
                 this.prepareDisplayPendingTx();
                 console.log('Page refreshed');
             }
-        }, 1800000);
-
-        // this.prepareDisplayInterval = setInterval(() => {
-        //     this.prepareDisplay();
-        //     this.prepareDisplayPendingTx();
-        //     console.log('Timer')
-        // }, 1000);
+        }, 600000);
     }
 
-    componentWillUnmount() {
-        clearInterval(this.timerID);
+    getPrices() {
+        fetch('https://safex.io/api/price/', {method: "POST"})
+            .then(resp => resp.json())
+            .then((resp) => {
+                try {
+                    var safex = 0.02;
+                    if (resp.price_usd !== null) {
+                        safex = parseFloat(resp.price_usd).toFixed(8);
+                        this.setState({safex_price: safex});
+                    }
+                    localStorage.setItem('safex_price', safex);
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+
+        fetch('https://api.coinmarketcap.com/v1/ticker/bitcoin/', {method: "GET"})
+            .then(resp => resp.json())
+            .then((resp) => {
+                try {
+                    var btc = 0;
+                    if (resp[0].symbol === 'BTC') {
+                        btc = parseFloat(resp[0].price_usd).toFixed(2);
+                        localStorage.setItem('btc_price', btc);
+                        this.setState({btc_price: btc});
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            });
     }
 
     getFee() {
@@ -896,6 +926,8 @@ export default class Wallet extends React.Component {
 
     createKey(e) {
         e.preventDefault();
+        this.prepareDisplay();
+
         this.setState({is_loading: true});
 
         var key_pair = genkey();
@@ -2237,7 +2269,7 @@ export default class Wallet extends React.Component {
     }
 
     editLabel(label, key) {
-        // console.log(label, key);
+        key.label = label;
     }
 
     openMainAlertPopup(message) {
@@ -2629,48 +2661,16 @@ export default class Wallet extends React.Component {
 
         return (
             <div className={this.state.loging_out ? 'wallet-page fadeOutUp' : 'wallet-page'}>
-                <Navigation />
-                <div className="container wallet-tabs-wrap">
-                    <div className="wallet-tabs fadeIn">
-                        {
-                            archive_active
-                            ?
-                                <div>
-                                    {
-                                        this.state.transfer_key_to_home
-                                        ?
-                                            <div onClick={this.setHomeView} className='btn btn-default button-shine glow-active'>
-                                                Home
-                                            </div>
-                                        :
-                                            <div onClick={this.setHomeView} className='btn btn-default button-shine'>
-                                                Home
-                                            </div>
-                                    }
-                                    <div onClick={this.setArchiveView} className='btn btn-default button-shine active'>
-                                        Archive
-                                    </div>
-                                </div>
-                            :
-                                <div>
-                                    <div onClick={this.setHomeView} className='btn btn-default button-shine active'>
-                                        Home
-                                    </div>
-                                    {
-                                        this.state.transfer_key_to_archive
-                                        ?
-                                            <div onClick={this.setArchiveView} className='btn btn-default button-shine glow-active'>
-                                                Archive
-                                            </div>
-                                        :
-                                            <div onClick={this.setArchiveView} className='btn btn-default button-shine'>
-                                                Archive
-                                            </div>
-                                    }
-                                </div>
-                        }
-                    </div>
-                </div>
+                <Navigation
+                    safexPrice={this.state.safex_price}
+                    btcPrice={this.state.btc_price}
+                    archiveActive={this.state.archive_active}
+                    setHomeView={this.setHomeView}
+                    setArchiveView={this.setArchiveView}
+                    keyToHome={this.state.transfer_key_to_home}
+                    keyToArchive={this.state.transfer_key_to_archive}
+                    getPrices={this.getPrices}
+                />
 
                 <div className="container keys-container fadeIn">
                     <div className={this.state.settings_active || this.state.send_overflow_active || this.state.dividend_active || this.state.affiliate_active
@@ -2681,18 +2681,11 @@ export default class Wallet extends React.Component {
                         </div>
                     </div>
                 </div>
-                <div className={this.state.history_overflow_active
-                    ? 'overflow historyModal fadeIn active'
-                    : 'overflow historyModal'}>
-                    <div className="col-xs-12 history-inner">
-                        <div className="container">
-                            <h3>History <span className="close" onClick={this.closeHistoryModal}>X</span></h3>
-                        </div>
-                        <div id="history_txs">
-                            <h5>Loading...</h5>
-                        </div>
-                    </div>
-                </div>
+
+                <HistoryModal
+                    historyOverflowActive={this.state.history_overflow_active}
+                    closeHistoryModal={this.closeHistoryModal}
+                />
 
                 <div className={this.state.sidebar_open
                     ? 'overflow sendModal active'
@@ -2933,175 +2926,54 @@ export default class Wallet extends React.Component {
                             <div></div>
                     }
                 </div>
-                <div className="key-buttons status fadeInUp">
-                    <div className="container">
-                        <div className="status-left-wrap">
-                            <span>Status:</span>
-                            <span className={this.state.safex_sync
-                                ? 'status-green'
-                                : 'status-red'}>SAFEX</span>
-                            <span className={this.state.btc_sync
-                                ? 'status-green'
-                                : 'status-red'}>BTC</span><br />
-                            <img src="images/transfer.png" alt="Transfer Icon"/>
-                            <span className="sync-span">{this.state.status_text}</span>
-                        </div>
-                        <div className={this.state.import_wrap_glow ? 'import-form-wrap active' :'import-form-wrap'}>
-                            <form onChange={this.importKeyChange} onSubmit={this.openImportModal}>
-                                <input name="key" value={this.state.import_key} onFocus={this.importGlow} onBlur={this.importGlowDeactivate} placeholder="Paste your private key"/>
-                                <button type="submit" className="button-shine" title="Import Key">Import</button>
-                            </form>
-                            <button onClick={this.openCreateKey} className="create-btn button-shine" title="Create New Key">
-                                <img src="images/plus.png" alt="Plus Logo"/>
-                            </button>
-                        </div>
-                        <div className="right-options">
-                            {
-                                this.state.affiliate_active
-                                ?
-                                    <button className="aff-btn aff-btn-active button-shine" title="Affiliate System (Under development)" onClick={this.closeAffiliateModal} disabled>
-                                        <img src="images/world-blue.png" alt="World Logo"/>
-                                    </button>
-                                :
-                                    <button className="aff-btn button-shine" title="Affiliate System (Under development)" onClick={this.openAffiliateModal} disabled>
-                                        <img src="images/world.png" alt="World Logo"/>
-                                    </button>
-                            }
 
-                            {
-                                this.state.dividend_active
-                                ?
-                                    <button className="dividend-btn dividend-btn-active button-shine" title="Dividend Calculator (Under development)" onClick={this.closeDividendModal} disabled>
-                                        <img src="images/calculator-blue.png" alt="Calculator Logo"/>
-                                    </button>
-                                :
-                                    <button className="dividend-btn button-shine" title="Dividend Calculator (Under development)" onClick={this.openDividendModal} disabled>
-                                        <img src="images/calculator.png" alt="Calculator Logo"/>
-                                    </button>
-                            }
+                <Footer
+                    safexSync={this.state.safex_sync}
+                    btcSync={this.state.btc_sync}
+                    statusText={this.state.status_text}
+                    importWrapGlow={this.state.import_wrap_glow}
+                    importKeyChange={this.importKeyChange}
+                    openImportModal={this.openImportModal}
+                    importKey={this.state.import_key}
+                    importGlow={this.importGlow}
+                    importGlowDeactivate={this.importGlowDeactivate}
+                    openCreateKey={this.openCreateKey}
+                    affiliateActive={this.state.affiliate_active}
+                    openAffiliateModal={this.openAffiliateModal}
+                    closeAffiliateModal={this.closeAffiliateModal}
+                    dividendActive={this.state.dividend_active}
+                    openDividendModal={this.openDividendModal}
+                    closeDividendModal={this.closeDividendModal}
+                    settingsActive={this.state.settings_active}
+                    openSettingsModal={this.openSettingsModal}
+                    closeSettingsModal={this.closeSettingsModal}
+                    refreshTimer={this.state.refreshTimer}
+                    refreshWallet={this.refreshWallet}
+                />
 
-                            {
-                                this.state.settings_active
-                                ?
-                                    <button className="settings button-shine settings-btn-active" onClick={this.closeSettingsModal} title="Settings">
-                                        <img src="images/settings-blue.png" alt="Mixer Logo"/>
-                                    </button>
-                                :
-                                    <button className="settings button-shine" onClick={this.openSettingsModal} title="Settings">
-                                        <img src="images/settings.png" alt="Mixer Logo"/>
-                                    </button>
-                            }
+                <ImportModal
+                    importModalActive={this.state.import_modal_active}
+                    createKeyActive={this.state.create_key_active}
+                    importKeyState={this.state.import_key}
+                    importKey={this.importKey}
+                    createKey={this.createKey}
+                    saveLabel={this.saveLabel}
+                    closeImportModal={this.closeImportModal}
+                />
 
-                            {
-                                this.state.refreshTimer === 0
-                                ?
-                                    <button className="refresh-btn button-shine"  onClick={this.refreshWallet} title="Refresh">
-                                        <img src="images/refresh.png" alt="Refresh Logo"/>
-                                    </button>
-                                :
-                                    <button className="refresh-btn button-shine disabled" title="Refresh">
-                                        <img src="images/refresh-blue.png" alt="Refresh Logo"/>
-                                        <span><p>{this.state.refreshTimer + 's'}</p></span>
-                                    </button>
-                            }
-                        </div>
-                    </div>
-                </div>
-
-                <div className={this.state.import_modal_active || this.state.create_key_active
-                    ? 'importModal active'
-                    : 'importModal'}>
-                    <div className="importModalInner">
-                        <form onSubmit={this.state.import_modal_active ? this.importKey : this.createKey}>
-                            <div className="input-group">
-                                <label htmlFor="key-label">Key Label</label>
-                                <input type="text" placeholder="Enter Key Label" name="label" id="label" onChange={this.saveLabel} />
-                            </div>
-                            {
-                                this.state.import_modal_active
-                                ?
-                                    <div>
-                                        <div className="input-group">
-                                            <label htmlFor="key">Private Key</label>
-                                            <input name="key" value={this.state.import_key} />
-                                        </div>
-
-                                        <button type="submit" className="button-shine" title="Import Key">Import Key</button>
-                                    </div>
-                                :
-                                    <div>
-                                        <div className="input-group input-group-hidden">
-                                            <label htmlFor="key">Private Key</label>
-                                            <input name="key" value="" disabled="disabled" />
-                                        </div>
-                                        {
-                                            this.state.create_key_active
-                                                ?
-                                                <button type="submit" className="button-shine" title="Create Key">Create Key</button>
-                                                :
-                                                <button type="submit" disabled="disabled" className="button-shine" title="Create Key"></button>
-                                        }
-                                    </div>
-                            }
-                        </form>
-                        <span className="close" onClick={this.closeImportModal}>X</span>
-                    </div>
-                </div>
-
-                <div className={this.state.main_alert_popup
-                    ? 'mainAlertPopup active'
-                    : 'mainAlertPopup'}>
-                    <div className="mainAlertPopupInner">
-                        <p>{this.state.main_alert_popup_text}</p>
-                        {
-                            this.state.export_unencrypted_wallet === false && this.state.export_encrypted_wallet
-                            ?
-                                <div className="mainAlertProceedWrap">
-                                    <button className="mainAlertProceed active" onClick={this.exportEncryptedWallet}>
-                                        Ok
-                                    </button>
-                                </div>
-                            :
-                                <div className="mainAlertProceedWrap">
-                                    {
-                                        this.state.export_unencrypted_wallet && this.state.export_encrypted_wallet === false
-                                            ?
-                                            <button className="mainAlertProceed active" onClick={this.exportUnencryptedWallet}>
-                                                Ok
-                                            </button>
-                                            :
-                                            <button className="mainAlertProceed">
-                                                Ok
-                                            </button>
-                                    }
-                                    <button className="mainAlertProceed">
-                                        Ok
-                                    </button>
-                                </div>
-                        }
-                        {
-                            this.state.transaction_being_sent
-                            ?
-                                <span className="close disabled" onClick={this.closeMainAlertPopup}>X</span>
-                            :
-                                <span className="close" onClick={this.closeMainAlertPopup}>X</span>
-                        }
-                    </div>
-                </div>
-
-                {
-                    this.state.transaction_being_sent
-                    ?
-                        <div className={this.state.main_alert_popup || this.state.import_modal_active || this.state.create_key_active
-                            ? 'mainAlertBackdrop active disabled'
-                            : 'mainAlertBackdrop'} onClick={this.state.main_alert_popup ? this.closeMainAlertPopup : this.closeImportModal}>
-                        </div>
-                    :
-                        <div className={this.state.main_alert_popup || this.state.import_modal_active || this.state.create_key_active
-                            ? 'mainAlertBackdrop active'
-                            : 'mainAlertBackdrop'} onClick={this.state.main_alert_popup ? this.closeMainAlertPopup : this.closeImportModal}>
-                        </div>
-                }
+                <MainAlertPopup
+                    mainAlertPopup={this.state.main_alert_popup}
+                    mainAlertPopupText={this.state.main_alert_popup_text}
+                    exportUnencryptedWalletState={this.state.export_unencrypted_wallet}
+                    exportEncryptedWalletState={this.state.export_encrypted_wallet}
+                    exportEncryptedWallet={this.exportEncryptedWallet}
+                    exportUnencryptedWallet={this.exportUnencryptedWallet}
+                    transactionBeingSent={this.state.transaction_being_sent}
+                    importModalActive={this.state.import_modal_active}
+                    createKeyActive={this.state.create_key_active}
+                    closeMainAlertPopup={this.closeMainAlertPopup}
+                    closeImportModal={this.closeImportModal}
+                />
 
             </div>
         );
