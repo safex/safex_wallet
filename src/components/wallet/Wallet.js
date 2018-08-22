@@ -3,12 +3,11 @@ import axios from 'axios';
 
 const fileDownload = require('react-file-download');
 const fs = window.require('fs');
-const os = window.require('os');
 const bitcoin = window.require('bitcoinjs-lib');
 const bitcore = window.require('bitcore-lib');
 import QRCode from 'qrcode.react';
 
-import {encrypt, safexPayload} from '../../utils/utils';
+import {encrypt} from '../../utils/utils';
 import {genkey} from '../../utils/keys';
 import {
     downloadWallet,
@@ -696,6 +695,17 @@ export default class Wallet extends React.Component {
 
     sendCoins(e) {
         e.preventDefault();
+        //set the signing key for the transaction
+        var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
+        //set the source of the transaction
+        var source = e.target.public_key.value;
+        //set the amount provided by the user
+        var amount = e.target.amount.value;
+        //set the fee provided by the user
+        var fee = e.target.fee.value;
+        //set the destination provided by the user
+        var destination = e.target.destination.value;
+
         //check whether Bitcoin or Safex is selected
         if (this.state.send_coin === 'safex') {
             if (this.state.fee_in_$ === false) {
@@ -709,21 +719,6 @@ export default class Wallet extends React.Component {
                         main_alert_popup: true,
                         main_alert_popup_text: 'Sending...',
                     });
-
-                    //set the signing key for the transaction
-                    var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
-                    //set the source of the transaction
-                    var source = e.target.public_key.value;
-                    //set the amount provided by the user
-                    var amount = e.target.amount.value;
-                    //set the fee provided by the user
-                    var fee = e.target.fee.value;
-                    //set the destination provided by the user
-                    var destination = e.target.destination.value;
-
-                    //here we will check to make sure that the destination is a valid bitcoin address
-                    var address = bitcore.Address.fromString(destination);
-                    var address2 = bitcore.Address.fromString(source);
 
                     //here we try to get the unspent transactions from the source we send from
                     try {
@@ -772,21 +767,6 @@ export default class Wallet extends React.Component {
                         main_alert_popup_text: 'Sending...',
                     });
 
-                    //set the signing key for the transaction
-                    var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
-                    //set the source of the transaction
-                    var source = e.target.public_key.value;
-                    //set the amount provided by the user
-                    var amount = e.target.amount.value;
-                    //set the fee provided by the user
-                    var fee = e.target.fee.value;
-                    //set the destination provided by the user
-                    var destination = e.target.destination.value;
-
-                    //here we will check to make sure that the destination is a valid bitcoin address
-
-                    var address = bitcore.Address.fromString(destination);
-                    var address2 = bitcore.Address.fromString(source);
                     //here we try to get the unspent transactions from the source we send from
                     try {
                         fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
@@ -931,7 +911,6 @@ export default class Wallet extends React.Component {
         this.setState({is_loading: true});
 
         var key_pair = genkey();
-
         var address = key_pair.getAddress();
 
         var key_json = {};
@@ -952,10 +931,8 @@ export default class Wallet extends React.Component {
 
         json['keys'].push(key_json);
 
-        var crypto = require('crypto'),
-            algorithm = 'aes-256-ctr',
-            password = localStorage.getItem('password');
-
+        var algorithm = 'aes-256-ctr';
+        var password = localStorage.getItem('password');
         var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
 
         fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
@@ -1091,10 +1068,8 @@ export default class Wallet extends React.Component {
 
                     json['keys'].push(key_json);
 
-                    var crypto = require('crypto'),
-                        algorithm = 'aes-256-ctr',
-                        password = localStorage.getItem('password');
-
+                    var algorithm = 'aes-256-ctr';
+                    var password = localStorage.getItem('password');
                     var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
 
                     fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
@@ -1632,15 +1607,15 @@ export default class Wallet extends React.Component {
     sendFeeOnChange(e) {
         var send_amount = this.state.send_amount;
         var send_fee = parseFloat(e.target.value);
+        var send_total = parseFloat(send_amount);
 
         if (this.state.send_coin === 'safex') {
-            var send_total = parseFloat(send_amount);
             this.setState({
                 send_fee: send_fee,
                 send_total: send_total.toFixed(0)
             });
         } else {
-            var send_total = parseFloat(send_fee) + parseFloat(send_amount);
+            send_total = parseFloat(send_fee) + parseFloat(send_amount);
             this.setState({
                 send_fee: send_fee,
                 send_total: send_total.toFixed(8)
@@ -1664,16 +1639,11 @@ export default class Wallet extends React.Component {
     //This is fired when change of currency is selected BTC SAFEX
     sendTotalAdjustCoinChange(coin) {
         var send_amount = this.state.send_amount;
-        if (this.state.average_fee > 0) {
-            var send_fee = this.state.average_fee;
-        } else {
-            var send_fee = this.state.send_fee;
-        }
+        var send_total = parseFloat(send_amount);
 
         //if this.state.average_fee > 0 send_fee == fast. Set active fee selection fastest.
         if (coin === 'safex') {
             send_amount = parseFloat(this.state.send_amount).toFixed(0);
-            var send_total = parseFloat(send_amount);
             this.setState({
                 send_amount: 1,
                 send_fee: parseFloat(this.state.average_fee).toFixed(8),
@@ -1682,7 +1652,7 @@ export default class Wallet extends React.Component {
             });
         } else {
             if (parseFloat(parseFloat(this.state.average_fee) / 4) > 0.00001) {
-                var send_total = parseFloat(this.state.average_fee) / 4 + 0.00001;
+                send_total = parseFloat(this.state.average_fee) / 4 + 0.00001;
                 this.setState({
                     send_amount: 0.00001.toFixed(8),
                     send_fee: parseFloat(parseFloat(this.state.average_fee) / 4).toFixed(8),
@@ -1690,7 +1660,7 @@ export default class Wallet extends React.Component {
                     active_fee: 'fast'
                 });
             } else {
-                var send_total = 0.00002;
+                send_total = 0.00002;
                 this.setState({
                     send_amount: 0.00001.toFixed(8),
                     send_fee: 0.00001.toFixed(8),
@@ -1996,10 +1966,8 @@ export default class Wallet extends React.Component {
 
             json.keys[index] = json_index;
 
-            var crypto = require('crypto'),
-                algorithm = 'aes-256-ctr',
-                password = localStorage.getItem('password');
-
+            var algorithm = 'aes-256-ctr';
+            var password = localStorage.getItem('password');
             var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
 
             fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
@@ -2052,12 +2020,9 @@ export default class Wallet extends React.Component {
 
             json.keys[index] = json_index;
 
-            var crypto = require('crypto'),
-                algorithm = 'aes-256-ctr',
-                password = localStorage.getItem('password');
-
+            var algorithm = 'aes-256-ctr';
+            var password = localStorage.getItem('password');
             var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
-
 
             fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
                 if (err) {
@@ -2223,26 +2188,28 @@ export default class Wallet extends React.Component {
 
     safexDividendOnChange(e) {
         e.preventDefault();
+        var safexDividendYield = 0;
+
         if (e.target.name === "total_trade_volume") {
-            var safexDividendYield = parseFloat(e.target.value) * (parseFloat(this.state.marketplaceFee) / 100) / parseFloat(this.state.safexMarketCap);
+            safexDividendYield = parseFloat(e.target.value) * (parseFloat(this.state.marketplaceFee) / 100) / parseFloat(this.state.safexMarketCap);
             this.setState({
                 totalTradeVolume: e.target.value,
                 safexDividendYield: (safexDividendYield * 100).toFixed(2)
             })
         } else if (e.target.name === "marketplace_fee") {
-            var safexDividendYield = (parseFloat(e.target.value) / 100) * parseFloat(this.state.totalTradeVolume) / parseFloat(this.state.safexMarketCap);
+            safexDividendYield = (parseFloat(e.target.value) / 100) * parseFloat(this.state.totalTradeVolume) / parseFloat(this.state.safexMarketCap);
             this.setState({
                 marketplaceFee: e.target.value,
                 safexDividendYield: (safexDividendYield * 100).toFixed(2)
             })
         } else if (e.target.name === "safex_market_cap") {
-            var safexDividendYield = (parseFloat(this.state.marketplaceFee) / 100) * parseFloat(this.state.totalTradeVolume) / parseFloat(e.target.value);
+            safexDividendYield = (parseFloat(this.state.marketplaceFee) / 100) * parseFloat(this.state.totalTradeVolume) / parseFloat(e.target.value);
             this.setState({
                 safexMarketCap: e.target.value,
                 safexDividendYield: (safexDividendYield * 100).toFixed(2)
             })
         } else if (e.target.name === "safex_holdings") {
-            var safexDividendYield = ((parseFloat(this.state.marketplaceFee) / 100) * parseFloat(this.state.totalTradeVolume) / 2147483647) * parseFloat(e.target.value) * (100 / (parseFloat(this.state.holdingsByMarket)));
+            safexDividendYield = ((parseFloat(this.state.marketplaceFee) / 100) * parseFloat(this.state.totalTradeVolume) / 2147483647) * parseFloat(e.target.value) * (100 / (parseFloat(this.state.holdingsByMarket)));
             this.setState({
                 safexHolding: e.target.value,
                 safexDividendYield: safexDividendYield.toFixed(2)

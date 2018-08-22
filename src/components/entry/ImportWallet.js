@@ -227,7 +227,7 @@ export default class ImportWallet extends React.Component {
                     <h2>Safex</h2>
                     <h3>Wallet</h3>
                     <p>v0.0.7</p>
-                    <Link className="back-button" to="/"><img src="images/back.png"/> Back</Link>
+                    <Link className="back-button" to="/"><img src="images/back.png" alt="back-button" /> Back</Link>
                 </div>
                 <div className="col-xs-12 Import-wallet">
                     <form className="form-group" onSubmit={this.handleSubmit}>

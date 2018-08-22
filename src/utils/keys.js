@@ -1,4 +1,3 @@
-import crypto from 'crypto';
 var bitcoin = window.require('bitcoinjs-lib');
 var bs58 = require('bs58');
 import { toHexString } from './utils';

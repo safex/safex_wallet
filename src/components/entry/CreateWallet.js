@@ -1,6 +1,5 @@
 import React from 'react';
 const fs = window.require('fs');
-const os = window.require('os');
 import {Link} from 'react-router';
 
 import {encrypt} from '../../utils/utils';

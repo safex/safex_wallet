@@ -11,7 +11,6 @@ import {
 } from '../../utils/wallet';
 
 const fs = window.require('fs');
-const os = window.require('os');
 const fileDownload = require('react-file-download');
 
 export default class SelectWallet extends React.Component {
@@ -184,7 +183,7 @@ export default class SelectWallet extends React.Component {
                 walletResetModalDlUnencrypted: false,
                 walletResetModal2unencrypted: false
             })
-            this.openWalletResetModal('walletResetModalDlEncrypted', "This is second confirmation. When you check the box and proceed you will be able to backup your encrypted wallet. After this there is no turning back your wallet will be deleted so that you can make a new one. In this step you\'ll backup your encrypted wallet that was already in the wallet. During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists. AFTER THIS THERE IS NO TURNING BACK, YOUR WALLET WILL BE DELETED HIT THE 'X' TO GET OUT OF THIS");
+            this.openWalletResetModal('walletResetModalDlEncrypted', "This is second confirmation. When you check the box and proceed you will be able to backup your encrypted wallet. After this there is no turning back your wallet will be deleted so that you can make a new one. In this step you'll backup your encrypted wallet that was already in the wallet. During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists. AFTER THIS THERE IS NO TURNING BACK, YOUR WALLET WILL BE DELETED HIT THE 'X' TO GET OUT OF THIS");
         }
     }
 

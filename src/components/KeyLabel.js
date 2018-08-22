@@ -1,8 +1,6 @@
 import React from "react";
 
 var fs = window.require('fs');
-var os = window.require('os');
-var bs58 = require('bs58');
 import {decrypt, encrypt} from "../utils/utils";
 
 export default class KeyLabel extends React.Component {
@@ -37,7 +35,6 @@ export default class KeyLabel extends React.Component {
     handleSubmit() {
         var val = this.state.editText.trim();
         var currentVal = this.props.keyLabel;
-        var keyReference = this.props.keyReference;
 
         if (val) {
             this.setState({
@@ -51,10 +48,8 @@ export default class KeyLabel extends React.Component {
             if(err){
                 console.log(err)
             }
-
-            var crypto = require('crypto'),
-                algorithm = 'aes-256-ctr',
-                password = localStorage.getItem("password");
+             var algorithm = 'aes-256-ctr';
+             var password = localStorage.getItem("password");
 
             //decrypt the wallet
             var decrypted_wallet = decrypt(wallet.toString(), algorithm, password);
