@@ -476,7 +476,7 @@ export default class Wallet extends React.Component {
                             transaction_being_sent: false,
                         });
                     }, 500);
-                    throw "There was an error with the transaction.";
+                    throw new Error("There was an error with the transaction.");
                 }
                 this.setState({
                     sidebar_open: true,
@@ -581,7 +581,7 @@ export default class Wallet extends React.Component {
                                         transaction_being_sent: false,
                                     });
                                 }, 500);
-                                throw "There was an error with the transaction.";
+                                throw new Error("There was an error with the transaction.");
                             }
                             this.setState({
                                 sidebar_open: true,
@@ -708,7 +708,19 @@ export default class Wallet extends React.Component {
 
         //check whether Bitcoin or Safex is selected
         if (this.state.send_coin === 'safex') {
-            if (this.state.fee_in_$ === false) {
+            if (this.state.send_fee < 0.00001) {
+                if (this.sidebar_open) {
+                    this.setState({
+                        send_fee: parseFloat(0.00001).toFixed(8),
+                    });
+                    this.setCoinModalOpenSettings('The fee is too small. Minimum fee is 0.00001000 BTC');
+                } else {
+                    this.setState({
+                        send_fee: parseFloat(0.00001).toFixed(8),
+                    });
+                    this.setCoinModalClosedSettings('The fee is too small. Minimum fee is 0.00001000 BTC');
+                }
+            } else {
                 //open the modal by setting transaction_being_sent
                 try {
                     this.setState({
@@ -740,7 +752,7 @@ export default class Wallet extends React.Component {
                         } else {
                             this.setCoinModalClosedSettings('Network communication error, please try again later');
                         }
-                        throw 'Network communication error, please try again later';
+                        throw new Error('Network communication error, please try again later');
                     }
                 } catch (e) {
                     //this is triggered if the destination address is not a valid bitcoin address
@@ -749,15 +761,27 @@ export default class Wallet extends React.Component {
                     } else {
                         this.setCoinModalClosedSettings('Invalid destination address');
                     }
-                    throw 'Invalid destination address';
+                    throw new Error('Invalid destination address');
+                }
+            }
+
+        //if safex is not selected then it must be Bitcoin
+        } else if(this.state.send_coin === 'btc') {
+            if (this.state.send_fee < 0.00001) {
+                if (this.sidebar_open) {
+                    this.setState({
+                        send_fee: parseFloat(0.00001).toFixed(8),
+                    });
+                    this.setCoinModalOpenSettings('The fee is too small. Minimum fee is 0.00001000 BTC');
+                } else {
+                    this.setState({
+                        send_fee: parseFloat(0.00001).toFixed(8),
+                    });
+                    this.setCoinModalClosedSettings('The fee is too small. Minimum fee is 0.00001000 BTC');
                 }
             } else {
-                this.setCoinModalOpenSettings('Please convert the transaction to BTC to proceed');
-            }
-            //if safex is not selected then it must be Bitcoin
-        } else if(this.state.send_coin === 'btc') {
-            if (this.state.fee_in_$ === false) {
-                try {  //open the modal by setting transaction_being_sent
+                try {
+                    //open the modal by setting transaction_being_sent
                     this.setState({
                         sidebar_open: true,
                         transaction_being_sent: true,
@@ -787,7 +811,7 @@ export default class Wallet extends React.Component {
                         } else {
                             this.setCoinModalClosedSettings('Network communication error, please try again later');
                         }
-                        throw 'Network communication error, please try again later';
+                        throw new Error('Network communication error, please try again later');
                     }
                 } catch (e) {
                     //this is triggered if the destination address is not a valid bitcoin address
@@ -796,10 +820,8 @@ export default class Wallet extends React.Component {
                     } else {
                         this.setCoinModalClosedSettings('Invalid destination address');
                     }
-                    throw 'Invalid destination address';
+                    throw new Error('Invalid destination address');
                 }
-            } else {
-                this.setCoinModalOpenSettings('Please convert the transaction to BTC to proceed');
             }
         }
     }
@@ -811,6 +833,7 @@ export default class Wallet extends React.Component {
         var key_safex_bal = 0;
         var pending_safex_bal = 0;
         var pending_btc_bal = 0;
+        var send_fee = this.state.send_fee;
 
         this.state.keys.map(key => {
             if (key.public_key === e.target.public_key.value) {
@@ -869,12 +892,24 @@ export default class Wallet extends React.Component {
             } else {
                 this.setCoinModalClosedSettings('Cannot send transaction, this key has a pending minus. Please try again later.');
             }
-            this.closeCoinModal;
+            this.closeCoinModal();
         } else if (this.state.fee_in_$) {
             if (this.sidebar_open) {
                 this.setCoinModalOpenSettings('Please convert the transaction to BTC to proceed');
             } else {
                 this.setCoinModalClosedSettings('Please convert the transaction to BTC to proceed');
+            }
+        } else if (send_fee < 0.00001) {
+            if (this.sidebar_open) {
+                this.setState({
+                    send_fee: parseFloat(0.00001).toFixed(8),
+                });
+                this.setCoinModalOpenSettings('The fee is too small. Minimum fee is 0.00001000 BTC');
+            } else {
+                this.setState({
+                    send_fee: parseFloat(0.00001).toFixed(8),
+                });
+                this.setCoinModalClosedSettings('The fee is too small. Minimum fee is 0.00001000 BTC');
             }
         } else {
             try {
@@ -1217,7 +1252,7 @@ export default class Wallet extends React.Component {
         var wallet_data = JSON.parse(localStorage.getItem('wallet'));
         var nice_keys = "";
         var keys = wallet_data['keys'];
-        keys.map((key) => {
+        keys.forEach((key) => {
             nice_keys += "private key: " + key.private_key + '\n';
             nice_keys += "public key: " + key.public_key + '\n';
             nice_keys += '\n';
@@ -1246,7 +1281,7 @@ export default class Wallet extends React.Component {
     //This function is connected to Send expansion button and receive expansion button
     openSendReceive(key, sendreceive) {
         if (sendreceive === 'send') {
-            if (!this.state.collapse_open.send_open && this.state.collapse_open.key !== key || this.state.collapse_open.send_open && this.state.collapse_open.key !== key) {
+            if ((!this.state.collapse_open.send_open && this.state.collapse_open.key !== key) || (this.state.collapse_open.send_open && this.state.collapse_open.key !== key)) {
                 this.setState({
                     private_key_open: {
                         private_key_popup: false,
@@ -1289,7 +1324,7 @@ export default class Wallet extends React.Component {
             }
         }
         if (sendreceive === 'receive') {
-            if (!this.state.collapse_open.receive_open && this.state.collapse_open.key !== key || this.state.collapse_open.receive_open && this.state.collapse_open.key !== key) {
+            if ((!this.state.collapse_open.receive_open && this.state.collapse_open.key !== key) || (this.state.collapse_open.receive_open && this.state.collapse_open.key !== key)) {
                 this.setState({
                     private_key_open: {
                         private_key_popup: false,
@@ -1302,7 +1337,7 @@ export default class Wallet extends React.Component {
                     receive_amount: 0.00000001.toFixed(8),
                 });
             }
-            if (this.state.collapse_open.receive_open && this.state.collapse_open.key === key || !this.state.collapse_open.receive_open && this.state.collapse_open.key === key) {
+            if ((this.state.collapse_open.receive_open && this.state.collapse_open.key === key) || (!this.state.collapse_open.receive_open && this.state.collapse_open.key === key)) {
                 this.setState({
                     private_key_open: {
                         private_key_popup: false,
@@ -1589,10 +1624,10 @@ export default class Wallet extends React.Component {
         var send_fee = this.state.send_fee;
         var send_total = 0;
         if (this.state.send_coin === 'safex') {
-            send_total = parseInt(e.target.value);
+            send_total = parseFloat(e.target.value);
             this.setState({
-                send_amount: parseInt(e.target.value),
-                send_total: parseInt(send_total)
+                send_amount: parseFloat(e.target.value),
+                send_total: parseFloat(send_total)
             });
         } else {
             send_total = parseFloat(e.target.value) + parseFloat(send_fee);
@@ -1620,10 +1655,6 @@ export default class Wallet extends React.Component {
                 send_fee: send_fee,
                 send_total: send_total.toFixed(8)
             });
-        }
-
-        if (this.state.send_amount <= 0.00001) {
-            this.state.send_amount === 0.00001;
         }
     }
 
@@ -2325,12 +2356,12 @@ export default class Wallet extends React.Component {
                         this.state.collapse_open.send_open && this.state.collapse_open.key === key
                         ?
                             <div>
-                                <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 || this.state.send_disabled === false ? '' : 'disabled'}
+                                <button disabled={(keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0) || this.state.send_disabled === false ? '' : 'disabled'}
                                     onClick={this.openSendReceive.bind(this, key, 'send')}
-                                    className={this.state.collapse_open.key === key && this.state.transaction_being_sent || this.state.send_disabled ? 'send-btn button-shine disabled-btn' : 'send-btn button-shine active'}>
+                                    className={(this.state.collapse_open.key === key && this.state.transaction_being_sent) || this.state.send_disabled ? 'send-btn button-shine disabled-btn' : 'send-btn button-shine active'}>
                                     <span className="img-wrap">
                                         {
-                                            this.state.collapse_open.key === key && this.state.transaction_being_sent || this.state.send_disabled
+                                            (this.state.collapse_open.key === key && this.state.transaction_being_sent) || this.state.send_disabled
                                             ?
                                                 <img src="images/outbox-gray.png" alt="Outbox Logo"/>
                                             :
@@ -2348,9 +2379,9 @@ export default class Wallet extends React.Component {
                             <div>
                                 <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
                                     onClick={this.openSendReceive.bind(this, key, 'send')}
-                                    className={this.state.collapse_open.key === key && this.state.collapse_open.receive_open || this.state.send_disabled ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
+                                    className={(this.state.collapse_open.key === key && this.state.collapse_open.receive_open) || this.state.send_disabled ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
                                     {
-                                        this.state.collapse_open.key === key && this.state.collapse_open.receive_open || this.state.transaction_being_sent || this.state.send_disabled
+                                        (this.state.collapse_open.key === key && this.state.collapse_open.receive_open) || this.state.transaction_being_sent || this.state.send_disabled
                                         ?
                                             <span className="img-wrap">
                                                 <img src="images/outbox-gray.png" alt="Outbox Logo"/>

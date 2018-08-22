@@ -159,7 +159,7 @@ export default class SelectWallet extends React.Component {
 
         let niceKeys = '';
         const keys = wallet['keys'];
-        keys.map((key) => {
+        keys.forEach((key) => {
             niceKeys += "private key: " + key.private_key + '\n';
             niceKeys += "public key: " + key.public_key + '\n';
             niceKeys += '\n';
