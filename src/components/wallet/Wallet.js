@@ -2764,7 +2764,6 @@ export default class Wallet extends React.Component {
                         resetSettingsForm={this.resetSettingsForm}
                         infoPopup={this.state.info_popup}
                         infoText={this.state.info_text}
-                        closeSettingsInfoPopup={this.closeSettingsInfoPopup}
                         openExportEncryptedWallet={this.openExportEncryptedWallet}
                         openExportUnencryptedWalletPopup={this.openExportUnencryptedWalletPopup}
                         logout={this.logout}
