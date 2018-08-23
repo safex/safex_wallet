@@ -23,6 +23,7 @@ import KeyLabel from "../KeyLabel";
 import HistoryModal from "../HistoryModal";
 import MainAlertPopup from "../MainAlertPopup";
 import ImportModal from "../ImportModal";
+import SendingModal from "../SendingModal";
 import Footer from "../Footer";
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 
@@ -706,6 +707,15 @@ export default class Wallet extends React.Component {
         //set the destination provided by the user
         var destination = e.target.destination.value;
 
+        var key_btc_bal = 0;
+        var key_safex_bal = 0;
+        this.state.keys.map(key => {
+            if (key.public_key === e.target.public_key.value) {
+                key_btc_bal = key.btc_bal;
+                key_safex_bal = key.safex_bal;
+            }
+        });
+
         //check whether Bitcoin or Safex is selected
         if (this.state.send_coin === 'safex') {
             if (this.state.send_fee < 0.00001) {
@@ -719,6 +729,18 @@ export default class Wallet extends React.Component {
                         send_fee: parseFloat(0.00001).toFixed(8),
                     });
                     this.setCoinModalClosedSettings('The fee is too small. Minimum fee is 0.00001000 BTC');
+                }
+            } else if ((this.state.send_coin === 'safex' && this.state.send_fee > key_btc_bal) || (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal)) {
+                if (this.sidebar_open) {
+                    this.setCoinModalOpenSettings('You do not have enough BITCOIN to cover the fee');
+                } else {
+                    this.setCoinModalClosedSettings('You do not have enough BITCOIN to cover the fee');
+                }
+            } else if (this.state.send_coin === 'safex' && this.state.send_amount > key_safex_bal) {
+                if (this.sidebar_open) {
+                    this.setCoinModalOpenSettings('You do not have enough SAFEX to cover this transaction');
+                } else {
+                    this.setCoinModalClosedSettings('You do not have enough SAFEX to cover this transaction');
                 }
             } else {
                 //open the modal by setting transaction_being_sent
@@ -778,6 +800,12 @@ export default class Wallet extends React.Component {
                         send_fee: parseFloat(0.00001).toFixed(8),
                     });
                     this.setCoinModalClosedSettings('The fee is too small. Minimum fee is 0.00001000 BTC');
+                }
+            } else if (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal) {
+                if (this.sidebar_open) {
+                    this.setCoinModalOpenSettings('You do not have enough BITCOIN to cover this transaction');
+                } else {
+                    this.setCoinModalClosedSettings('You do not have enough BITCOIN to cover this transaction');
                 }
             } else {
                 try {
@@ -2688,60 +2716,23 @@ export default class Wallet extends React.Component {
                 <div className={this.state.sidebar_open
                     ? 'overflow sendModal active'
                     : 'overflow sendModal'}>
-                    {
-                        this.state.send_overflow_active && this.state.transaction_sent === false
-                        ?
-                            <form className="container transactionBeingSent" onSubmit={this.sendCoins}>
-                                <div className="head">
-                                    <h3>Sending </h3>
-                                    <span className={this.state.transaction_being_sent ? 'close disabled' : 'close'} onClick={this.closeCoinModal}>X</span>
-                                </div>
-                                <div className="currency">
-                                    <span>Currency:</span>
-                                    <img className={this.state.send_coin === 'safex'
-                                        ? 'coin'
-                                        : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                         onClick={this.sendCoinChoose.bind(this, 'safex')}
-                                         src="images/coin-white.png" alt="Safex Coin"/>
-                                    <img className={this.state.send_coin === 'btc'
-                                        ? 'coin'
-                                        : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                         onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
-                                         alt="Bitcoin Coin"/>
-                                </div>
-                                <div className="input-group">
-                                    <label htmlFor="from">From:</label>
-                                    <textarea name="from" className="form-control" readOnly aria-describedby="basic-addon1" value={this.state.send_keys.public_key}>
-                                    </textarea>
-                                </div>
-                                <div className="input-group">
-                                    <label htmlFor="destination">To:</label>
-                                    <textarea name="destination" className="form-control" readOnly aria-describedby="basic-addon1" value={this.state.send_to}>
-                                    </textarea>
-                                </div>
-                                <input type="hidden" readOnly name="private_key"
-                                       value={this.state.send_keys.private_key} />
-                                <input type="hidden" readOnly name="public_key"
-                                       value={this.state.send_keys.public_key} />
-                                <div className="form-group">
-                                    <label htmlFor="amount">Amount:</label>
-                                    <input readOnly name="amount" value={this.state.send_amount}/>
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="fee">Fee(BTC):</label>
-                                    <input readOnly name="fee" value={parseFloat(this.state.send_fee).toFixed(8)}/>
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="total">Total:</label>
-                                    <input readOnly name="total" value={this.state.send_total} />
-                                </div>
-                                <button className={this.state.transaction_being_sent ? 'confirm-btn button-shine-green disabled' : 'confirm-btn button-shine-green'} type="submit">
-                                    {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}
-                                </button>
-                            </form>
-                        :
-                            <div></div>
-                    }
+                    <SendingModal
+                        overflowActive={this.state.send_overflow_active}
+                        transactionSent={this.state.transaction_sent}
+                        sendCoins={this.sendCoins}
+                        transactionBeingSent={this.state.transaction_being_sent}
+                        closeCoinModal={this.closeCoinModal}
+                        sendCoin={this.state.send_coin}
+                        sendCoinSafex={this.sendCoinChoose.bind(this, 'safex')}
+                        sendCoinBtc={this.sendCoinChoose.bind(this, 'btc')}
+                        publicKey={this.state.send_keys.public_key}
+                        receiveAddress={this.state.send_to}
+                        privateKey={this.state.send_keys.private_key}
+                        sendAmount={this.state.send_amount}
+                        sendFee={this.state.send_fee}
+                        sendTotal={this.state.send_total}
+                    />
+
                     {   this.state.transaction_sent
                         ?
                             <form className="container transactionSent" onSubmit={this.closeSuccessModal}>
