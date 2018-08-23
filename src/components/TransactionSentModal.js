@@ -1,6 +1,6 @@
 import React from "react";
 
-export default class SendingModal extends React.Component {
+export default class TransactionSentModal extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -10,14 +10,14 @@ export default class SendingModal extends React.Component {
 
     render() {
         return (
-            <div className={this.props.overflowActive && this.props.transactionSent === false ? "sending-wrap active" : "sending-wrap"}>
+            <div className={this.props.transactionSent ? "transaction-sent-wrap active" : "transaction-sent-wrap"}>
                 {
-                    this.props.overflowActive && this.props.transactionSent === false
+                    this.props.transactionSent
                     ?
-                        <form className="container transactionBeingSent" onSubmit={this.props.sendCoins}>
+                        <form className="container transactionSent" onSubmit={this.props.closeSuccessModal}>
                             <div className="head">
-                                <h3>Sending </h3>
-                                <span className={this.props.transactionBeingSent ? 'close disabled' : 'close'} onClick={this.props.closeCoinModal}>X</span>
+                                <h3>Sent </h3>
+                                <span className="close" onClick={this.props.closeSuccessModal}>X</span>
                             </div>
                             <div className="currency">
                                 <span>Currency:</span>
@@ -34,32 +34,43 @@ export default class SendingModal extends React.Component {
                             </div>
                             <div className="input-group">
                                 <label htmlFor="from">From:</label>
-                                <textarea name="from" className="form-control" readOnly aria-describedby="basic-addon1" value={this.props.publicKey}>
-                                    </textarea>
+                                <textarea name="from" className="form-control" readOnly
+                                    value={this.props.publicKey} placeholder="Address"
+                                    aria-describedby="basic-addon1">
+                                </textarea>
                             </div>
                             <div className="input-group">
                                 <label htmlFor="destination">To:</label>
-                                <textarea name="destination" className="form-control" readOnly aria-describedby="basic-addon1" value={this.props.receiveAddress}>
-                                    </textarea>
+                                <textarea name="destination" className="form-control" readOnly
+                                    value={this.props.receiveAddress} placeholder="Address"
+                                    aria-describedby="basic-addon1">
+                                </textarea>
+                            </div>
+                            <div className="input-group">
+                                <label htmlFor="txid">TX ID:</label>
+                                <textarea name="txid" className="form-control" readOnly
+                                    value={this.props.txid}  placeholder="Address"
+                                    aria-describedby="basic-addon1" rows="3">
+                                </textarea>
                             </div>
                             <input type="hidden" readOnly name="private_key"
-                                   value={this.props.privateKey} />
+                                value={this.props.privateKey} />
                             <input type="hidden" readOnly name="public_key"
-                                   value={this.props.publicKey} />
+                                value={this.props.publicKey} />
                             <div className="form-group">
                                 <label htmlFor="amount">Amount:</label>
-                                <input readOnly name="amount" value={this.props.sendAmount}/>
+                                <input readOnly name="amount" value={this.props.sendAmount} />
                             </div>
                             <div className="form-group">
                                 <label htmlFor="fee">Fee(BTC):</label>
-                                <input readOnly name="fee" value={parseFloat(this.props.sendFee).toFixed(8)}/>
+                                <input readOnly name="fee" value={this.props.sendFee} />
                             </div>
                             <div className="form-group">
                                 <label htmlFor="total">Total:</label>
                                 <input readOnly name="total" value={this.props.sendTotal} />
                             </div>
-                            <button className={this.props.transactionBeingSent ? 'confirm-btn button-shine-green disabled' : 'confirm-btn button-shine-green'} type="submit">
-                                {this.props.transactionBeingSent ? 'Pending' : 'CONFIRM'}
+                            <button type="submit" className="sent-close button-shine">
+                                Close
                             </button>
                         </form>
                     :

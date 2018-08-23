@@ -1,3 +1,10 @@
+.settings-wrap {
+  display: none;
+}
+.settings-wrap.active {
+  display: flex;
+  width: 100%;
+}
 .settingsModal {
   color: #fff;
 }

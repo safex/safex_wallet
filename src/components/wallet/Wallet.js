@@ -24,6 +24,10 @@ import HistoryModal from "../HistoryModal";
 import MainAlertPopup from "../MainAlertPopup";
 import ImportModal from "../ImportModal";
 import SendingModal from "../SendingModal";
+import TransactionSentModal from "../TransactionSentModal";
+import SettingsModal from "../SettingsModal";
+import DividendModal from "../DividendModal";
+import AffiliateModal from "../AffiliateModal";
 import Footer from "../Footer";
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 
@@ -2733,187 +2737,55 @@ export default class Wallet extends React.Component {
                         sendTotal={this.state.send_total}
                     />
 
-                    {   this.state.transaction_sent
-                        ?
-                            <form className="container transactionSent" onSubmit={this.closeSuccessModal}>
-                                <div className="head">
-                                    <h3>Sent </h3>
-                                    <span className="close" onClick={this.closeSuccessModal}>X</span>
-                                </div>
-                                <div className="currency">
-                                    <span>Currency:</span>
-                                    <img className={this.state.send_coin === 'safex'
-                                        ? 'coin'
-                                        : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                         onClick={this.sendCoinChoose.bind(this, 'safex')}
-                                         src="images/coin-white.png" alt="Safex Coin"/>
-                                    <img className={this.state.send_coin === 'btc'
-                                        ? 'coin'
-                                        : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                         onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
-                                         alt="Bitcoin Coin"/>
-                                </div>
-                                <div className="input-group">
-                                    <label htmlFor="from">From:</label>
-                                    <textarea name="from" className="form-control" readOnly
-                                        value={this.state.send_keys.public_key} placeholder="Address"
-                                        aria-describedby="basic-addon1">
-                                    </textarea>
-                                </div>
-                                <div className="input-group">
-                                    <label htmlFor="destination">To:</label>
-                                    <textarea name="destination" className="form-control" readOnly
-                                        value={this.state.send_to} placeholder="Address"
-                                        aria-describedby="basic-addon1">
-                                    </textarea>
-                                </div>
-                                <div className="input-group">
-                                    <label htmlFor="txid">TX ID:</label>
-                                    <textarea name="txid" className="form-control" readOnly
-                                        value={this.state.txid}  placeholder="Address"
-                                        aria-describedby="basic-addon1" rows="3">
-                                    </textarea>
-                                </div>
-                                <input type="hidden" readOnly name="private_key"
-                                    value={this.state.send_keys.private_key} />
-                                <input type="hidden" readOnly name="public_key"
-                                   value={this.state.send_keys.public_key} />
-                                <div className="form-group">
-                                    <label htmlFor="amount">Amount:</label>
-                                    <input readOnly name="amount" value={this.state.send_amount} />
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="fee">Fee(BTC):</label>
-                                    <input readOnly name="fee" value={this.state.send_fee} />
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="total">Total:</label>
-                                    <input readOnly name="total" value={this.state.send_total} />
-                                </div>
-                                <button type="submit" className="sent-close button-shine">
-                                    Close
-                                </button>
-                            </form>
-                        :
-                            <div></div>
-                    }
-                    {
-                        this.state.settings_active && this.state.send_overflow_active === false
-                        ?
-                            <div className="container form-wrap settingsModal">
-                                <div className="head">
-                                    <img src="images/mixer.png" alt="Transfer Icon"/>
-                                    <h3>
-                                        User<br />
-                                        Settings
-                                    </h3>
-                                    <span className="close" onClick={this.closeSettingsModal}>X</span>
-                                </div>
+                    <TransactionSentModal
+                        transactionSent={this.state.transaction_sent}
+                        closeSuccessModal={this.closeSuccessModal}
+                        sendCoin={this.state.send_coin}
+                        sendCoinSafex={this.sendCoinChoose.bind(this, 'safex')}
+                        sendCoinBtc={this.sendCoinChoose.bind(this, 'btc')}
+                        publicKey={this.state.send_keys.public_key}
+                        receiveAddress={this.state.send_to}
+                        txid={this.state.txid}
+                        privateKey={this.state.send_keys.private_key}
+                        sendAmount={this.state.send_amount}
+                        sendFee={this.state.send_fee}
+                        sendTotal={this.state.send_total}
+                    />
 
-                                <form onSubmit={this.changePassword} onChange={this.closeSettingsInfoPopup}>
-                                    <div className="form-group">
-                                        <label htmlFor="old_pass">Old Password:</label>
-                                        <input type="password" className={this.state.wrongOldPassword ? 'form-control shake password-input' : 'form-control password-input'} id="old_pass" name="old_pass" />
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="new_pass">New Password:</label>
-                                        <input type="password" className={this.state.wrongNewPassword ? 'form-control shake password-input' : 'form-control password-input'} id="new_pass" name="new_pass" />
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="repeat_pass">Repeat Password:</label>
-                                        <input type="password" className={this.state.wrongRepeatPassword ? 'form-control shake password-input' : 'form-control password-input'} id="repeat_pass" name="repeat_pass" />
-                                    </div>
-                                    <div className="col-xs-12 submit-wrap">
-                                        <div className="row">
-                                            <button className="reset-btn button-shine" type="reset" onClick={this.resetSettingsForm}>Reset</button>
-                                            <button className="submit-btn button-shine-green" type="submit">Submit</button>
-                                        </div>
-                                        <div className="info-wrap">
-                                            <div className={this.state.info_popup
-                                                ? 'info-text active'
-                                                : 'info-text'}>
-                                                <p>{this.state.info_text}</p>
-                                                <span className="close" onClick={this.closeSettingsInfoPopup}>X</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                                <button className="keys-btn button-shine" onClick={this.openExportEncryptedWallet}>Export Encrypted Wallet <span className="blue-text">(.dat)</span></button>
-                                <button className="keys-btn button-shine" onClick={this.openExportUnencryptedWalletPopup}>Export Unencrypted Keys</button>
-                                <button className="logout-btn button-shine-red" onClick={this.logout}>Logout</button>
-                            </div>
-                        :
-                            <div></div>
-                    }
-                    {
-                        this.state.dividend_active
-                        ?
-                            <form className="container" onChange={this.safexDividendOnChange.bind(this)}>
-                                <div className="head">
-                                    <img src="images/dividend-logo.png" alt="Transfer Icon"/>
-                                    <h3>
-                                        Dividend<br />
-                                        Calculator
-                                    </h3>
-                                    <span className="close" onClick={this.closeDividendModal}>X</span>
-                                </div>
+                    <SettingsModal
+                        settingsActive={this.state.settings_active}
+                        sendOverflowActive={this.state.send_overflow_active}
+                        closeSettingsModal={this.closeSettingsModal}
+                        changePassword={this.changePassword}
+                        closeSettingsInfoPopup={this.closeSettingsInfoPopup}
+                        wrongOldPassword={this.state.wrongOldPassword}
+                        wrongNewPassword={this.state.wrongNewPassword}
+                        wrongRepeatPassword={this.state.wrongRepeatPassword}
+                        resetSettingsForm={this.resetSettingsForm}
+                        infoPopup={this.state.info_popup}
+                        infoText={this.state.info_text}
+                        closeSettingsInfoPopup={this.closeSettingsInfoPopup}
+                        openExportEncryptedWallet={this.openExportEncryptedWallet}
+                        openExportUnencryptedWalletPopup={this.openExportUnencryptedWalletPopup}
+                        logout={this.logout}
+                    />
 
-                                <div className="form-group">
-                                    <label>
-                                        Projected Marketplace Volume $
-                                    </label>
-                                    <input type="number" name="total_trade_volume" value={this.state.totalTradeVolume}/>
-                                </div>
-                                <div className="form-group">
-                                    <label>
-                                        Marketplace Fee %
-                                    </label>
-                                    <input type="number" name="marketplace_fee" value={this.state.marketplaceFee}/>
-                                </div>
-                                <div className="form-group">
-                                    <label>
-                                        Safex Market Cap $
-                                    </label>
-                                    <input type="number" name="safex_market_cap" value={this.state.safexMarketCap}/>
-                                </div>
-                                <div className="form-group">
-                                    <label>
-                                        Number of SAFEX Held
-                                    </label>
-                                    <input type="number" name="safex_holdings" value={this.state.safexHolding}/>
-                                </div>
-                                <div className="form-group">
-                                    <label>
-                                        Cost of Safex Holdings $
-                                    </label>
-                                    <input type="number" name="safex_holdings_by_market" value={this.state.holdingsByMarket} readOnly/>
-                                </div>
-                                <div className="form-group">
-                                    <label>
-                                        Annual Return on Investment %
-                                    </label>
-                                    <input type="number" name="safex_dividend_yield" value={isNaN(this.state.safexDividendYield) ? '0' : this.state.safexDividendYield}/>
-                                </div>
-                            </form>
-                        :
-                            <div></div>
-                    }
-                    {
-                        this.state.affiliate_active
-                        ?
-                            <form className="container">
-                                <div className="head">
-                                    <img src="images/affiliate-logo.png" alt="Transfer Icon"/>
-                                    <h3>
-                                        Affiliate<br />
-                                        System
-                                    </h3>
-                                    <span className="close" onClick={this.closeAffiliateModal}>X</span>
-                                </div>
-                            </form>
-                        :
-                            <div></div>
-                    }
+                    <DividendModal
+                        dividendActive={this.state.dividend_active}
+                        safexDividendOnChange={this.safexDividendOnChange.bind(this)}
+                        closeDividendModal={this.closeDividendModal}
+                        totalTradeVolume={this.state.totalTradeVolume}
+                        marketplaceFee={this.state.marketplaceFee}
+                        safexMarketCap={this.state.safexMarketCap}
+                        safexHolding={this.state.safexHolding}
+                        holdingsByMarket={this.state.holdingsByMarket}
+                        safexDividendYield={this.state.safexDividendYield}
+                    />
+
+                    <AffiliateModal
+                        affiliateActive={this.state.affiliate_active}
+                        closeAffiliateModal={this.closeAffiliateModal}
+                    />
                 </div>
 
                 <Footer

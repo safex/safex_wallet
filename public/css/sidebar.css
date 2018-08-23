@@ -244,3 +244,10 @@ input::-webkit-inner-spin-button {
 .sending-wrap .transactionBeingSent {
   width: 100%;
 }
+.transaction-sent-wrap {
+  display: none;
+}
+.transaction-sent-wrap.active {
+  display: flex;
+  width: 100%;
+}
