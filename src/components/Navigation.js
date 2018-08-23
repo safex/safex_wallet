@@ -1,5 +1,6 @@
 import React from 'react';
 import {Link} from 'react-router';
+import packageJson from "../../package";
 
 export default class Navigation extends React.Component {
 
@@ -31,7 +32,7 @@ export default class Navigation extends React.Component {
                     <ul className="nav navbar-nav wallet-nav fadeIn">
                         <li>
                             <Link activeClassName="activeLink" onlyActiveOnIndex>
-                                Wallet &nbsp;v0.0.7
+                                Wallet &nbsp;{packageJson.version}
                             </Link>
                         </li>
                     </ul>

@@ -9,6 +9,7 @@ import {
     walletResetModal,
     walletResetModalStep
 } from '../../utils/wallet';
+import packageJson from "../../../package";
 
 const fs = window.require('fs');
 const fileDownload = require('react-file-download');
@@ -253,7 +254,7 @@ export default class SelectWallet extends React.Component {
                         <div className="col-xs-12 Login-logo">
                             <h2>Safex</h2>
                             <h3>Wallet</h3>
-                            <p>v0.0.7</p>
+                            <p>{packageJson.version}</p>
                             <button className="back-button wallet-reset-button" onClick={this.state.walletResetModal ? this.walletResetClose : this.walletResetStart}>Wallet Reset</button>
                         </div>
                         <div className="col-xs-8 col-xs-offset-2 App-intro">
@@ -290,7 +291,7 @@ export default class SelectWallet extends React.Component {
                         <div className="col-xs-12 Login-logo">
                             <h2>Safex</h2>
                             <h3>Wallet</h3>
-                            <p>v0.0.7</p>
+                            <p>{packageJson.version}</p>
                             <button className="back-button wallet-reset-button" onClick={this.state.walletResetModal ? this.walletResetClose : this.walletResetNoWallet}>Wallet
                                 Reset
                             </button>
