@@ -36,7 +36,9 @@ import {
     closeMainAlertPopup,
     openCreateKey,
     closeSendReceiveModal,
-    closeSendReceivePopup
+    closeSendReceivePopup,
+    openExportUnencryptedWalletPopup,
+    openExportEncryptedWalletPopup
 } from '../../utils/modals';
 
 import Navigation from '../Navigation';
@@ -170,9 +172,9 @@ export default class Wallet extends React.Component {
         this.setCloseAffiliateModal = this.setCloseAffiliateModal.bind(this);
         this.setCloseSendReceiveModal = this.setCloseSendReceiveModal.bind(this);
 
-        this.openExportUnencryptedWalletPopup = this.openExportUnencryptedWalletPopup.bind(this);
+        this.setOpenExportUnencryptedWalletPopup = this.setOpenExportUnencryptedWalletPopup.bind(this);
         this.exportUnencryptedWallet = this.exportUnencryptedWallet.bind(this);
-        this.openExportEncryptedWallet = this.openExportEncryptedWallet.bind(this);
+        this.setOpenExportEncryptedWallet = this.setOpenExportEncryptedWallet.bind(this);
         this.exportEncryptedWallet = this.exportEncryptedWallet.bind(this);
         this.getFee = this.getFee.bind(this);
         this.getPrices = this.getPrices.bind(this);
@@ -1253,19 +1255,8 @@ export default class Wallet extends React.Component {
         closeMainAlertPopup(this);
     }
 
-    openExportEncryptedWallet() {
-        this.setState({
-            export_encrypted_wallet: true,
-            export_unencrypted_wallet: false,
-
-            // Close Private Key Popup
-            private_key_open: {
-                private_key_popup: false,
-            },
-
-            // Close settings alert popup
-            info_popup: false,
-        });
+    setOpenExportEncryptedWallet() {
+        openExportEncryptedWalletPopup(this);
         this.openMainAlertPopup('This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the \'import key\' feature in another wallet. Press OK to proceed.');
     }
 
@@ -1287,19 +1278,8 @@ export default class Wallet extends React.Component {
         });
     }
 
-    openExportUnencryptedWalletPopup() {
-        this.setState({
-            export_encrypted_wallet: false,
-            export_unencrypted_wallet: true,
-
-            // Close Private Key Popup
-            private_key_open: {
-                private_key_popup: false,
-            },
-
-            // Close settings alert popup
-            info_popup: false,
-        });
+    setOpenExportUnencryptedWalletPopup() {
+        openExportUnencryptedWalletPopup(this);
         this.openMainAlertPopup('This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is not for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the \'import key\' feature in another wallet. Press OK to proceed.');
     }
 
@@ -2586,8 +2566,8 @@ export default class Wallet extends React.Component {
                         resetSettingsForm={this.resetSettingsForm}
                         infoPopup={this.state.info_popup}
                         infoText={this.state.info_text}
-                        openExportEncryptedWallet={this.openExportEncryptedWallet}
-                        openExportUnencryptedWalletPopup={this.openExportUnencryptedWalletPopup}
+                        openExportEncryptedWallet={this.setOpenExportEncryptedWallet}
+                        openExportUnencryptedWalletPopup={this.setOpenExportUnencryptedWalletPopup}
                         logout={this.logout}
                     />
 

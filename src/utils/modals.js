@@ -409,6 +409,42 @@ function closeSendReceivePopup(target) {
     });
 }
 
+/**
+ * Open Export Unencrypted Wallet Popup
+ */
+function openExportUnencryptedWalletPopup(target) {
+    target.setState({
+        export_encrypted_wallet: false,
+        export_unencrypted_wallet: true,
+
+        // Close Private Key Popup
+        private_key_open: {
+            private_key_popup: false,
+        },
+
+        // Close settings alert popup
+        info_popup: false,
+    });
+}
+
+/**
+ * Open Export Encrypted Wallet Popup
+ */
+function openExportEncryptedWalletPopup(target) {
+    target.setState({
+        export_encrypted_wallet: true,
+        export_unencrypted_wallet: false,
+
+        // Close Private Key Popup
+        private_key_open: {
+            private_key_popup: false,
+        },
+
+        // Close settings alert popup
+        info_popup: false,
+    });
+}
+
 module.exports = {
     openDividendModal,
     closeDividendModal,
@@ -432,5 +468,7 @@ module.exports = {
     closeMainAlertPopup,
     openCreateKey,
     closeSendReceiveModal,
-    closeSendReceivePopup
+    closeSendReceivePopup,
+    openExportUnencryptedWalletPopup,
+    openExportEncryptedWalletPopup
 };
