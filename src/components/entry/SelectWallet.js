@@ -1,16 +1,21 @@
 import React from 'react';
 import {Link} from 'react-router';
+
 import {
     decryptWalletData,
     DEFAULT_WALLET_PATH,
     downloadWallet,
     loadWalletFromFile,
     flashField,
+
+} from '../../utils/wallet';
+
+import {
     walletResetModal,
     walletResetModalStep
-} from '../../utils/wallet';
-import packageJson from "../../../package";
+} from '../../utils/modals';
 
+import packageJson from "../../../package";
 const fs = window.require('fs');
 const fileDownload = require('react-file-download');
 

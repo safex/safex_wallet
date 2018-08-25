@@ -9,14 +9,35 @@ import QRCode from 'qrcode.react';
 
 import {encrypt} from '../../utils/utils';
 import {genkey} from '../../utils/keys';
+
 import {
     downloadWallet,
     loadAndDecryptWalletFromFile,
     flashField,
+} from '../../utils/wallet';
+
+import {
+    openDividendModal,
+    closeDividendModal,
+    openAffiliateModal,
+    closeAffiliateModal,
+    openSettingsModal,
+    closeSettingsModal,
     openMainAlert,
     coinModalOpenSettings,
-    coinModalClosedSettings
-} from '../../utils/wallet';
+    coinModalClosedSettings,
+    archiveView,
+    homeView,
+    openHistoryModal,
+    closeHistoryModal,
+    closeSuccessModal,
+    closeCoinModal,
+    closePrivateModal,
+    closeMainAlertPopup,
+    openCreateKey,
+    closeSendReceiveModal,
+    closeSendReceivePopup
+} from '../../utils/modals';
 
 import Navigation from '../Navigation';
 import KeyLabel from "../KeyLabel";
@@ -29,6 +50,7 @@ import SettingsModal from "../SettingsModal";
 import DividendModal from "../DividendModal";
 import AffiliateModal from "../AffiliateModal";
 import Footer from "../Footer";
+
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 
 export default class Wallet extends React.Component {
@@ -131,22 +153,22 @@ export default class Wallet extends React.Component {
         this.prepareDisplay = this.prepareDisplay.bind(this);
         this.prepareDisplayPendingTx = this.prepareDisplayPendingTx.bind(this);
         this.openCoinModal = this.openCoinModal.bind(this);
-        this.closeCoinModal = this.closeCoinModal.bind(this);
+        this.setCloseCoinModal = this.setCloseCoinModal.bind(this);
         this.setCoinModalOpenSettings = this.setCoinModalOpenSettings.bind(this);
         this.setCoinModalClosedSettings = this.setCoinModalClosedSettings.bind(this);
-        this.openHistoryModal = this.openHistoryModal.bind(this);
+        this.setOpenHistoryModal = this.setOpenHistoryModal.bind(this);
         this.showPrivateModal = this.showPrivateModal.bind(this);
-        this.closePrivateModal = this.closePrivateModal.bind(this);
-        this.closeHistoryModal = this.closeHistoryModal.bind(this);
+        this.setClosePrivateModal = this.setClosePrivateModal.bind(this);
+        this.setCloseHistoryModal = this.setCloseHistoryModal.bind(this);
         this.sendAmountOnChange = this.sendAmountOnChange.bind(this);
         this.sendFeeOnChange = this.sendFeeOnChange.bind(this);
         this.sendTotalAdjustCoinChange = this.sendTotalAdjustCoinChange.bind(this);
-        this.closeSuccessModal = this.closeSuccessModal.bind(this);
-        this.openDividendModal = this.openDividendModal.bind(this);
-        this.closeDividendModal = this.closeDividendModal.bind(this);
-        this.openAffiliateModal = this.openAffiliateModal.bind(this);
-        this.closeAffiliateModal = this.closeAffiliateModal.bind(this);
-        this.closeSendReceiveModal = this.closeSendReceiveModal.bind(this);
+        this.setCloseSuccessModal = this.setCloseSuccessModal.bind(this);
+        this.setOpenDividendModal = this.setOpenDividendModal.bind(this);
+        this.setCloseDividendModal = this.setCloseDividendModal.bind(this);
+        this.setOpenAffiliateModal = this.setOpenAffiliateModal.bind(this);
+        this.setCloseAffiliateModal = this.setCloseAffiliateModal.bind(this);
+        this.setCloseSendReceiveModal = this.setCloseSendReceiveModal.bind(this);
 
         this.openExportUnencryptedWalletPopup = this.openExportUnencryptedWalletPopup.bind(this);
         this.exportUnencryptedWallet = this.exportUnencryptedWallet.bind(this);
@@ -156,8 +178,8 @@ export default class Wallet extends React.Component {
         this.getPrices = this.getPrices.bind(this);
         this.refreshWallet = this.refreshWallet.bind(this);
         this.feeChange = this.feeChange.bind(this);
-        this.openSettingsModal = this.openSettingsModal.bind(this);
-        this.closeSettingsModal = this.closeSettingsModal.bind(this);
+        this.setOpenSettingsModal = this.setOpenSettingsModal.bind(this);
+        this.setCloseSettingsModal = this.setCloseSettingsModal.bind(this);
         this.changePassword = this.changePassword.bind(this);
         this.logout = this.logout.bind(this);
         this.listTransactions = this.listTransactions.bind(this);
@@ -172,13 +194,13 @@ export default class Wallet extends React.Component {
         this.wrongRepeatPassword = this.wrongRepeatPassword.bind(this);
         this.closeSettingsInfoPopup = this.closeSettingsInfoPopup.bind(this);
         this.resetSettingsForm = this.resetSettingsForm.bind(this);
-        this.closeSendReceivePopup = this.closeSendReceivePopup.bind(this);
-        this.closeMainAlertPopup = this.closeMainAlertPopup.bind(this);
+        this.setCloseSendReceivePopup = this.setCloseSendReceivePopup.bind(this);
+        this.setCloseMainAlertPopup = this.setCloseMainAlertPopup.bind(this);
         this.openImportModal = this.openImportModal.bind(this);
         this.closeImportModal = this.closeImportModal.bind(this);
         this.saveLabel = this.saveLabel.bind(this);
         this.editLabel = this.editLabel.bind(this);
-        this.openCreateKey = this.openCreateKey.bind(this);
+        this.setOpenCreateKey = this.setOpenCreateKey.bind(this);
         this.amountChange = this.amountChange.bind(this);
         this.convertBtcToDollars = this.convertBtcToDollars.bind(this);
         this.copyToClipboard = this.copyToClipboard.bind(this);
@@ -214,6 +236,7 @@ export default class Wallet extends React.Component {
                 copied: false,
             });
             this.prepareDisplayPendingTx();
+            this.getFee();
             this.getPrices();
             console.log('Page refreshed');
         }
@@ -275,17 +298,19 @@ export default class Wallet extends React.Component {
         this.refreshWallet();
         this.getFee();
         this.getPrices();
-
-        this.refreshWalletInterval = setInterval(() => {
-            var i;
-            this.getPrices();
-            for(i=0; i<5; i++) {
-                this.prepareDisplay();
-                this.prepareDisplayPendingTx();
-                console.log('Page refreshed');
-            }
-        }, 600000);
+        let setRefreshInterval = setInterval(this.refreshWalletInterval, 600000);
     }
+
+    refreshWalletInterval = () => {
+        var i;
+        this.getFee();
+        this.getPrices();
+        for(i=0; i<5; i++) {
+            this.prepareDisplay();
+            this.prepareDisplayPendingTx();
+            console.log('Page refreshed');
+        }
+    };
 
     getPrices() {
         fetch('https://safex.io/api/price/', {method: "POST"})
@@ -472,7 +497,7 @@ export default class Wallet extends React.Component {
             .then((resp) => {
                 if (resp === "") {
                     this.setCoinModalOpenSettings('There was an error with the transaction');
-                    this.closeMainAlertPopup();
+                    this.setCloseMainAlertPopup();
                     this.setState({
                         send_disabled: false,
                     });
@@ -503,7 +528,7 @@ export default class Wallet extends React.Component {
                         });
                         console.log('refresh');
                     }, 200);
-                    this.closeSendReceiveModal();
+                    this.setCloseSendReceiveModal();
                 } else {
                     clearInterval(this.prepareDisplayInterval);
                 }
@@ -577,7 +602,7 @@ export default class Wallet extends React.Component {
                         .then((resp) => {
                             if (resp === "") {
                                 this.setCoinModalOpenSettings('There was an error with the transaction');
-                                this.closeMainAlertPopup();
+                                this.setCloseMainAlertPopup();
                                 this.setState({
                                     send_disabled: false,
                                 });
@@ -608,7 +633,7 @@ export default class Wallet extends React.Component {
                                     });
                                     console.log('refresh');
                                 }, 200);
-                                this.closeSendReceiveModal();
+                                this.setCloseSendReceiveModal();
                             } else {
                                 clearInterval(this.prepareDisplayInterval);
                             }
@@ -694,7 +719,7 @@ export default class Wallet extends React.Component {
                 });
                 this.prepareDisplay();
                 this.prepareDisplayPendingTx();
-                this.closeSendReceiveModal();
+                this.setCloseSendReceiveModal();
             });
     }
 
@@ -750,12 +775,20 @@ export default class Wallet extends React.Component {
                 //open the modal by setting transaction_being_sent
                 try {
                     this.setState({
+                        // Open Sending Modal
                         sidebar_open: true,
                         transaction_being_sent: true,
                         settings_active: false,
+
+                        // Disable send button
                         send_disabled: true,
+
+                        // Open main alert popup
                         main_alert_popup: true,
                         main_alert_popup_text: 'Sending...',
+
+                        // Close send receive popup
+                        send_receive_popup: false,
                     });
 
                     //here we try to get the unspent transactions from the source we send from
@@ -815,12 +848,20 @@ export default class Wallet extends React.Component {
                 try {
                     //open the modal by setting transaction_being_sent
                     this.setState({
+                        // Open Sending Modal
                         sidebar_open: true,
                         transaction_being_sent: true,
                         settings_active: false,
+
+                        // Disable send button
                         send_disabled: true,
+
+                        // Open main alert popup
                         main_alert_popup: true,
                         main_alert_popup_text: 'Sending...',
+
+                        // Close send receive popup
+                        send_receive_popup: false,
                     });
 
                     //here we try to get the unspent transactions from the source we send from
@@ -924,7 +965,7 @@ export default class Wallet extends React.Component {
             } else {
                 this.setCoinModalClosedSettings('Cannot send transaction, this key has a pending minus. Please try again later.');
             }
-            this.closeCoinModal();
+            this.setCloseCoinModal();
         } else if (this.state.fee_in_$) {
             if (this.sidebar_open) {
                 this.setCoinModalOpenSettings('Please convert the transaction to BTC to proceed');
@@ -1090,17 +1131,8 @@ export default class Wallet extends React.Component {
         }
     }
 
-    openCreateKey() {
-        this.setState({
-            history_overflow_active: false,
-            history_key: '',
-            create_key_active: true,
-
-            // Close Private Key Popup
-            private_key_open: {
-                private_key_popup: false,
-            },
-        });
+    setOpenCreateKey() {
+        openCreateKey(this);
     }
 
     importKey(e) {
@@ -1217,17 +1249,8 @@ export default class Wallet extends React.Component {
         });
     }
 
-    closeMainAlertPopup() {
-        this.setState({
-            main_alert_popup: false,
-        });
-
-        setTimeout(() => {
-            this.setState({
-                export_encrypted_wallet: false,
-                export_unencrypted_wallet: false,
-            });
-        }, 300)
+    setCloseMainAlertPopup() {
+        closeMainAlertPopup(this);
     }
 
     openExportEncryptedWallet() {
@@ -1337,7 +1360,7 @@ export default class Wallet extends React.Component {
                     send_public_key: ''
                 });
                 if (this.state.send_overflow_active) {
-                    this.closeCoinModal();
+                    this.setCloseCoinModal();
                 }
             }
 
@@ -1383,7 +1406,7 @@ export default class Wallet extends React.Component {
                     receive_amount: 0.00000001.toFixed(8),
                 });
                 if (this.state.send_overflow_active) {
-                    this.closeCoinModal();
+                    this.setCloseCoinModal();
                 }
             }
         }
@@ -1416,61 +1439,17 @@ export default class Wallet extends React.Component {
         });
     }
 
-    closePrivateModal(){
-        this.setState({
-            private_key_open: {
-                private_key_popup: false,
-            }
-        });
+    setClosePrivateModal(){
+        closePrivateModal(this);
     }
 
-    openHistoryModal(e) {
-        document.getElementById("history_txs").innerHTML = "<h5>Loading...</h5>";
-        this.setState({
-            sidebar_open: false,
-            history_overflow_active: true,
-
-            // Close Success Modal
-            transaction_sent: false,
-
-            // Close Coin Modal
-            send_overflow_active: false,
-            send_to: '',
-            send_keys: {
-                public_key: '',
-                private_key: ''
-            },
-
-            // Close Send Receive Modal
-            collapse_open: {
-                send_open: false,
-                receive_open: false
-            },
-
-            // Close Dividend Modal
-            dividend_active: false,
-
-            // Close Affiliate Modal
-            affiliate_active: false,
-
-            // Close Settings Modal
-            settings_active: false,
-
-            // Close Private Key Popup
-            private_key_open: {
-                private_key_popup: false,
-            },
-
-            copied: false
-        })
+    setOpenHistoryModal(e) {
+        openHistoryModal(this);
         this.listTransactions(this.state.keys[e].public_key);
     }
 
-    closeSendReceivePopup() {
-        this.setState({
-            send_receive_popup: false,
-            send_receive_info: ''
-        });
+    setCloseSendReceivePopup() {
+        closeSendReceivePopup(this);
     }
 
     changePassword(e) {
@@ -1554,16 +1533,6 @@ export default class Wallet extends React.Component {
         })
     }
 
-    closeSettingsModal() {
-        this.setState({
-            sidebar_open: false,
-            settings_active: false,
-
-            // Close Settings Form Popup
-            info_popup: false
-        });
-    }
-
     resetSettingsForm() {
         document.getElementsByClassName('password-input').value = '';
 
@@ -1572,83 +1541,28 @@ export default class Wallet extends React.Component {
         });
     }
 
-    closeCoinModal() {
-        this.setState({
-            sidebar_open: false,
-
-            send_overflow_active: false,
-            send_to: '',
-            send_keys: {
-                public_key: '',
-                private_key: ''
-            }
-        })
+    setCloseCoinModal() {
+        closeCoinModal(this);
     }
 
-    closeHistoryModal() {
-        this.setState({
-            history_overflow_active: false,
-            history_key: '',
-        })
+    setCloseHistoryModal() {
+        closeHistoryModal(this);
     }
 
-    closeSuccessModal(e) {
+    setCloseSuccessModal(e) {
         e.preventDefault();
-        this.setState({
-            sidebar_open: false,
-            transaction_sent: false,
-
-            // Close Coin Modal
-            send_overflow_active: false,
-            send_to: '',
-            send_keys: {
-                public_key: '',
-                private_key: ''
-            },
-
-            // Close Send Receive Modal
-            collapse_open: {
-                send_open: false,
-                receive_open: false
-            },
-
-            // Close Settings Info Popup
-            info_popup: false
-        });
+        closeSuccessModal(this);
         this.prepareDisplay();
         this.prepareDisplayPendingTx();
     }
 
-    openSettingsModal(e) {
+    setOpenSettingsModal(e) {
         e.preventDefault();
-        this.setState({
-            sidebar_open: true,
-            settings_active: true,
+        openSettingsModal(this);
+    }
 
-            // Close Send Coin Modal
-            transaction_being_sent: false,
-
-            // Close Success Modal
-            transaction_sent: false,
-
-            // Close Coin Modal
-            send_overflow_active: false,
-            send_to: '',
-            send_keys: {
-                public_key: '',
-                private_key: ''
-            },
-
-            // Close History Modal
-            history_overflow_active: false,
-            history_key: '',
-
-            // Close Dividend Modal
-            dividend_active: false,
-
-            // Close Affiliate Modal
-            affiliate_active: false,
-        });
+    setCloseSettingsModal() {
+        closeSettingsModal(this);
     }
 
     //This is fired when amount is changed
@@ -2127,126 +2041,33 @@ export default class Wallet extends React.Component {
     }
 
     setArchiveView() {
-        this.setState({
-            archive_active: true,
-
-            //Close History Modal
-            history_overflow_active: false,
-            history_key: '',
-
-            // Close Private Key Popup
-            private_key_open: {
-                private_key_popup: false,
-            },
-
-            // Close Send Receive Popup
-            send_receive_popup: false,
-            send_receive_info: '',
-
-            copied: false,
-        });
+        archiveView(this);
     }
 
     setHomeView() {
-        this.setState({
-            archive_active: false,
-
-            //Close History Modal
-            history_overflow_active: false,
-            history_key: '',
-
-            // Close Private Key Popup
-            private_key_open: {
-                private_key_popup: false,
-            },
-
-            // Close Send Receive Popup
-            send_receive_popup: false,
-            send_receive_info: '',
-
-            copied: false,
-        });
+        homeView(this);
     }
 
-    openDividendModal(e) {
+    setOpenDividendModal(e) {
         e.preventDefault();
-        this.setState({
-            sidebar_open: true,
-            dividend_active: true,
-
-            // Close Success Modal
-            transaction_sent: false,
-
-            // Close Coin Modal
-            send_overflow_active: false,
-            send_to: '',
-            send_keys: {
-                public_key: '',
-                private_key: ''
-            },
-
-            //Close History Modal
-            history_overflow_active: false,
-            history_key: '',
-
-            // Close Affiliate Modal
-            affiliate_active: false,
-
-            // Close Settings Modal
-            settings_active: false,
-        });
+        openDividendModal(this);
     }
 
-    closeDividendModal() {
-        this.setState({
-            sidebar_open: false,
-            dividend_active: false
-        });
+    setCloseDividendModal() {
+        closeDividendModal(this);
     }
 
-    openAffiliateModal(e) {
+    setOpenAffiliateModal(e) {
         e.preventDefault();
-        this.setState({
-            sidebar_open: true,
-            affiliate_active: true,
-
-            // Close Success Modal
-            transaction_sent: false,
-
-            // Close Coin Modal
-            send_overflow_active: false,
-            send_to: '',
-            send_keys: {
-                public_key: '',
-                private_key: ''
-            },
-
-            // Close History Modal
-            history_overflow_active: false,
-            history_key: '',
-
-            // Close Dividend Modal
-            dividend_active: false,
-
-            // Close Settings Modal
-            settings_active: false,
-        });
+        openAffiliateModal(this);
     }
 
-    closeAffiliateModal() {
-        this.setState({
-            sidebar_open: false,
-            affiliate_active: false
-        });
+    setCloseAffiliateModal() {
+        closeAffiliateModal(this);
     }
 
-    closeSendReceiveModal() {
-        this.setState({
-            collapse_open: {
-                send_open: false,
-                receive_open: false
-            }
-        });
+    setCloseSendReceiveModal() {
+        closeSendReceiveModal(this)
     }
 
     safexDividendOnChange(e) {
@@ -2319,6 +2140,7 @@ export default class Wallet extends React.Component {
             fee_in_$: !this.state.fee_in_$,
             send_fee: parseFloat(this.state.send_fee).toFixed(8),
         });
+        this.setCloseSendReceivePopup();
     }
 
     copyToClipboard(e){
@@ -2469,11 +2291,11 @@ export default class Wallet extends React.Component {
                                 {
                                     this.state.history_overflow_active
                                     ?
-                                        <button onClick={this.closeHistoryModal} className='archive-button history-button button-shine history-btn'>
+                                        <button onClick={this.setCloseHistoryModal} className='archive-button history-button button-shine history-btn'>
                                             <span>HISTORY</span>
                                         </button>
                                     :
-                                        <button onClick={() => this.openHistoryModal(key)} className='archive-button history-button button-shine history-btn'>
+                                        <button onClick={() => this.setOpenHistoryModal(key)} className='archive-button history-button button-shine history-btn'>
                                             <span>HISTORY</span>
                                         </button>
                                 }
@@ -2545,7 +2367,7 @@ export default class Wallet extends React.Component {
                             <div className="input-group">
                                 <span className="input-group-addon" id="basic-addon1">To:</span>
                                 <input name="destination" type="text" className="form-control" id="to" placeholder="Address"
-                                    aria-describedby="basic-addon1" onChange={this.closeSendReceivePopup} />
+                                    aria-describedby="basic-addon1" onChange={this.setCloseSendReceivePopup} />
                             </div>
                         </div>
                         <div className="col-xs-5 send-right">
@@ -2648,7 +2470,7 @@ export default class Wallet extends React.Component {
                                     ?  'send_receive_info active'
                                     :  'send_receive_info'}>
                                     <p>{this.state.send_receive_info}</p>
-                                    <span className="close" onClick={keys[key].pending_btc_bal < 0 || keys[key].pending_safex_bal < 0 ? this.closeSendReceiveModal : this.closeSendReceivePopup}>X</span>
+                                    <span className="close" onClick={keys[key].pending_btc_bal < 0 || keys[key].pending_safex_bal < 0 ? this.setCloseSendReceiveModal : this.setCloseSendReceivePopup}>X</span>
                                 </div>
                             </div>
                         </div>
@@ -2682,7 +2504,7 @@ export default class Wallet extends React.Component {
                     :  'col-xs-12 private_key_popup'}>
                     <h4>The following key is to control your coins, do not share it. Keep your private key for yourself only!</h4>
                     <p>{this.state.private_key_open.display_private_key}</p>
-                    <button onClick={this.closePrivateModal}>
+                    <button onClick={this.setClosePrivateModal}>
                         Ok
                     </button>
                 </div>
@@ -2714,7 +2536,7 @@ export default class Wallet extends React.Component {
 
                 <HistoryModal
                     historyOverflowActive={this.state.history_overflow_active}
-                    closeHistoryModal={this.closeHistoryModal}
+                    closeHistoryModal={this.setCloseHistoryModal}
                 />
 
                 <div className={this.state.sidebar_open
@@ -2725,7 +2547,7 @@ export default class Wallet extends React.Component {
                         transactionSent={this.state.transaction_sent}
                         sendCoins={this.sendCoins}
                         transactionBeingSent={this.state.transaction_being_sent}
-                        closeCoinModal={this.closeCoinModal}
+                        closeCoinModal={this.setCloseCoinModal}
                         sendCoin={this.state.send_coin}
                         sendCoinSafex={this.sendCoinChoose.bind(this, 'safex')}
                         sendCoinBtc={this.sendCoinChoose.bind(this, 'btc')}
@@ -2739,7 +2561,7 @@ export default class Wallet extends React.Component {
 
                     <TransactionSentModal
                         transactionSent={this.state.transaction_sent}
-                        closeSuccessModal={this.closeSuccessModal}
+                        closeSuccessModal={this.setCloseSuccessModal}
                         sendCoin={this.state.send_coin}
                         sendCoinSafex={this.sendCoinChoose.bind(this, 'safex')}
                         sendCoinBtc={this.sendCoinChoose.bind(this, 'btc')}
@@ -2797,16 +2619,16 @@ export default class Wallet extends React.Component {
                     importKey={this.state.import_key}
                     importGlow={this.importGlow}
                     importGlowDeactivate={this.importGlowDeactivate}
-                    openCreateKey={this.openCreateKey}
+                    openCreateKey={this.setOpenCreateKey}
                     affiliateActive={this.state.affiliate_active}
-                    openAffiliateModal={this.openAffiliateModal}
-                    closeAffiliateModal={this.closeAffiliateModal}
+                    openAffiliateModal={this.setOpenAffiliateModal}
+                    closeAffiliateModal={this.setCloseAffiliateModal}
                     dividendActive={this.state.dividend_active}
-                    openDividendModal={this.openDividendModal}
-                    closeDividendModal={this.closeDividendModal}
+                    openDividendModal={this.setOpenDividendModal}
+                    closeDividendModal={this.setCloseDividendModal}
                     settingsActive={this.state.settings_active}
-                    openSettingsModal={this.openSettingsModal}
-                    closeSettingsModal={this.closeSettingsModal}
+                    openSettingsModal={this.setOpenSettingsModal}
+                    closeSettingsModal={this.setCloseSettingsModal}
                     refreshTimer={this.state.refreshTimer}
                     refreshWallet={this.refreshWallet}
                 />
@@ -2831,7 +2653,7 @@ export default class Wallet extends React.Component {
                     transactionBeingSent={this.state.transaction_being_sent}
                     importModalActive={this.state.import_modal_active}
                     createKeyActive={this.state.create_key_active}
-                    closeMainAlertPopup={this.closeMainAlertPopup}
+                    closeMainAlertPopup={this.setCloseMainAlertPopup}
                     closeImportModal={this.closeImportModal}
                 />
 

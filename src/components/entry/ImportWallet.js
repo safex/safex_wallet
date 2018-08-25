@@ -1,14 +1,16 @@
 import React from 'react';
 import FileInput from 'react-file-input';
 import {Link} from 'react-router';
+
 import {
     decryptWalletData,
     DEFAULT_WALLET_PATH,
     loadAndDecryptWalletFromFile,
     loadWalletFromFile,
     flashField,
-    walletImportAlert,
 } from '../../utils/wallet';
+
+import {walletImportAlert,} from '../../utils/modals';
 import {encrypt} from '../../utils/utils';
 import packageJson from "../../../package";
 

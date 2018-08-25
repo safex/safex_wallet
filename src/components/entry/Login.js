@@ -4,8 +4,9 @@ import {Link} from 'react-router';
 import {
     decryptWalletData,
     flashField,
-    walletImportAlert
 } from '../../utils/wallet';
+
+import {walletImportAlert} from '../../utils/modals';
 import packageJson from "../../../package";
 
 export default class Login extends React.Component {
