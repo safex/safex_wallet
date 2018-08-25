@@ -2557,7 +2557,7 @@ export default class Wallet extends React.Component {
                     <SettingsModal
                         settingsActive={this.state.settings_active}
                         sendOverflowActive={this.state.send_overflow_active}
-                        closeSettingsModal={this.closeSettingsModal}
+                        closeSettingsModal={this.setCloseSettingsModal}
                         changePassword={this.changePassword}
                         closeSettingsInfoPopup={this.closeSettingsInfoPopup}
                         wrongOldPassword={this.state.wrongOldPassword}
@@ -2574,7 +2574,7 @@ export default class Wallet extends React.Component {
                     <DividendModal
                         dividendActive={this.state.dividend_active}
                         safexDividendOnChange={this.safexDividendOnChange.bind(this)}
-                        closeDividendModal={this.closeDividendModal}
+                        closeDividendModal={this.setCloseDividendModal}
                         totalTradeVolume={this.state.totalTradeVolume}
                         marketplaceFee={this.state.marketplaceFee}
                         safexMarketCap={this.state.safexMarketCap}
@@ -2585,7 +2585,7 @@ export default class Wallet extends React.Component {
 
                     <AffiliateModal
                         affiliateActive={this.state.affiliate_active}
-                        closeAffiliateModal={this.closeAffiliateModal}
+                        closeAffiliateModal={this.setCloseAffiliateModal}
                     />
                 </div>
 
