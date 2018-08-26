@@ -2,8 +2,6 @@ import React from 'react';
 
 
 export default class MigrationAddress extends React.Component {
-
-
     constructor(props) {
         super(props);
         this.state = {
@@ -28,8 +26,6 @@ export default class MigrationAddress extends React.Component {
         });
 
         this.getBalances(this.props.data.address, this.props.data.wif);
-
-
     }
 
 
@@ -81,9 +77,7 @@ export default class MigrationAddress extends React.Component {
                 status_text: 'Sync error, please refresh'
             });
         });
-
     }
-
 
     refresh(e) {
         e.preventDefault();

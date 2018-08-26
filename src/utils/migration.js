@@ -10,8 +10,9 @@ function generateSafexKeys() {
 function getUTXO(address) {
     let utxos = fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + address + '/utxo')
         .then(resp => resp.json())
-        .then(resp => return resp; )
-    .catch(err => return err; );
+        .then((resp) => {
+            return resp
+        });
 
 }
 
@@ -88,5 +89,5 @@ function createSafexAddressPayloadBuffer(safex_address) {
 
 
 module.exports = {
-
+    getUTXO
 };

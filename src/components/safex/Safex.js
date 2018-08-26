@@ -18,7 +18,6 @@ export default class Safex extends React.Component {
         this.goNext = this.goNext.bind(this);
     }
 
-
     goNext(e) {
         e.preventDefault();
         this.context.router.push('/migration')

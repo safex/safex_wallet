@@ -1,9 +1,6 @@
 import React from 'react';
 
-
 export default class SafexAddress extends React.Component {
-
-
     constructor(props) {
         super(props);
         this.state = {
@@ -21,7 +18,6 @@ export default class SafexAddress extends React.Component {
         var final_string = string + add_this;
         this.setState({address: final_string});
     }
-
 
     //get balances
     /*
