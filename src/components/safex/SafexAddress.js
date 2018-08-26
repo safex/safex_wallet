@@ -14,7 +14,9 @@ export default class SafexAddress extends React.Component {
     }
 
     addData(string) {
-        this.setState({address: string});
+        var add_this = "hello";
+        var final_string = string + " " + add_this;
+        this.setState({address: final_string});
     }
 
     //get balances
