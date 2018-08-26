@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 export default class MigrationAddress extends React.Component {
     constructor(props) {
         super(props);
@@ -27,7 +26,6 @@ export default class MigrationAddress extends React.Component {
 
         this.getBalances(this.props.data.address, this.props.data.wif);
     }
-
 
     getBalances(address) {
         var promises = [];
@@ -86,23 +84,17 @@ export default class MigrationAddress extends React.Component {
 
     //create safex blockchain key set
 
-
     render() {
         return (
-            <div>
-                address {this.state.address}
-                <br />
-                wif {this.state.wif}
-                <br />
-                safex {this.state.safex_bal}
-                <br />
-                pending safex {this.state.pending_safex_bal}
-                <br />
-                btc {this.state.btc_bal}
-                <br />
-                pending btc {this.state.pending_btc_bal}
-                <br />
-                <button onClick={this.refresh}>refresh</button>
+            <div className="address-wrap">
+                <p><span>address:</span> {this.state.address}</p>
+                <p><span>wif:</span> {this.state.wif}</p>
+                <p><span>safex:</span> {this.state.safex_bal}</p>
+                <p><span>pending safex:</span> {this.state.pending_safex_bal}</p>
+                <p><span>btc:</span> {this.state.btc_bal}</p>
+                <p><span>pending btc:</span> {this.state.pending_btc_bal}</p>
+
+                <button className="button-shine" onClick={this.refresh}>refresh</button>
             </div>
         )
     }

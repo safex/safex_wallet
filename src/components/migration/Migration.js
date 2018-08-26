@@ -1,14 +1,11 @@
 import React from 'react';
 import axios from 'axios';
 
-
 import MigrationAddress from './MigrationAddress';
 import Navigation from '../Navigation';
 
 import {getUTXO} from '../../utils/migration';
 import Login from "../entry/Login";
-
-
 
 export default class Migration extends React.Component {
 
@@ -45,8 +42,6 @@ export default class Migration extends React.Component {
     //restrict these addresses to only safex transactions
 
     render() {
-
-
         const {keys} = this.state;
 
         var table = Object.keys(keys).map((key) => {
@@ -55,15 +50,17 @@ export default class Migration extends React.Component {
             data['wif'] = keys[key].private_key;
             console.log(data)
             return <MigrationAddress key={key} data={data} />;
-
         });
 
         return (
             <div>
                 <Navigation />
 
-                {table}
-                <button onClick={this.goNext}> onClick</button>
+                <div className="container migration-wrap fadeIn">
+                    {table}
+
+                    <button className="button-shine" onClick={this.goNext}> Next</button>
+                </div>
             </div>
         );
     }
