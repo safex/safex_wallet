@@ -4,8 +4,10 @@ import {Link} from 'react-router';
 import {
     decryptWalletData,
     flashField,
-    walletImportAlert
 } from '../../utils/wallet';
+
+import {walletImportAlert} from '../../utils/modals';
+import packageJson from "../../../package";
 
 export default class Login extends React.Component {
     constructor(props) {
@@ -61,7 +63,7 @@ export default class Login extends React.Component {
                 <div className="col-xs-12 Login-logo">
                     <h2>Safex</h2>
                     <h3>Wallet</h3>
-                    <p>v0.0.7</p>
+                    <p>{packageJson.version}</p>
                     <Link className="back-button" to="/"><img src="images/back.png" alt="back button"/> Back</Link>
                 </div>
                 <div className="col-xs-12 Login-form">

@@ -1,17 +1,22 @@
 import React from 'react';
 import {Link} from 'react-router';
+
 import {
     decryptWalletData,
     DEFAULT_WALLET_PATH,
     downloadWallet,
     loadWalletFromFile,
     flashField,
-    walletResetModal,
-    walletResetModalStep
+
 } from '../../utils/wallet';
 
+import {
+    walletResetModal,
+    walletResetModalStep
+} from '../../utils/modals';
+
+import packageJson from "../../../package";
 const fs = window.require('fs');
-const os = window.require('os');
 const fileDownload = require('react-file-download');
 
 export default class SelectWallet extends React.Component {
@@ -160,7 +165,7 @@ export default class SelectWallet extends React.Component {
 
         let niceKeys = '';
         const keys = wallet['keys'];
-        keys.map((key) => {
+        keys.forEach((key) => {
             niceKeys += "private key: " + key.private_key + '\n';
             niceKeys += "public key: " + key.public_key + '\n';
             niceKeys += '\n';
@@ -184,7 +189,7 @@ export default class SelectWallet extends React.Component {
                 walletResetModalDlUnencrypted: false,
                 walletResetModal2unencrypted: false
             })
-            this.openWalletResetModal('walletResetModalDlEncrypted', "This is second confirmation. When you check the box and proceed you will be able to backup your encrypted wallet. After this there is no turning back your wallet will be deleted so that you can make a new one. In this step you\'ll backup your encrypted wallet that was already in the wallet. During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists. AFTER THIS THERE IS NO TURNING BACK, YOUR WALLET WILL BE DELETED HIT THE 'X' TO GET OUT OF THIS");
+            this.openWalletResetModal('walletResetModalDlEncrypted', "This is second confirmation. When you check the box and proceed you will be able to backup your encrypted wallet. After this there is no turning back your wallet will be deleted so that you can make a new one. In this step you'll backup your encrypted wallet that was already in the wallet. During this stage you will be able to backup your encrypted wallet file. You may need it in the future that is why this step exists. AFTER THIS THERE IS NO TURNING BACK, YOUR WALLET WILL BE DELETED HIT THE 'X' TO GET OUT OF THIS");
         }
     }
 
@@ -254,7 +259,7 @@ export default class SelectWallet extends React.Component {
                         <div className="col-xs-12 Login-logo">
                             <h2>Safex</h2>
                             <h3>Wallet</h3>
-                            <p>v0.0.7</p>
+                            <p>{packageJson.version}</p>
                             <button className="back-button wallet-reset-button" onClick={this.state.walletResetModal ? this.walletResetClose : this.walletResetStart}>Wallet Reset</button>
                         </div>
                         <div className="col-xs-8 col-xs-offset-2 App-intro">
@@ -291,7 +296,7 @@ export default class SelectWallet extends React.Component {
                         <div className="col-xs-12 Login-logo">
                             <h2>Safex</h2>
                             <h3>Wallet</h3>
-                            <p>v0.0.7</p>
+                            <p>{packageJson.version}</p>
                             <button className="back-button wallet-reset-button" onClick={this.state.walletResetModal ? this.walletResetClose : this.walletResetNoWallet}>Wallet
                                 Reset
                             </button>

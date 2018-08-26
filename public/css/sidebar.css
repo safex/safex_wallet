@@ -234,3 +234,20 @@ input::-webkit-inner-spin-button {
   border-bottom-left-radius: 10px;
   border-top-right-radius: 10px;
 }
+.sending-wrap {
+  display: none;
+}
+.sending-wrap.active {
+  display: flex;
+  width: 100%;
+}
+.sending-wrap .transactionBeingSent {
+  width: 100%;
+}
+.transaction-sent-wrap {
+  display: none;
+}
+.transaction-sent-wrap.active {
+  display: flex;
+  width: 100%;
+}

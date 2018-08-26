@@ -1,3 +1,10 @@
+.dividend-wrap {
+  display: none;
+}
+.dividend-wrap.active {
+  display: flex;
+  width: 100%;
+}
 .overflow.dividendModal > form input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
   opacity: .8;
   color: #fff;

@@ -131,78 +131,6 @@ function flashField(target, field, duration = 1000) {
     }, duration);
 }
 
-/**
- * Open Main Alert Popup
- */
-function openMainAlert(target, alert) {
-    target.setState({
-        main_alert_popup: true,
-        main_alert_popup_text: alert,
-    });
-}
-
-/**
- * Open Wallet Import Alerts
- */
-function walletImportAlert(target, alert, duration) {
-    target.setState({
-        walletImportAlerts: true,
-        walletImportAlertsText: alert
-    });
-    setTimeout(() => {
-        target.setState({
-            walletImportAlerts: false
-        });
-    }, duration);
-}
-
-/**
- * Open Wallet Reset Popup
- */
-function walletResetModal(target, step, alert) {
-    target.setState({
-        [step]: true,
-        walletResetModalText: alert,
-    });
-}
-
-/**
- * Open next wallet reset step and close the previous step
- */
-function walletResetModalStep(target, step, closedStep, alert) {
-    target.setState({
-        [step]: true,
-        [closedStep]: false,
-        walletResetModalText: alert,
-    });
-}
-
-/**
- * Send Coins validation settings when sidebar is opened
- */
-function coinModalOpenSettings(target, alert) {
-    target.setState({
-        sidebar_open: true,
-        send_receive_popup: true,
-        send_receive_info: alert
-    });
-}
-
-/**
- * Send Coins validation settings when sidebar is closed
- */
-function coinModalClosedSettings(target, alert) {
-    target.setState({
-        sidebar_open: false,
-        send_receive_popup: true,
-        send_receive_info: alert,
-        send_overflow_active: false,
-        settings_active: false,
-        affiliate_active: false,
-        dividend_active: false,
-    });
-}
-
 module.exports = {
     WALLET_FILENAME,
     DEFAULT_WALLET_PATH,
@@ -211,10 +139,4 @@ module.exports = {
     loadWalletFromFile,
     loadAndDecryptWalletFromFile,
     flashField,
-    openMainAlert,
-    walletImportAlert,
-    walletResetModal,
-    walletResetModalStep,
-    coinModalOpenSettings,
-    coinModalClosedSettings
 };

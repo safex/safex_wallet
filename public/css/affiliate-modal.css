@@ -1,0 +1,7 @@
+.affiliate-wrap {
+  display: none;
+}
+.affiliate-wrap.active {
+  display: flex;
+  width: 100%;
+}

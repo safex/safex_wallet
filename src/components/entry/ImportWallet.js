@@ -1,15 +1,18 @@
 import React from 'react';
 import FileInput from 'react-file-input';
 import {Link} from 'react-router';
+
 import {
     decryptWalletData,
     DEFAULT_WALLET_PATH,
     loadAndDecryptWalletFromFile,
     loadWalletFromFile,
     flashField,
-    walletImportAlert,
 } from '../../utils/wallet';
+
+import {walletImportAlert,} from '../../utils/modals';
 import {encrypt} from '../../utils/utils';
+import packageJson from "../../../package";
 
 const fs = window.require('fs');
 
@@ -226,8 +229,8 @@ export default class ImportWallet extends React.Component {
                 <div className="col-xs-12 Login-logo">
                     <h2>Safex</h2>
                     <h3>Wallet</h3>
-                    <p>v0.0.7</p>
-                    <Link className="back-button" to="/"><img src="images/back.png"/> Back</Link>
+                    <p>{packageJson.version}</p>
+                    <Link className="back-button" to="/"><img src="images/back.png" alt="back-button" /> Back</Link>
                 </div>
                 <div className="col-xs-12 Import-wallet">
                     <form className="form-group" onSubmit={this.handleSubmit}>
