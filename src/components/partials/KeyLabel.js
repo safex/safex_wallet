@@ -1,7 +1,7 @@
 import React from "react";
 
 var fs = window.require('fs');
-import {decrypt, encrypt} from "../utils/utils";
+import {decrypt, encrypt} from "../../utils/utils";
 
 export default class KeyLabel extends React.Component {
     constructor(props) {

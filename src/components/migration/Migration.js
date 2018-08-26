@@ -2,7 +2,7 @@ import React from 'react';
 import axios from 'axios';
 
 import MigrationAddress from './MigrationAddress';
-import Navigation from '../Navigation';
+import Navigation from '../partials/Navigation';
 
 import {getUTXO} from '../../utils/migration';
 import Login from "../entry/Login";

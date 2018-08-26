@@ -41,17 +41,17 @@ import {
     openExportEncryptedWalletPopup
 } from '../../utils/modals';
 
-import Navigation from '../Navigation';
-import KeyLabel from "../KeyLabel";
-import HistoryModal from "../HistoryModal";
-import MainAlertPopup from "../MainAlertPopup";
-import ImportModal from "../ImportModal";
-import SendingModal from "../SendingModal";
-import TransactionSentModal from "../TransactionSentModal";
-import SettingsModal from "../SettingsModal";
-import DividendModal from "../DividendModal";
-import AffiliateModal from "../AffiliateModal";
-import Footer from "../Footer";
+import Navigation from '../partials/Navigation';
+import KeyLabel from "../partials/KeyLabel";
+import HistoryModal from "../partials/HistoryModal";
+import MainAlertPopup from "../partials/MainAlertPopup";
+import ImportModal from "../partials/ImportModal";
+import SendingModal from "../partials/SendingModal";
+import TransactionSentModal from "../partials/TransactionSentModal";
+import SettingsModal from "../partials/SettingsModal";
+import DividendModal from "../partials/DividendModal";
+import AffiliateModal from "../partials/AffiliateModal";
+import Footer from "../partials/Footer";
 
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 

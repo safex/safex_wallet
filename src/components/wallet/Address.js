@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 export default class Address extends React.Component {
     constructor(props) {
         super(props);
@@ -84,7 +83,6 @@ export default class Address extends React.Component {
     }
 
     //create safex blockchain key set
-
 
     render() {
         return (
