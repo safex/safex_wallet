@@ -36,11 +36,11 @@ export default class Footer extends React.Component {
                         {
                             this.props.affiliateActive
                             ?
-                                <button className="aff-btn aff-btn-active button-shine" title="Affiliate System (Under development)" onClick={this.props.closeAffiliateModal}>
+                                <button className="aff-btn aff-btn-active button-shine" title="Affiliate System (Under development)" onClick={this.props.closeAffiliateModal} disabled>
                                     <img src="images/world-blue.png" alt="World Logo"/>
                                 </button>
                             :
-                                <button className="aff-btn button-shine" title="Affiliate System (Under development)" onClick={this.props.openAffiliateModal}>
+                                <button className="aff-btn button-shine" title="Affiliate System (Under development)" onClick={this.props.openAffiliateModal} disabled>
                                     <img src="images/world.png" alt="World Logo"/>
                                 </button>
                         }
@@ -48,11 +48,11 @@ export default class Footer extends React.Component {
                         {
                             this.props.dividendActive
                             ?
-                                <button className="dividend-btn dividend-btn-active button-shine" title="Dividend Calculator (Under development)" onClick={this.props.closeDividendModal}>
+                                <button className="dividend-btn dividend-btn-active button-shine" title="Dividend Calculator (Under development)" onClick={this.props.closeDividendModal} disabled>
                                     <img src="images/calculator-blue.png" alt="Calculator Logo"/>
                                 </button>
                             :
-                                <button className="dividend-btn button-shine" title="Dividend Calculator (Under development)" onClick={this.props.openDividendModal}>
+                                <button className="dividend-btn button-shine" title="Dividend Calculator (Under development)" onClick={this.props.openDividendModal} disabled>
                                     <img src="images/calculator.png" alt="Calculator Logo"/>
                                 </button>
                         }
