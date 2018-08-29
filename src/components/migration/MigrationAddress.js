@@ -3,8 +3,6 @@ import React from 'react';
 import { get_utxos, generateSafexBtcTransaction } from '../../utils/migration';
 
 export default class MigrationAddress extends React.Component {
-
-
     constructor(props) {
         super(props);
         this.state = {
@@ -45,10 +43,7 @@ export default class MigrationAddress extends React.Component {
         });
 
         this.getBalances(this.props.data.address, this.props.data.wif);
-
-
     }
-
 
     getBalances(address) {
         var promises = [];
@@ -98,9 +93,7 @@ export default class MigrationAddress extends React.Component {
                 status_text: 'Sync error, please refresh'
             });
         });
-
     }
-
 
     refresh(e) {
         e.preventDefault();
@@ -108,7 +101,6 @@ export default class MigrationAddress extends React.Component {
     }
 
     //create safex blockchain key set
-
 
     render() {
         return (

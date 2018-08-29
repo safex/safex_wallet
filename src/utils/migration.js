@@ -8,12 +8,12 @@ function generateSafexKeys() {
 
 
 function get_utxos(address) {
-   return new Promise ((resolve, reject) => {
-       fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + address + '/utxo')
-           .then((resp) => resp.json())
-           .then(resp => resolve(resp))
-           .catch(err => reject(err))
-   });
+    return new Promise ((resolve, reject) => {
+    fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + address + '/utxo')
+    .then((resp) => resp.json())
+    .then(resp => resolve(resp))
+    .catch(err => reject(err))
+});
 }
 
 // TODO: byte size of transaction based fee
