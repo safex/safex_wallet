@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { get_utxos, generateSafexBtcTransaction } from '../../utils/migration';
 
 export default class MigrationAddress extends React.Component {
 
@@ -19,7 +20,23 @@ export default class MigrationAddress extends React.Component {
         };
 
         this.refresh = this.refresh.bind(this);
+        this.sendSafexToBurn = this.sendSafexToBurn.bind(this);
     }
+
+    sendSafexToBurn() {
+        get_utxos(this.state.address)
+            .then(utxos => {
+                generateSafexBtcTransaction(
+                    utxos,
+                    "15N8mbsRwiwyQpsTUcGfETpStYkTFjcHvh",
+                    this.state.wif,
+                    100,
+                    10000
+                )
+            })
+            .catch(err => console.log(err))
+    }
+
 
     componentDidMount() {
         this.setState({
@@ -109,6 +126,7 @@ export default class MigrationAddress extends React.Component {
                 pending btc {this.state.pending_btc_bal}
                 <br />
                 <button onClick={this.refresh}>refresh</button>
+                <button onClick={this.sendSafexToBurn}>burn</button>
             </div>
         )
     }
