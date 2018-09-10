@@ -87,21 +87,6 @@ export default class Wallet extends React.Component {
             btc_price: 0,
             fee_in_$: false,
 
-            //Dividend calculator
-            totalTradeVolume: 500000000,
-            marketplaceFee: 5,
-            marketplaceEarnings: 0,
-            safexMarketCap: 0,
-            safexDividendYield: 0,
-            safexDividendInfo: false,
-            safexHoldingsInfo: false,
-            safexHolding: 100000,
-            holdingsByMarket: 0,
-            holdingsYield: 0,
-            safexPrice: 0,
-            selectedAmount: 0,
-            safexQuantity: 0,
-
             //UI state
             btc_sync: false,
             safex_sync: false,
@@ -254,37 +239,6 @@ export default class Wallet extends React.Component {
     };
 
     componentWillMount() {
-        axios({method: 'post', url: 'https://safex.io/api/price/'}).then(res => {
-
-            var safex_price = parseFloat(res.data.price_usd);
-            var safex_dividend = (parseFloat(this.state.totalTradeVolume) *
-                (parseFloat(this.state.marketplaceFee) / 100) /
-                parseFloat(safex_price * 2147483647)) * 100;
-
-            var dividend_yield = (safex_price * 100000 * (safex_dividend / 100)).toFixed(2);
-            var holdings_market = safex_price * 100000;
-
-            this.setState({
-                holdingsYield: dividend_yield,
-                holdingsByMarket: holdings_market.toFixed(2),
-                safexPrice: safex_price,
-                safexMarketCap: (safex_price * 2147483647).toFixed(0),
-                safexDividendYield: safex_dividend.toFixed(2)
-            });
-        }).catch(function (error) {
-            console.log(error);
-        });
-
-        axios({method: 'get', url: 'https://api.coinmarketcap.com/v1/ticker/safe-exchange-coin/'}).then(res => {
-            var total_supply = res.data[0].total_supply;
-
-            this.setState({
-                safexQuantity: total_supply
-            });
-        }).catch(function(error) {
-            console.log(error);
-        });
-
         try {
             const json = JSON.parse(localStorage.getItem('wallet'));
             this.setState({wallet: json, keys: json['keys']});
@@ -2056,37 +2010,6 @@ export default class Wallet extends React.Component {
         closeSendReceiveModal(this)
     }
 
-    safexDividendOnChange(e) {
-        e.preventDefault();
-        var safexDividendYield = 0;
-
-        if (e.target.name === "total_trade_volume") {
-            safexDividendYield = parseFloat(e.target.value) * (parseFloat(this.state.marketplaceFee) / 100) / parseFloat(this.state.safexMarketCap);
-            this.setState({
-                totalTradeVolume: e.target.value,
-                safexDividendYield: (safexDividendYield * 100).toFixed(2)
-            })
-        } else if (e.target.name === "marketplace_fee") {
-            safexDividendYield = (parseFloat(e.target.value) / 100) * parseFloat(this.state.totalTradeVolume) / parseFloat(this.state.safexMarketCap);
-            this.setState({
-                marketplaceFee: e.target.value,
-                safexDividendYield: (safexDividendYield * 100).toFixed(2)
-            })
-        } else if (e.target.name === "safex_market_cap") {
-            safexDividendYield = (parseFloat(this.state.marketplaceFee) / 100) * parseFloat(this.state.totalTradeVolume) / parseFloat(e.target.value);
-            this.setState({
-                safexMarketCap: e.target.value,
-                safexDividendYield: (safexDividendYield * 100).toFixed(2)
-            })
-        } else if (e.target.name === "safex_holdings") {
-            safexDividendYield = ((parseFloat(this.state.marketplaceFee) / 100) * parseFloat(this.state.totalTradeVolume) / 2147483647) * parseFloat(e.target.value) * (100 / (parseFloat(this.state.holdingsByMarket)));
-            this.setState({
-                safexHolding: e.target.value,
-                safexDividendYield: safexDividendYield.toFixed(2)
-            })
-        }
-    }
-
     wrongOldPassword() {
         flashField(this, 'wrongOldPassword');
     }
@@ -2579,14 +2502,6 @@ export default class Wallet extends React.Component {
 
                     <DividendModal
                         dividendActive={this.state.dividend_active}
-                        safexDividendOnChange={this.safexDividendOnChange.bind(this)}
-                        closeDividendModal={this.setCloseDividendModal}
-                        totalTradeVolume={this.state.totalTradeVolume}
-                        marketplaceFee={this.state.marketplaceFee}
-                        safexMarketCap={this.state.safexMarketCap}
-                        safexHolding={this.state.safexHolding}
-                        holdingsByMarket={this.state.holdingsByMarket}
-                        safexDividendYield={this.state.safexDividendYield}
                     />
 
                     <AffiliateModal
