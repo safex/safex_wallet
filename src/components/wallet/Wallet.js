@@ -206,6 +206,7 @@ export default class Wallet extends React.Component {
         this.amountChange = this.amountChange.bind(this);
         this.convertBtcToDollars = this.convertBtcToDollars.bind(this);
         this.copyToClipboard = this.copyToClipboard.bind(this);
+        this.migrate = this.migrate.bind(this);
     }
 
     logout() {
@@ -226,6 +227,10 @@ export default class Wallet extends React.Component {
         setTimeout(() => {
             this.context.router.push('/');
         }, 1500)
+    }
+
+    migrate() {
+        this.context.router.push('/migration');
     }
 
     refreshWallet() {
@@ -669,68 +674,6 @@ export default class Wallet extends React.Component {
             });
     }
 
-    //TODO: needs more testing - safex not sent
-    formSafexTransactionBeta(utxos, amount, fee, destination, key, source) {
-        var running_total = 0;
-        var tx = new bitcoin.TransactionBuilder();
-        var inputs_num = 0;
-
-        // here we list btc tx from our wallet, remove 700sats, put back (the rest - fee) to ourself
-        utxos.forEach(txn => {
-            if (running_total < (700 + fee)) {
-                running_total += txn.satoshis;
-                tx.addInput(txn.txid, txn.vout);
-                inputs_num += 1;
-            }
-        });
-        tx.addOutput(destination, 700);
-
-        var btc_remaining = (running_total - (700 + fee));
-        if (btc_remaining > 0) {
-            tx.addOutput(source, btc_remaining);
-        }
-
-        var btc = require('bitcoinjs-lib');
-        if (amount <= 0.1) {
-            this.openMainAlertPopup('Transaction not processed - Amount is too low.');
-            return;
-        }
-
-        // payload omni tx
-        var data = new Buffer("0000000000000056" + String("0000000000000000" + amount).slice(-16));
-        var dataScript = btc.script.nullData.output.encode(data);
-        tx.addOutput(dataScript, 1000)
-
-        for (var i = 0; i < inputs_num; i++) {
-            tx.sign(i, key);
-        }
-        var json = {};
-        json['rawtx'] = tx.build().toHex();
-        fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
-            .then(resp => resp.text())
-            .then((resp) => {
-                this.setState({
-                    sidebar_open: true,
-                    transaction_sent: true,
-                    transaction_being_sent: false,
-                    txid: resp,
-
-                    // Close main alert popup
-                    main_alert_popup: false,
-                    main_alert_popup_text: '',
-
-                    // Close Send Receive Modal
-                    collapse_open: {
-                        send_open: false,
-                        receive_open: false
-                    },
-                });
-                this.prepareDisplay();
-                this.prepareDisplayPendingTx();
-                this.setCloseSendReceiveModal();
-            });
-    }
-
     sendCoins(e) {
         e.preventDefault();
         //set the signing key for the transaction
@@ -1020,6 +963,7 @@ export default class Wallet extends React.Component {
         }
     }
 
+
     createKey(e) {
         e.preventDefault();
         this.prepareDisplay();
@@ -1027,7 +971,7 @@ export default class Wallet extends React.Component {
         this.setState({is_loading: true});
 
         var key_pair = genkey();
-        var address = key_pair.getAddress();
+        const { address } = bitcoin.payments.p2pkh({ pubkey: key_pair.publicKey })
 
         var key_json = {};
         key_json['public_key'] = address;
@@ -1092,7 +1036,7 @@ export default class Wallet extends React.Component {
         e.preventDefault();
         try{
             var key_pair = bitcoin.ECPair.fromWIF(e.target.key.value);
-            var address = key_pair.getAddress();
+            const { address } = bitcoin.payments.p2pkh({ pubkey: key_pair.publicKey })
 
             try {
                 var json = JSON.parse(localStorage.getItem('wallet'));
@@ -1147,7 +1091,7 @@ export default class Wallet extends React.Component {
         e.preventDefault();
         try {
             var key_pair = bitcoin.ECPair.fromWIF(e.target.key.value);
-            var address = key_pair.getAddress();
+            const { address } = bitcoin.payments.p2pkh({ pubkey: key_pair.publicKey })
 
             var key_json = {};
             key_json['public_key'] = address;
@@ -2500,6 +2444,8 @@ export default class Wallet extends React.Component {
         return (
             <div className={this.state.loging_out ? 'wallet-page fadeOutUp' : 'wallet-page'}>
                 <Navigation
+                    wallet={this.wallet}
+                    migrate={this.migrate}
                     safexPrice={this.state.safex_price}
                     btcPrice={this.state.btc_price}
                     archiveActive={this.state.archive_active}
