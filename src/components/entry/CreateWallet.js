@@ -4,6 +4,7 @@ import {Link} from 'react-router';
 
 import {encrypt} from '../../utils/utils';
 import {genkey} from '../../utils/keys';
+const bitcoin = window.require('bitcoinjs-lib');
 import {
     DEFAULT_WALLET_PATH,
     flashField,
@@ -51,7 +52,7 @@ export default class CreateWallet extends React.Component {
         if (e.target.create_password.value.length > 0 && e.target.create_password.value === e.target.repeat_password.value) {
             const key_pair = genkey();
 
-            const address = key_pair.getAddress();
+            const { address } = bitcoin.payments.p2pkh({ pubkey: key_pair.publicKey });
 
             const key_json = {};
             key_json['public_key'] = address;
