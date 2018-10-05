@@ -35,6 +35,53 @@ function broadcastTransaction(rawtx) {
     });
 }
 
+function generate_btc_transaction(utxos, destination, wif, amount, fee) {
+    console.log(fee)
+    let key = bitcoin.ECPair.fromWIF(wif);
+    var running_total = 0;
+    var tx = new bitcoin.TransactionBuilder();
+    var inputs_num = 0;
+    let fee_adj = 0;
+    utxos.forEach(txn => {
+        if (running_total < (fee)) {
+            running_total += txn.satoshis;
+            inputs_num += 1;
+        }
+    });
+    fee_adj = inputs_num * 180;
+
+    fee_adj += 100;
+
+    fee = Math.trunc(fee * (fee_adj / 1000));
+    var inputs_num = 0;
+    var running_total = 0;
+    utxos.forEach(txn => {
+        if (running_total < (fee)) {
+            running_total += txn.satoshis;
+            tx.addInput(txn.txid, txn.vout);
+            inputs_num += 1;
+        }
+    });
+
+    const {address} = bitcoin.payments.p2pkh({pubkey: key.publicKey})
+    //problem is right here when adding a Output
+
+
+    const left_overs = running_total - (700 + fee);
+    if (left_overs > 0) {
+        tx.addOutput(address, left_overs);
+    }
+
+    for (var i = 0; i < inputs_num; i++) {
+        tx.sign(i, key);
+    }
+
+    var json = {};
+    json['rawtx'] = tx.build().toHex();
+    json['fee'] = fee;
+    return json;
+}
+
 //standard BTC Blockchain Safex transaction
 function generateSafexBtcTransaction(utxos, destination, wif, amount, fee) {
     console.log(fee)
@@ -239,5 +286,6 @@ module.exports = {
     getFee,
     BURN_ADDRESS,
     verify_safex_address,
-    structureSafexKeys
+    structureSafexKeys,
+    generate_btc_transaction
 };
