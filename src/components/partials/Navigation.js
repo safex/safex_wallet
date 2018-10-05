@@ -37,6 +37,11 @@ export default class Navigation extends React.Component {
                         </li>
                     </ul>
                     <div className="wallet-tabs fadeIn">
+                        <div onClick={this.props.migrate} className='btn btn-default button-shine active'>
+                            Migrate
+                        </div><div onClick={this.props.wallet} className='btn btn-default button-shine active'>
+                        Wallet
+                    </div>
                         {
                             this.props.archiveActive
                             ?
