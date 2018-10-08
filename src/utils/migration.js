@@ -41,7 +41,7 @@ function generate_btc_transaction(utxos, destination, wif, amount, fee) {
     var running_total = 0;
     var tx = new bitcoin.TransactionBuilder();
     var inputs_num = 0;
-    let fee_adj = 0;
+    let fee_adj;
     utxos.forEach(txn => {
         if (running_total < (fee)) {
             running_total += txn.satoshis;
@@ -89,7 +89,7 @@ function generateSafexBtcTransaction(utxos, destination, wif, amount, fee) {
     var running_total = 0;
     var tx = new bitcoin.TransactionBuilder();
     var inputs_num = 0;
-    let fee_adj = 0;
+    let fee_adj;
     utxos.forEach(txn => {
         if (running_total < (700 + fee)) {
             running_total += txn.satoshis;
@@ -150,7 +150,7 @@ function setSafexMigrationAddress(utxos, destination, wif, payload, fee) {
     var running_total = 0;
     var tx = new bitcoin.TransactionBuilder();
     var inputs_num = 0;
-    let fee_adj = 0;
+    let fee_adj;
     utxos.forEach(txn => {
         if (running_total < (700 + fee)) {
             running_total += txn.satoshis;

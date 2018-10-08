@@ -54,6 +54,7 @@ export default class Migrate2 extends React.Component {
 
     }
 
+    //generates a new random safex key set
     createSafexKey() {
         this.setState({create_address: true, loading: true});
 
@@ -71,6 +72,7 @@ export default class Migrate2 extends React.Component {
         });
     }
 
+    //use this after safex keys were generated
     saveSafexKeys() {
         //in here do the logic for modifying the wallet file data info
         try {
@@ -118,13 +120,13 @@ export default class Migrate2 extends React.Component {
         });
     }
 
+    //use this if the keys are provided by the user
     setYourKeys(e) {
         e.preventDefault();
         if (verify_safex_address(e.target.spend_key.value,
             e.target.view_key.value,
             e.target.safex_address.value)) {
             const safex_keys = structureSafexKeys(e.target.spend_key.value, e.target.view_key.value);
-            console.log(safex_keys)
 
             try {
                 var json = JSON.parse(localStorage.getItem('wallet'));
@@ -182,60 +184,71 @@ export default class Migrate2 extends React.Component {
         }
     }
 
-
-    selectSafexKeys() {
-        //in here do the logic for modifying the wallet file data info
-        try {
-            var json = JSON.parse(localStorage.getItem('wallet'));
-        } catch (e) {
-            alert('Error parsing the wallet data.');
-        }
-        console.log(json)
-        if (json.hasOwnProperty('safex_keys')) {
-            json['safex_keys'].push(this.state.safex_key);
-        } else {
-            json['safex_keys'] = [];
-            json['safex_keys'].push(this.state.safex_key);
-        }
-
-        var index = -1;
-
-        for (var key in json.keys) {
-            if (json.keys[key].public_key == this.props.data.address) {
-                index = key;
-                json.keys[key]['migration_data'] = {};
-                json.keys[key]['migration_data'].safex_keys = this.state.safex_key;
-                json.keys[key].migration_progress = 2;
+    //use this for selected key from dropdown menu
+    selectKey(e) {
+        e.preventDefault();
+        if (e.target.address_selection.value.length > 0) {
+            try {
+                var json = JSON.parse(localStorage.getItem('wallet'));
+            } catch (e) {
+                alert('Error parsing the wallet data.');
             }
-        }
 
-        var algorithm = 'aes-256-ctr';
-        var password = localStorage.getItem('password');
-        var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
+            var key_index = -1;
 
-        fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
-            if (err) {
-                alert('Problem communicating to the wallet file.');
-            } else {
-                try {
-                    localStorage.setItem('wallet', JSON.stringify(json));
-                    var json2 = JSON.parse(localStorage.getItem('wallet'));
-                    console.log(json2.keys[index].migration_data);
-                    this.props.setMigrationProgress(2);
-                } catch (e) {
-                    console.log(e);
-                    alert('An error adding a key to the wallet. Please contact team@safex.io');
+            var x_index = -1;
+
+            for (var key in json.keys) {
+                if (json.keys[key].public_key == this.props.data.address) {
+                    key_index = key;
+                    for (var x_key in json.safex_keys) {
+                        if (json.safex_keys[key].public_addr == e.target.address_selection.value) {
+                            x_index = x_key;
+                            json.keys[key_index]['migration_data'] = {};
+                            json.keys[key_index]['migration_data'].safex_keys = json.safex_keys[x_index];
+                            json.keys[key_index].migration_progress = 2;
+                        }
+                    }
                 }
             }
-        });
-    }
 
-    selectKey(e) {
-        e.preventDefault()
-        console.log(e.target.address_selection.value);
+            if (x_index != -1 && key_index != 1) {
+                var algorithm = 'aes-256-ctr';
+                var password = localStorage.getItem('password');
+                var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
+
+                fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
+                    if (err) {
+                        alert('Problem communicating to the wallet file.');
+                    } else {
+                        try {
+                            localStorage.setItem('wallet', JSON.stringify(json));
+                            var json2 = JSON.parse(localStorage.getItem('wallet'));
+                            this.setState({
+                                safex_key: json2.safex_keys[x_index],
+                                safex_address: json2.safex_keys[x_index].public_addr,
+                                safex_spend_pub: json2.safex_keys[x_index].spend.pub,
+                                safex_spend_sec: json2.safex_keys[x_index].spend.sec,
+                                safex_view_pub: json2.safex_keys[x_index].view.pub,
+                                safex_view_sec: json2.safex_keys[x_index].view.sec,
+                                loading: false,
+                            });
+                            this.props.setMigrationProgress(2);
+                        } catch (e) {
+                            console.log(e);
+                            alert('An error adding a key to the wallet. Please contact team@safex.io');
+                        }
+                    }
+                });
+            } else {
+                alert('error key does not exist')
+            }
+
+
+        } else {
+            alert('no key from your list has been selected')
+        }
     }
-    //create safex blockchain key set
-    //also load the possible keys from other uses
 
     render() {
 
@@ -284,11 +297,11 @@ export default class Migrate2 extends React.Component {
 
                         <form onSubmit={this.setYourKeys}>
                             <input
-                                value="Safex5zWwY4Y6jeotfp7WbeyYsBB2TC5HEEpCvvNGy8wgxSsnU8mezWiwGLfMqMJq4TEfYMGeGDPZY7xaa3tkwPiDkS53ezKt7J3K"
+                                value=""
                                 name="safex_address"/>
-                            <input value="c3396a3231a66f547d1422fe0941fc8c9fcf4fa31898f1d283ade4a355854b06"
+                            <input value=""
                                    name="spend_key"/>
-                            <input value="771c41938d2dbc893dd5973f4188e308fec3002198f56344472694f2ca5ed40b"
+                            <input value=""
                                    name="view_key"/>
 
                             <button>set your key</button>
