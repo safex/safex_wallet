@@ -77,6 +77,12 @@
   animation-duration: 1s;
   animation-fill-mode: both;
 }
+.wallet-tabs div {
+  float: left;
+}
+.wallet-tabs div:last-child {
+  margin-right: 0;
+}
 .wallet-tabs .btn {
   background: transparent;
   border: 1px solid #b7b7b7;
@@ -90,9 +96,6 @@
   margin-right: 10px;
   font-size: 13px;
   width: 82px;
-}
-.wallet-tabs .btn:last-child {
-  margin-right: 0;
 }
 .wallet-tabs .btn:hover {
   background: transparent;

@@ -62,6 +62,7 @@ export default class Wallet extends React.Component {
 
         this.state = {
             //wallet state
+            activeHomePage: true,
             keys: [],
             wallet: {},
             import_key: '',
@@ -212,6 +213,8 @@ export default class Wallet extends React.Component {
 
     componentWillUnmount() {
         this.setState({
+            activeHomePage: false,
+
             sidebar_open: false,
             // Close Settings Modal
             settings_active: false,
@@ -221,7 +224,6 @@ export default class Wallet extends React.Component {
                 send_open: false,
                 receive_open: false
             },
-
         });
         clearInterval(this.state.refreshInterval);
     }
@@ -607,7 +609,7 @@ export default class Wallet extends React.Component {
             .then((resp) => {
                 var decoded_txn = bitcoin.Transaction.fromHex(resp);
                 var txn = bitcoin.TransactionBuilder.fromTransaction(decoded_txn);
-                checks.forEach(function (item) {
+                checks.forEach(function(item) {
                     txn.tx.outs.some(out => {
                         try {
                             var pubkey = bitcoin.address.fromOutputScript(out.script, bitcoin.networks.livenet);
@@ -1568,98 +1570,93 @@ export default class Wallet extends React.Component {
         var send_amount = this.state.send_amount;
         var send_total = parseFloat(send_amount);
 
+
+
         //if this.state.average_fee > 0 send_fee == fast. Set active fee selection fastest.
         if (coin === 'safex') {
             get_utxos(this.state.send_public_key)
                 .then(utxos => {
-                            const rawtx = generateSafexBtcTransaction(
-                                utxos,
-                                BURN_ADDRESS,
-                                this.state.send_private_key,
-                                1,
-                                this.state.average_fee * 100000000
-                            );
-                            this.setState({
-                                send_amount: 1,
-                                send_total: 1,
-                                send_fee: (rawtx.fee / 100000000).toFixed(8),
-                                active_fee: 'fast'
-                            });
-                        }).catch(err => {
-                        console.log(err)
-                })
-                .catch(err => console.log(err));
+                    const rawtx = generateSafexBtcTransaction(
+                        utxos,
+                        BURN_ADDRESS,
+                        this.state.send_private_key,
+                        1,
+                        this.state.average_fee * 100000000
+                    );
+                    this.setState({
+                        send_amount: 1,
+                        send_total: 1,
+                        send_fee: parseFloat(rawtx.fee / 100000000).toFixed(8),
+                        active_fee: 'fast'
+                    });
+                }).catch(err => console.log(err))
+            .catch(err => console.log(err));
         } else {
             get_utxos(this.state.send_public_key)
                 .then(utxos => {
-                            const rawtx = generate_btc_transaction(
-                                utxos,
-                                BURN_ADDRESS,
-                                this.state.send_private_key,
-                                0.00001.toFixed(8),
-                                this.state.average_fee * 100000000
-                            );
-                            this.setState({
-                                send_amount: 0.00001.toFixed(8),
-                                send_fee: (rawtx.fee / 100000000).toFixed(8),
-                                active_fee: 'fast',
-                                send_total: parseFloat(parseFloat(this.state.send_amount) + rawtx.fee / 100000000).toFixed(8)
-                            });
-                        }).catch(err => {
-                        console.log(err)
-                })
-                .catch(err => console.log(err));
+                    const rawtx = generate_btc_transaction(
+                        utxos,
+                        BURN_ADDRESS,
+                        this.state.send_private_key,
+                        0.00001.toFixed(8),
+                        this.state.average_fee * 100000000
+                    );
+                    this.setState({
+                        send_amount: 0.00001.toFixed(8),
+                        send_fee: parseFloat(rawtx.fee / 100000000).toFixed(8),
+                        active_fee: 'fast',
+                        send_total: parseFloat(parseFloat(0.00001) + parseFloat(rawtx.fee / 100000000)).toFixed(8)
+                    });
+                    console.log(send_total)
+                }).catch(err => console.log(err))
+            .catch(err => console.log(err));
         }
     }
 
-
-    feeChange(e, speed) {
-        console.log(this.state.average_fee)
-        console.log(this.state)
+    feeChange(speed) {
         var coin = this.state.send_coin;
         if (coin === 'safex') {
-            get_utxos(this.state.send_public_key)
-                .then(utxos => {
-                    getFee()
-                        .then((fee) => {
-                            const rawtx = generateSafexBtcTransaction(
-                                utxos,
-                                BURN_ADDRESS,
-                                this.state.send_private_key,
-                                1,
-                                fee * 100000000
-                            );
-                            this.setState({send_fee: rawtx.fee / 100000000, active_fee: speed});
-                        }).catch(err => {
-                        console.log(err)
-                    })
-                        .catch(err => console.log(err));
-                })
-                .catch(err => console.log(err));
+            if (speed === 'fast') {
+                this.setState({
+                    send_fee: parseFloat(this.state.average_fee).toFixed(8),
+                    active_fee: speed
+                });
+            }
+            if (speed === 'med') {
+                this.setState({
+                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 2).toFixed(8),
+                    active_fee: speed
+                });
+            }
+            if (speed === 'slow') {
+                this.setState({
+                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 4).toFixed(8),
+                    active_fee: speed
+                });
+            }
         }
         if (coin === 'btc') {
-            get_utxos(this.state.send_public_key)
-                .then(utxos => {
-                    getFee()
-                        .then((fee) => {
-                            const rawtx = generate_btc_transaction(
-                                utxos,
-                                BURN_ADDRESS,
-                                this.state.send_private_key,
-                                this.state.send_amount,
-                                fee * 100000000
-                            );
-                            this.setState({
-                                send_fee: rawtx.fee / 100000000,
-                                active_fee: speed,
-                                send_total: parseFloat(parseFloat(this.state.send_amount) + rawtx.fee / 100000000).toFixed(8)
-                            });
-                        }).catch(err => {
-                        console.log(err)
-                    })
-                        .catch(err => console.log(err));
-                })
-                .catch(err => console.log(err));
+            if (speed === 'fast') {
+                this.setState({
+                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 4).toFixed(8),
+                    send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.average_fee) / 4).toFixed(8),
+                    active_fee: speed
+                });
+            }
+            if (speed === 'med') {
+                this.setState({
+                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 6).toFixed(8),
+                    send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.average_fee) / 6).toFixed(8),
+                    active_fee: speed
+                });
+            }
+            if (speed === 'slow') {
+                this.setState({
+                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 8).toFixed(8),
+                    send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.average_fee) / 8).toFixed(8),
+                    active_fee: speed
+                });
+            }
         }
     }
 
@@ -2094,27 +2091,25 @@ export default class Wallet extends React.Component {
                         <form onSubmit={this.copyToClipboard}>
                             {
                                 this.state.copied && keys[key].public_key === this.state.current_public_key
-                                    ?
+                                ?
                                     <CopyToClipboard text={keys[key].public_key}
-                                                     onCopy={() => this.setState({copied: true})}
-                                                     className="button-shine">
+                                        onCopy={() => this.setState({copied: true})}
+                                        className="button-shine">
                                         <button>
                                             Copied
                                         </button>
                                     </CopyToClipboard>
-                                    :
+                                :
                                     <CopyToClipboard text={keys[key].public_key}
-                                                     onCopy={() => this.setState({copied: true})}
-                                                     className="button-shine">
+                                        onCopy={() => this.setState({copied: true})}
+                                        className="button-shine">
                                         <button>
                                             Copy
                                         </button>
                                     </CopyToClipboard>
                             }
-                            <input type="text" value={keys[key].public_key}
-                                   onChange={({target: {value}}) => this.setState({value, copied: false})} disabled/>
-                            <input type="hidden" name="current_public_key" id="current_public_key" readOnly
-                                   value={keys[key].public_key}/>
+                            <input type="text" value={keys[key].public_key} onChange={({target: {value}}) => this.setState({value, copied: false})} disabled/>
+                            <input type="hidden" name="current_public_key" id="current_public_key" readOnly value={keys[key].public_key}/>
                         </form>
                     </div>
                     <span>
@@ -2137,7 +2132,7 @@ export default class Wallet extends React.Component {
                 <div className="pull-right single-key-btns-wrap">
                     {
                         this.state.collapse_open.send_open && this.state.collapse_open.key === key
-                            ?
+                        ?
                             <div>
                                 <button
                                     disabled={(keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0) || this.state.send_disabled === false ? '' : 'disabled'}
@@ -2146,9 +2141,9 @@ export default class Wallet extends React.Component {
                                     <span className="img-wrap">
                                         {
                                             (this.state.collapse_open.key === key && this.state.transaction_being_sent) || this.state.send_disabled
-                                                ?
+                                            ?
                                                 <img src="images/outbox-gray.png" alt="Outbox Logo"/>
-                                                :
+                                            :
                                                 <img src="images/outbox-white.png" alt="Outbox Logo"/>
                                         }
                                     </span>
@@ -2160,7 +2155,7 @@ export default class Wallet extends React.Component {
                                     <span>RECEIVE</span>
                                 </button>
                             </div>
-                            :
+                        :
                             <div>
                                 <button
                                     disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
@@ -2168,11 +2163,11 @@ export default class Wallet extends React.Component {
                                     className={(this.state.collapse_open.key === key && this.state.collapse_open.receive_open) || this.state.send_disabled ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
                                     {
                                         (this.state.collapse_open.key === key && this.state.collapse_open.receive_open) || this.state.transaction_being_sent || this.state.send_disabled
-                                            ?
+                                        ?
                                             <span className="img-wrap">
                                                 <img src="images/outbox-gray.png" alt="Outbox Logo"/>
                                             </span>
-                                            :
+                                        :
                                             <span className="img-wrap">
                                             {
                                                 keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0
@@ -2207,36 +2202,36 @@ export default class Wallet extends React.Component {
                         <div className="row amounts">
                             <div className="col-xs-5 amount-btns-wrap">
                                 <button onClick={() => this.removeFromArchive(key)}
-                                        className={keys[key].archived === true
-                                        || (!keys[key].hasOwnProperty('archived') && archive_active === true)
-                                            ? 'archive-button button-shine to-home-btn'
-                                            : 'archive-button button-shine hidden-xs hidden-sm hidden-md hidden-lg to-home-btn'}>
+                                    className={keys[key].archived === true
+                                    || (!keys[key].hasOwnProperty('archived') && archive_active === true)
+                                        ? 'archive-button button-shine to-home-btn'
+                                        : 'archive-button button-shine hidden-xs hidden-sm hidden-md hidden-lg to-home-btn'}>
                                     <span>TO HOME</span>
                                 </button>
 
                                 <button onClick={() => this.sendToArchive(key)}
-                                        className={keys[key].archived === false
-                                        || (!keys[key].hasOwnProperty('archived') && archive_active === false)
-                                            ? 'archive-button button-shine to-archive-btn'
-                                            : 'archive-button button-shine hidden-xs hidden-sm hidden-md hidden-lg to-archive-btn'}>
+                                    className={keys[key].archived === false
+                                    || (!keys[key].hasOwnProperty('archived') && archive_active === false)
+                                        ? 'archive-button button-shine to-archive-btn'
+                                        : 'archive-button button-shine hidden-xs hidden-sm hidden-md hidden-lg to-archive-btn'}>
                                     <span>TO ARCHIVE</span>
                                 </button>
                                 {
                                     this.state.history_overflow_active
-                                        ?
+                                    ?
                                         <button onClick={this.setCloseHistoryModal}
-                                                className='archive-button history-button button-shine history-btn'>
+                                            className='archive-button history-button button-shine history-btn'>
                                             <span>HISTORY</span>
                                         </button>
-                                        :
+                                    :
                                         <button onClick={() => this.setOpenHistoryModal(key)}
-                                                className='archive-button history-button button-shine history-btn'>
+                                            className='archive-button history-button button-shine history-btn'>
                                             <span>HISTORY</span>
                                         </button>
                                 }
 
                                 <button onClick={() => this.showPrivateModal(key)}
-                                        className='archive-button show-private-button button-shine show-private-btn'>
+                                    className='archive-button show-private-button button-shine show-private-btn'>
                                     <span>show private</span>
                                 </button>
                             </div>
@@ -2331,12 +2326,12 @@ export default class Wallet extends React.Component {
                                 </label>
                                 {
                                     this.state.send_coin === 'safex'
-                                        ?
+                                    ?
                                         <input type="number" name="amount" id="amount"
                                                onChange={this.sendAmountOnChange}
                                                readOnly={this.state.fee_in_$ ? 'readonly' : ''}
                                                value={this.state.fee_in_$ ? (this.state.send_amount * this.state.safex_price).toFixed(8) : this.state.send_amount}/>
-                                        :
+                                    :
                                         <input type="number" name="amount" id="amount"
                                                onChange={this.sendAmountOnChange}
                                                readOnly={this.state.fee_in_$ ? 'readonly' : ''}
@@ -2382,35 +2377,35 @@ export default class Wallet extends React.Component {
                                 </label>
                                 {
                                     this.state.send_coin === 'safex'
-                                        ?
+                                    ?
                                         <input className="total-input" type="number" name="total" readOnly
                                                value={this.state.fee_in_$ ? (this.state.send_total * this.state.safex_price).toFixed(8) : this.state.send_total}/>
-                                        :
+                                    :
                                         <input className="total-input" type="number" name="total" readOnly
                                                value={this.state.fee_in_$ ? (this.state.send_total * this.state.btc_price).toFixed(8) : this.state.send_total}/>
                                 }
                             </div>
                             <div className="form-group">
                                 <button type="button" className="btc-convert-btn button-shine"
-                                        onClick={this.convertBtcToDollars}
-                                        disabled={this.state.send_overflow_active && this.state.transaction_sent === false ? 'disabled' : ''}>
+                                    onClick={this.convertBtcToDollars}
+                                    disabled={this.state.send_overflow_active && this.state.transaction_sent === false ? 'disabled' : ''}>
                                     {this.state.fee_in_$ ? '$ to btc' : 'Btc to $'}
                                 </button>
                                 {
                                     this.state.send_overflow_active && this.state.transaction_sent === false
-                                        ?
+                                    ?
                                         <button type="submit"
-                                                name="form_send_submit"
-                                                className="form-send-submit button-shine"
-                                                disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
+                                            name="form_send_submit"
+                                            className="form-send-submit button-shine"
+                                            disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
                                             <img src="images/outgoing.png" alt="Outgoing Icon"/>
                                             Send
                                         </button>
-                                        :
+                                    :
                                         <button type="submit"
-                                                name="form_send_submit"
-                                                className="form-send-submit button-shine"
-                                                disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
+                                            name="form_send_submit"
+                                            className="form-send-submit button-shine"
+                                            disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
                                             <img src="images/outgoing-blue.png" alt="Outgoing Icon"/>
                                             Send
                                         </button>
@@ -2422,7 +2417,7 @@ export default class Wallet extends React.Component {
                                     : 'send_receive_info'}>
                                     <p>{this.state.send_receive_info}</p>
                                     <span className="close"
-                                          onClick={keys[key].pending_btc_bal < 0 || keys[key].pending_safex_bal < 0 ? this.setCloseSendReceiveModal : this.setCloseSendReceivePopup}>X</span>
+                                        onClick={keys[key].pending_btc_bal < 0 || keys[key].pending_safex_bal < 0 ? this.setCloseSendReceiveModal : this.setCloseSendReceivePopup}>X</span>
                                 </div>
                             </div>
                         </div>
@@ -2445,7 +2440,7 @@ export default class Wallet extends React.Component {
 
                             <label htmlFor="amount">Amount:</label>
                             <input type="number" name="amount" placeholder="1" onChange={this.amountChange}
-                                   value={this.state.receive_amount}/>
+                                value={this.state.receive_amount}/>
                         </div>
                         <div className="col-xs-5 qr-code-wrap">
                             <QRCode value={"bitcoin:" + keys[key].public_key + "?amount=" + this.state.receive_amount}/>
@@ -2480,6 +2475,7 @@ export default class Wallet extends React.Component {
                     keyToHome={this.state.transfer_key_to_home}
                     keyToArchive={this.state.transfer_key_to_archive}
                     getPrices={this.getPrices}
+                    activeHomePage={this.state.activeHomePage}
                 />
 
                 <div className="container keys-container fadeIn">

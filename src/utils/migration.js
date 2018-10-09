@@ -36,7 +36,6 @@ function broadcastTransaction(rawtx) {
 }
 
 function generate_btc_transaction(utxos, destination, wif, amount, fee) {
-    console.log(fee)
     let key = bitcoin.ECPair.fromWIF(wif);
     var running_total = 0;
     var tx = new bitcoin.TransactionBuilder();
@@ -84,7 +83,6 @@ function generate_btc_transaction(utxos, destination, wif, amount, fee) {
 
 //standard BTC Blockchain Safex transaction
 function generateSafexBtcTransaction(utxos, destination, wif, amount, fee) {
-    console.log(fee)
     let key = bitcoin.ECPair.fromWIF(wif);
     var running_total = 0;
     var tx = new bitcoin.TransactionBuilder();
@@ -122,11 +120,11 @@ function generateSafexBtcTransaction(utxos, destination, wif, amount, fee) {
     }
 
     const _payload = createSafexPayloadBuffer(56, amount);
-    console.log("made the payload ", _payload)
+    // console.log("made the payload ", _payload)
 
     const dataScript = bitcoin.payments.embed({data: [_payload]})
 
-    console.log("generated datascript")
+    // console.log("generated datascript")
     tx.addOutput(dataScript.output, 0);
 
 

@@ -1,12 +1,13 @@
 import React from 'react';
 
 import {createSafexAddress, verify_safex_address, structureSafexKeys} from '../../utils/migration';
+import {openMigrationAlert, closeMigrationAlert} from '../../utils/modals';
 
 const fs = window.require('fs');
 import {encrypt} from "../../utils/utils";
+import MigrationAlert from "../partials/MigrationAlert";
 
 var swg = window.require('safex-addressjs');
-
 
 //Set the Safex Address
 export default class Migrate2 extends React.Component {
@@ -25,6 +26,8 @@ export default class Migrate2 extends React.Component {
                 safex_checksum: "",
                 safex_key: {},
                 safex_keys: {},
+                migration_alert: false,
+                migration_alert_text: '',
             };
 
         this.setSafexAddress = this.setSafexAddress.bind(this);
@@ -32,8 +35,11 @@ export default class Migrate2 extends React.Component {
         this.saveSafexKeys = this.saveSafexKeys.bind(this);
         this.setYourKeys = this.setYourKeys.bind(this);
         this.selectKey = this.selectKey.bind(this);
+        this.setOpenMigrationAlert = this.setOpenMigrationAlert.bind(this);
+        this.setCloseMigrationAlert = this.setCloseMigrationAlert.bind(this);
+        this.startOver = this.startOver.bind(this);
+        this.goBack = this.goBack.bind(this);
     }
-
 
     componentDidMount() {
         try {
@@ -47,11 +53,8 @@ export default class Migrate2 extends React.Component {
         })
     }
 
-
     setSafexAddress(e) {
         e.preventDefault();
-
-
     }
 
     //generates a new random safex key set
@@ -105,7 +108,8 @@ export default class Migrate2 extends React.Component {
 
         fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
             if (err) {
-                alert('Problem communicating to the wallet file.');
+                console.log('Problem communicating to the wallet file.');
+                this.setOpenMigrationAlert('Problem communicating to the wallet file.');
             } else {
                 try {
                     localStorage.setItem('wallet', JSON.stringify(json));
@@ -131,7 +135,8 @@ export default class Migrate2 extends React.Component {
             try {
                 var json = JSON.parse(localStorage.getItem('wallet'));
             } catch (e) {
-                alert('Error parsing the wallet data.');
+                console.log('Error parsing the wallet data.');
+                this.setOpenMigrationAlert('Error parsing the wallet data.');
             }
             console.log(json)
             if (json.hasOwnProperty('safex_keys')) {
@@ -158,7 +163,8 @@ export default class Migrate2 extends React.Component {
 
             fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
                     if (err) {
-                        alert('Problem communicating to the wallet file.');
+                        console.log('Problem communicating to the wallet file.');
+                        this.setOpenMigrationAlert('Problem communicating to the wallet file.');
                     } else {
                         try {
                             localStorage.setItem('wallet', JSON.stringify(json));
@@ -174,13 +180,14 @@ export default class Migrate2 extends React.Component {
                             this.props.setMigrationProgress(2);
                         } catch (e) {
                             console.log(e);
-                            alert('An error adding a key to the wallet. Please contact team@safex.io');
+                            this.setOpenMigrationAlert('An error adding a key to the wallet. Please contact team@safex.io');
                         }
                     }
                 }
             );
         } else {
-            alert("incorrect keys")
+            console.log('Incorrect keys');
+            this.setOpenMigrationAlert('Incorrect keys');
         }
     }
 
@@ -191,7 +198,8 @@ export default class Migrate2 extends React.Component {
             try {
                 var json = JSON.parse(localStorage.getItem('wallet'));
             } catch (e) {
-                alert('Error parsing the wallet data.');
+                console.log('Error parsing the wallet data.');
+                this.setOpenMigrationAlert('Error parsing the wallet data.');
             }
 
             var key_index = -1;
@@ -219,7 +227,7 @@ export default class Migrate2 extends React.Component {
 
                 fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
                     if (err) {
-                        alert('Problem communicating to the wallet file.');
+                        this.setOpenMigrationAlert('Problem communicating to the wallet file.');
                     } else {
                         try {
                             localStorage.setItem('wallet', JSON.stringify(json));
@@ -236,22 +244,39 @@ export default class Migrate2 extends React.Component {
                             this.props.setMigrationProgress(2);
                         } catch (e) {
                             console.log(e);
-                            alert('An error adding a key to the wallet. Please contact team@safex.io');
+                            this.setOpenMigrationAlert('An error adding a key to the wallet. Please contact team@safex.io');
                         }
                     }
                 });
             } else {
-                alert('error key does not exist')
+                console.log('Key does not exist');
+                this.setOpenMigrationAlert('Key does not exist');
             }
-
-
         } else {
-            alert('no key from your list has been selected')
+            console.log('No key from your list has been selected');
+            this.setOpenMigrationAlert('No key from your list has been selected');
         }
     }
 
-    render() {
+    startOver() {
+        this.setState({
+            create_address: false
+        })
+    }
 
+    setOpenMigrationAlert(message) {
+        openMigrationAlert(this, message);
+    }
+
+    setCloseMigrationAlert() {
+        closeMigrationAlert(this);
+    }
+
+    goBack() {
+        this.props.setMigrationProgress(0);
+    }
+
+    render() {
         var options = [];
         if (this.state.safex_keys) {
             Object.keys(this.state.safex_keys).map(key => {
@@ -268,47 +293,52 @@ export default class Migrate2 extends React.Component {
 
         return (
             <div>
-
                 <p>Step 2/4</p>
+                {
+                    this.state.create_address
+                    ?
+                        <div>
+                            <p>These are the components</p>
+                            <p>Wallet address</p>
+                            <p>{this.state.safex_address}</p>
+                            <p>Spend key</p>
+                            <p>public: {this.state.safex_spend_pub}</p>
+                            <p>secret: {this.state.safex_spend_sec}</p>
+                            <p>View key</p>
+                            <p>public: {this.state.safex_view_pub}</p>
+                            <p>secret: {this.state.safex_view_sec}</p>
 
-                {this.state.create_address ?
-                    <div>
-                        <p>These are the components</p>
-                        <p>{this.state.safex_address}</p>
-                        <p>{this.state.safex_spend_pub}</p>
-                        <p>{this.state.safex_spend_sec}</p>
-                        <p>{this.state.safex_view_pub}</p>
-                        <p>{this.state.safex_view_sec}</p>
+                            <button className="button-shine" onClick={this.saveSafexKeys}>I have backed up my Safex Key Information</button>
+                            <button className="button-shine" onClick={this.startOver}>Start over</button>
+                        </div>
+                    :
+                        <div>
+                            <button className="button-shine new-wallet-btn" onClick={this.createSafexKey}>create new key</button>
 
-                        <button onClick={this.saveSafexKeys}>I have backed up my Safex Key Information</button>
-                        <button>start over</button>
-                    </div>
-                    : <div>
-                        <button onClick={this.createSafexKey}>create new key (green)</button>
+                            <form onSubmit={this.selectKey}>
+                                <select name="address_selection">
+                                    {options}
+                                </select>
+                                <button className="button-shine">Set Selected Key</button>
+                            </form>
 
-                        <form onSubmit={this.selectKey}>
+                            <form onSubmit={this.setYourKeys}>
+                                <input name="safex_address" placeholder="Safex address" />
+                                <input name="spend_key"     placeholder="Secret spend key" />
+                                <input name="view_key"      placeholder="Secret view key" />
 
-                            <select name="address_selection">
-                                {options}
-                            </select>
-                            <button>Set Selected Key</button>
+                                <button className="button-shine">Set your key</button>
+                            </form>
+                            <button className="button-shine" onClick={this.goBack}>Go Back</button>
+                        </div>
+                }
 
-                        </form>
-
-                        <form onSubmit={this.setYourKeys}>
-                            <input
-                                value=""
-                                name="safex_address"/>
-                            <input value=""
-                                   name="spend_key"/>
-                            <input value=""
-                                   name="view_key"/>
-
-                            <button>set your key</button>
-                        </form>
-                    </div>}
+                <MigrationAlert
+                    migrationAlert={this.state.migration_alert}
+                    migrationAlertText={this.state.migration_alert_text}
+                    closeMigrationAlert={this.setCloseMigrationAlert}
+                />
             </div>
-
         )
     }
 }

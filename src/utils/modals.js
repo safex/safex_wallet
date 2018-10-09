@@ -445,6 +445,25 @@ function openExportEncryptedWalletPopup(target) {
     });
 }
 
+/**
+ * Open Migration Alert Popup
+ */
+function openMigrationAlert(target, alert) {
+    target.setState({
+        migration_alert: true,
+        migration_alert_text: alert,
+    });
+}
+
+/**
+ * Close Migration Alert Popup
+ */
+function closeMigrationAlert(target) {
+    target.setState({
+        migration_alert: false,
+    });
+}
+
 module.exports = {
     openDividendModal,
     closeDividendModal,
@@ -470,5 +489,7 @@ module.exports = {
     closeSendReceiveModal,
     closeSendReceivePopup,
     openExportUnencryptedWalletPopup,
-    openExportEncryptedWalletPopup
+    openExportEncryptedWalletPopup,
+    openMigrationAlert,
+    closeMigrationAlert
 };

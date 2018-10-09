@@ -9,6 +9,8 @@ import {
     getFee
 } from '../../utils/migration';
 
+import {openMigrationAlert, closeMigrationAlert} from '../../utils/modals';
+import MigrationAlert from "../partials/MigrationAlert";
 
 //Burn Safe Exchange Coins
 export default class Migrate5 extends React.Component {
@@ -26,13 +28,18 @@ export default class Migrate5 extends React.Component {
             btc_price: 0,
             status_text: "",
             txn_fee: 0,
+            migration_alert: false,
+            migration_alert_text: '',
+            migration_complete: false,
         };
 
         this.refresh = this.refresh.bind(this);
         this.burnSafex = this.burnSafex.bind(this);
         this.validateAmount = this.validateAmount.bind(this);
+        this.goBack = this.goBack.bind(this);
+        this.setOpenMigrationAlert = this.setOpenMigrationAlert.bind(this);
+        this.setCloseMigrationAlert = this.setCloseMigrationAlert.bind(this);
     }
-
 
     componentDidMount() {
         this.setState({
@@ -43,9 +50,7 @@ export default class Migrate5 extends React.Component {
         this.getBalances(this.props.data.address);
         this.getTxnFee();
         this.setState({loading: false});
-
     }
-
 
     getTxnFee() {
         //public spend key is first half
@@ -124,7 +129,10 @@ export default class Migrate5 extends React.Component {
                         );
                         return rawtx;
                     }).then(rawtx => broadcastTransaction(rawtx))
-                    .then(() => this.setState({loading: false}))
+                    .then(() => this.setState({
+                        loading: false,
+                        migration_complete: true,
+                    }))
                     .catch(err => alert("error broadcasting transaction " + err));
             })
             .catch(err => alert("error getting UTXOs " + err));
@@ -132,29 +140,51 @@ export default class Migrate5 extends React.Component {
 
     validateAmount(e) {
         if (parseInt(e.target.value) > this.state.safex_bal) {
-            alert("not enough safex balance for that transaction, max is " + this.state.safex_bal);
+            console.log("Not enough safex balance for that transaction, max is " + this.state.safex_bal);
+            this.setOpenMigrationAlert('Not enough safex balance for that transaction, max is');
             e.target.value = this.state.safex_bal;
         }
     }
 
-    //create safex blockchain key set
+    goBack() {
+        this.props.setMigrationProgress(3);
+    }
 
+    setOpenMigrationAlert(message) {
+        openMigrationAlert(this, message);
+    }
+
+    setCloseMigrationAlert() {
+        closeMigrationAlert(this);
+    }
+
+    //create safex blockchain key set
     render() {
         return (
             <div>
-                <p>Final Step</p>
+                {
+                    this.state.migration_complete
+                    ?
+                        <p className="green-text">Migration of your tokens has started. This process may take a while, please be patient while migration transaction is being processed.</p>
+                    :
+                        <div>
+                            <p>Final Step</p>
+                            <p><span>You will need</span> {this.state.txn_fee} btc </p>
 
-                <p>Setting your Safex Address for Migration requires two steps. In this step we will set
-                    the First Half of the Safex Address This will require a bitcoin fee.
-                    The next step will also require a bitcoin fee.</p>
-                <p>yo</p>
-                <form onSubmit={this.burnSafex}>
-                    <p>You will need {this.state.txn_fee} btc </p>
+                            <form onSubmit={this.burnSafex}>
+                                <input onChange={this.validateAmount} name="amount" placeholder="Amount"/>
+                                <button className="button-shine">send</button>
+                            </form>
+                            <button className="button-shine" onClick={this.goBack}>Go Back</button>
+                            <p>the burn address: {BURN_ADDRESS} </p>
 
-                    <input onChange={this.validateAmount} name="amount"/>
-                    <button>send</button>
-                    <p>the burn address: {BURN_ADDRESS} </p>
-                </form>
+                            <MigrationAlert
+                                migrationAlert={this.state.migration_alert}
+                                migrationAlertText={this.state.migration_alert_text}
+                                closeMigrationAlert={this.setCloseMigrationAlert}
+                            />
+                        </div>
+                }
             </div>
         )
     }

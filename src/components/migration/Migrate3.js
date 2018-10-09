@@ -2,7 +2,6 @@ import React from 'react';
 
 import {get_utxos, broadcastTransaction, setSafexMigrationAddress, getFee, BURN_ADDRESS} from '../../utils/migration';
 
-
 //Set First Half of the Safex Address
 export default class Migrate3 extends React.Component {
     constructor(props) {
@@ -22,11 +21,10 @@ export default class Migrate3 extends React.Component {
             txn_fee: 0,
         };
 
-        this.refresh = this.refresh.bind(this);
         this.setSafexAddress = this.setSafexAddress.bind(this);
         this.getTxnFee = this.getTxnFee.bind(this);
+        this.goBack = this.goBack.bind(this);
     }
-
 
     componentDidMount() {
         this.setState({
@@ -94,7 +92,7 @@ export default class Migrate3 extends React.Component {
                     }).catch(err => {
                     console.log(err)
                 })
-                    .catch(err => console.log(err));
+                .catch(err => console.log(err));
             })
             .catch(err => console.log(err));
     }
@@ -128,25 +126,29 @@ export default class Migrate3 extends React.Component {
                     .catch(err => alert("error broadcasting transaction " + err));
             })
             .catch(err => alert("error getting UTXOs " + err));
-
-
     }
 
+    goBack() {
+        this.props.setMigrationProgress(1);
+    }
 
-//take firsthalf and send transaction
-
+    //take firsthalf and send transaction
     render() {
         return (
             <div>
                 <p>Step 3/4</p>
 
-                <p>Setting your Safex Address for Migration requires two steps. In this step we will set
-                    the First Half of the Safex Address This will require a bitcoin fee.
-                    The next step will also require a bitcoin fee.</p>
-                <p>You will need {this.state.txn_fee} btc </p>
+                <p>
+                    Setting your Safex Address for Migration requires two steps. In this step we will set
+                    the First Half of the Safex Address. This will require a bitcoin fee.
+                    The next step will also require a bitcoin fee.
+                </p>
 
-                <p>Your bitcoin balance {this.state.btc_bal}</p>
-                <button onClick={this.setSafexAddress}>Set the first half</button>
+                <p><span>You will need</span> {this.state.txn_fee} btc </p>
+                <p><span>Your btc balance</span> {this.state.btc_bal} btc</p>
+
+                <button className="button-shine" onClick={this.goBack}>Go Back</button>
+                <button className="button-shine" onClick={this.setSafexAddress}>Set the first half</button>
             </div>
         )
     }

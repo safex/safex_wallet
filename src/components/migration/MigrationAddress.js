@@ -6,19 +6,17 @@ import Migrate3 from './Migrate3';
 import Migrate4 from './Migrate4';
 import Migrate5 from './Migrate5';
 
-import {
-    getFee
-} from '../../utils/migration';
+import {getFee} from '../../utils/migration';
 import {encrypt} from "../../utils/utils";
 
 const fs = window.require('fs');
-
 
 export default class MigrationAddress extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             loading: true,
+            label: "",
             address: "",
             wif: "",
             safex_bal: 0,
@@ -37,10 +35,10 @@ export default class MigrationAddress extends React.Component {
         this.setMigrationProgress = this.setMigrationProgress.bind(this);
     }
 
-
     componentDidMount() {
         getFee().catch(e => alert("network error " + e));
         this.setState({
+            label: this.props.data.label,
             address: this.props.data.address,
             wif: this.props.data.wif,
             migration_progress: this.props.data.migration_progress,
@@ -108,12 +106,12 @@ export default class MigrationAddress extends React.Component {
         this.getBalances(this.state.address);
     }
 
-
     setMigrationVisible() {
         if (this.state.show_migration == true) {
             this.setState({show_migration: false});
         } else {
             this.setState({show_migration: true});
+            this.setMigrationProgress(0);
         }
     }
 
@@ -224,50 +222,22 @@ export default class MigrationAddress extends React.Component {
                 break;
         }
 
-
         return (
-            <div>
+            <div className="address-wrap">
+                <p><span>Label</span>           {this.state.label}</p>
+                <p><span>Address</span>         {this.state.address}</p>
+                <p><span>Safex</span>           {this.state.safex_bal}</p>
+                <p><span>Pending safex</span>   {this.state.pending_safex_bal}</p>
+                <p><span>BTC</span>             {this.state.btc_bal}</p>
+                <p><span>Pending BTC</span>     {this.state.pending_btc_bal}</p>
 
-                {this.state.show_migration ? <div>{migration_shot}</div> : null}
-
-                address {this.state.address}
-                <br/>
-                safex {this.state.safex_bal}
-                <br/>
-                pending safex {this.state.pending_safex_bal}
-                <br/>
-                btc {this.state.btc_bal}
-                <br/>
-                pending btc {this.state.pending_btc_bal}
-                <br/>
-
-                <button onClick={() => {
-                    this.setMigrationProgress(0)
-                }}>show 1
-                </button>
-                <button onClick={() => {
-                    this.setMigrationProgress(1)
-                }}>show 2
-                </button>
-                <button onClick={() => {
-                    this.setMigrationProgress(2)
-                }}>show 3
-                </button>
-                <button onClick={() => {
-                    this.setMigrationProgress(3)
-                }}>show 4
-                </button>
-                <button onClick={() => {
-                    this.setMigrationProgress(4)
-                }}>show 5
-                </button>
-                <button onClick={this.setMigrationVisible}>
+                <button className="button-shine" onClick={this.setMigrationVisible}>
                     {
-                        this.state.show_migration ?
-                            "Hide Migration" : "Migrate"
-                    }</button>
+                        this.state.show_migration ? "Hide Migration" : "Migrate"
+                    }
+                </button>
 
-
+                {this.state.show_migration ? <div className="migration-step-wrap">{migration_shot}</div> : null}
             </div>
         )
     }

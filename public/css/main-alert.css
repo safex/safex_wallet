@@ -101,6 +101,7 @@
   margin: 15px 0 0;
 }
 .mainAlertPopup .close {
+  width: auto;
   position: absolute;
   right: 15px;
   top: 14px;

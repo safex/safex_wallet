@@ -2,7 +2,6 @@ import React from 'react';
 
 import {get_utxos, broadcastTransaction, setSafexMigrationAddress, BURN_ADDRESS, getFee} from '../../utils/migration';
 
-
 //Set Second Half of the Safex Address
 export default class Migrate4 extends React.Component {
     constructor(props) {
@@ -23,11 +22,11 @@ export default class Migrate4 extends React.Component {
 
         this.refresh = this.refresh.bind(this);
         this.setSafexAddress = this.setSafexAddress.bind(this);
+        this.goBack = this.goBack.bind(this);
     }
 
-
     getTxnFee() {
-        console.log(this.state.safex_key)
+        console.log(this.state.safex_key);
         //public spend key is first half
         get_utxos(this.props.data.address)
             .then(utxos => {
@@ -74,7 +73,6 @@ export default class Migrate4 extends React.Component {
                 return resp
             }));
 
-
         Promise.all(promises).then(values => {
             this.setState({
                 btc_bal: (values[0] / 100000000).toFixed(8),
@@ -116,7 +114,7 @@ export default class Migrate4 extends React.Component {
 
                     }).then(rawtx => broadcastTransaction(rawtx))
                     .then(result => {
-                        this.props.setMigrationProgress(3);
+                        this.props.setMigrationProgress(4);
                         console.log(result);
                     })
                     .catch(err => alert("error broadcasting transaction " + err));
@@ -125,21 +123,27 @@ export default class Migrate4 extends React.Component {
 
     }
 
+    goBack() {
+        this.props.setMigrationProgress(2);
+    }
 
-//take firsthalf and send transaction
-
+    //take firsthalf and send transaction
     render() {
         return (
             <div>
                 <p>Step 3/4</p>
 
-                <p>Setting your Safex Address for Migration requires two steps. In this step we will set
-                    the First Half of the Safex Address This will require a bitcoin fee.
-                    The next step will also require a bitcoin fee.</p>
-                <p>You will need {this.state.txn_fee} btc </p>
+                <p>
+                    Setting your Safex Address for Migration requires two steps. In this step we will set
+                    the Second Half of the Safex Address. This will require a bitcoin fee.
+                    The next step will also require a bitcoin fee.
+                </p>
 
-                <p>Your bitcoin balance {this.state.btc_bal}</p>
-                <button onClick={this.setSafexAddress}>Set the second half</button>
+                <p><span>You will need</span> {this.state.txn_fee} btc </p>
+                <p><span>Your btc balance</span> {this.state.btc_bal} btc</p>
+
+                <button className="button-shine" onClick={this.goBack}>Go Back</button>
+                <button className="button-shine" onClick={this.setSafexAddress}>Set the second half</button>
             </div>
         )
     }

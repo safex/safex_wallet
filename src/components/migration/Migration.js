@@ -3,9 +3,7 @@ import React from 'react';
 import MigrationAddress from './MigrationAddress';
 import Navigation from '../partials/Navigation';
 
-
 export default class Migration extends React.Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -58,6 +56,7 @@ export default class Migration extends React.Component {
 
         var table = Object.keys(keys).map((key) => {
             var data = {};
+            data['label'] = keys[key].label;
             data['address'] = keys[key].public_key;
             data['wif'] = keys[key].private_key;
             data['migration_progress'] = 0;
@@ -74,17 +73,12 @@ export default class Migration extends React.Component {
 
         return (
             <div>
-                <Navigation
-                    wallet={this.wallet}
-                />
+                <Navigation wallet={this.wallet} />
 
                 <div className="container migration-wrap fadeIn">
                     {table}
 
-
-                    <p>
-                        <button className="button-shine" onClick={this.goNext}> To the Real Safex Wallet</button>
-                    </p>
+                    {/*<button className="button-shine" onClick={this.goNext}> To the Real Safex Wallet</button>*/}
                 </div>
             </div>
         );
