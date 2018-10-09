@@ -298,22 +298,27 @@ export default class Migrate2 extends React.Component {
                     this.state.create_address
                     ?
                         <div>
-                            <p>These are the components</p>
-                            <p>Wallet address</p>
+                            <p className="red-text">
+                                The following wallet information is to control your coins, do not share it. <br />
+                                Abusing these informations can and will result in total loss of your Safex Tokens and Safex Cash.<br />
+                                Keep this information safe at all times!
+                            </p>
+                            <p>Wallet Address</p>
                             <p>{this.state.safex_address}</p>
-                            <p>Spend key</p>
+                            <p>Spend Key</p>
                             <p>public: {this.state.safex_spend_pub}</p>
                             <p>secret: {this.state.safex_spend_sec}</p>
                             <p>View key</p>
                             <p>public: {this.state.safex_view_pub}</p>
                             <p>secret: {this.state.safex_view_sec}</p>
 
-                            <button className="button-shine" onClick={this.saveSafexKeys}>I have backed up my Safex Key Information</button>
-                            <button className="button-shine" onClick={this.startOver}>Start over</button>
+                            <button className="button-shine green-btn" onClick={this.saveSafexKeys}>I have backed up my Safex Key Information</button>
+                            <button className="button-shine" onClick={this.createSafexKey}>Create new key</button>
+                            <button className="button-shine" onClick={this.startOver}>Go back</button>
                         </div>
                     :
                         <div>
-                            <button className="button-shine new-wallet-btn" onClick={this.createSafexKey}>create new key</button>
+                            <button className="button-shine green-btn" onClick={this.createSafexKey}>create new key</button>
 
                             <form onSubmit={this.selectKey}>
                                 <select name="address_selection">
