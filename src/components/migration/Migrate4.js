@@ -1,6 +1,8 @@
 import React from 'react';
 
 import {get_utxos, broadcastTransaction, setSafexMigrationAddress, BURN_ADDRESS, getFee} from '../../utils/migration';
+import {openMigrationAlert, closeMigrationAlert} from '../../utils/modals';
+import MigrationAlert from "../partials/MigrationAlert";
 
 //Set Second Half of the Safex Address
 export default class Migrate4 extends React.Component {
@@ -18,11 +20,15 @@ export default class Migrate4 extends React.Component {
             btc_price: 0,
             status_text: "",
             safex_key: {},
+            migration_alert: false,
+            migration_alert_text: '',
         };
 
         this.refresh = this.refresh.bind(this);
         this.setSafexAddress = this.setSafexAddress.bind(this);
         this.goBack = this.goBack.bind(this);
+        this.setOpenMigrationAlert = this.setOpenMigrationAlert.bind(this);
+        this.setCloseMigrationAlert = this.setCloseMigrationAlert.bind(this);
     }
 
     getTxnFee() {
@@ -43,12 +49,18 @@ export default class Migrate4 extends React.Component {
                         );
                         this.setState({txn_fee: rawtx.fee / 100000000});
                     }).catch(err => {
-                    console.log(err)
-                })
-                    .catch(err => console.log(err));
+                        console.log("error getting fee " + err);
+                        this.setOpenMigrationAlert("error getting fee " + err);
+                }).catch(err => {
+                    console.log("error broadcasting transaction " + err);
+                    this.setOpenMigrationAlert("error broadcasting transaction " + err);
+                });
                 /**/
             })
-            .catch(err => console.log(err));
+            .catch(err => {
+                console.log("error getting UTXOs " + err);
+                this.setOpenMigrationAlert("error getting UTXOs " + err);
+            });
     }
 
     componentDidMount() {
@@ -117,14 +129,27 @@ export default class Migrate4 extends React.Component {
                         this.props.setMigrationProgress(4);
                         console.log(result);
                     })
-                    .catch(err => alert("error broadcasting transaction " + err));
+                    .catch(err => {
+                        console.log("error broadcasting transaction " + err);
+                        this.setOpenMigrationAlert("error broadcasting transaction " + err);
+                    });
             })
-            .catch(err => alert("error getting UTXOs " + err));
-
+            .catch(err => {
+                console.log("error getting UTXOs " + err);
+                this.setOpenMigrationAlert("error getting UTXOs " + err);
+            });
     }
 
     goBack() {
         this.props.setMigrationProgress(2);
+    }
+
+    setOpenMigrationAlert(message) {
+        openMigrationAlert(this, message);
+    }
+
+    setCloseMigrationAlert() {
+        closeMigrationAlert(this);
     }
 
     //take firsthalf and send transaction
@@ -144,6 +169,12 @@ export default class Migrate4 extends React.Component {
 
                 <button className="button-shine" onClick={this.goBack}>Go Back</button>
                 <button className="button-shine" onClick={this.setSafexAddress}>Set the second half</button>
+
+                <MigrationAlert
+                    migrationAlert={this.state.migration_alert}
+                    migrationAlertText={this.state.migration_alert_text}
+                    closeMigrationAlert={this.setCloseMigrationAlert}
+                />
             </div>
         )
     }

@@ -2,6 +2,7 @@ import React from 'react';
 
 import MigrationAddress from './MigrationAddress';
 import Navigation from '../partials/Navigation';
+import Footer from "../partials/Footer";
 
 export default class Migration extends React.Component {
     constructor(props) {

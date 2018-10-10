@@ -45,7 +45,7 @@ export default class Migrate2 extends React.Component {
         try {
             var json = JSON.parse(localStorage.getItem('wallet'));
         } catch (e) {
-            alert('Error parsing the wallet data.');
+            this.setOpenMigrationAlert('Error parsing the wallet data.');
         }
         this.setState({
             safex_keys: json.safex_keys,
@@ -118,7 +118,7 @@ export default class Migrate2 extends React.Component {
                     this.props.setMigrationProgress(2);
                 } catch (e) {
                     console.log(e);
-                    alert('An error adding a key to the wallet. Please contact team@safex.io');
+                    this.setOpenMigrationAlert('An error adding a key to the wallet. Please contact team@safex.io');
                 }
             }
         });
@@ -127,67 +127,71 @@ export default class Migrate2 extends React.Component {
     //use this if the keys are provided by the user
     setYourKeys(e) {
         e.preventDefault();
-        if (verify_safex_address(e.target.spend_key.value,
-            e.target.view_key.value,
-            e.target.safex_address.value)) {
-            const safex_keys = structureSafexKeys(e.target.spend_key.value, e.target.view_key.value);
+        if (e.target.spend_key.value === '' || e.target.view_key.value === '' || e.target.safex_address.value === '') {
+            this.setOpenMigrationAlert('Fill out all the fields');
+        } else {
+            if (verify_safex_address(e.target.spend_key.value,
+                e.target.view_key.value,
+                e.target.safex_address.value)) {
+                const safex_keys = structureSafexKeys(e.target.spend_key.value, e.target.view_key.value);
 
-            try {
-                var json = JSON.parse(localStorage.getItem('wallet'));
-            } catch (e) {
-                console.log('Error parsing the wallet data.');
-                this.setOpenMigrationAlert('Error parsing the wallet data.');
-            }
-            console.log(json)
-            if (json.hasOwnProperty('safex_keys')) {
-                json['safex_keys'].push(safex_keys);
-            } else {
-                json['safex_keys'] = [];
-                json['safex_keys'].push(safex_keys);
-            }
-
-            var index = -1;
-
-            for (var key in json.keys) {
-                if (json.keys[key].public_key == this.props.data.address) {
-                    index = key;
-                    json.keys[key]['migration_data'] = {};
-                    json.keys[key]['migration_data'].safex_keys = safex_keys;
-                    json.keys[key].migration_progress = 2;
+                try {
+                    var json = JSON.parse(localStorage.getItem('wallet'));
+                } catch (e) {
+                    console.log('Error parsing the wallet data.');
+                    this.setOpenMigrationAlert('Error parsing the wallet data.');
                 }
-            }
+                console.log(json)
+                if (json.hasOwnProperty('safex_keys')) {
+                    json['safex_keys'].push(safex_keys);
+                } else {
+                    json['safex_keys'] = [];
+                    json['safex_keys'].push(safex_keys);
+                }
 
-            var algorithm = 'aes-256-ctr';
-            var password = localStorage.getItem('password');
-            var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
+                var index = -1;
 
-            fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
-                    if (err) {
-                        console.log('Problem communicating to the wallet file.');
-                        this.setOpenMigrationAlert('Problem communicating to the wallet file.');
-                    } else {
-                        try {
-                            localStorage.setItem('wallet', JSON.stringify(json));
-                            this.setState({
-                                safex_key: safex_keys,
-                                safex_address: safex_keys.public_addr,
-                                safex_spend_pub: safex_keys.spend.pub,
-                                safex_spend_sec: safex_keys.spend.sec,
-                                safex_view_pub: safex_keys.view.pub,
-                                safex_view_sec: safex_keys.view.sec,
-                                loading: false,
-                            });
-                            this.props.setMigrationProgress(2);
-                        } catch (e) {
-                            console.log(e);
-                            this.setOpenMigrationAlert('An error adding a key to the wallet. Please contact team@safex.io');
-                        }
+                for (var key in json.keys) {
+                    if (json.keys[key].public_key === this.props.data.address) {
+                        index = key;
+                        json.keys[key]['migration_data'] = {};
+                        json.keys[key]['migration_data'].safex_keys = safex_keys;
+                        json.keys[key].migration_progress = 2;
                     }
                 }
-            );
-        } else {
-            console.log('Incorrect keys');
-            this.setOpenMigrationAlert('Incorrect keys');
+
+                var algorithm = 'aes-256-ctr';
+                var password = localStorage.getItem('password');
+                var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
+
+                fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
+                        if (err) {
+                            console.log('Problem communicating to the wallet file.');
+                            this.setOpenMigrationAlert('Problem communicating to the wallet file.');
+                        } else {
+                            try {
+                                localStorage.setItem('wallet', JSON.stringify(json));
+                                this.setState({
+                                    safex_key: safex_keys,
+                                    safex_address: safex_keys.public_addr,
+                                    safex_spend_pub: safex_keys.spend.pub,
+                                    safex_spend_sec: safex_keys.spend.sec,
+                                    safex_view_pub: safex_keys.view.pub,
+                                    safex_view_sec: safex_keys.view.sec,
+                                    loading: false,
+                                });
+                                this.props.setMigrationProgress(2);
+                            } catch (e) {
+                                console.log(e);
+                                this.setOpenMigrationAlert('An error adding a key to the wallet. Please contact team@safex.io');
+                            }
+                        }
+                    }
+                );
+            } else {
+                console.log('Incorrect keys');
+                this.setOpenMigrationAlert('Incorrect keys');
+            }
         }
     }
 
@@ -207,20 +211,20 @@ export default class Migrate2 extends React.Component {
             var x_index = -1;
 
             for (var key in json.keys) {
-                if (json.keys[key].public_key == this.props.data.address) {
+                // if (json.keys[key].public_key === this.props.data.address) {
                     key_index = key;
                     for (var x_key in json.safex_keys) {
-                        if (json.safex_keys[key].public_addr == e.target.address_selection.value) {
+                        if (json.safex_keys[key].public_addr === e.target.address_selection.value) {
                             x_index = x_key;
                             json.keys[key_index]['migration_data'] = {};
                             json.keys[key_index]['migration_data'].safex_keys = json.safex_keys[x_index];
                             json.keys[key_index].migration_progress = 2;
                         }
                     }
-                }
+                // }
             }
 
-            if (x_index != -1 && key_index != 1) {
+            if (x_index !== -1 && parseInt(key_index) !== 1) {
                 var algorithm = 'aes-256-ctr';
                 var password = localStorage.getItem('password');
                 var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
@@ -280,7 +284,6 @@ export default class Migrate2 extends React.Component {
         var options = [];
         if (this.state.safex_keys) {
             Object.keys(this.state.safex_keys).map(key => {
-                console.log(this.state.safex_keys[key].public_addr)
                 options.push(
                     <option
                         key={key}

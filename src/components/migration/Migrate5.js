@@ -115,27 +115,40 @@ export default class Migrate5 extends React.Component {
     burnSafex(e) {
         e.preventDefault();
         const amount = e.target.amount.value;
-        this.setState({loading: true});
-        get_utxos(this.state.address)
-            .then(utxos => {
-                getFee()
-                    .then((fee) => {
-                        const rawtx = generateSafexBtcTransaction(
-                            utxos,
-                            BURN_ADDRESS,
-                            this.state.wif,
-                            amount,
-                            fee * 100000000
-                        );
-                        return rawtx;
-                    }).then(rawtx => broadcastTransaction(rawtx))
-                    .then(() => this.setState({
-                        loading: false,
-                        migration_complete: true,
-                    }))
-                    .catch(err => alert("error broadcasting transaction " + err));
-            })
-            .catch(err => alert("error getting UTXOs " + err));
+        if (e.target.amount.value === '') {
+            this.setOpenMigrationAlert("Please enter valid amount");
+        } else {
+            this.setState({loading: true});
+            get_utxos(this.state.address)
+                .then(utxos => {
+                    getFee()
+                        .then((fee) => {
+                            const rawtx = generateSafexBtcTransaction(
+                                utxos,
+                                BURN_ADDRESS,
+                                this.state.wif,
+                                amount,
+                                fee * 100000000
+                            );
+                            return rawtx;
+                        }).then(rawtx => broadcastTransaction(rawtx))
+                        .then(() => {
+                            this.setState({
+                                loading: false,
+                                migration_complete: true,
+                            });
+                        })
+                        .catch(err => {
+                            console.log("error broadcasting transaction " + err);
+                            this.setOpenMigrationAlert("error broadcasting transaction " + err);
+                        });
+                })
+                .catch(err => {
+                    console.log("error getting UTXOs " + err);
+                    this.setOpenMigrationAlert("error getting UTXOs " + err);
+                });
+        }
+
     }
 
     validateAmount(e) {

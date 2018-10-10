@@ -1608,8 +1608,8 @@ export default class Wallet extends React.Component {
                         send_total: parseFloat(parseFloat(0.00001) + parseFloat(rawtx.fee / 100000000)).toFixed(8)
                     });
                     console.log(send_total)
-                }).catch(err => console.log(err))
-            .catch(err => console.log(err));
+                }).catch(err => console.log("generate btc transaction error" + err))
+            .catch(err => console.log("error getting UTXOs " + err));
         }
     }
 
@@ -2565,6 +2565,7 @@ export default class Wallet extends React.Component {
                 </div>
 
                 <Footer
+                    activeHomePage={this.state.activeHomePage}
                     safexSync={this.state.safex_sync}
                     btcSync={this.state.btc_sync}
                     statusText={this.state.status_text}

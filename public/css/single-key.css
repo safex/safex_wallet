@@ -438,6 +438,9 @@
   width: 120px;
   padding: 10px;
   padding-top: 0;
+  -webkit-transition: all 0.1s ease-out;
+  -moz-transition: all 0.1s ease-out;
+  transition: all 0.1s ease-out;
 }
 .form-send input {
   width: 130px;

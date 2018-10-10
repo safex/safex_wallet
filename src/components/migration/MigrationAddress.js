@@ -11,6 +11,9 @@ import {encrypt} from "../../utils/utils";
 
 const fs = window.require('fs');
 
+import {openMigrationAlert, closeMigrationAlert} from '../../utils/modals';
+import MigrationAlert from "../partials/MigrationAlert";
+
 export default class MigrationAddress extends React.Component {
     constructor(props) {
         super(props);
@@ -28,11 +31,15 @@ export default class MigrationAddress extends React.Component {
             status_text: "",
             migration_progress: 0,
             show_migration: false,
-            safex_key: {}
+            safex_key: {},
+            migration_alert: false,
+            migration_alert_text: '',
         };
         this.refresh = this.refresh.bind(this);
         this.setMigrationVisible = this.setMigrationVisible.bind(this);
         this.setMigrationProgress = this.setMigrationProgress.bind(this);
+        this.setOpenMigrationAlert = this.setOpenMigrationAlert.bind(this);
+        this.setCloseMigrationAlert = this.setCloseMigrationAlert.bind(this);
     }
 
     componentDidMount() {
@@ -162,6 +169,14 @@ export default class MigrationAddress extends React.Component {
         }
     }
 
+    setOpenMigrationAlert(message) {
+        openMigrationAlert(this, message);
+    }
+
+    setCloseMigrationAlert() {
+        closeMigrationAlert(this);
+    }
+
     render() {
         let {migration_progress, address, wif, safex_key} = this.state;
         let migration_shot;
@@ -238,6 +253,12 @@ export default class MigrationAddress extends React.Component {
                 </button>
 
                 {this.state.show_migration ? <div className="migration-step-wrap">{migration_shot}</div> : null}
+
+                <MigrationAlert
+                    migrationAlert={this.state.migration_alert}
+                    migrationAlertText={this.state.migration_alert_text}
+                    closeMigrationAlert={this.setCloseMigrationAlert}
+                />
             </div>
         )
     }
