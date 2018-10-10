@@ -62,7 +62,6 @@ export default class Migrate2 extends React.Component {
         this.setState({create_address: true, loading: true});
 
         const safex_keys = createSafexAddress();
-        console.log(safex_keys);
 
         this.setState({
             safex_key: safex_keys,
@@ -83,7 +82,7 @@ export default class Migrate2 extends React.Component {
         } catch (e) {
             alert('Error parsing the wallet data.');
         }
-        console.log(json)
+
         if (json.hasOwnProperty('safex_keys')) {
             json['safex_keys'].push(this.state.safex_key);
         } else {
@@ -292,7 +291,6 @@ export default class Migrate2 extends React.Component {
                     </option>)
             });
         }
-        console.log(options)
 
         return (
             <div>

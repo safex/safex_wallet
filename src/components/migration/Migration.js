@@ -12,9 +12,42 @@ export default class Migration extends React.Component {
             keys: {},
         };
 
+        this.getPrices = this.getPrices.bind(this);
         this.goNext = this.goNext.bind(this);
         this.reloadWallet = this.reloadWallet.bind(this);
         this.wallet = this.wallet.bind(this);
+    }
+
+    getPrices() {
+        fetch('https://safex.io/api/price/', {method: "POST"})
+            .then(resp => resp.json())
+            .then((resp) => {
+                try {
+                    var safex = 0.02;
+                    if (resp.price_usd !== null) {
+                        safex = parseFloat(resp.price_usd).toFixed(8);
+                        this.setState({safex_price: safex});
+                    }
+                    localStorage.setItem('safex_price', safex);
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+
+        fetch('https://api.coinmarketcap.com/v1/ticker/bitcoin/', {method: "GET"})
+            .then(resp => resp.json())
+            .then((resp) => {
+                try {
+                    var btc = 0;
+                    if (resp[0].symbol === 'BTC') {
+                        btc = parseFloat(resp[0].price_usd).toFixed(2);
+                        localStorage.setItem('btc_price', btc);
+                        this.setState({btc_price: btc});
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            });
     }
 
     componentDidMount() {
@@ -28,6 +61,7 @@ export default class Migration extends React.Component {
             });
             this.context.router.push('/');
         }
+        this.getPrices();
     }
 
     wallet() {
@@ -71,10 +105,15 @@ export default class Migration extends React.Component {
                 key={key}
                 data={data}/>;
         });
+        console.log(this.state.safex_price, this.state.btc_price)
 
         return (
             <div>
-                <Navigation wallet={this.wallet} />
+                <Navigation
+                    safexPrice={this.state.safex_price}
+                    btcPrice={this.state.btc_price}
+                    wallet={this.wallet}
+                />
 
                 <div className="container migration-wrap fadeIn">
                     {table}

@@ -88,18 +88,12 @@ export default class Navigation extends React.Component {
                         }
                     </div>
                 </div>
-                {
-                    this.props.activeHomePage
-                    ?
-                        <div className="collapse navbar-collapse" id="navbar-collapse">
-                            <ul className="nav navbar-nav navbar-right coin-amounts">
-                                <li><span className="currency">SAFEX</span> <span className="amount">${this.props.safexPrice}</span></li>
-                                <li><span className="currency">BTC</span> <span className="amount">${this.props.btcPrice}</span></li>
-                            </ul>
-                        </div>
-                    :
-                        <div></div>
-                }
+                <div className="collapse navbar-collapse" id="navbar-collapse">
+                    <ul className="nav navbar-nav navbar-right coin-amounts">
+                        <li><span className="currency">SAFEX</span> <span className="amount">${this.props.safexPrice}</span></li>
+                        <li><span className="currency">BTC</span> <span className="amount">${this.props.btcPrice}</span></li>
+                    </ul>
+                </div>
             </div>
         </nav>);
     }
