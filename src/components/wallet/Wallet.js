@@ -610,7 +610,7 @@ export default class Wallet extends React.Component {
                 var decoded_txn = bitcoin.Transaction.fromHex(resp);
                 var txn = bitcoin.TransactionBuilder.fromTransaction(decoded_txn);
                 checks.forEach(function(item) {
-                    txn.tx.outs.some(out => {
+                    txn.__tx.outs.some(out => {
                         try {
                             var pubkey = bitcoin.address.fromOutputScript(out.script, bitcoin.networks.livenet);
                         } catch (e) {
