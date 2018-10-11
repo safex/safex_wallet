@@ -157,7 +157,7 @@ function setSafexMigrationAddress(utxos, destination, wif, payload, fee) {
     });
     fee_adj = inputs_num * 180;
 
-    fee_adj += 180;
+    fee_adj += 230;
 
     fee = Math.trunc(fee * (fee_adj / 1000));
     var inputs_num = 0;

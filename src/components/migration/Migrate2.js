@@ -335,7 +335,6 @@ export default class Migrate2 extends React.Component {
 
                                 <button className="button-shine">Set your key</button>
                             </form>
-                            <button className="button-shine" onClick={this.goBack}>Go Back</button>
                         </div>
                 }
 

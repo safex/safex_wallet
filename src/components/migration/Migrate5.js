@@ -188,7 +188,6 @@ export default class Migrate5 extends React.Component {
                                 <input onChange={this.validateAmount} name="amount" placeholder="Amount"/>
                                 <button className="button-shine">send</button>
                             </form>
-                            <button className="button-shine" onClick={this.goBack}>Go Back</button>
                             <p>the burn address: {BURN_ADDRESS} </p>
 
                             <MigrationAlert

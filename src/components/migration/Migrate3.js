@@ -173,7 +173,6 @@ export default class Migrate3 extends React.Component {
                 <p><span>You will need</span> {this.state.txn_fee} btc </p>
                 <p><span>Your btc balance</span> {this.state.btc_bal} btc</p>
 
-                <button className="button-shine" onClick={this.goBack}>Go Back</button>
                 <button className="button-shine" onClick={this.setSafexAddress}>Set the first half</button>
 
                 <MigrationAlert
