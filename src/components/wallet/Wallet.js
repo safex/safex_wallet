@@ -2471,7 +2471,7 @@ export default class Wallet extends React.Component {
                     <h4>The following key is to control your coins, do not share it. Keep your private key for yourself
                         only!</h4>
                     <p>{this.state.private_key_open.display_private_key}</p>
-                    <button onClick={this.setClosePrivateModal}>
+                    <button className="button-shine" onClick={this.setClosePrivateModal}>
                         Ok
                     </button>
                 </div>
