@@ -2388,18 +2388,25 @@ export default class Wallet extends React.Component {
                                     this.state.send_coin === 'safex'
                                     ?
                                         <input className="total-input" type="number" name="total" readOnly
-                                               value={this.state.fee_in_$ ? (this.state.send_total * this.state.safex_price).toFixed(8) : this.state.send_total}/>
+                                            value={this.state.fee_in_$ ? (this.state.send_total * this.state.safex_price).toFixed(8) : this.state.send_total}/>
                                     :
                                         <input className="total-input" type="number" name="total" readOnly
-                                               value={this.state.fee_in_$ ? (this.state.send_total * this.state.btc_price).toFixed(8) : this.state.send_total}/>
+                                            value={this.state.fee_in_$ ? (this.state.send_total * this.state.btc_price).toFixed(8) : this.state.send_total}/>
                                 }
                             </div>
                             <div className="form-group">
-                                <button type="button" className="btc-convert-btn button-shine"
-                                    onClick={this.convertBtcToDollars}
-                                    disabled={this.state.send_overflow_active && this.state.transaction_sent === false ? 'disabled' : ''}>
-                                    {this.state.fee_in_$ ? '$ to btc' : 'Btc to $'}
-                                </button>
+                                {
+                                    this.state.send_coin === 'safex'
+                                    ?
+                                        <span></span>
+                                    :
+                                        <button type="button" className="btc-convert-btn button-shine"
+                                                onClick={this.convertBtcToDollars}
+                                                disabled={this.state.send_overflow_active && this.state.transaction_sent === false ? 'disabled' : ''}>
+                                            {this.state.fee_in_$ ? '$ to btc' : 'Btc to $'}
+                                        </button>
+                                }
+
                                 {
                                     this.state.send_overflow_active && this.state.transaction_sent === false
                                     ?
