@@ -75,7 +75,6 @@ export default class Migrate3 extends React.Component {
     }
 
     getTxnFee() {
-        console.log("heree " + this.state.safex_key)
         //public spend key is first half
         get_utxos(this.props.data.address)
             .then(utxos => {
@@ -110,7 +109,6 @@ export default class Migrate3 extends React.Component {
             });
     }
 
-
     setSafexAddress(e) {
         e.preventDefault();
         console.log(this.state.safex_key)
@@ -130,6 +128,7 @@ export default class Migrate3 extends React.Component {
                         );
 
                         return rawtx;
+                        console.log(rawtx)
 
                     }).then(rawtx => broadcastTransaction(rawtx))
                     .then(result => {

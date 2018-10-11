@@ -794,7 +794,7 @@ export default class Wallet extends React.Component {
                 }
             }
 
-            //if safex is not selected then it must be Bitcoin
+        //if safex is not selected then it must be Bitcoin
         } else if (this.state.send_coin === 'btc') {
             if (this.state.send_fee < 0.00001) {
                 if (this.sidebar_open) {
@@ -1308,7 +1308,7 @@ export default class Wallet extends React.Component {
                         receive_open: false
                     },
                     send_private_key: this.state.keys[key].private_key,
-                    send_public_key: ''
+                    send_public_key: this.state.keys[key].public_key,
                 });
                 if (this.state.send_overflow_active) {
                     this.setCloseCoinModal();
@@ -1326,7 +1326,7 @@ export default class Wallet extends React.Component {
                         receive_open: false
                     },
                     send_private_key: this.state.keys[key].private_key,
-                    send_public_key: ''
+                    send_public_key: this.state.keys[key].public_key,
                 });
             }
         }
@@ -1570,8 +1570,6 @@ export default class Wallet extends React.Component {
         var send_amount = this.state.send_amount;
         var send_total = parseFloat(send_amount);
 
-
-
         //if this.state.average_fee > 0 send_fee == fast. Set active fee selection fastest.
         if (coin === 'safex') {
             get_utxos(this.state.send_public_key)
@@ -1589,8 +1587,14 @@ export default class Wallet extends React.Component {
                         send_fee: parseFloat(rawtx.fee / 100000000).toFixed(8),
                         active_fee: 'fast'
                     });
-                }).catch(err => console.log(err))
-            .catch(err => console.log(err));
+                }).catch(err => {
+                    console.log("generate safex transaction error" + err);
+                    this.openMainAlertPopup("generate safex transaction error" + err);
+                })
+            .catch(err => {
+                console.log("error getting UTXOs " + err);
+                this.openMainAlertPopup("error getting UTXOs " + err);
+            });
         } else {
             get_utxos(this.state.send_public_key)
                 .then(utxos => {
@@ -1607,9 +1611,14 @@ export default class Wallet extends React.Component {
                         active_fee: 'fast',
                         send_total: parseFloat(parseFloat(0.00001) + parseFloat(rawtx.fee / 100000000)).toFixed(8)
                     });
-                    console.log(send_total)
-                }).catch(err => console.log("generate btc transaction error" + err))
-            .catch(err => console.log("error getting UTXOs " + err));
+                }).catch(err => {
+                    console.log("generate btc transaction error" + err);
+                    this.openMainAlertPopup("generate btc transaction error" + err);
+                })
+            .catch(err => {
+                console.log("error getting UTXOs " + err);
+                this.openMainAlertPopup("error getting UTXOs " + err);
+            });
         }
     }
 

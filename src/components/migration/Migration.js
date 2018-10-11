@@ -51,7 +51,6 @@ export default class Migration extends React.Component {
     }
 
     componentDidMount() {
-        console.log("rendering Migration component");
         try {
             const json = JSON.parse(localStorage.getItem('wallet'));
             this.setState({wallet: json, keys: json['keys']});
@@ -62,6 +61,7 @@ export default class Migration extends React.Component {
             this.context.router.push('/');
         }
         this.getPrices();
+        let setRefreshInterval = setInterval(this.reloadWallet, 600000);
     }
 
     wallet() {
@@ -79,6 +79,7 @@ export default class Migration extends React.Component {
             });
             this.context.router.push('/');
         }
+        this.getPrices();
     }
 
     goNext(e) {
@@ -105,7 +106,6 @@ export default class Migration extends React.Component {
                 key={key}
                 data={data}/>;
         });
-        console.log(this.state.safex_price, this.state.btc_price)
 
         return (
             <div>

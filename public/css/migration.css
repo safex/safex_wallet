@@ -2,6 +2,7 @@
 .safex-wrap {
   height: 570px;
   overflow: auto;
+  padding-top: 5px;
   padding-bottom: 15px;
   animation-duration: 1s;
   animation-delay: .8s;
@@ -46,6 +47,14 @@
   padding: 15px;
   border-radius: 7px;
   position: relative;
+  transition: all ease 0.2s;
+}
+.migration-wrap:hover .address-wrap {
+  opacity: .8;
+}
+.migration-wrap:hover .address-wrap:hover{
+  opacity: 1;
+  box-shadow: 0 0 7px 0 rgba(0, 199, 236, 0.5);
 }
 .address-wrap p,
 .safex-wrap p {

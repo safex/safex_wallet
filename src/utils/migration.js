@@ -120,11 +120,11 @@ function generateSafexBtcTransaction(utxos, destination, wif, amount, fee) {
     }
 
     const _payload = createSafexPayloadBuffer(56, amount);
-    // console.log("made the payload ", _payload)
+    console.log("made the payload ", _payload)
 
     const dataScript = bitcoin.payments.embed({data: [_payload]})
 
-    // console.log("generated datascript")
+    console.log("generated datascript")
     tx.addOutput(dataScript.output, 0);
 
 
@@ -140,10 +140,10 @@ function generateSafexBtcTransaction(utxos, destination, wif, amount, fee) {
 }
 
 
-//set the public key to where you want safex tokens sent to and safex cash
+//set the public key to where you want safex tokens and safex cash to be sent
 function setSafexMigrationAddress(utxos, destination, wif, payload, fee) {
     //let fee = 8110;
-    console.log(fee)
+    console.log('fee: ' + fee)
     let key = bitcoin.ECPair.fromWIF(wif);
     var running_total = 0;
     var tx = new bitcoin.TransactionBuilder();
@@ -174,7 +174,6 @@ function setSafexMigrationAddress(utxos, destination, wif, payload, fee) {
     //problem is right here when adding a Output
     tx.addOutput(destination, 700);
 
-
     const left_overs = running_total - (700 + fee);
     if (left_overs > 0) {
         tx.addOutput(address, left_overs);
@@ -188,7 +187,6 @@ function setSafexMigrationAddress(utxos, destination, wif, payload, fee) {
     console.log("generated datascript")
     tx.addOutput(dataScript.output, 0);
 
-
     for (var i = 0; i < inputs_num; i++) {
         tx.sign(i, key);
     }
@@ -199,11 +197,9 @@ function setSafexMigrationAddress(utxos, destination, wif, payload, fee) {
     return json;
 }
 
-
 /*
     Omni Payload creation helper functions This emulates the "Simple Send" Payload
  */
-
 
 function createSafexPayload(propertyId, amount) {
     return (
@@ -246,20 +242,17 @@ function structureSafexKeys(spend, view) {
     return keys;
 }
 
-
 function toHexString(byteArray) {
     return Array.from(byteArray, function (byte) {
         return ('0' + (byte & 0xFF).toString(16)).slice(-2);
     }).join('')
 }
 
-
 /*
     End Omni Payload Helper Functions
  */
 
 const BURN_ADDRESS = "1SAFEXg6ah1JqixuYUnEyKetC4hJhztoz";
-
 
 function verify_safex_address(spend, view, address) {
 

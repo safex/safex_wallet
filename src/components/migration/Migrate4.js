@@ -33,7 +33,7 @@ export default class Migrate4 extends React.Component {
 
     getTxnFee() {
         console.log(this.state.safex_key);
-        //public spend key is first half
+        //public view key is second half
         get_utxos(this.props.data.address)
             .then(utxos => {
                 getFee()

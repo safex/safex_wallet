@@ -154,7 +154,7 @@ export default class Migrate5 extends React.Component {
     validateAmount(e) {
         if (parseInt(e.target.value) > this.state.safex_bal) {
             console.log("Not enough safex balance for that transaction, max is " + this.state.safex_bal);
-            this.setOpenMigrationAlert('Not enough safex balance for that transaction, max is');
+            this.setOpenMigrationAlert('Not enough safex balance for that transaction, max is' + this.state.safex_bal);
             e.target.value = this.state.safex_bal;
         }
     }
