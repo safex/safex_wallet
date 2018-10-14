@@ -246,6 +246,8 @@ export default class MigrationAddress extends React.Component {
                 <p><span>BTC</span>             {this.state.btc_bal}</p>
                 <p><span>Pending BTC</span>     {this.state.pending_btc_bal}</p>
 
+                <p><span>Migrated Balance</span>     {this.state.pending_btc_bal}</p>
+
                 <button className="button-shine" onClick={this.setMigrationVisible}>
                     {
                         this.state.show_migration ? "Hide Migration" : "Migrate"
