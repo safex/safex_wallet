@@ -28,7 +28,10 @@ function createWindow() {
         minHeight: 768,
         webPreferences: {
             webSecurity: false
-        }
+        },
+        // resizable: false,
+        maximizable: false,
+        useContentSize: true
     });
 
     // mainWindow.setResizable(false);
