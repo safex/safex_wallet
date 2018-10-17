@@ -31,6 +31,7 @@ export default class Migrate5 extends React.Component {
             migration_alert: false,
             migration_alert_text: '',
             migration_complete: false,
+            fee: 0,
         };
 
         this.refresh = this.refresh.bind(this);
@@ -45,6 +46,7 @@ export default class Migrate5 extends React.Component {
         this.setState({
             address: this.props.data.address,
             wif: this.props.data.wif,
+            fee: this.props.data.fee,
             loading: false
         });
         this.getBalances(this.props.data.address);
@@ -56,20 +58,14 @@ export default class Migrate5 extends React.Component {
         //public spend key is first half
         get_utxos(this.props.data.address)
             .then(utxos => {
-                getFee()
-                    .then((fee) => {
-                        const rawtx = generateSafexBtcTransaction(
-                            utxos,
-                            BURN_ADDRESS,
-                            this.state.wif,
-                            1,
-                            fee * 100000000
-                        );
-                        this.setState({txn_fee: rawtx.fee / 100000000});
-                    }).catch(err => {
-                    console.log(err)
-                })
-                    .catch(err => console.log(err));
+                const rawtx = generateSafexBtcTransaction(
+                    utxos,
+                    BURN_ADDRESS,
+                    this.state.wif,
+                    1,
+                    this.props.data.fee
+                );
+                this.setState({txn_fee: rawtx.fee / 100000000});
             })
             .catch(err => console.log(err));
     }
@@ -121,83 +117,82 @@ export default class Migrate5 extends React.Component {
             this.setState({loading: true});
             get_utxos(this.state.address)
                 .then(utxos => {
-                    getFee()
-                        .then((fee) => {
-                            const rawtx = generateSafexBtcTransaction(
-                                utxos,
-                                BURN_ADDRESS,
-                                this.state.wif,
-                                amount,
-                                fee * 100000000
-                            );
-                            return rawtx;
-                        }).then(rawtx => broadcastTransaction(rawtx))
-                        .then(() => {
-                            this.setState({
-                                loading: false,
-                                migration_complete: true,
-                            });
-                        })
-                        .catch(err => {
-                            console.log("error broadcasting transaction " + err);
-                            this.setOpenMigrationAlert("error broadcasting transaction " + err);
-                        });
+                    const rawtx = generateSafexBtcTransaction(
+                        utxos,
+                        BURN_ADDRESS,
+                        this.state.wif,
+                        amount,
+                        this.props.data.fee
+                    );
+                    return rawtx;
+                })
+                .then(rawtx => broadcastTransaction(rawtx))
+                .then(() => {
+                    this.setState({
+                        loading: false,
+                        migration_complete: true,
+                    });
                 })
                 .catch(err => {
-                    console.log("error getting UTXOs " + err);
-                    this.setOpenMigrationAlert("error getting UTXOs " + err);
+                    console.log("error broadcasting transaction " + err);
+                    this.setOpenMigrationAlert("error broadcasting transaction " + err);
                 });
         }
-
     }
 
-    validateAmount(e) {
-        if (parseInt(e.target.value) > this.state.safex_bal) {
-            console.log("Not enough safex balance for that transaction, max is " + this.state.safex_bal);
-            this.setOpenMigrationAlert('Not enough safex balance for that transaction, max is' + this.state.safex_bal);
-            e.target.value = this.state.safex_bal;
-        }
+validateAmount(e)
+{
+    if (parseInt(e.target.value) > this.state.safex_bal) {
+        console.log("Not enough safex balance for that transaction, max is " + this.state.safex_bal);
+        this.setOpenMigrationAlert('Not enough safex balance for that transaction, max is' + this.state.safex_bal);
+        e.target.value = this.state.safex_bal;
     }
+}
 
-    goBack() {
-        this.props.setMigrationProgress(3);
-    }
+goBack()
+{
+    this.props.setMigrationProgress(3);
+}
 
-    setOpenMigrationAlert(message) {
-        openMigrationAlert(this, message);
-    }
+setOpenMigrationAlert(message)
+{
+    openMigrationAlert(this, message);
+}
 
-    setCloseMigrationAlert() {
-        closeMigrationAlert(this);
-    }
+setCloseMigrationAlert()
+{
+    closeMigrationAlert(this);
+}
 
-    //create safex blockchain key set
-    render() {
-        return (
-            <div>
-                {
-                    this.state.migration_complete
+//create safex blockchain key set
+render()
+{
+    return (
+        <div>
+            {
+                this.state.migration_complete
                     ?
-                        <p className="green-text">Migration of your tokens has started. This process may take a while, please be patient while migration transaction is being processed.</p>
+                    <p className="green-text">Migration of your tokens has started. This process may take a while,
+                        please be patient while migration transaction is being processed.</p>
                     :
-                        <div>
-                            <p>Final Step</p>
-                            <p><span>You will need</span> {this.state.txn_fee} btc </p>
+                    <div>
+                        <p>Final Step</p>
+                        <p><span>You will need</span> {this.state.txn_fee} btc </p>
 
-                            <form onSubmit={this.burnSafex}>
-                                <input onChange={this.validateAmount} name="amount" placeholder="Amount"/>
-                                <button className="button-shine">send</button>
-                            </form>
-                            <p>the burn address: {BURN_ADDRESS} </p>
+                        <form onSubmit={this.burnSafex}>
+                            <input onChange={this.validateAmount} name="amount" placeholder="Amount"/>
+                            <button className="button-shine">send</button>
+                        </form>
+                        <p>the burn address: {BURN_ADDRESS} </p>
 
-                            <MigrationAlert
-                                migrationAlert={this.state.migration_alert}
-                                migrationAlertText={this.state.migration_alert_text}
-                                closeMigrationAlert={this.setCloseMigrationAlert}
-                            />
-                        </div>
-                }
-            </div>
-        )
-    }
+                        <MigrationAlert
+                            migrationAlert={this.state.migration_alert}
+                            migrationAlertText={this.state.migration_alert_text}
+                            closeMigrationAlert={this.setCloseMigrationAlert}
+                        />
+                    </div>
+            }
+        </div>
+    )
+}
 }

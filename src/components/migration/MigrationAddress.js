@@ -34,6 +34,7 @@ export default class MigrationAddress extends React.Component {
             safex_key: {},
             migration_alert: false,
             migration_alert_text: '',
+            fee: 0,
         };
         this.refresh = this.refresh.bind(this);
         this.setMigrationVisible = this.setMigrationVisible.bind(this);
@@ -43,7 +44,7 @@ export default class MigrationAddress extends React.Component {
     }
 
     componentDidMount() {
-        getFee().catch(e => alert("network error " + e));
+        console.log(this.props.data.migration_progress)
         this.setState({
             label: this.props.data.label,
             address: this.props.data.address,
@@ -51,6 +52,7 @@ export default class MigrationAddress extends React.Component {
             migration_progress: this.props.data.migration_progress,
             loading: false,
             safex_key: this.props.data.safex_key,
+            fee: this.props.data.fee,
         });
         this.getBalances(this.props.data.address);
     }
@@ -118,7 +120,6 @@ export default class MigrationAddress extends React.Component {
             this.setState({show_migration: false});
         } else {
             this.setState({show_migration: true});
-            this.setMigrationProgress(0);
         }
     }
 
@@ -178,7 +179,7 @@ export default class MigrationAddress extends React.Component {
     }
 
     render() {
-        let {migration_progress, address, wif, safex_key} = this.state;
+        let {migration_progress, address, wif, safex_key, fee} = this.state;
         let migration_shot;
 
         switch (migration_progress) {
@@ -204,6 +205,7 @@ export default class MigrationAddress extends React.Component {
                 data['address'] = address;
                 data['wif'] = wif;
                 data['safex_key'] = safex_key;
+                data['fee'] = fee;
                 //set first half of key
                 migration_shot = <Migrate3
                     setMigrationVisible={this.setMigrationVisible}
@@ -216,6 +218,7 @@ export default class MigrationAddress extends React.Component {
                 data['address'] = address;
                 data['wif'] = wif;
                 data['safex_key'] = safex_key;
+                data['fee'] = fee;
                 //set second half of key
                 migration_shot = <Migrate4
                     setMigrationVisible={this.setMigrationVisible}
@@ -228,6 +231,7 @@ export default class MigrationAddress extends React.Component {
                 data['address'] = address;
                 data['wif'] = wif;
                 data['safex_key'] = safex_key;
+                data['fee'] = fee;
                 //send to burn address
                 migration_shot = <Migrate5
                     setMigrationVisible={this.setMigrationVisible}

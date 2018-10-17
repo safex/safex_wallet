@@ -1,6 +1,7 @@
 var bitcoin = window.require('bitcoinjs-lib');
 var swg = window.require('safex-addressjs');
 
+const Buffer = window.require('safe-buffer').Buffer;
 
 function get_utxos(address) {
     return new Promise((resolve, reject) => {
@@ -142,15 +143,14 @@ function generateSafexBtcTransaction(utxos, destination, wif, amount, fee) {
 
 //set the public key to where you want safex tokens and safex cash to be sent
 function setSafexMigrationAddress(utxos, destination, wif, payload, fee) {
-    //let fee = 8110;
-    console.log('fee: ' + fee)
     let key = bitcoin.ECPair.fromWIF(wif);
     var running_total = 0;
     var tx = new bitcoin.TransactionBuilder();
     var inputs_num = 0;
     let fee_adj;
     utxos.forEach(txn => {
-        if (running_total < (700 + fee)) {
+
+        if (running_total == 0 && txn.satoshis > (fee + 700)) {
             running_total += txn.satoshis;
             inputs_num += 1;
         }
@@ -163,7 +163,7 @@ function setSafexMigrationAddress(utxos, destination, wif, payload, fee) {
     var inputs_num = 0;
     var running_total = 0;
     utxos.forEach(txn => {
-        if (running_total < (700 + fee)) {
+        if (running_total == 0 && txn.satoshis > (fee + 700)) {
             running_total += txn.satoshis;
             tx.addInput(txn.txid, txn.vout);
             inputs_num += 1;

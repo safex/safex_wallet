@@ -206,24 +206,23 @@ export default class Migrate2 extends React.Component {
             }
 
             var key_index = -1;
-
             var x_index = -1;
 
             for (var key in json.keys) {
-                // if (json.keys[key].public_key === this.props.data.address) {
+                if (json.keys[key].public_key == this.props.data.address) {
                     key_index = key;
                     for (var x_key in json.safex_keys) {
-                        if (json.safex_keys[key].public_addr === e.target.address_selection.value) {
+                        if (json.safex_keys[x_key].public_addr === e.target.address_selection.value) {
                             x_index = x_key;
                             json.keys[key_index]['migration_data'] = {};
                             json.keys[key_index]['migration_data'].safex_keys = json.safex_keys[x_index];
                             json.keys[key_index].migration_progress = 2;
                         }
                     }
-                // }
+                 }
             }
 
-            if (x_index !== -1 && parseInt(key_index) !== 1) {
+            if (x_index != -1 && key_index != -1) {
                 var algorithm = 'aes-256-ctr';
                 var password = localStorage.getItem('password');
                 var cipher_text = encrypt(JSON.stringify(json), algorithm, password);

@@ -2,13 +2,15 @@ import React from 'react';
 
 import MigrationAddress from './MigrationAddress';
 import Navigation from '../partials/Navigation';
-import Footer from "../partials/Footer";
+import Footer from '../partials/Footer';
+import {getFee} from '../../utils/migration';
 
 export default class Migration extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             wallet: "",
+            fee: 0,
             keys: {},
         };
 
@@ -48,11 +50,14 @@ export default class Migration extends React.Component {
                     console.log(e);
                 }
             });
+
+        getFee().then(fee => this.setState({fee: fee * 100000000})).catch(e => alert("network error " + e));
     }
 
     componentDidMount() {
         try {
             const json = JSON.parse(localStorage.getItem('wallet'));
+            this.getPrices();
             this.setState({wallet: json, keys: json['keys']});
         } catch (e) {
             this.setState({
@@ -60,7 +65,6 @@ export default class Migration extends React.Component {
             });
             this.context.router.push('/');
         }
-        this.getPrices();
         let setRefreshInterval = setInterval(this.reloadWallet, 600000);
     }
 
@@ -69,6 +73,7 @@ export default class Migration extends React.Component {
     }
 
     reloadWallet() {
+        console.log("wallet reloaded");
         console.log("wallet reloaded");
         try {
             const json = JSON.parse(localStorage.getItem('wallet'));
@@ -88,24 +93,30 @@ export default class Migration extends React.Component {
     }
 
     render() {
-        const {keys} = this.state;
+        const {keys, fee} = this.state;
+        var table;
+        console.log("feee " + fee)
+        if (fee > 0) {
+            table = Object.keys(keys).map((key) => {
+                var data = {};
+                data['label'] = keys[key].label;
+                data['address'] = keys[key].public_key;
+                data['wif'] = keys[key].private_key;
+                data['safex_key'] = {};
+                data['fee'] = fee;
+                if (keys[key].hasOwnProperty('migration_data')) {
+                    data['migration_progress'] = keys[key].migration_progress;
+                    data['safex_key'] = keys[key].migration_data.safex_keys;
+                } else {
+                    data['migration_progress'] = 0;
+                }
+                return <MigrationAddress
+                    reloadWallet={this.reloadWallet}
+                    key={key}
+                    data={data}/>;
+            });
+        }
 
-        var table = Object.keys(keys).map((key) => {
-            var data = {};
-            data['label'] = keys[key].label;
-            data['address'] = keys[key].public_key;
-            data['wif'] = keys[key].private_key;
-            data['migration_progress'] = 0;
-            data['safex_key'] = {};
-            if (keys[key].hasOwnProperty('migration_data')) {
-                data['migration_progress'] = keys[key].migration_progress;
-                data['safex_key'] = keys[key].migration_data.safex_keys;
-            }
-            return <MigrationAddress
-                reloadWallet={this.reloadWallet}
-                key={key}
-                data={data}/>;
-        });
 
         return (
             <div>

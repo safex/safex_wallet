@@ -22,6 +22,7 @@ export default class Migrate4 extends React.Component {
             safex_key: {},
             migration_alert: false,
             migration_alert_text: '',
+            fee: 0,
         };
 
         this.refresh = this.refresh.bind(this);
@@ -36,26 +37,19 @@ export default class Migrate4 extends React.Component {
         //public view key is second half
         get_utxos(this.props.data.address)
             .then(utxos => {
-                getFee()
-                    .then((fee) => {
-                        const payload = '536166657832' + this.props.data.safex_key.view.pub + this.props.data.safex_key.checksum;
-                        console.log(payload)
-                        const rawtx = setSafexMigrationAddress(
-                            utxos,
-                            BURN_ADDRESS,
-                            this.state.wif,
-                            payload,
-                            fee * 100000000
-                        );
-                        this.setState({txn_fee: rawtx.fee / 100000000});
-                    }).catch(err => {
-                        console.log("error getting fee " + err);
-                        this.setOpenMigrationAlert("error getting fee " + err);
-                }).catch(err => {
-                    console.log("error broadcasting transaction " + err);
-                    this.setOpenMigrationAlert("error broadcasting transaction " + err);
-                });
-                /**/
+                const payload = '536166657832' +
+                    this.props.data.safex_key.view.pub +
+                    this.props.data.safex_key.checksum;
+
+                const rawtx = setSafexMigrationAddress(
+                    utxos,
+                    BURN_ADDRESS,
+                    this.state.wif,
+                    payload,
+                    this.props.data.fee
+                );
+
+                this.setState({txn_fee: rawtx.fee / 100000000});
             })
             .catch(err => {
                 console.log("error getting UTXOs " + err);
@@ -67,7 +61,8 @@ export default class Migrate4 extends React.Component {
         this.setState({
             address: this.props.data.address,
             wif: this.props.data.wif,
-            safex_key: this.props.data.safex_key
+            safex_key: this.props.data.safex_key,
+            fee: this.props.data.fee,
         });
 
         this.getBalances(this.props.data.address);
@@ -110,30 +105,31 @@ export default class Migrate4 extends React.Component {
         //public spend key is first half
         get_utxos(this.state.address)
             .then(utxos => {
-                getFee()
-                    .then((fee) => {
-                        const payload = '536166657832' + this.props.data.safex_key.view.pub + this.props.data.safex_key.checksum;
+                const payload = '536166657832' +
+                    this.props.data.safex_key.view.pub +
+                    this.props.data.safex_key.checksum;
 
-                        const rawtx = setSafexMigrationAddress(
-                            utxos,
-                            BURN_ADDRESS,
-                            this.state.wif,
-                            payload,
-                            fee * 100000000
-                        );
+                const rawtx = setSafexMigrationAddress(
+                    utxos,
+                    BURN_ADDRESS,
+                    this.state.wif,
+                    payload,
+                    this.props.data.fee
+                );
 
-                        return rawtx;
+                return rawtx;
 
-                    }).then(rawtx => broadcastTransaction(rawtx))
-                    .then(result => {
-                        this.props.setMigrationProgress(4);
-                        console.log(result);
-                    })
-                    .catch(err => {
-                        console.log("error broadcasting transaction " + err);
-                        this.setOpenMigrationAlert("error broadcasting transaction " + err);
-                    });
             })
+            .then(rawtx => broadcastTransaction(rawtx))
+            .then(result => {
+                this.props.setMigrationProgress(4);
+                console.log(result);
+            })
+            .catch(err => {
+                console.log("error broadcasting transaction " + err);
+                this.setOpenMigrationAlert("error broadcasting transaction " + err);
+            })
+
             .catch(err => {
                 console.log("error getting UTXOs " + err);
                 this.setOpenMigrationAlert("error getting UTXOs " + err);
