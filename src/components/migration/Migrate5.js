@@ -17,6 +17,7 @@ export default class Migrate5 extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            safex_key: this.props.data.safex_key,
             loading: true,
             address: "",
             wif: "",
@@ -45,6 +46,7 @@ export default class Migrate5 extends React.Component {
         this.setState({
             address: this.props.data.address,
             wif: this.props.data.wif,
+            safex_key: this.props.data.safex_key,
             loading: false
         });
         this.getBalances(this.props.data.address);
@@ -178,7 +180,7 @@ export default class Migrate5 extends React.Component {
                 {
                     this.state.migration_complete
                     ?
-                        <p className="green-text">Migration of your tokens has started. This process may take a while, please be patient while migration transaction is being processed.</p>
+                        <p className="green-text">Migration of your tokens has started. This process may take a couple of days, please be patient while migration transaction is being processed.</p>
                     :
                         <div>
                             <p>Final Step</p>
@@ -188,6 +190,7 @@ export default class Migrate5 extends React.Component {
                                 <input onChange={this.validateAmount} name="amount" placeholder="Amount"/>
                                 <button className="button-shine">send</button>
                             </form>
+                            <p><span className="span-200">You target migration address:</span> {this.state.safex_key.public_addr}</p>
                             <p>the burn address: {BURN_ADDRESS} </p>
 
                             <MigrationAlert

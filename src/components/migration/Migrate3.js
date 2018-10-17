@@ -27,7 +27,6 @@ export default class Migrate3 extends React.Component {
 
         this.setSafexAddress = this.setSafexAddress.bind(this);
         this.getTxnFee = this.getTxnFee.bind(this);
-        this.goBack = this.goBack.bind(this);
         this.setOpenMigrationAlert = this.setOpenMigrationAlert.bind(this);
         this.setCloseMigrationAlert = this.setCloseMigrationAlert.bind(this);
     }
@@ -146,10 +145,6 @@ export default class Migrate3 extends React.Component {
             });
     }
 
-    goBack() {
-        this.props.setMigrationProgress(1);
-    }
-
     setOpenMigrationAlert(message) {
         openMigrationAlert(this, message);
     }
@@ -170,6 +165,7 @@ export default class Migrate3 extends React.Component {
                     The next step will also require a bitcoin fee.
                 </p>
 
+                <p><span className="span-200">You target migration address:</span> {this.state.safex_key.public_addr}</p>
                 <p><span>You will need</span> {this.state.txn_fee} btc </p>
                 <p><span>Your btc balance</span> {this.state.btc_bal} btc</p>
 

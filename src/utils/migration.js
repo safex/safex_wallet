@@ -1,4 +1,4 @@
-var bitcoin = window.require('bitcoinjs-lib');
+var bitcoin = require('bitcoinjs-lib');
 var swg = window.require('safex-addressjs');
 
 

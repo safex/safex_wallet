@@ -28,17 +28,20 @@ export default class Migrate2 extends React.Component {
                 safex_keys: {},
                 migration_alert: false,
                 migration_alert_text: '',
+                all_field_filled: false,
+                proceed_to_step_3: false
             };
 
         this.setSafexAddress = this.setSafexAddress.bind(this);
         this.createSafexKey = this.createSafexKey.bind(this);
         this.saveSafexKeys = this.saveSafexKeys.bind(this);
         this.setYourKeys = this.setYourKeys.bind(this);
-        this.selectKey = this.selectKey.bind(this);
         this.setOpenMigrationAlert = this.setOpenMigrationAlert.bind(this);
         this.setCloseMigrationAlert = this.setCloseMigrationAlert.bind(this);
         this.startOver = this.startOver.bind(this);
-        this.goBack = this.goBack.bind(this);
+        this.checkFields = this.checkFields.bind(this);
+        this.proceedToStep3 = this.proceedToStep3.bind(this);
+        this.confirmProceed = this.confirmProceed.bind(this);
     }
 
     componentDidMount() {
@@ -114,13 +117,24 @@ export default class Migrate2 extends React.Component {
                     localStorage.setItem('wallet', JSON.stringify(json));
                     var json2 = JSON.parse(localStorage.getItem('wallet'));
                     console.log(json2.keys[index].migration_data);
-                    this.props.setMigrationProgress(2);
+                    this.proceedToStep3();
                 } catch (e) {
                     console.log(e);
                     this.setOpenMigrationAlert('An error adding a key to the wallet. Please contact team@safex.io');
                 }
             }
         });
+    }
+
+    proceedToStep3() {
+        this.setOpenMigrationAlert('Are you sure you want to proceed? There is no turning back after this step. First migration transaction will be executed. Please make sure you that you do not lose and always keep safe your Safex Blockchain private keys.');
+        this.setState({
+            proceed_to_step_3: true
+        });
+    }
+
+    confirmProceed() {
+        this.props.setMigrationProgress(2);
     }
 
     //use this if the keys are provided by the user
@@ -179,7 +193,7 @@ export default class Migrate2 extends React.Component {
                                     safex_view_sec: safex_keys.view.sec,
                                     loading: false,
                                 });
-                                this.props.setMigrationProgress(2);
+                                this.proceedToStep3();
                             } catch (e) {
                                 console.log(e);
                                 this.setOpenMigrationAlert('An error adding a key to the wallet. Please contact team@safex.io');
@@ -191,73 +205,6 @@ export default class Migrate2 extends React.Component {
                 console.log('Incorrect keys');
                 this.setOpenMigrationAlert('Incorrect keys');
             }
-        }
-    }
-
-    //use this for selected key from dropdown menu
-    selectKey(e) {
-        e.preventDefault();
-        if (e.target.address_selection.value.length > 0) {
-            try {
-                var json = JSON.parse(localStorage.getItem('wallet'));
-            } catch (e) {
-                console.log('Error parsing the wallet data.');
-                this.setOpenMigrationAlert('Error parsing the wallet data.');
-            }
-
-            var key_index = -1;
-
-            var x_index = -1;
-
-            for (var key in json.keys) {
-                // if (json.keys[key].public_key === this.props.data.address) {
-                    key_index = key;
-                    for (var x_key in json.safex_keys) {
-                        if (json.safex_keys[key].public_addr === e.target.address_selection.value) {
-                            x_index = x_key;
-                            json.keys[key_index]['migration_data'] = {};
-                            json.keys[key_index]['migration_data'].safex_keys = json.safex_keys[x_index];
-                            json.keys[key_index].migration_progress = 2;
-                        }
-                    }
-                // }
-            }
-
-            if (x_index !== -1 && parseInt(key_index) !== 1) {
-                var algorithm = 'aes-256-ctr';
-                var password = localStorage.getItem('password');
-                var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
-
-                fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
-                    if (err) {
-                        this.setOpenMigrationAlert('Problem communicating to the wallet file.');
-                    } else {
-                        try {
-                            localStorage.setItem('wallet', JSON.stringify(json));
-                            var json2 = JSON.parse(localStorage.getItem('wallet'));
-                            this.setState({
-                                safex_key: json2.safex_keys[x_index],
-                                safex_address: json2.safex_keys[x_index].public_addr,
-                                safex_spend_pub: json2.safex_keys[x_index].spend.pub,
-                                safex_spend_sec: json2.safex_keys[x_index].spend.sec,
-                                safex_view_pub: json2.safex_keys[x_index].view.pub,
-                                safex_view_sec: json2.safex_keys[x_index].view.sec,
-                                loading: false,
-                            });
-                            this.props.setMigrationProgress(2);
-                        } catch (e) {
-                            console.log(e);
-                            this.setOpenMigrationAlert('An error adding a key to the wallet. Please contact team@safex.io');
-                        }
-                    }
-                });
-            } else {
-                console.log('Key does not exist');
-                this.setOpenMigrationAlert('Key does not exist');
-            }
-        } else {
-            console.log('No key from your list has been selected');
-            this.setOpenMigrationAlert('No key from your list has been selected');
         }
     }
 
@@ -275,8 +222,20 @@ export default class Migrate2 extends React.Component {
         closeMigrationAlert(this);
     }
 
-    goBack() {
-        this.props.setMigrationProgress(0);
+    checkFields() {
+        var safex_address = document.getElementById('safex_address').value;
+        var spend_key = document.getElementById('spend_key').value;
+        var view_key = document.getElementById('view_key').value;
+
+        if (safex_address !== '' && spend_key !== '' && view_key !== '') {
+            this.setState({
+                all_field_filled: true
+            })
+        } else {
+            this.setState({
+                all_field_filled: false
+            })
+        }
     }
 
     render() {
@@ -313,27 +272,22 @@ export default class Migrate2 extends React.Component {
                             <p>public: {this.state.safex_view_pub}</p>
                             <p>secret: {this.state.safex_view_sec}</p>
 
-                            <button className="button-shine green-btn" onClick={this.saveSafexKeys}>I have backed up my Safex Key Information</button>
+                            <button className="button-shine green-btn" onClick={this.saveSafexKeys}>I have backed up my Safex Key Information and continue</button>
                             <button className="button-shine" onClick={this.createSafexKey}>Create new key</button>
                             <button className="button-shine" onClick={this.startOver}>Go back</button>
                         </div>
                     :
                         <div>
+                            <p>If you don't already have Safex address</p>
                             <button className="button-shine green-btn" onClick={this.createSafexKey}>create new key</button>
 
-                            <form onSubmit={this.selectKey}>
-                                <select name="address_selection">
-                                    {options}
-                                </select>
-                                <button className="button-shine">Set Selected Key</button>
-                            </form>
-
                             <form onSubmit={this.setYourKeys}>
-                                <input name="safex_address" placeholder="Safex address" />
-                                <input name="spend_key"     placeholder="Secret spend key" />
-                                <input name="view_key"      placeholder="Secret view key" />
+                                <label htmlFor="safex_address">If you already have Safex address, enter it here</label>
+                                <input name="safex_address" placeholder="Safex address" id="safex_address" onChange={this.checkFields} />
+                                <input name="spend_key"     placeholder="Secret spend key" id="spend_key" onChange={this.checkFields} />
+                                <input name="view_key"      placeholder="Secret view key" id="view_key" onChange={this.checkFields} />
 
-                                <button className="button-shine">Set your key</button>
+                                <button className={this.state.all_field_filled ? "button-shine green-btn" : "button-shine"}>Set your key</button>
                             </form>
                         </div>
                 }
@@ -342,6 +296,8 @@ export default class Migrate2 extends React.Component {
                     migrationAlert={this.state.migration_alert}
                     migrationAlertText={this.state.migration_alert_text}
                     closeMigrationAlert={this.setCloseMigrationAlert}
+                    proceedToStep3={this.state.proceed_to_step_3}
+                    confirmProceed={this.confirmProceed}
                 />
             </div>
         )

@@ -43,7 +43,10 @@ export default class MigrationAddress extends React.Component {
     }
 
     componentDidMount() {
-        getFee().catch(e => alert("network error " + e));
+        getFee().catch(e => {
+            console.log("network error " + e);
+            this.setOpenMigrationAlert("network error " + e);
+        });
         this.setState({
             label: this.props.data.label,
             address: this.props.data.address,
@@ -239,14 +242,13 @@ export default class MigrationAddress extends React.Component {
 
         return (
             <div className="address-wrap">
-                <p><span>Label</span>           {this.state.label}</p>
-                <p><span>Address</span>         {this.state.address}</p>
-                <p><span>Safex</span>           {this.state.safex_bal}</p>
-                <p><span>Pending safex</span>   {this.state.pending_safex_bal}</p>
-                <p><span>BTC</span>             {this.state.btc_bal}</p>
-                <p><span>Pending BTC</span>     {this.state.pending_btc_bal}</p>
-
-                <p><span>Migrated Balance</span>     {this.state.pending_btc_bal}</p>
+                <p><span>Label</span>            {this.state.label}</p>
+                <p><span>Address</span>          {this.state.address}</p>
+                <p><span>Safex</span>            {this.state.safex_bal}</p>
+                <p><span>Pending safex</span>    {this.state.pending_safex_bal}</p>
+                <p><span>BTC</span>              {this.state.btc_bal}</p>
+                <p><span>Pending BTC</span>      {this.state.pending_btc_bal}</p>
+                <p><span>Migrated Balance</span> {this.state.pending_btc_bal}</p>
 
                 <button className="button-shine" onClick={this.setMigrationVisible}>
                     {
