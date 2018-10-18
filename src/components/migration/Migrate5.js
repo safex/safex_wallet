@@ -17,6 +17,7 @@ export default class Migrate5 extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            safex_key: this.props.data.safex_key,
             loading: true,
             address: "",
             wif: "",
@@ -47,6 +48,7 @@ export default class Migrate5 extends React.Component {
             address: this.props.data.address,
             wif: this.props.data.wif,
             fee: this.props.data.fee,
+            safex_key: this.props.data.safex_key,
             loading: false
         });
         this.getBalances(this.props.data.address);
@@ -138,61 +140,58 @@ export default class Migrate5 extends React.Component {
                     this.setOpenMigrationAlert("error broadcasting transaction " + err);
                 });
         }
+
     }
 
-validateAmount(e)
-{
-    if (parseInt(e.target.value) > this.state.safex_bal) {
-        console.log("Not enough safex balance for that transaction, max is " + this.state.safex_bal);
-        this.setOpenMigrationAlert('Not enough safex balance for that transaction, max is' + this.state.safex_bal);
-        e.target.value = this.state.safex_bal;
+    validateAmount(e) {
+        if (parseInt(e.target.value) > this.state.safex_bal) {
+            console.log("Not enough safex balance for that transaction, max is " + this.state.safex_bal);
+            this.setOpenMigrationAlert('Not enough safex balance for that transaction, max is' + this.state.safex_bal);
+            e.target.value = this.state.safex_bal;
+        }
     }
-}
 
-goBack()
-{
-    this.props.setMigrationProgress(3);
-}
+    goBack() {
+        this.props.setMigrationProgress(3);
+    }
 
-setOpenMigrationAlert(message)
-{
-    openMigrationAlert(this, message);
-}
+    setOpenMigrationAlert(message) {
+        openMigrationAlert(this, message);
+    }
 
-setCloseMigrationAlert()
-{
-    closeMigrationAlert(this);
-}
+    setCloseMigrationAlert() {
+        closeMigrationAlert(this);
+    }
 
-//create safex blockchain key set
-render()
-{
-    return (
-        <div>
-            {
-                this.state.migration_complete
+    //create safex blockchain key set
+    render() {
+        return (
+            <div>
+                {
+                    this.state.migration_complete
                     ?
-                    <p className="green-text">Migration of your tokens has started. This process may take a while,
+                    <p className="green-text">Migration of your tokens has started. This process may take a couple of days,
                         please be patient while migration transaction is being processed.</p>
                     :
-                    <div>
-                        <p>Final Step</p>
-                        <p><span>You will need</span> {this.state.txn_fee} btc </p>
+                        <div>
+                            <p>Final Step</p>
+                            <p><span>You will need</span> {this.state.txn_fee} btc </p>
 
-                        <form onSubmit={this.burnSafex}>
-                            <input onChange={this.validateAmount} name="amount" placeholder="Amount"/>
-                            <button className="button-shine">send</button>
-                        </form>
-                        <p>the burn address: {BURN_ADDRESS} </p>
+                            <form onSubmit={this.burnSafex}>
+                                <input onChange={this.validateAmount} name="amount" placeholder="Amount"/>
+                                <button className="button-shine">send</button>
+                            </form>
+                            <p><span className="span-200">You target migration address:</span> {this.state.safex_key.public_addr}</p>
+                            <p>the burn address: {BURN_ADDRESS} </p>
 
-                        <MigrationAlert
-                            migrationAlert={this.state.migration_alert}
-                            migrationAlertText={this.state.migration_alert_text}
-                            closeMigrationAlert={this.setCloseMigrationAlert}
-                        />
-                    </div>
-            }
-        </div>
-    )
-}
+                            <MigrationAlert
+                                migrationAlert={this.state.migration_alert}
+                                migrationAlertText={this.state.migration_alert_text}
+                                closeMigrationAlert={this.setCloseMigrationAlert}
+                            />
+                        </div>
+                }
+            </div>
+        )
+    }
 }

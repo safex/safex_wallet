@@ -28,6 +28,7 @@ export default class Migrate2 extends React.Component {
                 safex_keys: {},
                 migration_alert: false,
                 migration_alert_text: '',
+                all_field_filled: false,
             };
 
         this.setSafexAddress = this.setSafexAddress.bind(this);
@@ -38,7 +39,7 @@ export default class Migrate2 extends React.Component {
         this.setOpenMigrationAlert = this.setOpenMigrationAlert.bind(this);
         this.setCloseMigrationAlert = this.setCloseMigrationAlert.bind(this);
         this.startOver = this.startOver.bind(this);
-        this.goBack = this.goBack.bind(this);
+        this.checkFields = this.checkFields.bind(this);
     }
 
     componentDidMount() {
@@ -274,8 +275,20 @@ export default class Migrate2 extends React.Component {
         closeMigrationAlert(this);
     }
 
-    goBack() {
-        this.props.setMigrationProgress(0);
+    checkFields() {
+        var safex_address = document.getElementById('safex_address').value;
+        var spend_key = document.getElementById('spend_key').value;
+        var view_key = document.getElementById('view_key').value;
+
+        if (safex_address !== '' && spend_key !== '' && view_key !== '') {
+            this.setState({
+                all_field_filled: true
+            })
+        } else {
+            this.setState({
+                all_field_filled: false
+            })
+        }
     }
 
     render() {
@@ -312,12 +325,13 @@ export default class Migrate2 extends React.Component {
                             <p>public: {this.state.safex_view_pub}</p>
                             <p>secret: {this.state.safex_view_sec}</p>
 
-                            <button className="button-shine green-btn" onClick={this.saveSafexKeys}>I have backed up my Safex Key Information</button>
+                            <button className="button-shine green-btn" onClick={this.saveSafexKeys}>I have backed up my Safex Key Information and continue</button>
                             <button className="button-shine" onClick={this.createSafexKey}>Create new key</button>
                             <button className="button-shine" onClick={this.startOver}>Go back</button>
                         </div>
                     :
                         <div>
+                            <p>If you don't already have Safex address</p>
                             <button className="button-shine green-btn" onClick={this.createSafexKey}>create new key</button>
 
                             <form onSubmit={this.selectKey}>
@@ -328,11 +342,12 @@ export default class Migrate2 extends React.Component {
                             </form>
 
                             <form onSubmit={this.setYourKeys}>
-                                <input name="safex_address" placeholder="Safex address" />
-                                <input name="spend_key"     placeholder="Secret spend key" />
-                                <input name="view_key"      placeholder="Secret view key" />
+                                <label htmlFor="safex_address">If you already have Safex address, enter it here</label>
+                                <input name="safex_address" placeholder="Safex address" id="safex_address" onChange={this.checkFields} />
+                                <input name="spend_key"     placeholder="Secret spend key" id="spend_key" onChange={this.checkFields} />
+                                <input name="view_key"      placeholder="Secret view key" id="view_key" onChange={this.checkFields} />
 
-                                <button className="button-shine">Set your key</button>
+                                <button className={this.state.all_field_filled ? "button-shine green-btn" : "button-shine"}>Set your key</button>
                             </form>
                         </div>
                 }

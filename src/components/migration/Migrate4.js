@@ -27,7 +27,6 @@ export default class Migrate4 extends React.Component {
 
         this.refresh = this.refresh.bind(this);
         this.setSafexAddress = this.setSafexAddress.bind(this);
-        this.goBack = this.goBack.bind(this);
         this.setOpenMigrationAlert = this.setOpenMigrationAlert.bind(this);
         this.setCloseMigrationAlert = this.setCloseMigrationAlert.bind(this);
     }
@@ -102,7 +101,7 @@ export default class Migrate4 extends React.Component {
     setSafexAddress(e) {
         e.preventDefault();
         console.log(this.state.safex_key)
-        //public spend key is first half
+        //public view key is second half
         get_utxos(this.state.address)
             .then(utxos => {
                 const payload = '536166657832' +
@@ -129,15 +128,10 @@ export default class Migrate4 extends React.Component {
                 console.log("error broadcasting transaction " + err);
                 this.setOpenMigrationAlert("error broadcasting transaction " + err);
             })
-
             .catch(err => {
                 console.log("error getting UTXOs " + err);
                 this.setOpenMigrationAlert("error getting UTXOs " + err);
             });
-    }
-
-    goBack() {
-        this.props.setMigrationProgress(2);
     }
 
     setOpenMigrationAlert(message) {
@@ -148,7 +142,7 @@ export default class Migrate4 extends React.Component {
         closeMigrationAlert(this);
     }
 
-    //take firsthalf and send transaction
+    //take second half and send transaction
     render() {
         return (
             <div>
@@ -160,6 +154,7 @@ export default class Migrate4 extends React.Component {
                     The next step will also require a bitcoin fee.
                 </p>
 
+                <p><span className="span-200">You target migration address:</span> {this.state.safex_key.public_addr}</p>
                 <p><span>You will need</span> {this.state.txn_fee} btc </p>
                 <p><span>Your btc balance</span> {this.state.btc_bal} btc</p>
 
