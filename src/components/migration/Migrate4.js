@@ -102,36 +102,43 @@ export default class Migrate4 extends React.Component {
         e.preventDefault();
         console.log(this.state.safex_key)
         //public view key is second half
-        get_utxos(this.state.address)
-            .then(utxos => {
-                const payload = '536166657832' +
-                    this.props.data.safex_key.view.pub +
-                    this.props.data.safex_key.checksum;
+        window.require('dns').resolve('omni.safex.io', function (err) {
+            if (err) {
+                console.log(" error broadcasting transaction " + err);
+                this.setOpenMigrationAlert(" transaction not sent, connectivity issue " + err);
+            } else {
+                get_utxos(this.state.address)
+                    .then(utxos => {
+                        const payload = '536166657832' +
+                            this.props.data.safex_key.view.pub +
+                            this.props.data.safex_key.checksum;
 
-                const rawtx = setSafexMigrationAddress(
-                    utxos,
-                    BURN_ADDRESS,
-                    this.state.wif,
-                    payload,
-                    this.props.data.fee
-                );
+                        const rawtx = setSafexMigrationAddress(
+                            utxos,
+                            BURN_ADDRESS,
+                            this.state.wif,
+                            payload,
+                            this.props.data.fee
+                        );
 
-                return rawtx;
+                        return rawtx;
 
-            })
-            .then(rawtx => broadcastTransaction(rawtx))
-            .then(result => {
-                this.props.setMigrationProgress(4);
-                console.log(result);
-            })
-            .catch(err => {
-                console.log("error broadcasting transaction " + err);
-                this.setOpenMigrationAlert("error broadcasting transaction " + err);
-            })
-            .catch(err => {
-                console.log("error getting UTXOs " + err);
-                this.setOpenMigrationAlert("error getting UTXOs " + err);
-            });
+                    })
+                    .then(rawtx => broadcastTransaction(rawtx))
+                    .then(result => {
+                        this.props.setMigrationProgress(4);
+                        console.log(result);
+                    })
+                    .catch(err => {
+                        console.log("error broadcasting transaction " + err);
+                        this.setOpenMigrationAlert("error broadcasting transaction " + err);
+                    })
+                    .catch(err => {
+                        console.log("error getting UTXOs " + err);
+                        this.setOpenMigrationAlert("error getting UTXOs " + err);
+                    });
+            }
+        });
     }
 
     setOpenMigrationAlert(message) {
@@ -154,7 +161,8 @@ export default class Migrate4 extends React.Component {
                     The next step will also require a bitcoin fee.
                 </p>
 
-                <p><span className="span-200">You target migration address:</span> {this.state.safex_key.public_addr}</p>
+                <p><span className="span-200">You target migration address:</span> {this.state.safex_key.public_addr}
+                </p>
                 <p><span>You will need</span> {this.state.txn_fee} btc </p>
                 <p><span>Your btc balance</span> {this.state.btc_bal} btc</p>
 

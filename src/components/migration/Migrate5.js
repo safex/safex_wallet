@@ -105,40 +105,43 @@ export default class Migrate5 extends React.Component {
         });
     }
 
-    refresh(e) {
-        e.preventDefault();
-        this.getBalances(this.state.address);
-    }
-
     burnSafex(e) {
         e.preventDefault();
         const amount = e.target.amount.value;
         if (e.target.amount.value === '') {
-            this.setOpenMigrationAlert("Please enter valid amount");
+            this.setOpenMigrationAlert("Please enter a valid amount");
         } else {
+
             this.setState({loading: true});
-            get_utxos(this.state.address)
-                .then(utxos => {
-                    const rawtx = generateSafexBtcTransaction(
-                        utxos,
-                        BURN_ADDRESS,
-                        this.state.wif,
-                        amount,
-                        this.props.data.fee
-                    );
-                    return rawtx;
-                })
-                .then(rawtx => broadcastTransaction(rawtx))
-                .then(() => {
-                    this.setState({
-                        loading: false,
-                        migration_complete: true,
-                    });
-                })
-                .catch(err => {
-                    console.log("error broadcasting transaction " + err);
-                    this.setOpenMigrationAlert("error broadcasting transaction " + err);
-                });
+            window.require('dns').resolve('omni.safex.io', function(err) {
+                if (err) {
+                    console.log(" error broadcasting transaction " + err);
+                    this.setOpenMigrationAlert(" transaction not sent, connectivity issue " + err);
+                } else {
+                    get_utxos(this.state.address)
+                        .then(utxos => {
+                            const rawtx = generateSafexBtcTransaction(
+                                utxos,
+                                BURN_ADDRESS,
+                                this.state.wif,
+                                amount,
+                                this.props.data.fee
+                            );
+                            return rawtx;
+                        })
+                        .then(rawtx => broadcastTransaction(rawtx))
+                        .then(() => {
+                            this.setState({
+                                loading: false,
+                                migration_complete: true,
+                            });
+                        })
+                        .catch(err => {
+                            console.log("error broadcasting transaction " + err);
+                            this.setOpenMigrationAlert("error broadcasting transaction " + err);
+                        });
+                }
+            });
         }
 
     }
