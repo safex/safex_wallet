@@ -35,7 +35,6 @@ export default class Migrate5 extends React.Component {
             fee: 0,
         };
 
-        this.refresh = this.refresh.bind(this);
         this.burnSafex = this.burnSafex.bind(this);
         this.validateAmount = this.validateAmount.bind(this);
         this.goBack = this.goBack.bind(this);
@@ -173,8 +172,7 @@ export default class Migrate5 extends React.Component {
                 {
                     this.state.migration_complete
                     ?
-                    <p className="green-text">Migration of your tokens has started. This process may take a couple of days,
-                        please be patient while migration transaction is being processed.</p>
+                        <p className="green-text">Migration of your tokens has started. This process may take a couple of days, please be patient while migration transaction is being processed.</p>
                     :
                         <div>
                             <p>Final Step</p>
@@ -184,7 +182,12 @@ export default class Migrate5 extends React.Component {
                                 <input onChange={this.validateAmount} name="amount" placeholder="Amount"/>
                                 <button className="button-shine">send</button>
                             </form>
-                            <p><span className="span-200">You target migration address:</span> {this.state.safex_key.public_addr}</p>
+                            <button className="button-shine" onClick={this.reset}>Reset</button>
+                            
+                            <p>
+                                <span className="span-200">You target migration address:</span><br />
+                                {this.state.safex_key.public_addr}
+                            </p>
                             <p>the burn address: {BURN_ADDRESS} </p>
 
                             <MigrationAlert

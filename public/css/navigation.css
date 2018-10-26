@@ -97,6 +97,23 @@
   font-size: 13px;
   width: 82px;
 }
+.wallet-tabs .instruction-modal-btn {
+  margin-top: 5px;
+  font-size: 22px;
+  background: transparent;
+  border: 0px;
+  color: #fff;
+  padding-right: 2px;
+  -webkit-transition: all 0.2s ease-out;
+  -moz-transition: all 0.2s ease-out;
+  transition: all 0.2s ease-out;
+  font-weight: 600;
+  opacity: .7;
+}
+.wallet-tabs .instruction-modal-btn:hover {
+  color: #12bedd;
+  opacity: 1;
+}
 .wallet-tabs .btn:hover {
   background: transparent;
   border: 1px solid #00e7ff;

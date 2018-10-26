@@ -2,8 +2,8 @@ import React from 'react';
 
 import MigrationAddress from './MigrationAddress';
 import Navigation from '../partials/Navigation';
-import Footer from '../partials/Footer';
 import {getFee} from '../../utils/migration';
+import InstructionsModal from "../partials/InstructionsModal";
 
 export default class Migration extends React.Component {
     constructor(props) {
@@ -12,12 +12,15 @@ export default class Migration extends React.Component {
             wallet: "",
             fee: 0,
             keys: {},
+            instructionsModal: false
         };
 
         this.getPrices = this.getPrices.bind(this);
         this.goNext = this.goNext.bind(this);
         this.reloadWallet = this.reloadWallet.bind(this);
         this.wallet = this.wallet.bind(this);
+        this.openInstructionsModal = this.openInstructionsModal.bind(this);
+        this.closeInstructionsModal = this.closeInstructionsModal.bind(this);
     }
 
     getPrices() {
@@ -74,7 +77,6 @@ export default class Migration extends React.Component {
 
     reloadWallet() {
         console.log("wallet reloaded");
-        console.log("wallet reloaded");
         try {
             const json = JSON.parse(localStorage.getItem('wallet'));
             this.setState({wallet: json, keys: json['keys']});
@@ -89,7 +91,19 @@ export default class Migration extends React.Component {
 
     goNext(e) {
         e.preventDefault();
-        this.context.router.push('/safex')
+        this.context.router.push('/safex');
+    }
+
+    openInstructionsModal() {
+        this.setState({
+            instructionsModal: true
+        });
+    }
+
+    closeInstructionsModal() {
+        this.setState({
+            instructionsModal: false
+        });
     }
 
     render() {
@@ -124,6 +138,9 @@ export default class Migration extends React.Component {
                     safexPrice={this.state.safex_price}
                     btcPrice={this.state.btc_price}
                     wallet={this.wallet}
+                    instructionsModal={this.state.instructionsModal}
+                    openInstructionsModal={this.openInstructionsModal}
+                    closeInstructionsModal={this.closeInstructionsModal}
                 />
 
                 <div className="container migration-wrap fadeIn">
@@ -131,6 +148,12 @@ export default class Migration extends React.Component {
 
                     {/*<button className="button-shine" onClick={this.goNext}> To the Real Safex Wallet</button>*/}
                 </div>
+
+                <InstructionsModal
+                    instructionsModal={this.state.instructionsModal}
+                    openInstructionsModal={this.openInstructionsModal}
+                    closeInstructionsModal={this.closeInstructionsModal}
+                />
             </div>
         );
     }

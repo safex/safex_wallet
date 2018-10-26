@@ -242,3 +242,122 @@
   visibility: visible;
   opacity: 1;
 }
+/* Instructions Modal */
+.instructionsModal {
+  display: table;
+  border: 1px solid #327A9B;
+  border-radius: 8px;
+  background: url(../images/info-bg.png);
+  background-size: 100% 100%;
+  background-repeat: repeat-y;
+  color: #fff;
+  font-size: 17px;
+  padding: 12px 15px 15px;
+  width: 600px;
+  visibility: hidden;
+  opacity: 0;
+  transition: all ease 0.3s;
+  -o-transition: all ease 0.3s;
+  -moz-transition: all ease 0.3s;
+  -webkit-transition: all ease 0.3s;
+  margin: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 100002;
+}
+.instructionsModal.active {
+  visibility: visible;
+  opacity: 1;
+}
+.instructionsModal:hover {
+  outline: 0px none;
+  -webkit-box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5);
+  box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5);
+  border: 1px solid #00e7ff;
+}
+.instructionsModal .close {
+  width: auto;
+  position: absolute;
+  right: 15px;
+  top: 14px;
+  color: #fff;
+  opacity: 1;
+  font-size: 19px;
+  font-family: "Brandon Grotesque Bold", Helvetica, Arial,sans-serif;
+}
+.instructionsModal h3 {
+  text-align: center;
+  margin: 0 0 25px;
+}
+.instructionsModal .lang-bts-wrap {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  position: absolute;
+  top: 15px;
+}
+.instructionsModal .lang-bts-wrap button {
+  width: 48px;
+  text-indent: 2px;
+  border-radius: 7px;
+  background-color: rgba(18, 190, 221, 0.45);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.26px;
+  line-height: 1.2;
+  position: relative;
+  border: 2px solid #54BCD9;
+  margin-right: 10px;
+  padding: 3px 8px 4px;
+  -webkit-transition: all 0.2s ease-in;
+  -moz-transition: all 0.2s ease-in;
+  transition: all 0.2s ease-in;
+}
+.instructionsModal .lang-bts-wrap button.active {
+  background: #0ec8c1;
+  border: 2px solid #0ec8c1;
+}
+.instructionsModal .lang-bts-wrap button.active:hover {
+  box-shadow: 0 0 30px 0 rgba(14, 200, 193, .5) !important;
+}
+.instructionsModal p {
+  background: transparent;
+  border: 0px none;
+  margin-right: 0;
+  padding-right: 15px;
+  font-size: 17px;
+  margin-bottom: 0;
+  text-transform: initial;
+  line-height: 1.2;
+  text-align: left;
+}
+.instructionsModalBackdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.5);
+  z-index: 10001;
+  opacity: 0;
+  visibility: hidden;
+  border-radius: 7px;
+  transition: all ease 0.3s;
+  -o-transition: all ease 0.3s;
+  -moz-transition: all ease 0.3s;
+  -webkit-transition: all ease 0.3s;
+}
+.instructionsModalBackdrop.active {
+  visibility: visible;
+  opacity: 1;
+}

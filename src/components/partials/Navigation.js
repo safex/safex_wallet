@@ -82,8 +82,11 @@ export default class Navigation extends React.Component {
                                     }
                                 </div>
                             :
-                                <div onClick={this.props.wallet} className='btn btn-default button-shine'>
-                                    Wallet
+                                <div>
+                                    <div onClick={this.props.wallet} className='btn btn-default button-shine'>
+                                        Wallet
+                                    </div>
+                                    <button onClick={this.props.instructionsModal ? this.props.closeInstructionsModal : this.props.openInstructionsModal} className="instruction-modal-btn" title="Instructions">?</button>
                                 </div>
                         }
                     </div>

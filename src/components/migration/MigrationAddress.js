@@ -119,6 +119,7 @@ export default class MigrationAddress extends React.Component {
             this.setState({show_migration: false});
         } else {
             this.setState({show_migration: true});
+            this.setMigrationProgress(0);
         }
     }
 
