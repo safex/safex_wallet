@@ -34,6 +34,12 @@
   -webkit-box-shadow: inset 0 0 1px #000000 !important;
   box-shadow:         inset 0 0 1px #000000 !important;
 }
+.migration-wrap .refresh-btn {
+  width: 80px;
+}
+.migration-wrap .refresh-btn.disabled {
+  background: rgba(0, 157, 191, .6);
+}
 .migration-wrap .green-btn {
   background: #0ec8c1;
 }
@@ -95,7 +101,7 @@
   font-weight: 600;
   line-height: 1;
   padding: 2px 29px 3px 12px;
-  margin: 10px 0 5px;
+  margin: 0 0 5px;
   border: 1px solid #1a9dbd;
   background-color: rgba(28, 170, 203, .35);
   color: #fff;

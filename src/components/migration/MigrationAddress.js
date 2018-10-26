@@ -35,6 +35,8 @@ export default class MigrationAddress extends React.Component {
             migration_alert: false,
             migration_alert_text: '',
             fee: 0,
+            refreshTimer: 0,
+            refreshInterval: '',
         };
         this.refresh = this.refresh.bind(this);
         this.setMigrationVisible = this.setMigrationVisible.bind(this);
@@ -109,9 +111,26 @@ export default class MigrationAddress extends React.Component {
         });
     }
 
-    refresh(e) {
-        e.preventDefault();
+    refresh() {
         this.getBalances(this.state.address);
+        if (this.state.refreshTimer === 0) {
+            let interval = setInterval(this.refreshPageTimer, 1000);
+            this.setState({
+                refreshTimer: 23,
+                refreshInterval: interval,
+            });
+            this.getBalances(this.state.address);
+            console.log('Page refreshed');
+        }
+    }
+
+    refreshPageTimer = () => {
+        if (this.state.refreshTimer > 0) {
+            this.setState({refreshTimer: this.state.refreshTimer - 1});
+        }
+        else {
+            clearInterval(this.state.refreshInterval);
+        }
     }
 
     setMigrationVisible() {
@@ -249,6 +268,16 @@ export default class MigrationAddress extends React.Component {
                 <p><span>BTC</span>              {this.state.btc_bal}</p>
                 <p><span>Pending BTC</span>      {this.state.pending_btc_bal}</p>
                 <p><span>Migrated Balance</span> {this.state.pending_btc_bal}</p>
+
+                {
+                    this.state.refreshTimer === 0
+                    ?
+                        <button className="button-shine refresh-btn" onClick={this.refresh}>Refresh</button>
+                    :
+                        <button className="button-shine refresh-btn disabled" onClick={this.refresh}>
+                            {this.state.refreshTimer + ' s'}
+                        </button>
+                }
 
                 <button className="button-shine" onClick={this.setMigrationVisible}>
                     {

@@ -8,6 +8,7 @@ import {encrypt} from "../../utils/utils";
 import MigrationAlert from "../partials/MigrationAlert";
 
 var swg = window.require('safex-addressjs');
+const fileDownload = require('react-file-download');
 
 //Set the Safex Address
 export default class Migrate2 extends React.Component {
@@ -29,6 +30,8 @@ export default class Migrate2 extends React.Component {
                 migration_alert: false,
                 migration_alert_text: '',
                 all_field_filled: false,
+                used_addresses: false,
+                existing_addresses: false,
             };
 
         this.setSafexAddress = this.setSafexAddress.bind(this);
@@ -40,6 +43,9 @@ export default class Migrate2 extends React.Component {
         this.setCloseMigrationAlert = this.setCloseMigrationAlert.bind(this);
         this.startOver = this.startOver.bind(this);
         this.checkFields = this.checkFields.bind(this);
+        this.usedAddresses = this.usedAddresses.bind(this);
+        this.existingAddresses = this.existingAddresses.bind(this);
+        this.exportNewWalletAddress = this.exportNewWalletAddress.bind(this);
     }
 
     componentDidMount() {
@@ -63,6 +69,7 @@ export default class Migrate2 extends React.Component {
         this.setState({create_address: true, loading: true});
 
         const safex_keys = createSafexAddress();
+        localStorage.setItem('new_wallet_address', JSON.stringify(safex_keys));
 
         this.setState({
             safex_key: safex_keys,
@@ -115,6 +122,7 @@ export default class Migrate2 extends React.Component {
                     localStorage.setItem('wallet', JSON.stringify(json));
                     var json2 = JSON.parse(localStorage.getItem('wallet'));
                     console.log(json2.keys[index].migration_data);
+                    this.exportNewWalletAddress();
                     this.props.setMigrationProgress(2);
                 } catch (e) {
                     console.log(e);
@@ -263,7 +271,10 @@ export default class Migrate2 extends React.Component {
 
     startOver() {
         this.setState({
-            create_address: false
+            create_address: false,
+            used_addresses: false,
+            existing_addresses: false,
+            all_field_filled: false,
         })
     }
 
@@ -289,6 +300,32 @@ export default class Migrate2 extends React.Component {
                 all_field_filled: false
             })
         }
+    }
+
+    usedAddresses() {
+        this.setState({
+            used_addresses: true
+        })
+    }
+
+    existingAddresses() {
+        this.setState({
+            existing_addresses: true
+        })
+    }
+
+    exportNewWalletAddress() {
+        var wallet_data = JSON.parse(localStorage.getItem('new_wallet_address'));
+        var new_wallet = "";
+        new_wallet += "Public address: " + wallet_data.public_addr + '\n';
+        new_wallet += "Spendkey " + '\n';
+        new_wallet += "pub: "     + wallet_data.spend.pub + '\n';
+        new_wallet += "sec: "     + wallet_data.spend.sec + '\n';
+        new_wallet += "Viewkey "  + '\n';
+        new_wallet += "pub: "     + wallet_data.view.pub + '\n';
+        new_wallet += "sec: "     + wallet_data.view.sec + '\n';
+        var date = Date.now();
+        fileDownload(new_wallet, date + 'new_wallet_address.txt');
     }
 
     render() {
@@ -331,24 +368,55 @@ export default class Migrate2 extends React.Component {
                         </div>
                     :
                         <div>
-                            <p>If you don't already have Safex address</p>
-                            <button className="button-shine green-btn" onClick={this.createSafexKey}>create new key</button>
+                            {
+                                this.state.used_addresses
+                                ?
+                                    <div>
+                                        <form onSubmit={this.selectKey}>
+                                            <label htmlFor="address_selection">Previously used Safex addresses</label>
+                                            <select name="address_selection">
+                                                {options}
+                                            </select>
+                                            <button className="button-shine">Set address</button>
+                                        </form>
+                                        <button className="button-shine" onClick={this.startOver}>Go back</button>
+                                    </div>
+                                :
+                                    <div>
+                                        {
+                                            this.state.existing_addresses
+                                            ?
+                                                <div>
+                                                    <form onSubmit={this.setYourKeys}>
+                                                        <label htmlFor="safex_address">If you already have your Safex address, enter it here</label>
+                                                        <input name="safex_address" placeholder="Safex address"    id="safex_address" onChange={this.checkFields} />
+                                                        <input name="spend_key"     placeholder="Secret spend key" id="spend_key"     onChange={this.checkFields} />
+                                                        <input name="view_key"      placeholder="Secret view key"  id="view_key"      onChange={this.checkFields} />
 
-                            <form onSubmit={this.selectKey}>
-                                <select name="address_selection">
-                                    {options}
-                                </select>
-                                <button className="button-shine">Set Selected Key</button>
-                            </form>
+                                                        <button className={this.state.all_field_filled ? "button-shine green-btn" : "button-shine"}>Set your address</button>
+                                                    </form>
+                                                    <button className="button-shine" onClick={this.startOver}>Go back</button>
+                                                </div>
+                                            :
+                                                <div className="row">
+                                                    <div className="col-xs-4">
+                                                        <p>If you don't already have Safex address</p>
+                                                        <button className="button-shine green-btn" onClick={this.createSafexKey}>create new address</button>
+                                                    </div>
 
-                            <form onSubmit={this.setYourKeys}>
-                                <label htmlFor="safex_address">If you already have Safex address, enter it here</label>
-                                <input name="safex_address" placeholder="Safex address" id="safex_address" onChange={this.checkFields} />
-                                <input name="spend_key"     placeholder="Secret spend key" id="spend_key" onChange={this.checkFields} />
-                                <input name="view_key"      placeholder="Secret view key" id="view_key" onChange={this.checkFields} />
+                                                    <div className="col-xs-4">
+                                                        <p>Previously used Safex addresses</p>
+                                                        <button className="button-shine" onClick={this.usedAddresses}>My addresses</button>
+                                                    </div>
 
-                                <button className={this.state.all_field_filled ? "button-shine green-btn" : "button-shine"}>Set your key</button>
-                            </form>
+                                                    <div className="col-xs-4">
+                                                        <p>Use my Safex address</p>
+                                                        <button className="button-shine" onClick={this.existingAddresses}>Enter my address</button>
+                                                    </div>
+                                                </div>
+                                        }
+                                    </div>
+                            }
                         </div>
                 }
 
