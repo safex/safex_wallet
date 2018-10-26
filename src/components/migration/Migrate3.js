@@ -3,6 +3,7 @@ import React from 'react';
 import {get_utxos, broadcastTransaction, setSafexMigrationAddress, getFee, BURN_ADDRESS} from '../../utils/migration';
 import {openMigrationAlert, closeMigrationAlert} from '../../utils/modals';
 import MigrationAlert from "../partials/MigrationAlert";
+import ResetMigration from "../partials/ResetMigration";
 
 //Set First Half of the Safex Address
 export default class Migrate3 extends React.Component {
@@ -24,12 +25,16 @@ export default class Migrate3 extends React.Component {
             migration_alert: false,
             migration_alert_text: '',
             fee: 0,
+            reset_migration: false
         };
 
         this.setSafexAddress = this.setSafexAddress.bind(this);
         this.getTxnFee = this.getTxnFee.bind(this);
         this.setOpenMigrationAlert = this.setOpenMigrationAlert.bind(this);
         this.setCloseMigrationAlert = this.setCloseMigrationAlert.bind(this);
+        this.openResetMigration = this.openResetMigration.bind(this);
+        this.closeResetMigration = this.closeResetMigration.bind(this);
+        this.confirmReset = this.confirmReset.bind(this);
     }
 
     componentDidMount() {
@@ -156,6 +161,22 @@ export default class Migrate3 extends React.Component {
         closeMigrationAlert(this);
     }
 
+    openResetMigration() {
+        this.setState({
+            reset_migration: true
+        })
+    }
+
+    closeResetMigration() {
+        this.setState({
+            reset_migration: false
+        })
+    }
+
+    confirmReset() {
+        this.props.setMigrationProgress(0);
+    }
+
     //take firsthalf and send transaction
     render() {
         return (
@@ -177,12 +198,19 @@ export default class Migrate3 extends React.Component {
                 <p><span>Your btc balance</span> {this.state.btc_bal} btc</p>
 
                 <button className="button-shine" onClick={this.setSafexAddress}>Set the first half</button>
-                <button className="button-shine" onClick={this.reset}>Reset</button>
+                <button className="button-shine red-btn" onClick={this.openResetMigration}>Reset</button>
 
                 <MigrationAlert
                     migrationAlert={this.state.migration_alert}
                     migrationAlertText={this.state.migration_alert_text}
                     closeMigrationAlert={this.setCloseMigrationAlert}
+                />
+
+                <ResetMigration
+                    resetMigration={this.state.reset_migration}
+                    confirmReset={this.confirmReset}
+                    openResetMigration={this.openResetMigration}
+                    closeResetMigration={this.closeResetMigration}
                 />
             </div>
         )

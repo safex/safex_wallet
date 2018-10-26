@@ -11,6 +11,7 @@ import {
 
 import {openMigrationAlert, closeMigrationAlert} from '../../utils/modals';
 import MigrationAlert from "../partials/MigrationAlert";
+import ResetMigration from "../partials/ResetMigration";
 
 //Burn Safe Exchange Coins
 export default class Migrate5 extends React.Component {
@@ -33,6 +34,7 @@ export default class Migrate5 extends React.Component {
             migration_alert_text: '',
             migration_complete: false,
             fee: 0,
+            reset_migration: false
         };
 
         this.burnSafex = this.burnSafex.bind(this);
@@ -40,6 +42,9 @@ export default class Migrate5 extends React.Component {
         this.goBack = this.goBack.bind(this);
         this.setOpenMigrationAlert = this.setOpenMigrationAlert.bind(this);
         this.setCloseMigrationAlert = this.setCloseMigrationAlert.bind(this);
+        this.openResetMigration = this.openResetMigration.bind(this);
+        this.closeResetMigration = this.closeResetMigration.bind(this);
+        this.confirmReset = this.confirmReset.bind(this);
     }
 
     componentDidMount() {
@@ -165,6 +170,22 @@ export default class Migrate5 extends React.Component {
         closeMigrationAlert(this);
     }
 
+    openResetMigration() {
+        this.setState({
+            reset_migration: true
+        })
+    }
+
+    closeResetMigration() {
+        this.setState({
+            reset_migration: false
+        })
+    }
+
+    confirmReset() {
+        this.props.setMigrationProgress(0);
+    }
+
     //create safex blockchain key set
     render() {
         return (
@@ -182,7 +203,7 @@ export default class Migrate5 extends React.Component {
                                 <input onChange={this.validateAmount} name="amount" placeholder="Amount"/>
                                 <button className="button-shine">send</button>
                             </form>
-                            <button className="button-shine" onClick={this.reset}>Reset</button>
+                            <button className="button-shine red-btn" onClick={this.reset}>Reset</button>
                             
                             <p>
                                 <span className="span-200">You target migration address:</span><br />
@@ -197,6 +218,13 @@ export default class Migrate5 extends React.Component {
                             />
                         </div>
                 }
+
+                <ResetMigration
+                    resetMigration={this.state.reset_migration}
+                    confirmReset={this.confirmReset}
+                    openResetMigration={this.openResetMigration}
+                    closeResetMigration={this.closeResetMigration}
+                />
             </div>
         )
     }
