@@ -29,12 +29,8 @@ function createWindow() {
         webPreferences: {
             webSecurity: false
         },
-        // resizable: false,
-        maximizable: false,
         useContentSize: true
     });
-
-    // mainWindow.setResizable(false);
 
     // and load the index.html of the app.
     const startUrl = process.env.ELECTRON_START_URL || url.format({
@@ -44,7 +40,7 @@ function createWindow() {
         });
     mainWindow.loadURL(startUrl);
 
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
