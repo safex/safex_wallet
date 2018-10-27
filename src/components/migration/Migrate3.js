@@ -109,44 +109,37 @@ export default class Migrate3 extends React.Component {
         console.log(this.state.safex_key)
         //public spend key is first half
 
-        window.require('dns').resolve('omni.safex.io', function (err) {
-            if (err) {
+        get_utxos(this.state.address)
+            .then(utxos => {
+                const payload = '536166657831' +
+                    this.props.data.safex_key.spend.pub +
+                    this.props.data.safex_key.checksum;
+
+                const rawtx = setSafexMigrationAddress(
+                    utxos,
+                    BURN_ADDRESS,
+                    this.state.wif,
+                    payload,
+                    this.props.data.fee
+                );
+
+                return rawtx;
+                console.log(rawtx)
+
+            })
+            .then(rawtx => broadcastTransaction(rawtx))
+            .then(result => {
+                this.props.setMigrationProgress(3);
+                console.log(result);
+            })
+            .catch(err => {
                 console.log("error broadcasting transaction " + err);
-                this.setOpenMigrationAlert("transaction not sent, connectivity issue " + err);
-            } else {
-                get_utxos(this.state.address)
-                    .then(utxos => {
-                        const payload = '536166657831' +
-                            this.props.data.safex_key.spend.pub +
-                            this.props.data.safex_key.checksum;
-
-                        const rawtx = setSafexMigrationAddress(
-                            utxos,
-                            BURN_ADDRESS,
-                            this.state.wif,
-                            payload,
-                            this.props.data.fee
-                        );
-
-                        return rawtx;
-                        console.log(rawtx)
-
-                    })
-                    .then(rawtx => broadcastTransaction(rawtx))
-                    .then(result => {
-                        this.props.setMigrationProgress(3);
-                        console.log(result);
-                    })
-                    .catch(err => {
-                        console.log("error broadcasting transaction " + err);
-                        this.setOpenMigrationAlert("error broadcasting transaction " + err);
-                    })
-                    .catch(err => {
-                        console.log("error getting UTXOs " + err);
-                        this.setOpenMigrationAlert("error getting UTXOs " + err);
-                    });
-            }
-        });
+                this.setOpenMigrationAlert("error broadcasting transaction " + err);
+            })
+            .catch(err => {
+                console.log("error getting UTXOs " + err);
+                this.setOpenMigrationAlert("error getting UTXOs " + err);
+            });
     }
 
     setOpenMigrationAlert(message) {

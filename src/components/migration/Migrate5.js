@@ -116,38 +116,30 @@ export default class Migrate5 extends React.Component {
         if (e.target.amount.value === '') {
             this.setOpenMigrationAlert("Please enter a valid amount");
         } else {
-
             this.setState({loading: true});
-            window.require('dns').resolve('omni.safex.io', function(err) {
-                if (err) {
+            get_utxos(this.state.address)
+                .then(utxos => {
+                    const rawtx = generateSafexBtcTransaction(
+                        utxos,
+                        BURN_ADDRESS,
+                        this.state.wif,
+                        amount,
+                        this.props.data.fee
+                    );
+                    return rawtx;
+                })
+                .then(rawtx => broadcastTransaction(rawtx))
+                .then(() => {
+                    this.setState({
+                        loading: false,
+                        migration_complete: true,
+                    });
+                    this.props.refresh();
+                })
+                .catch(err => {
                     console.log("error broadcasting transaction " + err);
-                    this.setOpenMigrationAlert("transaction not sent, connectivity issue " + err);
-                } else {
-                    get_utxos(this.state.address)
-                        .then(utxos => {
-                            const rawtx = generateSafexBtcTransaction(
-                                utxos,
-                                BURN_ADDRESS,
-                                this.state.wif,
-                                amount,
-                                this.props.data.fee
-                            );
-                            return rawtx;
-                        })
-                        .then(rawtx => broadcastTransaction(rawtx))
-                        .then(() => {
-                            this.setState({
-                                loading: false,
-                                migration_complete: true,
-                            });
-                            this.props.refresh();
-                        })
-                        .catch(err => {
-                            console.log("error broadcasting transaction " + err);
-                            this.setOpenMigrationAlert("error broadcasting transaction " + err);
-                        });
-                }
-            });
+                    this.setOpenMigrationAlert("error broadcasting transaction " + err);
+                });
         }
 
     }
