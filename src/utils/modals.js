@@ -464,6 +464,30 @@ function closeMigrationAlert(target) {
     });
 }
 
+/**
+ * Open Reset Migration Popup
+ */
+function openResetMigration(target) {
+    target.setState({
+        reset_migration: true
+    })
+}
+
+/**
+ * Close Reset Migration Popup
+ */
+function closeResetMigration(target) {
+    target.setState({
+        reset_migration: false
+    })
+}
+/**
+ * Confirm Reset Migration
+ */
+function confirmReset(target) {
+    target.props.setMigrationProgress(0);
+}
+
 module.exports = {
     openDividendModal,
     closeDividendModal,
@@ -491,5 +515,8 @@ module.exports = {
     openExportUnencryptedWalletPopup,
     openExportEncryptedWalletPopup,
     openMigrationAlert,
-    closeMigrationAlert
+    closeMigrationAlert,
+    openResetMigration,
+    closeResetMigration,
+    confirmReset
 };

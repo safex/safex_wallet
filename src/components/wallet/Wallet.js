@@ -942,7 +942,7 @@ export default class Wallet extends React.Component {
             } else {
                 this.setCoinModalClosedSettings('Please convert the transaction to BTC to proceed');
             }
-        } else if (send_fee < 0.00001) {
+        } else if (send_fee < 0.00001 || send_fee === '' || isNaN(send_fee)) {
             if (this.sidebar_open) {
                 this.setState({
                     send_fee: parseFloat(0.00001).toFixed(8),
@@ -981,7 +981,6 @@ export default class Wallet extends React.Component {
             }
         }
     }
-
 
     createKey(e) {
         e.preventDefault();
@@ -2337,21 +2336,21 @@ export default class Wallet extends React.Component {
                                     this.state.send_coin === 'safex'
                                     ?
                                         <input type="number" name="amount" id="amount"
-                                               onChange={this.sendAmountOnChange}
-                                               readOnly={this.state.fee_in_$ ? 'readonly' : ''}
-                                               value={this.state.fee_in_$ ? (this.state.send_amount * this.state.safex_price).toFixed(8) : this.state.send_amount}/>
+                                            onChange={this.sendAmountOnChange}
+                                            readOnly={this.state.fee_in_$ ? 'readonly' : ''}
+                                            value={this.state.fee_in_$ ? (this.state.send_amount * this.state.safex_price).toFixed(8) : this.state.send_amount}/>
                                     :
                                         <input type="number" name="amount" id="amount"
-                                               onChange={this.sendAmountOnChange}
-                                               readOnly={this.state.fee_in_$ ? 'readonly' : ''}
-                                               value={this.state.fee_in_$ ? (this.state.send_amount * this.state.btc_price).toFixed(8) : this.state.send_amount}/>
+                                            onChange={this.sendAmountOnChange}
+                                            readOnly={this.state.fee_in_$ ? 'readonly' : ''}
+                                            value={this.state.fee_in_$ ? (this.state.send_amount * this.state.btc_price).toFixed(8) : this.state.send_amount}/>
                                 }
                             </div>
                             <div className="form-group">
                                 <label htmlFor="fee">{this.state.fee_in_$ ? 'Fee ($)' : 'Fee (BTC):'}</label>
                                 <input type="number" name="fee" onChange={this.sendFeeOnChange}
-                                       readOnly={this.state.fee_in_$ ? 'readonly' : ''}
-                                       value={this.state.fee_in_$ ? (this.state.send_fee * this.state.btc_price).toFixed(8) : this.state.send_fee}/>
+                                    readOnly={this.state.fee_in_$ ? 'readonly' : ''}
+                                    value={this.state.fee_in_$ ? (this.state.send_fee * this.state.btc_price).toFixed(8) : this.state.send_fee}/>
                             </div>
                             <div className="form-group fee-buttons">
                                 <span className={this.state.active_fee === 'slow'
@@ -2401,8 +2400,8 @@ export default class Wallet extends React.Component {
                                         <span></span>
                                     :
                                         <button type="button" className="btc-convert-btn button-shine"
-                                                onClick={this.convertBtcToDollars}
-                                                disabled={this.state.send_overflow_active && this.state.transaction_sent === false ? 'disabled' : ''}>
+                                            onClick={this.convertBtcToDollars}
+                                            disabled={this.state.send_overflow_active && this.state.transaction_sent === false ? 'disabled' : ''}>
                                             {this.state.fee_in_$ ? '$ to btc' : 'Btc to $'}
                                         </button>
                                 }
@@ -2503,6 +2502,8 @@ export default class Wallet extends React.Component {
                             {table}
                         </div>
                     </div>
+
+                    <div className={this.state.send_overflow_active ? "keys-backdrop active" : "keys-backdrop"} onClick={this.state.send_overflow_active ? this.setCloseCoinModal : ''}></div>
                 </div>
 
                 <HistoryModal

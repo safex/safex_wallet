@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {get_utxos, broadcastTransaction, setSafexMigrationAddress, BURN_ADDRESS, getFee} from '../../utils/migration';
-import {openMigrationAlert, closeMigrationAlert} from '../../utils/modals';
+import {openMigrationAlert, closeMigrationAlert, openResetMigration, closeResetMigration, confirmReset} from '../../utils/modals';
 import MigrationAlert from "../partials/MigrationAlert";
 import ResetMigration from "../partials/ResetMigration";
 
@@ -31,9 +31,9 @@ export default class Migrate4 extends React.Component {
         this.setSafexAddress = this.setSafexAddress.bind(this);
         this.setOpenMigrationAlert = this.setOpenMigrationAlert.bind(this);
         this.setCloseMigrationAlert = this.setCloseMigrationAlert.bind(this);
-        this.openResetMigration = this.openResetMigration.bind(this);
-        this.closeResetMigration = this.closeResetMigration.bind(this);
-        this.confirmReset = this.confirmReset.bind(this);
+        this.setOpenResetMigration = this.setOpenResetMigration.bind(this);
+        this.setCloseResetMigration = this.setCloseResetMigration.bind(this);
+        this.setConfirmReset = this.setConfirmReset.bind(this);
     }
 
     getTxnFee() {
@@ -106,44 +106,37 @@ export default class Migrate4 extends React.Component {
     setSafexAddress(e) {
         e.preventDefault();
         console.log(this.state.safex_key)
-        //public view key is second half
-        window.require('dns').resolve('omni.safex.io', function (err) {
-            if (err) {
-                console.log(" error broadcasting transaction " + err);
-                this.setOpenMigrationAlert(" transaction not sent, connectivity issue " + err);
-            } else {
-                get_utxos(this.state.address)
-                    .then(utxos => {
-                        const payload = '536166657832' +
-                            this.props.data.safex_key.view.pub +
-                            this.props.data.safex_key.checksum;
+        //public spend key is first half
+        get_utxos(this.state.address)
+            .then(utxos => {
+                const payload = '536166657832' +
+                    this.props.data.safex_key.view.pub +
+                    this.props.data.safex_key.checksum;
 
-                        const rawtx = setSafexMigrationAddress(
-                            utxos,
-                            BURN_ADDRESS,
-                            this.state.wif,
-                            payload,
-                            this.props.data.fee
-                        );
+                const rawtx = setSafexMigrationAddress(
+                    utxos,
+                    BURN_ADDRESS,
+                    this.state.wif,
+                    payload,
+                    this.props.data.fee
+                );
 
-                        return rawtx;
+                return rawtx;
 
-                    })
-                    .then(rawtx => broadcastTransaction(rawtx))
-                    .then(result => {
-                        this.props.setMigrationProgress(4);
-                        console.log(result);
-                    })
-                    .catch(err => {
-                        console.log("error broadcasting transaction " + err);
-                        this.setOpenMigrationAlert("error broadcasting transaction " + err);
-                    })
-                    .catch(err => {
-                        console.log("error getting UTXOs " + err);
-                        this.setOpenMigrationAlert("error getting UTXOs " + err);
-                    });
-            }
-        });
+            })
+            .then(rawtx => broadcastTransaction(rawtx))
+            .then(result => {
+                this.props.setMigrationProgress(4);
+                console.log(result);
+            })
+            .catch(err => {
+                console.log("error broadcasting transaction " + err);
+                this.setOpenMigrationAlert("error broadcasting transaction " + err);
+            })
+            .catch(err => {
+                console.log("error getting UTXOs " + err);
+                this.setOpenMigrationAlert("error getting UTXOs " + err);
+            });
     }
 
     setOpenMigrationAlert(message) {
@@ -154,20 +147,16 @@ export default class Migrate4 extends React.Component {
         closeMigrationAlert(this);
     }
 
-    openResetMigration() {
-        this.setState({
-            reset_migration: true
-        })
+    setOpenResetMigration() {
+        openResetMigration(this);
     }
 
-    closeResetMigration() {
-        this.setState({
-            reset_migration: false
-        })
+    setCloseResetMigration() {
+        closeResetMigration(this);
     }
 
-    confirmReset() {
-        this.props.setMigrationProgress(0);
+    setConfirmReset() {
+        confirmReset(this);
     }
 
     //take second half and send transaction
@@ -191,7 +180,7 @@ export default class Migrate4 extends React.Component {
                 <p><span>Your btc balance</span> {this.state.btc_bal} btc</p>
 
                 <button className="button-shine" onClick={this.setSafexAddress}>Set the second half</button>
-                <button className="button-shine red-btn" onClick={this.reset}>Reset</button>
+                <button className="button-shine red-btn" onClick={this.setOpenResetMigration}>Reset</button>
 
                 <MigrationAlert
                     migrationAlert={this.state.migration_alert}
@@ -201,9 +190,9 @@ export default class Migrate4 extends React.Component {
 
                 <ResetMigration
                     resetMigration={this.state.reset_migration}
-                    confirmReset={this.confirmReset}
-                    openResetMigration={this.openResetMigration}
-                    closeResetMigration={this.closeResetMigration}
+                    confirmReset={this.setConfirmReset}
+                    openResetMigration={this.setOpenResetMigration}
+                    closeResetMigration={this.setCloseResetMigration}
                 />
             </div>
         )

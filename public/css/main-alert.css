@@ -9,7 +9,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,.6);
+  background: rgba(0,0,0,.7);
   z-index: 10001;
   opacity: 0;
   visibility: hidden;

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {get_utxos, broadcastTransaction, setSafexMigrationAddress, getFee, BURN_ADDRESS} from '../../utils/migration';
-import {openMigrationAlert, closeMigrationAlert} from '../../utils/modals';
+import {openMigrationAlert, closeMigrationAlert, openResetMigration, closeResetMigration, confirmReset} from '../../utils/modals';
 import MigrationAlert from "../partials/MigrationAlert";
 import ResetMigration from "../partials/ResetMigration";
 
@@ -32,16 +32,14 @@ export default class Migrate3 extends React.Component {
         this.getTxnFee = this.getTxnFee.bind(this);
         this.setOpenMigrationAlert = this.setOpenMigrationAlert.bind(this);
         this.setCloseMigrationAlert = this.setCloseMigrationAlert.bind(this);
-        this.openResetMigration = this.openResetMigration.bind(this);
-        this.closeResetMigration = this.closeResetMigration.bind(this);
-        this.confirmReset = this.confirmReset.bind(this);
+        this.setOpenResetMigration = this.setOpenResetMigration.bind(this);
+        this.setCloseResetMigration = this.setCloseResetMigration.bind(this);
+        this.setConfirmReset = this.setConfirmReset.bind(this);
     }
 
     componentDidMount() {
-
         this.getBalances(this.props.data.address);
         this.getTxnFee();
-
 
         this.setState({
             address: this.props.data.address,
@@ -50,6 +48,7 @@ export default class Migrate3 extends React.Component {
             fee: this.props.data.fee,
             loading: false
         });
+        console.log(this.state.address)
     }
 
     getBalances(address) {
@@ -61,7 +60,6 @@ export default class Migrate3 extends React.Component {
             .then((resp) => {
                 return resp
             }));
-
 
         Promise.all(promises).then(values => {
             this.setState({
@@ -77,8 +75,7 @@ export default class Migrate3 extends React.Component {
         });
     }
 
-    refresh(e) {
-        e.preventDefault();
+    refresh() {
         this.getBalances(this.state.address);
     }
 
@@ -114,8 +111,8 @@ export default class Migrate3 extends React.Component {
 
         window.require('dns').resolve('omni.safex.io', function (err) {
             if (err) {
-                console.log(" error broadcasting transaction " + err);
-                this.setOpenMigrationAlert(" transaction not sent, connectivity issue " + err);
+                console.log("error broadcasting transaction " + err);
+                this.setOpenMigrationAlert("transaction not sent, connectivity issue " + err);
             } else {
                 get_utxos(this.state.address)
                     .then(utxos => {
@@ -150,7 +147,6 @@ export default class Migrate3 extends React.Component {
                     });
             }
         });
-
     }
 
     setOpenMigrationAlert(message) {
@@ -161,20 +157,16 @@ export default class Migrate3 extends React.Component {
         closeMigrationAlert(this);
     }
 
-    openResetMigration() {
-        this.setState({
-            reset_migration: true
-        })
+    setOpenResetMigration() {
+        openResetMigration(this);
     }
 
-    closeResetMigration() {
-        this.setState({
-            reset_migration: false
-        })
+    setCloseResetMigration() {
+        closeResetMigration(this);
     }
 
-    confirmReset() {
-        this.props.setMigrationProgress(0);
+    setConfirmReset() {
+        confirmReset(this);
     }
 
     //take firsthalf and send transaction
@@ -198,7 +190,7 @@ export default class Migrate3 extends React.Component {
                 <p><span>Your btc balance</span> {this.state.btc_bal} btc</p>
 
                 <button className="button-shine" onClick={this.setSafexAddress}>Set the first half</button>
-                <button className="button-shine red-btn" onClick={this.openResetMigration}>Reset</button>
+                <button className="button-shine red-btn" onClick={this.setOpenResetMigration}>Reset</button>
 
                 <MigrationAlert
                     migrationAlert={this.state.migration_alert}
@@ -208,9 +200,9 @@ export default class Migrate3 extends React.Component {
 
                 <ResetMigration
                     resetMigration={this.state.reset_migration}
-                    confirmReset={this.confirmReset}
-                    openResetMigration={this.openResetMigration}
-                    closeResetMigration={this.closeResetMigration}
+                    confirmReset={this.setConfirmReset}
+                    openResetMigration={this.setOpenResetMigration}
+                    closeResetMigration={this.setCloseResetMigration}
                 />
             </div>
         )

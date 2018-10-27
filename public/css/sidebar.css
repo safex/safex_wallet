@@ -151,7 +151,7 @@
 }
 .overflow.sendModal .confirm-btn {
   display: block;
-  margin: 30px auto;
+  margin: 30px auto 15px;
   border: 1px solid rgba(0, 231, 255, 1);
   border-radius: 10px;
   background: transparent;
@@ -163,6 +163,22 @@
 }
 .overflow.sendModal .confirm-btn.disabled {
   pointer-events: none;
+}
+.overflow.sendModal .cancel-btn {
+  display: block;
+  border: 1px solid #c80e4b;
+  border-radius: 10px;
+  background: #c80e4b;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 12px;
+  padding: 6px 1px 5px;
+  width: 70%;
+  margin: 0px auto;
+  font-weight: 600;
+}
+.overflow.sendModal .cancel-btn:hover {
+
 }
 .overflow.sendModal .input-group {
   width: 100%;

@@ -9,7 +9,7 @@ import {
     getFee
 } from '../../utils/migration';
 
-import {openMigrationAlert, closeMigrationAlert} from '../../utils/modals';
+import {openMigrationAlert, closeMigrationAlert, openResetMigration, closeResetMigration, confirmReset} from '../../utils/modals';
 import MigrationAlert from "../partials/MigrationAlert";
 import ResetMigration from "../partials/ResetMigration";
 
@@ -34,7 +34,7 @@ export default class Migrate5 extends React.Component {
             migration_alert_text: '',
             migration_complete: false,
             fee: 0,
-            reset_migration: false
+            reset_migration : false
         };
 
         this.burnSafex = this.burnSafex.bind(this);
@@ -42,9 +42,10 @@ export default class Migrate5 extends React.Component {
         this.goBack = this.goBack.bind(this);
         this.setOpenMigrationAlert = this.setOpenMigrationAlert.bind(this);
         this.setCloseMigrationAlert = this.setCloseMigrationAlert.bind(this);
-        this.openResetMigration = this.openResetMigration.bind(this);
-        this.closeResetMigration = this.closeResetMigration.bind(this);
-        this.confirmReset = this.confirmReset.bind(this);
+        this.setOpenResetMigration = this.setOpenResetMigration.bind(this);
+        this.setCloseResetMigration = this.setCloseResetMigration.bind(this);
+        this.setConfirmReset = this.setConfirmReset.bind(this);
+        this.backToStep1 = this.backToStep1.bind(this);
     }
 
     componentDidMount() {
@@ -111,7 +112,7 @@ export default class Migrate5 extends React.Component {
 
     burnSafex(e) {
         e.preventDefault();
-        const amount = e.target.amount.value;
+        const amount = parseInt(e.target.amount.value);
         if (e.target.amount.value === '') {
             this.setOpenMigrationAlert("Please enter a valid amount");
         } else {
@@ -119,8 +120,8 @@ export default class Migrate5 extends React.Component {
             this.setState({loading: true});
             window.require('dns').resolve('omni.safex.io', function(err) {
                 if (err) {
-                    console.log(" error broadcasting transaction " + err);
-                    this.setOpenMigrationAlert(" transaction not sent, connectivity issue " + err);
+                    console.log("error broadcasting transaction " + err);
+                    this.setOpenMigrationAlert("transaction not sent, connectivity issue " + err);
                 } else {
                     get_utxos(this.state.address)
                         .then(utxos => {
@@ -139,6 +140,7 @@ export default class Migrate5 extends React.Component {
                                 loading: false,
                                 migration_complete: true,
                             });
+                            this.props.refresh();
                         })
                         .catch(err => {
                             console.log("error broadcasting transaction " + err);
@@ -170,19 +172,20 @@ export default class Migrate5 extends React.Component {
         closeMigrationAlert(this);
     }
 
-    openResetMigration() {
-        this.setState({
-            reset_migration: true
-        })
+    setOpenResetMigration() {
+        openResetMigration(this);
     }
 
-    closeResetMigration() {
-        this.setState({
-            reset_migration: false
-        })
+    setCloseResetMigration() {
+        closeResetMigration(this);
     }
 
-    confirmReset() {
+    setConfirmReset() {
+        confirmReset(this);
+    }
+
+    backToStep1() {
+        this.props.setMigrationVisible();
         this.props.setMigrationProgress(0);
     }
 
@@ -193,7 +196,10 @@ export default class Migrate5 extends React.Component {
                 {
                     this.state.migration_complete
                     ?
-                        <p className="green-text">Migration of your tokens has started. This process may take a couple of days, please be patient while migration transaction is being processed.</p>
+                        <div>
+                            <p className="green-text">Migration of your tokens has started. This process may take a couple of days, please be patient while migration transaction is being processed.</p>
+                            <button className="button-shine" onClick={this.backToStep1}>Ok</button>
+                        </div>
                     :
                         <div>
                             <p>Final Step</p>
@@ -203,8 +209,8 @@ export default class Migrate5 extends React.Component {
                                 <input onChange={this.validateAmount} name="amount" placeholder="Amount"/>
                                 <button className="button-shine">send</button>
                             </form>
-                            <button className="button-shine red-btn" onClick={this.reset}>Reset</button>
-                            
+                            <button className="button-shine red-btn" onClick={this.setOpenResetMigration}>Reset</button>
+
                             <p>
                                 <span className="span-200">You target migration address:</span><br />
                                 {this.state.safex_key.public_addr}
@@ -221,9 +227,9 @@ export default class Migrate5 extends React.Component {
 
                 <ResetMigration
                     resetMigration={this.state.reset_migration}
-                    confirmReset={this.confirmReset}
-                    openResetMigration={this.openResetMigration}
-                    closeResetMigration={this.closeResetMigration}
+                    confirmReset={this.setConfirmReset}
+                    openResetMigration={this.setOpenResetMigration}
+                    closeResetMigration={this.setCloseResetMigration}
                 />
             </div>
         )

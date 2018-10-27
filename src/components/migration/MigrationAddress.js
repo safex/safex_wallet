@@ -112,7 +112,6 @@ export default class MigrationAddress extends React.Component {
     }
 
     refresh() {
-        this.getBalances(this.state.address);
         if (this.state.refreshTimer === 0) {
             let interval = setInterval(this.refreshPageTimer, 1000);
             this.setState({
@@ -255,19 +254,28 @@ export default class MigrationAddress extends React.Component {
                     setMigrationVisible={this.setMigrationVisible}
                     setMigrationProgress={this.setMigrationProgress}
                     key={address}
-                    data={data}/>
+                    data={data}
+                    refresh={this.refresh}/>
                 break;
         }
 
         return (
             <div className="address-wrap">
-                <p><span>Label</span>            {this.state.label}</p>
-                <p><span>Address</span>          {this.state.address}</p>
-                <p><span>Safex</span>            {this.state.safex_bal}</p>
-                <p><span>Pending safex</span>    {this.state.pending_safex_bal}</p>
-                <p><span>BTC</span>              {this.state.btc_bal}</p>
-                <p><span>Pending BTC</span>      {this.state.pending_btc_bal}</p>
-                <p><span>Migrated Balance</span> {this.state.pending_btc_bal}</p>
+                <div className="row">
+                    <div className="col-xs-6">
+                        <p><span>Label</span>            {this.state.label}</p>
+                        <p><span>Address</span>          {this.state.address}</p>
+                        <p><span>Safex</span>            {this.state.safex_bal}</p>
+                        <p><span>Pending safex</span>    {this.state.pending_safex_bal}</p>
+                        <p><span>BTC</span>              {this.state.btc_bal}</p>
+                        <p><span>Pending BTC</span>      {this.state.pending_btc_bal}</p>
+                        <p><span>Migrated Balance</span> {this.state.pending_btc_bal}</p>
+                    </div>
+
+                    <div className="col-xs-6 keys-table-wrap">
+
+                    </div>
+                </div>
 
                 {
                     this.state.refreshTimer === 0
@@ -278,6 +286,12 @@ export default class MigrationAddress extends React.Component {
                             {this.state.refreshTimer + ' s'}
                         </button>
                 }
+
+                {/*<button onClick={() => {this.setMigrationProgress(0)}}>show 1</button>*/}
+                {/*<button onClick={() => {this.setMigrationProgress(1)}}>show 2</button>*/}
+                {/*<button onClick={() => {this.setMigrationProgress(2)}}>show 3</button>*/}
+                {/*<button onClick={() => {this.setMigrationProgress(3)}}>show 4</button>*/}
+                {/*<button onClick={() => {this.setMigrationProgress(4)}}>show 5</button>*/}
 
                 <button className="button-shine" onClick={this.setMigrationVisible}>
                     {

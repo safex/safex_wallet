@@ -317,6 +317,7 @@ export default class Migrate2 extends React.Component {
     exportNewWalletAddress() {
         var wallet_data = JSON.parse(localStorage.getItem('new_wallet_address'));
         var new_wallet = "";
+
         new_wallet += "Public address: " + wallet_data.public_addr + '\n';
         new_wallet += "Spendkey " + '\n';
         new_wallet += "pub: "     + wallet_data.spend.pub + '\n';
@@ -325,6 +326,7 @@ export default class Migrate2 extends React.Component {
         new_wallet += "pub: "     + wallet_data.view.pub + '\n';
         new_wallet += "sec: "     + wallet_data.view.sec + '\n';
         var date = Date.now();
+
         fileDownload(new_wallet, date + 'new_wallet_address.txt');
     }
 
@@ -350,7 +352,7 @@ export default class Migrate2 extends React.Component {
                         <div>
                             <p className="red-text">
                                 The following wallet information is to control your coins, do not share it. <br />
-                                Abusing these informations can and will result in total loss of your Safex Tokens and Safex Cash.<br />
+                                Sharing this information can and will result in total loss of your Safex Tokens and Safex Cash.<br />
                                 Keep this information safe at all times!
                             </p>
                             <p>Wallet Address</p>
@@ -373,7 +375,7 @@ export default class Migrate2 extends React.Component {
                                 ?
                                     <div>
                                         <form onSubmit={this.selectKey}>
-                                            <label htmlFor="address_selection">Previously used Safex addresses</label>
+                                            <p>Previously used Safex addresses</p>
                                             <select name="address_selection">
                                                 {options}
                                             </select>
@@ -388,7 +390,7 @@ export default class Migrate2 extends React.Component {
                                             ?
                                                 <div>
                                                     <form onSubmit={this.setYourKeys}>
-                                                        <label htmlFor="safex_address">If you already have your Safex address, enter it here</label>
+                                                        <p>If you already have your Safex address, enter it here</p>
                                                         <input name="safex_address" placeholder="Safex address"    id="safex_address" onChange={this.checkFields} />
                                                         <input name="spend_key"     placeholder="Secret spend key" id="spend_key"     onChange={this.checkFields} />
                                                         <input name="view_key"      placeholder="Secret view key"  id="view_key"      onChange={this.checkFields} />
