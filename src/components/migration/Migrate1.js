@@ -41,7 +41,7 @@ export default class Migrate1 extends React.Component {
                     Safe Exchnage Coins will be transferable. And any Airdrop will be absorbed by the Safex Developers.
                 </p>
 
-                <button className="button-shine" onClick={() => {this.props.setMigrationVisible()}}>Cancel</button>
+                <button className="button-shine red-btn" onClick={() => {this.props.setMigrationVisible()}}>Cancel</button>
                 <button className="button-shine" onClick={() => {this.props.setMigrationProgress(1)}}>Proceed</button>
             </div>
         )
