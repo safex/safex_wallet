@@ -144,7 +144,9 @@ export default class Migration extends React.Component {
                 />
 
                 <div className="container migration-wrap fadeIn">
-                    {table}
+                    <div className="col-xs-12 migration-inner">
+                        {table}
+                    </div>
 
                     {/*<button className="button-shine" onClick={this.goNext}> To the Real Safex Wallet</button>*/}
                 </div>
