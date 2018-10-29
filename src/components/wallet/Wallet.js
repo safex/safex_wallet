@@ -888,62 +888,62 @@ export default class Wallet extends React.Component {
         });
 
         if ((this.state.send_coin === 'safex' && this.state.send_fee > key_btc_bal) || (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal)) {
-            if (this.sidebar_open) {
+            if (this.state.sidebar_open) {
                 this.setCoinModalOpenSettings('You do not have enough BITCOIN to cover the fee');
             } else {
                 this.setCoinModalClosedSettings('You do not have enough BITCOIN to cover the fee');
             }
         } else if (this.state.send_coin === 'safex' && this.state.send_amount > key_safex_bal) {
-            if (this.sidebar_open) {
+            if (this.state.sidebar_open) {
                 this.setCoinModalOpenSettings('You do not have enough SAFEX to cover this transaction');
             } else {
                 this.setCoinModalClosedSettings('You do not have enough SAFEX to cover this transaction');
             }
         } else if (this.state.send_coin === 'safex' && (this.state.send_amount === '' || this.state.send_amount === 0 || isNaN(this.state.send_amount))) {
-            if (this.sidebar_open) {
+            if (this.state.sidebar_open) {
                 this.setCoinModalOpenSettings('Invalid SAFEX amount');
             } else {
                 this.setCoinModalClosedSettings('Invalid SAFEX amount');
             }
         } else if (this.state.send_coin === 'btc' && (this.state.send_amount === '' || parseFloat(this.state.send_amount) === 0 || isNaN(this.state.send_total))) {
-            if (this.sidebar_open) {
+            if (this.state.sidebar_open) {
                 this.setCoinModalOpenSettings('Invalid BITCOIN amount');
             } else {
                 this.setCoinModalClosedSettings('Invalid BITCOIN amount');
             }
         } else if (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal) {
-            if (this.sidebar_open) {
+            if (this.state.sidebar_open) {
                 this.setCoinModalOpenSettings('You do not have enough BITCOIN to cover this transaction');
             } else {
                 this.setCoinModalClosedSettings('You do not have enough BITCOIN to cover this transaction');
             }
         } else if (e.target.destination.value === '') {
-            if (this.sidebar_open) {
+            if (this.state.sidebar_open) {
                 this.setCoinModalOpenSettings('Destination field is empty');
             } else {
                 this.setCoinModalClosedSettings('Destination field is empty');
             }
         } else if (e.target.destination.value === e.target.public_key.value) {
-            if (this.sidebar_open) {
+            if (this.state.sidebar_open) {
                 this.setCoinModalOpenSettings('Invalid sending address');
             } else {
                 this.setCoinModalClosedSettings('Invalid sending address');
             }
         } else if (pending_safex_bal < 0 || pending_btc_bal < 0) {
-            if (this.sidebar_open) {
+            if (this.state.sidebar_open) {
                 this.setCoinModalOpenSettings('Cannot send transaction, this key has a pending minus. Please try again later.');
             } else {
                 this.setCoinModalClosedSettings('Cannot send transaction, this key has a pending minus. Please try again later.');
             }
             this.setCloseCoinModal();
         } else if (this.state.fee_in_$) {
-            if (this.sidebar_open) {
+            if (this.state.sidebar_open) {
                 this.setCoinModalOpenSettings('Please convert the transaction to BTC to proceed');
             } else {
                 this.setCoinModalClosedSettings('Please convert the transaction to BTC to proceed');
             }
         } else if (send_fee < 0.00001 || send_fee === '' || isNaN(send_fee)) {
-            if (this.sidebar_open) {
+            if (this.state.sidebar_open) {
                 this.setState({
                     send_fee: parseFloat(0.00001).toFixed(8),
                 });

@@ -88,7 +88,7 @@ export default class Migrate2 extends React.Component {
         try {
             var json = JSON.parse(localStorage.getItem('wallet'));
         } catch (e) {
-            alert('Error parsing the wallet data.');
+            this.setOpenMigrationAlert('Error parsing the wallet data.');
         }
 
         if (json.hasOwnProperty('safex_keys')) {
@@ -101,7 +101,7 @@ export default class Migrate2 extends React.Component {
         var index = -1;
 
         for (var key in json.keys) {
-            if (json.keys[key].public_key == this.props.data.address) {
+            if (json.keys[key].public_key === this.props.data.address) {
                 index = key;
                 json.keys[key]['migration_data'] = {};
                 json.keys[key]['migration_data'].safex_keys = this.state.safex_key;
@@ -173,29 +173,28 @@ export default class Migrate2 extends React.Component {
                 var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
 
                 fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
-                        if (err) {
-                            console.log('Problem communicating to the wallet file.');
-                            this.setOpenMigrationAlert('Problem communicating to the wallet file.');
-                        } else {
-                            try {
-                                localStorage.setItem('wallet', JSON.stringify(json));
-                                this.setState({
-                                    safex_key: safex_keys,
-                                    safex_address: safex_keys.public_addr,
-                                    safex_spend_pub: safex_keys.spend.pub,
-                                    safex_spend_sec: safex_keys.spend.sec,
-                                    safex_view_pub: safex_keys.view.pub,
-                                    safex_view_sec: safex_keys.view.sec,
-                                    loading: false,
-                                });
-                                this.props.setMigrationProgress(2);
-                            } catch (e) {
-                                console.log(e);
-                                this.setOpenMigrationAlert('An error adding a key to the wallet. Please contact team@safex.io');
-                            }
+                    if (err) {
+                        console.log('Problem communicating to the wallet file.');
+                        this.setOpenMigrationAlert('Problem communicating to the wallet file.');
+                    } else {
+                        try {
+                            localStorage.setItem('wallet', JSON.stringify(json));
+                            this.setState({
+                                safex_key: safex_keys,
+                                safex_address: safex_keys.public_addr,
+                                safex_spend_pub: safex_keys.spend.pub,
+                                safex_spend_sec: safex_keys.spend.sec,
+                                safex_view_pub: safex_keys.view.pub,
+                                safex_view_sec: safex_keys.view.sec,
+                                loading: false,
+                            });
+                            this.props.setMigrationProgress(2);
+                        } catch (e) {
+                            console.log(e);
+                            this.setOpenMigrationAlert('An error adding a key to the wallet. Please contact team@safex.io');
                         }
                     }
-                );
+                });
             } else {
                 console.log('Incorrect keys');
                 this.setOpenMigrationAlert('Incorrect keys');
@@ -218,7 +217,7 @@ export default class Migrate2 extends React.Component {
             var x_index = -1;
 
             for (var key in json.keys) {
-                if (json.keys[key].public_key == this.props.data.address) {
+                if (json.keys[key].public_key === this.props.data.address) {
                     key_index = key;
                     for (var x_key in json.safex_keys) {
                         if (json.safex_keys[x_key].public_addr === e.target.address_selection.value) {
@@ -228,7 +227,7 @@ export default class Migrate2 extends React.Component {
                             json.keys[key_index].migration_progress = 2;
                         }
                     }
-                 }
+                }
             }
 
             if (x_index != -1 && key_index != -1) {

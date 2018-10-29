@@ -204,7 +204,7 @@ export default class Migrate5 extends React.Component {
                             <button className="button-shine red-btn" onClick={this.setOpenResetMigration}>Reset</button>
 
                             <p>
-                                <span className="span-200">You target migration address:</span><br />
+                                <span className="span-200">Your target migration address:</span><br />
                                 {this.state.safex_key.public_addr}
                             </p>
                             <p>the burn address: {BURN_ADDRESS} </p>

@@ -172,7 +172,7 @@ export default class Migrate4 extends React.Component {
                 </p>
 
                 <p>
-                    <span className="span-200">You target migration address:</span><br />
+                    <span className="span-200">Your target migration address:</span><br />
                     {this.state.safex_key.public_addr}
                 </p>
 

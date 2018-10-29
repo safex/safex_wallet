@@ -33,7 +33,7 @@ export default class InstructionsModal extends React.Component {
                                 <div>
                                     <h3>Instructions</h3>
                                     <p>
-                                        To migrate Safex Tokens to the Safex Blockchain, click <button>migrate</button> button of the key you want to migrate the tokens from.
+                                        To migrate your Safex Tokens to the Safex Blockchain, click <button>migrate</button> button of the key you want to migrate the tokens from.
                                         Read the following text, and if you agree, click proceed. If you don't already have your Safex address, click <button className="green-btn">create new address</button>
                                         button. This will generate new Safex address.
                                     </p>
