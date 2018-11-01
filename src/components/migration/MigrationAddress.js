@@ -299,7 +299,9 @@ export default class MigrationAddress extends React.Component {
   confirmReset() {
       this.setCloseResetMigration();
       this.setMigrationProgress(0);
-      this.setMigrationVisible();
+      if (this.state.show_migration) {
+          this.setMigrationVisible();
+      }
   }
 
   render() {
