@@ -17,8 +17,8 @@ export default class ResetMigration extends React.Component {
                         <span className="close" onClick={this.props.closeResetMigration}>X</span>
                         Are you sure you want to reset your migration?
                         <div className="btns-wrap">
-                            <button className="button-shine green-btn" onClick={this.props.confirmReset}>Ok</button>
                             <button className="button-shine red-btn" onClick={this.props.closeResetMigration}>Cancel</button>
+                            <button className="button-shine green-btn" onClick={this.props.confirmReset}>Ok</button>
                         </div>
                     </div>
                 </div>

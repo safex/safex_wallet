@@ -184,7 +184,7 @@ export default class Migrate5 extends React.Component {
     //create safex blockchain key set
     render() {
         return (
-            <div>
+            <div className="final-step">
                 {
                     this.state.migration_complete
                     ?
@@ -197,17 +197,20 @@ export default class Migrate5 extends React.Component {
                             <p>Final Step</p>
                             <p><span>You will need</span> {this.state.txn_fee} btc </p>
 
-                            <form onSubmit={this.burnSafex}>
+                            <form className="final-step-form" onSubmit={this.burnSafex}>
                                 <input onChange={this.validateAmount} name="amount" placeholder="Amount"/>
                                 <button className="button-shine">send</button>
                             </form>
-                            <button className="button-shine red-btn" onClick={this.setOpenResetMigration}>Reset</button>
+                            <button className="button-shine red-btn reset-btn" onClick={this.setOpenResetMigration}>Reset</button>
 
                             <p>
                                 <span className="span-200">Your target migration address:</span><br />
-                                {this.state.safex_key.public_addr}
+                                <input className="target-address" value={this.state.safex_key.public_addr} />
                             </p>
-                            <p>the burn address: {BURN_ADDRESS} </p>
+                            <p>
+                                <span className="span-200">The burn address:</span><br />
+                                <input className="target-address" value={BURN_ADDRESS} />
+                            </p>
 
                             <MigrationAlert
                                 migrationAlert={this.state.migration_alert}

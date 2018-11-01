@@ -176,14 +176,14 @@ export default class Migrate3 extends React.Component {
 
                 <p>
                     <span className="span-200">Your target migration address:</span><br />
-                    {this.state.safex_key.public_addr}
+                    <input className="target-address" value={this.state.safex_key.public_addr} />
                 </p>
 
                 <p><span>You will need</span> {this.state.txn_fee} btc </p>
                 <p><span>Your btc balance</span> {this.state.btc_bal} btc</p>
 
                 <button className="button-shine red-btn" onClick={this.setOpenResetMigration}>Reset</button>
-                <button className="button-shine" onClick={this.setSafexAddress}>Set the first half</button>
+                <button className="button-shine green-btn" onClick={this.setSafexAddress}>Set the first half</button>
 
                 <MigrationAlert
                     migrationAlert={this.state.migration_alert}
