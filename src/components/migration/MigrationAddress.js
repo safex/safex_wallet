@@ -299,9 +299,7 @@ export default class MigrationAddress extends React.Component {
   confirmReset() {
       this.setCloseResetMigration();
       this.setMigrationProgress(0);
-      if (this.state.show_migration) {
-          this.setMigrationVisible();
-      }
+      this.setMigrationVisible();
   }
 
   render() {
@@ -551,7 +549,10 @@ export default class MigrationAddress extends React.Component {
           {/*show 5*/}
         {/*</button>*/}
 
-        <button className="button-shine red-btn" onClick={this.setOpenResetMigration}>
+        {
+
+        }
+        <button className={this.state.show_migration ? "button-shine red-btn" : "hidden"} onClick={this.setOpenResetMigration}>
           Reset
         </button>
 
