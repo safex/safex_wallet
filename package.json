@@ -84,6 +84,7 @@
       "build/css/*.*",
       "build/fonts/*.*",
       "build/images/*.*",
+      "build/images/migration/*.*",
       "build/static/css/*.*",
       "build/static/js/*.*"
     ],

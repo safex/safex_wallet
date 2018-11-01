@@ -46,7 +46,7 @@
 .migration-wrap .refresh-btn {
   width: 100px;
   position: absolute;
-  top: 17px;
+  top: 7px;
   right: 5px;
   background: rgba(0, 157, 191, 1);
 }
@@ -137,7 +137,7 @@
   max-width: 445px;
 }
 .address-wrap .keys-table-wrap .table-wrap table tr td.address span {
-  width: calc(100% - 100px);
+  width: calc(100% - 95px);
   display: inline-block;
 }
 .address-wrap .keys-table-wrap .table-wrap table tr td.address button {

@@ -419,10 +419,6 @@ export default class MigrationAddress extends React.Component {
             <table>
               <tbody>
                 <tr>
-                  <td className="border">Label</td>
-                  <td className="blue">{this.state.label}</td>
-                </tr>
-                <tr>
                   <td className="border">Address</td>
                   <td>{this.state.address}</td>
                 </tr>
