@@ -117,7 +117,7 @@
 }
 .address-wrap .keys-table-wrap .table-wrap table tr td {
   padding: 5px !important;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid #009dbf;
 }
 .address-wrap .keys-table-wrap .table-wrap.expanded table tr td.address {
   width: 100%;
@@ -317,20 +317,17 @@
   padding-left: 15px;
 }
 .migration-step-wrap .final-step .reset-btn {
-  position: absolute;
-  bottom: 145px;
 }
 .migration-step-wrap .final-step-form {
   margin-bottom: 10px;
+  display: inline-block;
 }
 .migration-step-wrap .final-step-form input {
-  width: 100%;
+  width: 200px;
 }
 .migration-step-wrap .final-step-form button {
-  position: relative;
-  left: 70px;
+  margin-left: 10px;
 }
-
 .address-wrap .address-wrap-inner {
   padding-top: 15px;
   padding-bottom: 15px;
