@@ -106,6 +106,7 @@
   padding-left: 0;
 }
 .address-wrap .keys-table-wrap h3 {
+  font-size: 20px;
   margin: 0 0 5px;
 }
 .address-wrap .keys-table-wrap .table-wrap {
@@ -141,7 +142,7 @@
 }
 .address-wrap .keys-table-wrap .table-wrap table tr td.address button {
   margin: 1px 0 0 0;
-  padding: 3px 9px 4px;
+  padding: 4px 9px 5px;
   float: right;
   min-width: 82px;
 }
@@ -750,7 +751,7 @@
   z-index: 10001;
   opacity: 0;
   visibility: hidden;
-  border-radius: 7px;
+  border-radius: 5px;
   transition: all ease 0.3s;
   -o-transition: all ease 0.3s;
   -moz-transition: all ease 0.3s;

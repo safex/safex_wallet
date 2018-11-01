@@ -33,8 +33,7 @@ export default class Migrate5 extends React.Component {
             migration_alert: false,
             migration_alert_text: '',
             migration_complete: false,
-            fee: 0,
-            reset_migration : false
+            fee: 0
         };
 
         this.burnSafex = this.burnSafex.bind(this);
@@ -42,9 +41,6 @@ export default class Migrate5 extends React.Component {
         this.goBack = this.goBack.bind(this);
         this.setOpenMigrationAlert = this.setOpenMigrationAlert.bind(this);
         this.setCloseMigrationAlert = this.setCloseMigrationAlert.bind(this);
-        this.setOpenResetMigration = this.setOpenResetMigration.bind(this);
-        this.setCloseResetMigration = this.setCloseResetMigration.bind(this);
-        this.setConfirmReset = this.setConfirmReset.bind(this);
         this.backToStep1 = this.backToStep1.bind(this);
     }
 
@@ -164,18 +160,6 @@ export default class Migrate5 extends React.Component {
         closeMigrationAlert(this);
     }
 
-    setOpenResetMigration() {
-        openResetMigration(this);
-    }
-
-    setCloseResetMigration() {
-        closeResetMigration(this);
-    }
-
-    setConfirmReset() {
-        confirmReset(this);
-    }
-
     backToStep1() {
         this.props.setMigrationVisible();
         this.props.setMigrationProgress(0);
@@ -201,7 +185,6 @@ export default class Migrate5 extends React.Component {
                                 <input onChange={this.validateAmount} name="amount" placeholder="Amount"/>
                                 <button className="button-shine">send</button>
                             </form>
-                            <button className="button-shine red-btn reset-btn" onClick={this.setOpenResetMigration}>Reset</button>
 
                             <p>
                                 <span className="span-200">Your target migration address:</span><br />
@@ -219,13 +202,6 @@ export default class Migrate5 extends React.Component {
                             />
                         </div>
                 }
-
-                <ResetMigration
-                    resetMigration={this.state.reset_migration}
-                    confirmReset={this.setConfirmReset}
-                    openResetMigration={this.setOpenResetMigration}
-                    closeResetMigration={this.setCloseResetMigration}
-                />
             </div>
         )
     }

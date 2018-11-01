@@ -481,12 +481,6 @@ function closeResetMigration(target) {
         reset_migration: false
     })
 }
-/**
- * Confirm Reset Migration
- */
-function confirmReset(target) {
-    target.props.setMigrationProgress(0);
-}
 
 module.exports = {
     openDividendModal,
@@ -517,6 +511,5 @@ module.exports = {
     openMigrationAlert,
     closeMigrationAlert,
     openResetMigration,
-    closeResetMigration,
-    confirmReset
+    closeResetMigration
 };

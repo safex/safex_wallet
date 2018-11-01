@@ -23,17 +23,13 @@ export default class Migrate4 extends React.Component {
             safex_key: {},
             migration_alert: false,
             migration_alert_text: '',
-            fee: 0,
-            reset_migration: false
+            fee: 0
         };
 
         this.refresh = this.refresh.bind(this);
         this.setSafexAddress = this.setSafexAddress.bind(this);
         this.setOpenMigrationAlert = this.setOpenMigrationAlert.bind(this);
         this.setCloseMigrationAlert = this.setCloseMigrationAlert.bind(this);
-        this.setOpenResetMigration = this.setOpenResetMigration.bind(this);
-        this.setCloseResetMigration = this.setCloseResetMigration.bind(this);
-        this.setConfirmReset = this.setConfirmReset.bind(this);
     }
 
     getTxnFee() {
@@ -147,18 +143,6 @@ export default class Migrate4 extends React.Component {
         closeMigrationAlert(this);
     }
 
-    setOpenResetMigration() {
-        openResetMigration(this);
-    }
-
-    setCloseResetMigration() {
-        closeResetMigration(this);
-    }
-
-    setConfirmReset() {
-        confirmReset(this);
-    }
-
     //take second half and send transaction
     render() {
         return (
@@ -179,20 +163,12 @@ export default class Migrate4 extends React.Component {
                 <p><span>You will need</span> {this.state.txn_fee} btc </p>
                 <p><span>Your btc balance</span> {this.state.btc_bal} btc</p>
 
-                <button className="button-shine red-btn" onClick={this.setOpenResetMigration}>Reset</button>
                 <button className="button-shine green-btn" onClick={this.setSafexAddress}>Set the second half</button>
 
                 <MigrationAlert
                     migrationAlert={this.state.migration_alert}
                     migrationAlertText={this.state.migration_alert_text}
                     closeMigrationAlert={this.setCloseMigrationAlert}
-                />
-
-                <ResetMigration
-                    resetMigration={this.state.reset_migration}
-                    confirmReset={this.setConfirmReset}
-                    openResetMigration={this.setOpenResetMigration}
-                    closeResetMigration={this.setCloseResetMigration}
                 />
             </div>
         )
