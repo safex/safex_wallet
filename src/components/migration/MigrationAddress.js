@@ -494,7 +494,7 @@ export default class MigrationAddress extends React.Component {
           </div>
 
           <div className="col-xs-8 keys-table-wrap">
-            <h3>Safex addresses</h3>
+            <h3>Migrations Table</h3>
             <div
               className={
                 this.state.table_expanded ? "table-wrap expanded" : "table-wrap"
@@ -502,9 +502,9 @@ export default class MigrationAddress extends React.Component {
             >
               <table>
                 <thead>
-                  <th>Address</th>
-                  <th>Balance</th>
-                  <th>Cash</th>
+                  <th>Safex Address</th>
+                  <th>Tokens (SFT)</th>
+                  <th>Cash (SFX)</th>
                 </thead>
 
                 <tbody>{safex_address}</tbody>
@@ -513,46 +513,15 @@ export default class MigrationAddress extends React.Component {
           </div>
         </div>
 
-        {/* <button
-          className="button-shine"
-          onClick={() => {
-            this.setMigrationProgress(0);
-          }}
+        { <button
+            className="button-shine"
+            onClick={() => {
+                this.setMigrationProgress(2);
+            }}
         >
-          show 1
+            show 3
         </button>
-        <button
-          className="button-shine"
-          onClick={() => {
-            this.setMigrationProgress(1);
-          }}
-        >
-          show 2
-        </button>
-        <button
-          className="button-shine"
-          onClick={() => {
-            this.setMigrationProgress(2);
-          }}
-        >
-          show 3
-        </button>
-        <button
-          className="button-shine"
-          onClick={() => {
-            this.setMigrationProgress(3);
-          }}
-        >
-          show 4
-        </button>
-        <button
-          className="button-shine"
-          onClick={() => {
-            this.setMigrationProgress(4);
-          }}
-        >
-          show 5
-        </button> */}
+        }
 
         <button className="button-shine" onClick={this.setMigrationVisible}>
           {this.state.show_migration ? "Hide Migration" : "Migrate"}
