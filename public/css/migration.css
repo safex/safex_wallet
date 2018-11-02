@@ -103,7 +103,9 @@
 }
 .address-wrap .keys-table-wrap {
   color: #fff;
+  padding-right: 0;
   padding-left: 0;
+  width: 640px;
 }
 .address-wrap .keys-table-wrap h3 {
   font-size: 20px;
@@ -111,7 +113,7 @@
 }
 .address-wrap .keys-table-wrap .table-wrap {
   overflow: auto;
-  max-height: 123px;
+  max-height: 120px;
 }
 .address-wrap .keys-table-wrap .table-wrap table {
   width: calc(100% - 1px);
@@ -394,6 +396,7 @@
 }
 .address-wrap .address-wrap-inner .address-wrap-inner-left {
   padding-right: 0;
+  width: 280px;
 }
 .address-wrap .address-wrap-inner .address-wrap-inner-left table {
   color: #fff;

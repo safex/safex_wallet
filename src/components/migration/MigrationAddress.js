@@ -37,7 +37,7 @@ export default class MigrationAddress extends React.Component {
       btc_price: 0,
       status_text: "",
       migration_progress: 0,
-        migrated_balance: 0,
+      migrated_balance: 0,
       show_migration: false,
       safex_key: {},
       migration_alert: false,
@@ -169,25 +169,25 @@ export default class MigrationAddress extends React.Component {
         })
     );
     promises.push(
-        fetch("http://omni.safex.io:3010/api/" + this.state.address, {
-            method: "POST"
+      fetch("http://omni.safex.io:3010/api/" + this.state.address, {
+        method: "POST"
+      })
+        .then(resp => resp.json())
+        .then(resp => {
+          return resp;
         })
-            .then(resp => resp.json())
-            .then(resp => {
-              return resp;
-            })
     );
 
     Promise.all(promises)
       .then(values => {
-        console.log(values[4])
+        console.log(values[4]);
 
         this.setState({
           safex_bal: values[0].balance,
           btc_bal: (values[1] / 100000000).toFixed(8),
           pending_btc_bal: (values[2] / 100000000).toFixed(8),
           pending_safex_bal: values[3],
-            migrated_balance: values[4].migrated_balance,
+          migrated_balance: values[4].migrated_balance,
           btc_sync: true,
           safex_sync: true,
           status_text: "Synchronized",
@@ -250,8 +250,8 @@ export default class MigrationAddress extends React.Component {
       modded_json = json_lswallet.keys[index];
       modded_json.migration_progress = step;
       if (step === 0) {
-          modded_json.safex_keys.txid1 = "";
-          modded_json.safex_keys.txid2 = "";
+        modded_json.safex_keys.txid1 = "";
+        modded_json.safex_keys.txid2 = "";
       }
       json_lswallet.keys[index] = modded_json;
 
@@ -319,7 +319,14 @@ export default class MigrationAddress extends React.Component {
   }
 
   render() {
-    let { migration_progress, address, wif, safex_key, fee, migrated_balance } = this.state;
+    let {
+      migration_progress,
+      address,
+      wif,
+      safex_key,
+      fee,
+      migrated_balance
+    } = this.state;
     let migration_shot;
 
     switch (migration_progress) {
@@ -424,7 +431,9 @@ export default class MigrationAddress extends React.Component {
           </button>
         </td>
         <td className="col-60">{address.balance}</td>
-        <td className="col-60">{(address.balance * 0.00232830643).toFixed(10)}</td>
+        <td className="col-60">
+          {(address.balance * 0.00232830643).toFixed(10)}
+        </td>
       </tr>
     ));
 
@@ -488,18 +497,14 @@ export default class MigrationAddress extends React.Component {
                 <tr>
                   <td
                     className={
-                      this.state.pending_btc_bal >= 0
-                        ? "green-border"
-                        : "red-border"
+                      migrated_balance >= 0 ? "green-border" : "red-border"
                     }
                   >
                     Migrated Balance
                   </td>
                   <td
                     className={
-                      migrated_balance >= 0
-                        ? "green-text"
-                        : "red-text"
+                      migrated_balance >= 0 ? "green-text" : "red-text"
                     }
                   >
                     {migrated_balance}
@@ -529,14 +534,15 @@ export default class MigrationAddress extends React.Component {
           </div>
         </div>
 
-        { <button
+        {
+          <button
             className="button-shine"
             onClick={() => {
-                this.setMigrationProgress(2);
+              this.setMigrationProgress(2);
             }}
-        >
+          >
             show 3
-        </button>
+          </button>
         }
 
         <button className="button-shine" onClick={this.setMigrationVisible}>

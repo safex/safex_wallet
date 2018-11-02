@@ -118,35 +118,31 @@ export default class Migrate5 extends React.Component {
     e.preventDefault();
     const amount_value = document.getElementById("amount").value;
     const amount = parseInt(amount_value);
-    if (amount === "") {
-      this.setOpenMigrationAlert("Please enter a valid amount");
-    } else {
-      this.setState({ loading: true });
-      get_utxos(this.state.address)
-        .then(utxos => {
-          const rawtx = generateSafexBtcTransaction(
-            utxos,
-            BURN_ADDRESS,
-            this.state.wif,
-            amount,
-            this.props.data.fee
-          );
-          return rawtx;
-        })
-        .then(rawtx => broadcastTransaction(rawtx))
-        .then(() => {
-          this.setState({
-            loading: false,
-            migration_complete: true
-          });
-          this.props.refresh();
-          this.toggleConfirmMigration();
-        })
-        .catch(err => {
-          console.log("error broadcasting transaction " + err);
-          this.setOpenMigrationAlert("error broadcasting transaction " + err);
+    this.setState({ loading: true });
+    get_utxos(this.state.address)
+      .then(utxos => {
+        const rawtx = generateSafexBtcTransaction(
+          utxos,
+          BURN_ADDRESS,
+          this.state.wif,
+          amount,
+          this.props.data.fee
+        );
+        return rawtx;
+      })
+      .then(rawtx => broadcastTransaction(rawtx))
+      .then(() => {
+        this.setState({
+          loading: false,
+          migration_complete: true
         });
-    }
+        this.props.refresh();
+        this.toggleConfirmMigration();
+      })
+      .catch(err => {
+        console.log("error broadcasting transaction " + err);
+        this.setOpenMigrationAlert("error broadcasting transaction " + err);
+      });
   }
 
   validateAmount(e) {
@@ -173,9 +169,16 @@ export default class Migrate5 extends React.Component {
 
   toggleConfirmMigration(e) {
     e.preventDefault();
-    this.setState({
-      confirm_migration: !this.state.confirm_migration
-    });
+    const amount_value = document.getElementById("amount").value;
+    const amount = parseInt(amount_value);
+
+    if (amount === "" || isNaN(amount)) {
+      this.setOpenMigrationAlert("Please enter a valid amount");
+    } else {
+      this.setState({
+        confirm_migration: !this.state.confirm_migration
+      });
+    }
   }
 
   //create safex blockchain key set
