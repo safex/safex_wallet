@@ -41,7 +41,7 @@ export default class Migrate5 extends React.Component {
         this.goBack = this.goBack.bind(this);
         this.setOpenMigrationAlert = this.setOpenMigrationAlert.bind(this);
         this.setCloseMigrationAlert = this.setCloseMigrationAlert.bind(this);
-        this.backToStep1 = this.backToStep1.bind(this);
+        this.backToStep5 = this.backToStep5.bind(this);
     }
 
     componentDidMount() {
@@ -160,9 +160,8 @@ export default class Migrate5 extends React.Component {
         closeMigrationAlert(this);
     }
 
-    backToStep1() {
-        this.props.setMigrationVisible();
-        this.props.setMigrationProgress(0);
+    backToStep5() {
+        this.setState({migration_complete: false});
     }
 
     //create safex blockchain key set
@@ -174,7 +173,7 @@ export default class Migrate5 extends React.Component {
                     ?
                         <div>
                             <p className="green-text">Migration of your tokens has started. This process may take a couple of days, please be patient while migration transaction is being processed.</p>
-                            <button className="button-shine" onClick={this.backToStep1}>Ok</button>
+                            <button className="button-shine" onClick={this.backToStep5}>Ok</button>
                         </div>
                     :
                         <div>
