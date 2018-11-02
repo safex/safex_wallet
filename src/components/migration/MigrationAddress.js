@@ -12,11 +12,11 @@ import { encrypt } from "../../utils/utils";
 const fs = window.require("fs");
 
 import {
-    openMigrationAlert,
-    closeMigrationAlert,
-    openResetMigration,
-    closeResetMigration,
-    confirmReset
+  openMigrationAlert,
+  closeMigrationAlert,
+  openResetMigration,
+  closeResetMigration,
+  confirmReset
 } from "../../utils/modals";
 import MigrationAlert from "../partials/MigrationAlert";
 import ResetMigration from "../partials/ResetMigration";
@@ -297,9 +297,9 @@ export default class MigrationAddress extends React.Component {
   }
 
   confirmReset() {
-      this.setCloseResetMigration();
-      this.setMigrationProgress(0);
-      this.setMigrationVisible();
+    this.setCloseResetMigration();
+    this.setMigrationProgress(0);
+    this.setMigrationVisible();
   }
 
   render() {
@@ -407,8 +407,8 @@ export default class MigrationAddress extends React.Component {
               : "expand"}
           </button>
         </td>
-        <td className="col-80">{address.balance}</td>
-        <td className="col-80">{address.balance}</td>
+        <td className="col-60">{address.balance}</td>
+        <td className="col-60">{address.balance}</td>
       </tr>
     ));
 
@@ -513,51 +513,58 @@ export default class MigrationAddress extends React.Component {
           </div>
         </div>
 
-        {/*<button*/}
-          {/*onClick={() => {*/}
-            {/*this.setMigrationProgress(0);*/}
-          {/*}}*/}
-        {/*>*/}
-          {/*show 1*/}
-        {/*</button>*/}
-        {/*<button*/}
-          {/*onClick={() => {*/}
-            {/*this.setMigrationProgress(1);*/}
-          {/*}}*/}
-        {/*>*/}
-          {/*show 2*/}
-        {/*</button>*/}
-        {/*<button*/}
-          {/*onClick={() => {*/}
-            {/*this.setMigrationProgress(2);*/}
-          {/*}}*/}
-        {/*>*/}
-          {/*show 3*/}
-        {/*</button>*/}
-        {/*<button*/}
-          {/*onClick={() => {*/}
-            {/*this.setMigrationProgress(3);*/}
-          {/*}}*/}
-        {/*>*/}
-          {/*show 4*/}
-        {/*</button>*/}
-        {/*<button*/}
-          {/*onClick={() => {*/}
-            {/*this.setMigrationProgress(4);*/}
-          {/*}}*/}
-        {/*>*/}
-          {/*show 5*/}
-        {/*</button>*/}
-
-        {
-
-        }
-        <button className={this.state.show_migration ? "button-shine red-btn" : "hidden"} onClick={this.setOpenResetMigration}>
-          Reset
+        {/* <button
+          className="button-shine"
+          onClick={() => {
+            this.setMigrationProgress(0);
+          }}
+        >
+          show 1
         </button>
+        <button
+          className="button-shine"
+          onClick={() => {
+            this.setMigrationProgress(1);
+          }}
+        >
+          show 2
+        </button>
+        <button
+          className="button-shine"
+          onClick={() => {
+            this.setMigrationProgress(2);
+          }}
+        >
+          show 3
+        </button>
+        <button
+          className="button-shine"
+          onClick={() => {
+            this.setMigrationProgress(3);
+          }}
+        >
+          show 4
+        </button>
+        <button
+          className="button-shine"
+          onClick={() => {
+            this.setMigrationProgress(4);
+          }}
+        >
+          show 5
+        </button> */}
 
         <button className="button-shine" onClick={this.setMigrationVisible}>
           {this.state.show_migration ? "Hide Migration" : "Migrate"}
+        </button>
+
+        <button
+          className={
+            this.state.show_migration ? "button-shine red-btn" : "hidden"
+          }
+          onClick={this.setOpenResetMigration}
+        >
+          Reset
         </button>
 
         {this.state.show_migration ? (
@@ -570,12 +577,12 @@ export default class MigrationAddress extends React.Component {
           closeMigrationAlert={this.setCloseMigrationAlert}
         />
 
-          <ResetMigration
-            resetMigration={this.state.reset_migration}
-            confirmReset={this.confirmReset}
-            openResetMigration={this.setOpenResetMigration}
-            closeResetMigration={this.setCloseResetMigration}
-          />
+        <ResetMigration
+          resetMigration={this.state.reset_migration}
+          confirmReset={this.confirmReset}
+          openResetMigration={this.setOpenResetMigration}
+          closeResetMigration={this.setCloseResetMigration}
+        />
       </div>
     );
   }

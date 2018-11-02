@@ -111,7 +111,7 @@
 }
 .address-wrap .keys-table-wrap .table-wrap {
   overflow: auto;
-  max-height: 140px;
+  max-height: 123px;
 }
 .address-wrap .keys-table-wrap .table-wrap table {
   width: calc(100% - 1px);
@@ -149,8 +149,8 @@
 .address-wrap .keys-table-wrap .table-wrap table tr td.address.expanded button {
   display: inline-block;
 }
-.address-wrap .keys-table-wrap .table-wrap table tr td.col-80 {
-  width: 80px;
+.address-wrap .keys-table-wrap .table-wrap table tr td.col-60 {
+  width: 60px;
 }
 .migration-wrap:hover .address-wrap {
   opacity: 0.8;
@@ -328,6 +328,8 @@
 }
 .migration-step-wrap .final-step-form button {
   margin-left: 10px;
+  position: relative;
+  top: -1px;
 }
 .address-wrap .address-wrap-inner {
   padding-top: 15px;
@@ -390,37 +392,78 @@
   text-align: center;
   margin-top: 5px;
 }
-.address-wrap .address-wrap-inner table {
+.address-wrap .address-wrap-inner .address-wrap-inner-left {
+  padding-right: 0;
+}
+.address-wrap .address-wrap-inner .address-wrap-inner-left table {
   color: #fff;
 }
-.address-wrap .address-wrap-inner table tr.row-clearfix {
+.address-wrap
+  .address-wrap-inner
+  .address-wrap-inner-left
+  table
+  tr.row-clearfix {
   min-height: 15px;
   display: block;
 }
-.address-wrap .address-wrap-inner table tr.row-clearfix.last {
+.address-wrap
+  .address-wrap-inner
+  .address-wrap-inner-left
+  table
+  tr.row-clearfix.last {
   min-height: 25px;
 }
-.address-wrap .address-wrap-inner table tr td {
+.address-wrap .address-wrap-inner .address-wrap-inner-left table tr td {
   padding: 0 15px 0 10px;
   font-size: 16px;
 }
-.address-wrap .address-wrap-inner table tr td.green-text {
+.address-wrap
+  .address-wrap-inner
+  .address-wrap-inner-left
+  table
+  tr
+  td.green-text {
   color: #00bfa2;
   font-weight: 600;
 }
-.address-wrap .address-wrap-inner table tr td.red-text {
+.address-wrap
+  .address-wrap-inner
+  .address-wrap-inner-left
+  table
+  tr
+  td.red-text {
   font-weight: 600;
 }
-.address-wrap .address-wrap-inner table tr td.blue-border {
+.address-wrap
+  .address-wrap-inner
+  .address-wrap-inner-left
+  table
+  tr
+  td.blue-border {
   border-left: 3px solid #009dbf;
 }
-.address-wrap .address-wrap-inner table tr td.orange-border {
+.address-wrap
+  .address-wrap-inner
+  .address-wrap-inner-left
+  table
+  tr
+  td.orange-border {
   border-left: 3px solid #ff9c00;
 }
-.address-wrap .address-wrap-inner table tr td.green-border {
+.address-wrap
+  .address-wrap-inner
+  .address-wrap-inner-left
+  table
+  tr
+  td.green-border {
   border-left: 3px solid #00bfa2;
 }
-.address-wrap .address-wrap-inner table tr td.red-border {
+.address-wrap
+  .address-wrap-inner
+  .address-wrap-inner-left
+  table
+  tr
+  td.red-border {
   border-left: 3px solid #c80e4b;
 }
 /* Migration Popup */
