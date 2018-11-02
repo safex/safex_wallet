@@ -95,9 +95,9 @@ function generateSafexBtcTransaction(utxos, destination, wif, amount, fee) {
             inputs_num += 1;
         }
     });
-    fee_adj = inputs_num * 180;
+    fee_adj = inputs_num * 200;
 
-    fee_adj += 180;
+    fee_adj += 225;
 
     fee = Math.trunc(fee * (fee_adj / 1000));
     var inputs_num = 0;
@@ -155,9 +155,9 @@ function setSafexMigrationAddress(utxos, destination, wif, payload, fee) {
             inputs_num += 1;
         }
     });
-    fee_adj = inputs_num * 180;
+    fee_adj = inputs_num * 200;
 
-    fee_adj += 230;
+    fee_adj += 280;
 
     fee = Math.trunc(fee * (fee_adj / 1000));
     var inputs_num = 0;
