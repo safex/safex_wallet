@@ -27,8 +27,8 @@ export default class Migrate5 extends React.Component {
     this.state = {
       safex_key: this.props.data.safex_key,
       loading: true,
-      address: "",
-      wif: "",
+      address: this.props.data.address,
+      wif: this.props.data.wif,
       safex_bal: 0,
       pending_safex_bal: 0,
       btc_bal: 0,
@@ -40,27 +40,18 @@ export default class Migrate5 extends React.Component {
       migration_alert: false,
       migration_alert_text: "",
       migration_complete: false,
-      fee: 0,
+      fee: this.props.data.fee,
       confirm_migration: false
     };
 
     this.burnSafex = this.burnSafex.bind(this);
     this.validateAmount = this.validateAmount.bind(this);
-    this.goBack = this.goBack.bind(this);
     this.setOpenMigrationAlert = this.setOpenMigrationAlert.bind(this);
     this.setCloseMigrationAlert = this.setCloseMigrationAlert.bind(this);
-    this.backToStep5 = this.backToStep5.bind(this);
     this.toggleConfirmMigration = this.toggleConfirmMigration.bind(this);
   }
 
   componentDidMount() {
-    this.setState({
-      address: this.props.data.address,
-      wif: this.props.data.wif,
-      fee: this.props.data.fee,
-      safex_key: this.props.data.safex_key,
-      loading: false
-    });
     this.getBalances(this.props.data.address);
     this.getTxnFee();
     this.setState({ loading: false });
@@ -172,23 +163,12 @@ export default class Migrate5 extends React.Component {
     }
   }
 
-  goBack() {
-    this.props.setMigrationProgress(3);
-  }
-
   setOpenMigrationAlert(message) {
     openMigrationAlert(this, message);
   }
 
   setCloseMigrationAlert() {
     closeMigrationAlert(this);
-  }
-
-  backToStep5() {
-    this.setState({
-      migration_complete: false,
-      confirm_migration: false
-    });
   }
 
   toggleConfirmMigration(e) {
@@ -202,18 +182,6 @@ export default class Migrate5 extends React.Component {
   render() {
     return (
       <div className="final-step">
-        {this.state.migration_complete ? (
-          <div>
-            <p className="green-text">
-              Migration of your tokens has started. This process may take a
-              couple of days, please be patient while migration transaction is
-              being processed.
-            </p>
-            <button className="button-shine" onClick={this.backToStep5}>
-              Ok
-            </button>
-          </div>
-        ) : (
           <div>
             <p>Final Step</p>
             <p>
@@ -259,7 +227,6 @@ export default class Migrate5 extends React.Component {
               closeConfirmMigration={this.toggleConfirmMigration}
             />
           </div>
-        )}
       </div>
     );
   }

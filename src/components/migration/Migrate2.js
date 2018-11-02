@@ -105,7 +105,10 @@ export default class Migrate2 extends React.Component {
                 index = key;
                 json.keys[key]['migration_data'] = {};
                 json.keys[key]['migration_data'].safex_keys = this.state.safex_key;
+                json.keys[key]['migration_data'].txid1 = "";
+                json.keys[key]['migration_data'].txid2 = "";
                 json.keys[key].migration_progress = 2;
+
             }
         }
 

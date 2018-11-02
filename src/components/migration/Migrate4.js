@@ -61,7 +61,12 @@ export default class Migrate4 extends React.Component {
           this.props.data.fee
         );
 
-        this.setState({ txn_fee: rawtx.fee / 100000000 });
+          var btc_bal = 0;
+          utxos.forEach(txn => {
+
+              btc_bal += txn.satoshis;
+          });
+          this.setState({ txn_fee: rawtx.fee / 100000000, btc_bal: btc_bal / 100000000 });
       })
       .catch(err => {
         console.log("error getting UTXOs " + err);
@@ -76,40 +81,8 @@ export default class Migrate4 extends React.Component {
       safex_key: this.props.data.safex_key,
       fee: this.props.data.fee
     });
-
-    this.getBalances(this.props.data.address);
     this.getTxnFee();
     this.setState({ loading: false });
-  }
-
-  getBalances(address) {
-    var promises = [];
-    var json = {};
-    json["address"] = address;
-    promises.push(
-      fetch(
-        "http://bitcoin.safex.io:3001/insight-api/addr/" + address + "/balance"
-      )
-        .then(resp => resp.text())
-        .then(resp => {
-          return resp;
-        })
-    );
-
-    Promise.all(promises)
-      .then(values => {
-        this.setState({
-          btc_bal: (values[0] / 100000000).toFixed(8),
-          safex_price: localStorage.getItem("safex_price"),
-          btc_price: localStorage.getItem("btc_price")
-        });
-      })
-      .catch(e => {
-        console.log(e);
-        this.setState({
-          status_text: "Sync error, please refresh"
-        });
-      });
   }
 
   refresh(e) {
