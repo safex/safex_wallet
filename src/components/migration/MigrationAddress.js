@@ -27,7 +27,7 @@ export default class MigrationAddress extends React.Component {
     this.state = {
       loading: true,
       label: "",
-      address: "",
+      address: this.props.data.address,
       wif: "",
       safex_bal: 0,
       pending_safex_bal: 0,
@@ -37,6 +37,7 @@ export default class MigrationAddress extends React.Component {
       btc_price: 0,
       status_text: "",
       migration_progress: 0,
+        migrated_balance: 0,
       show_migration: false,
       safex_key: {},
       migration_alert: false,
@@ -113,7 +114,6 @@ export default class MigrationAddress extends React.Component {
   componentDidMount() {
     this.setState({
       label: this.props.data.label,
-      address: this.props.data.address,
       wif: this.props.data.wif,
       migration_progress: this.props.data.migration_progress,
       loading: false,
@@ -168,14 +168,26 @@ export default class MigrationAddress extends React.Component {
           return resp;
         })
     );
+    promises.push(
+        fetch("http://omni.safex.io:3010/api/" + this.state.address, {
+            method: "POST"
+        })
+            .then(resp => resp.json())
+            .then(resp => {
+              return resp;
+            })
+    );
 
     Promise.all(promises)
       .then(values => {
+        console.log(values[4])
+
         this.setState({
           safex_bal: values[0].balance,
           btc_bal: (values[1] / 100000000).toFixed(8),
           pending_btc_bal: (values[2] / 100000000).toFixed(8),
           pending_safex_bal: values[3],
+            migrated_balance: values[4].migrated_balance,
           btc_sync: true,
           safex_sync: true,
           status_text: "Synchronized",
@@ -237,6 +249,10 @@ export default class MigrationAddress extends React.Component {
       let modded_json;
       modded_json = json_lswallet.keys[index];
       modded_json.migration_progress = step;
+      if (step === 0) {
+          modded_json.safex_keys.txid1 = "";
+          modded_json.safex_keys.txid2 = "";
+      }
       json_lswallet.keys[index] = modded_json;
 
       var algorithm = "aes-256-ctr";
@@ -303,7 +319,7 @@ export default class MigrationAddress extends React.Component {
   }
 
   render() {
-    let { migration_progress, address, wif, safex_key, fee } = this.state;
+    let { migration_progress, address, wif, safex_key, fee, migrated_balance } = this.state;
     let migration_shot;
 
     switch (migration_progress) {
@@ -408,7 +424,7 @@ export default class MigrationAddress extends React.Component {
           </button>
         </td>
         <td className="col-60">{address.balance}</td>
-        <td className="col-60">{address.balance}</td>
+        <td className="col-60">{(address.balance * 0.00232830643).toFixed(10)}</td>
       </tr>
     ));
 
@@ -481,12 +497,12 @@ export default class MigrationAddress extends React.Component {
                   </td>
                   <td
                     className={
-                      this.state.pending_btc_bal >= 0
+                      migrated_balance >= 0
                         ? "green-text"
                         : "red-text"
                     }
                   >
-                    {this.state.pending_btc_bal}
+                    {migrated_balance}
                   </td>
                 </tr>
               </tbody>

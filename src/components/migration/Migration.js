@@ -12,7 +12,8 @@ export default class Migration extends React.Component {
             wallet: "",
             fee: 0,
             keys: {},
-            instructionsModal: false
+            instructionsModal: false,
+            loading: true
         };
 
         this.getPrices = this.getPrices.bind(this);
@@ -54,7 +55,7 @@ export default class Migration extends React.Component {
                 }
             });
 
-        getFee().then(fee => this.setState({fee: fee * 100000000})).catch(e => alert("network error " + e));
+        getFee().then(fee => this.setState({fee: fee * 100000000, loading: false})).catch(e => alert("network error " + e));
     }
 
     componentDidMount() {
@@ -131,33 +132,41 @@ export default class Migration extends React.Component {
             });
         }
 
+        if (this.state.loading) {
+            return (
+                <div className="spinner-wrap">
+                   <div className="lds-dual-ring"></div>
+        </div>
+        )
+        } else {
+            return (
+                <div>
+                    <Navigation
+                        safexPrice={this.state.safex_price}
+                        btcPrice={this.state.btc_price}
+                        wallet={this.wallet}
+                        instructionsModal={this.state.instructionsModal}
+                        openInstructionsModal={this.openInstructionsModal}
+                        closeInstructionsModal={this.closeInstructionsModal}
+                    />
 
-        return (
-            <div>
-                <Navigation
-                    safexPrice={this.state.safex_price}
-                    btcPrice={this.state.btc_price}
-                    wallet={this.wallet}
-                    instructionsModal={this.state.instructionsModal}
-                    openInstructionsModal={this.openInstructionsModal}
-                    closeInstructionsModal={this.closeInstructionsModal}
-                />
+                    <div className="container migration-wrap fadeIn">
+                        <div className="col-xs-12 migration-inner">
+                            {table}
+                        </div>
 
-                <div className="container migration-wrap fadeIn">
-                    <div className="col-xs-12 migration-inner">
-                        {table}
+                        {/*<button className="button-shine" onClick={this.goNext}> To the Real Safex Wallet</button>*/}
                     </div>
 
-                    {/*<button className="button-shine" onClick={this.goNext}> To the Real Safex Wallet</button>*/}
+                    <InstructionsModal
+                        instructionsModal={this.state.instructionsModal}
+                        openInstructionsModal={this.openInstructionsModal}
+                        closeInstructionsModal={this.closeInstructionsModal}
+                    />
                 </div>
+            );
+        }
 
-                <InstructionsModal
-                    instructionsModal={this.state.instructionsModal}
-                    openInstructionsModal={this.openInstructionsModal}
-                    closeInstructionsModal={this.closeInstructionsModal}
-                />
-            </div>
-        );
     }
 }
 
