@@ -68,7 +68,12 @@ export default class Migrate5 extends React.Component {
           1,
           this.props.data.fee
         );
-        this.setState({ txn_fee: rawtx.fee / 100000000 });
+        var btc_bal = 0;
+          utxos.forEach(txn => {
+
+              btc_bal += txn.satoshis;
+          });
+          this.setState({ txn_fee: rawtx.fee / 100000000, btc_bal: btc_bal / 100000000 });
       })
       .catch(err => console.log(err));
   }
@@ -87,21 +92,11 @@ export default class Migrate5 extends React.Component {
           return resp;
         })
     );
-    promises.push(
-      fetch(
-        "http://bitcoin.safex.io:3001/insight-api/addr/" + address + "/balance"
-      )
-        .then(resp => resp.text())
-        .then(resp => {
-          return resp;
-        })
-    );
 
     Promise.all(promises)
       .then(values => {
         this.setState({
           safex_bal: values[0].balance,
-          btc_bal: (values[1] / 100000000).toFixed(8),
           safex_price: localStorage.getItem("safex_price"),
           btc_price: localStorage.getItem("btc_price")
         });
@@ -173,7 +168,9 @@ export default class Migrate5 extends React.Component {
     const amount = parseInt(amount_value);
 
     if (amount === "" || isNaN(amount)) {
-      this.setOpenMigrationAlert("Please enter a valid amount");
+      this.setOpenMigrationAlert("Please enter a valid Safex amount");
+    } else if (this.state.btc_bal < this.state.txn_fee) {
+        this.setOpenMigrationAlert("Not enough btc to complete this transaction, you need " + this.state.txn_fee);
     } else {
       this.setState({
         confirm_migration: !this.state.confirm_migration

@@ -47,58 +47,8 @@ export default class MigrationAddress extends React.Component {
       refreshInterval: "",
       table_expanded: false,
       reset_migration: false,
-      safex_address_meta: {
-        Safex5ztDMv5nM3y1ycT4vKNyeRE4MQFW8pHVaTDFzP5TsofLJ86SpbAtbB6nEtkMJ1xkDjfuEcKwe78wrwvXEsEVKuU3azLUo61Y: {
-          hidden: false
-        },
-        Safex61AUGG1vFWiket69ocRxVf5nRgvMF3Yq7nSA1mYCDkRYZnDoJ3P4FF3w8EdLp5fbZeWHJxc6ZRAxV8T2yo1GyJtRstQLHP3D: {
-          hidden: false
-        },
-        Safex5zuPyx8QToo1eYF6rfvkVxinWHJmHogYXUJTKQAfEsXaVnVpgdAEmMaTnBLREiYtpWPTqDwNDcYhEN4F2XBWnTJohcpLbz29: {
-          hidden: false
-        },
-        Safex5zNzaB8xVZoGhKaPBPKreTacF9FE19UT2WZ84GoUwqDAgL3GzfS8y19dXSM6ETi1m8bkkjuRSdBHQf87DijePpfzBTGzgS2p: {
-          hidden: false
-        }
-      },
-      safex_addresses: [
-        {
-          address:
-            "Safex5ztDMv5nM3y1ycT4vKNyeRE4MQFW8pHVaTDFzP5TsofLJ86SpbAtbB6nEtkMJ1xkDjfuEcKwe78wrwvXEsEVKuU3azLUo61Y",
-          checksum: "83f0651f",
-          blockheight1: 544899,
-          blockheight2: 544899,
-          balance: 0,
-          burns: []
-        },
-        {
-          address:
-            "Safex61AUGG1vFWiket69ocRxVf5nRgvMF3Yq7nSA1mYCDkRYZnDoJ3P4FF3w8EdLp5fbZeWHJxc6ZRAxV8T2yo1GyJtRstQLHP3D",
-          checksum: "eff4ea80",
-          blockheight1: 544900,
-          blockheight2: 544900,
-          balance: 1,
-          burns: [Array]
-        },
-        {
-          address:
-            "Safex5zuPyx8QToo1eYF6rfvkVxinWHJmHogYXUJTKQAfEsXaVnVpgdAEmMaTnBLREiYtpWPTqDwNDcYhEN4F2XBWnTJohcpLbz29",
-          checksum: "968b2142",
-          blockheight1: 544995,
-          blockheight2: 544995,
-          balance: 1,
-          burns: [Array]
-        },
-        {
-          address:
-            "Safex5zNzaB8xVZoGhKaPBPKreTacF9FE19UT2WZ84GoUwqDAgL3GzfS8y19dXSM6ETi1m8bkkjuRSdBHQf87DijePpfzBTGzgS2p",
-          checksum: "05dc6b69",
-          blockheight1: 546475,
-          blockheight2: 546475,
-          balance: 128,
-          burns: [Array]
-        }
-      ]
+      safex_address_meta: {},
+      safex_addresses: [],
     };
     this.refresh = this.refresh.bind(this);
     this.setMigrationVisible = this.setMigrationVisible.bind(this);
@@ -180,7 +130,22 @@ export default class MigrationAddress extends React.Component {
 
     Promise.all(promises)
       .then(values => {
-        console.log(values[4]);
+
+          var address_array = [];
+          var safex_address_meta = {};
+        if (values[4].hasOwnProperty('safex_addresses')) {
+            console.log("addresses length " + values[4].safex_addresses.length);
+            for (var i = 0; i < values[4].safex_addresses.length; i++) {
+                safex_address_meta[values[4].safex_addresses[i].safex_address] = {};
+                safex_address_meta[values[4].safex_addresses[i].safex_address].hidden = false;
+                address_array.push(values[4].safex_addresses[i]);
+            }
+            console.log(safex_address_meta)
+            console.log(address_array)
+        }
+
+
+
 
         this.setState({
           safex_bal: values[0].balance,
@@ -188,6 +153,8 @@ export default class MigrationAddress extends React.Component {
           pending_btc_bal: (values[2] / 100000000).toFixed(8),
           pending_safex_bal: values[3],
           migrated_balance: values[4].migrated_balance,
+          safex_addresses: address_array,
+            safex_address_meta: safex_address_meta,
           btc_sync: true,
           safex_sync: true,
           status_text: "Synchronized",
@@ -405,27 +372,27 @@ export default class MigrationAddress extends React.Component {
     }
 
     const safex_address = this.state.safex_addresses.map(address => (
-      <tr key={address.address}>
+      <tr key={address.safex_address}>
         <td
           className={
-            this.state.safex_address_meta[address.address].hidden
+            this.state.safex_address_meta[address.safex_address].hidden
               ? "address expanded"
               : "address"
           }
           id="address"
         >
           <span>
-            {this.state.safex_address_meta[address.address].hidden
-              ? address.address
-              : address.address.slice(0, 6) +
+            {this.state.safex_address_meta[address.safex_address].hidden
+              ? address.safex_address
+              : address.safex_address.slice(0, 6) +
                 "..." +
-                address.address.slice(address.address.length - 4)}
+                address.safex_address.slice(address.safex_address.length - 4)}
           </span>
           <button
-            onClick={() => this.toggleAddress(address.address)}
+            onClick={() => this.toggleAddress(address.safex_address)}
             className="button-shine"
           >
-            {this.state.safex_address_meta[address.address].hidden
+            {this.state.safex_address_meta[address.safex_address].hidden
               ? "collapse"
               : "expand"}
           </button>
