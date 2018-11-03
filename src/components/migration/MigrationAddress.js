@@ -292,12 +292,11 @@ export default class MigrationAddress extends React.Component {
         closeMigrationAlert(this);
     }
 
-    toggleAddress(address) {
+    toggleAddress(index) {
+        var store_meta = this.state.safex_address_meta;
+        store_meta[index].hidden = !this.state.safex_address_meta[index].hidden;
         this.setState(() => ({
-            safex_address_meta: {
-                ...this.state.safex_address_meta,
-                [address]: {hidden: !this.state.safex_address_meta[address].hidden}
-            }
+            safex_address_meta: store_meta
         }));
     }
 
@@ -426,7 +425,7 @@ export default class MigrationAddress extends React.Component {
                 address.safex_address.slice(address.safex_address.length - 4)}
           </span>
                     <button
-                        onClick={() => this.toggleAddress(address.safex_address)}
+                        onClick={() => this.toggleAddress(index)}
                         className="button-shine"
                     >
                         {this.state.safex_address_meta[index].hidden
@@ -538,7 +537,7 @@ export default class MigrationAddress extends React.Component {
                     </div>
                 </div>
 
-                {
+                {/*
                     <button
                         className="button-shine"
                         onClick={() => {
@@ -547,7 +546,7 @@ export default class MigrationAddress extends React.Component {
                     >
                         show 3
                     </button>
-                }
+                */}
 
                 <button className="button-shine" onClick={this.setMigrationVisible}>
                     {this.state.show_migration ? "Hide Migration" : "Migrate"}

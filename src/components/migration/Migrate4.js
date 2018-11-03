@@ -90,7 +90,7 @@ export default class Migrate4 extends React.Component {
         e.preventDefault();
         console.log(this.state.safex_key);
         //public spend key is first half
-        if (this.props.data.pending_bal !== 0) {
+        if (this.props.data.pending_bal != 0) {
             this.setOpenMigrationAlert("warning you have unconfirmed transactions, please wait until they are confirmed");
 
         } else {

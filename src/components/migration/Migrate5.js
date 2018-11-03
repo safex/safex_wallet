@@ -14,7 +14,7 @@ import {
 } from "../../utils/modals";
 
 import MigrationAlert from "../partials/MigrationAlert";
-import ConfirmMigration from "../partials/ConfirmMigration";
+import ConfirmMigration from "../migration/partials/ConfirmMigration";
 
 //Burn Safe Exchange Coins
 export default class Migrate5 extends React.Component {
@@ -108,10 +108,7 @@ export default class Migrate5 extends React.Component {
 
     burnSafex(e) {
         e.preventDefault();
-        if (this.props.data.pending_bal !== 0) {
-            this.setOpenMigrationAlert("warning you have unconfirmed transactions, please wait until they are confirmed");
 
-        } else {
 
             const amount_value = document.getElementById("amount").value;
             const amount = parseInt(amount_value);
@@ -140,7 +137,7 @@ export default class Migrate5 extends React.Component {
                     console.log("error broadcasting transaction " + err);
                     this.setOpenMigrationAlert("error broadcasting transaction " + err);
                 });
-        }
+
     }
 
     validateAmount(e) {
@@ -167,6 +164,10 @@ export default class Migrate5 extends React.Component {
 
     toggleConfirmMigration(e) {
         e.preventDefault();
+    if (this.props.data.pending_bal != 0) {
+        this.setOpenMigrationAlert("warning you have unconfirmed transactions, please wait until they are confirmed");
+
+    } else {
         const amount_value = document.getElementById("amount").value;
         const amount = parseInt(amount_value);
 
@@ -179,6 +180,7 @@ export default class Migrate5 extends React.Component {
                 confirm_migration: !this.state.confirm_migration
             });
         }
+    }
     }
 
     //create safex blockchain key set

@@ -92,9 +92,9 @@ export default class Migrate3 extends React.Component {
 
     setSafexAddress(e) {
         e.preventDefault();
-        console.log(this.state.safex_key);
+        console.log(this.props.data.pending_bal);
         //public spend key is first half
-        if (this.props.data.pending_bal !== 0) {
+        if (this.props.data.pending_bal != 0) {
             this.setOpenMigrationAlert("warning you have unconfirmed transactions, please wait until they are confirmed");
 
         } else {

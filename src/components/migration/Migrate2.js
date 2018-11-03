@@ -105,8 +105,6 @@ export default class Migrate2 extends React.Component {
                 index = key;
                 json.keys[key]['migration_data'] = {};
                 json.keys[key]['migration_data'].safex_keys = this.state.safex_key;
-                json.keys[key]['migration_data'].txid1 = "";
-                json.keys[key]['migration_data'].txid2 = "";
                 json.keys[key].migration_progress = 2;
 
             }
@@ -141,6 +139,22 @@ export default class Migrate2 extends React.Component {
         if (e.target.spend_key.value === '' || e.target.view_key.value === '' || e.target.safex_address.value === '') {
             this.setOpenMigrationAlert('Fill out all the fields');
         } else {
+
+            let duplicate = false;
+
+            //here check for duplicates
+            for (var key in this.state.safex_keys) {
+                console.log(this.state.safex_keys[key].spend.sec)
+                if (this.state.safex_keys[key].spend.sec === e.target.spend_key.value &&
+                    this.state.safex_keys[key].view.sec === e.target.view_key.value &&
+                    this.state.safex_keys[key].public_addr === e.target.safex_address.value) {
+                    duplicate = true;
+                    console.log("duplicate detected")
+                }
+            }
+
+
+
             if (verify_safex_address(e.target.spend_key.value,
                 e.target.view_key.value,
                 e.target.safex_address.value)) {
@@ -152,10 +166,9 @@ export default class Migrate2 extends React.Component {
                     console.log('Error parsing the wallet data.');
                     this.setOpenMigrationAlert('Error parsing the wallet data.');
                 }
-                console.log(json)
-                if (json.hasOwnProperty('safex_keys')) {
+                if (json.hasOwnProperty('safex_keys') && duplicate === false) {
                     json['safex_keys'].push(safex_keys);
-                } else {
+                } else if (duplicate === false) {
                     json['safex_keys'] = [];
                     json['safex_keys'].push(safex_keys);
                 }
@@ -200,7 +213,7 @@ export default class Migrate2 extends React.Component {
                 });
             } else {
                 console.log('Incorrect keys');
-                this.setOpenMigrationAlert('Incorrect keys');
+                this.setOpenMigrationAlert('Incorrect keys or duplicate');
             }
         }
     }
@@ -376,9 +389,8 @@ export default class Migrate2 extends React.Component {
                             <p>secret: {this.state.safex_view_sec}</p>
 
                             <button className="button-shine" onClick={this.startOver}>Go back</button>
-                            <button className="button-shine" onClick={this.createSafexKey}>Create new address</button>
                             <button className="button-shine green-btn" onClick={this.saveSafexKeys}>Back up my Safex
-                                Address Information and continue
+                                Keys and continue
                             </button>
                         </div>
                         :
