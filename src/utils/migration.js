@@ -36,14 +36,16 @@ function broadcastTransaction(rawtx) {
     });
 }
 
-function generate_btc_transaction(utxos, destination, wif, amount, fee) {
+function generate_btc_transaction(utxos, destination, wif, amountdec, fee) {
     let key = bitcoin.ECPair.fromWIF(wif);
     var running_total = 0;
     var tx = new bitcoin.TransactionBuilder();
     var inputs_num = 0;
     let fee_adj;
+    console.log(amountdec)
+    var amount = amountdec * 100000000;
     utxos.forEach(txn => {
-        if (running_total < (fee)) {
+        if (running_total < (fee + amount)) {
             running_total += txn.satoshis;
             inputs_num += 1;
         }
@@ -56,7 +58,7 @@ function generate_btc_transaction(utxos, destination, wif, amount, fee) {
     var inputs_num = 0;
     var running_total = 0;
     utxos.forEach(txn => {
-        if (running_total < (fee)) {
+        if (running_total < (fee + amount)) {
             running_total += txn.satoshis;
             tx.addInput(txn.txid, txn.vout);
             inputs_num += 1;
@@ -65,9 +67,10 @@ function generate_btc_transaction(utxos, destination, wif, amount, fee) {
 
     const {address} = bitcoin.payments.p2pkh({pubkey: key.publicKey})
     //problem is right here when adding a Output
+    tx.addOutput(destination, amount);
 
 
-    const left_overs = running_total - (700 + fee);
+    const left_overs = running_total - (amount + fee);
     if (left_overs > 0) {
         tx.addOutput(address, left_overs);
     }

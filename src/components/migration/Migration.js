@@ -55,7 +55,10 @@ export default class Migration extends React.Component {
                 }
             });
 
-        getFee().then(fee => this.setState({fee: fee * 100000000, loading: false})).catch(e => alert("network error " + e));
+        getFee().then(fee => this.setState({
+            fee: fee * 100000000,
+            loading: false
+        })).catch(e => alert("network error " + e));
     }
 
     componentDidMount() {
@@ -135,9 +138,9 @@ export default class Migration extends React.Component {
         if (this.state.loading) {
             return (
                 <div className="spinner-wrap">
-                   <div className="lds-dual-ring"></div>
-        </div>
-        )
+                    <div className="lds-dual-ring"></div>
+                </div>
+            )
         } else {
             return (
                 <div>

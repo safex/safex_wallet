@@ -322,11 +322,11 @@ export default class Migrate2 extends React.Component {
 
         new_wallet += "Public address: " + wallet_data.public_addr + '\n';
         new_wallet += "Spendkey " + '\n';
-        new_wallet += "pub: "     + wallet_data.spend.pub + '\n';
-        new_wallet += "sec: "     + wallet_data.spend.sec + '\n';
-        new_wallet += "Viewkey "  + '\n';
-        new_wallet += "pub: "     + wallet_data.view.pub + '\n';
-        new_wallet += "sec: "     + wallet_data.view.sec + '\n';
+        new_wallet += "pub: " + wallet_data.spend.pub + '\n';
+        new_wallet += "sec: " + wallet_data.spend.sec + '\n';
+        new_wallet += "Viewkey " + '\n';
+        new_wallet += "pub: " + wallet_data.view.pub + '\n';
+        new_wallet += "sec: " + wallet_data.view.sec + '\n';
         var date = Date.now();
 
         fileDownload(new_wallet, date + 'new_wallet_address.txt');
@@ -350,19 +350,20 @@ export default class Migrate2 extends React.Component {
                 <p>Step 2/4</p>
                 {
                     this.state.create_address
-                    ?
+                        ?
                         <div>
                             <div className="set-your-key-head">
                                 <div className="set-your-key-left">
-                                    <img src="images/migration/cube.png" alt="New Key" />
+                                    <img src="images/migration/cube.png" alt="New Key"/>
                                 </div>
                                 <div className="set-your-key-right">
                                     <h3 className="green-text">Migrate to new Safex address</h3>
                                 </div>
                             </div>
                             <p className="red-text">
-                                The following wallet information is to control your coins, do not share it. <br />
-                                Sharing this information can and will result in total loss of your Safex Tokens and Safex Cash.<br />
+                                The following wallet information is to control your coins, do not share it. <br/>
+                                Sharing this information can and will result in total loss of your Safex Tokens and
+                                Safex Cash.<br/>
                                 Keep this information safe at all times!
                             </p>
                             <p>Wallet Address</p>
@@ -376,17 +377,19 @@ export default class Migrate2 extends React.Component {
 
                             <button className="button-shine" onClick={this.startOver}>Go back</button>
                             <button className="button-shine" onClick={this.createSafexKey}>Create new address</button>
-                            <button className="button-shine green-btn" onClick={this.saveSafexKeys}>Back up my Safex Address Information and continue</button>
+                            <button className="button-shine green-btn" onClick={this.saveSafexKeys}>Back up my Safex
+                                Address Information and continue
+                            </button>
                         </div>
-                    :
+                        :
                         <div>
                             {
                                 this.state.used_addresses
-                                ?
+                                    ?
                                     <div>
                                         <div className="set-your-key-head">
                                             <div className="set-your-key-left">
-                                                <img src="images/migration/my-keys.png" alt="My Keys" />
+                                                <img src="images/migration/my-keys.png" alt="My Keys"/>
                                             </div>
                                             <div className="set-your-key-right">
                                                 <h3 className="purple-text">Your previously used Safex addresses</h3>
@@ -400,59 +403,81 @@ export default class Migrate2 extends React.Component {
                                         </form>
                                         <button className="button-shine" onClick={this.startOver}>Go back</button>
                                     </div>
-                                :
+                                    :
                                     <div>
                                         {
                                             this.state.existing_addresses
-                                            ?
+                                                ?
                                                 <div>
                                                     <div className="set-your-key-head">
                                                         <div className="set-your-key-left">
-                                                            <img src="images/migration/enter-key.png" alt="Enter Key" />
+                                                            <img src="images/migration/enter-key.png" alt="Enter Key"/>
                                                         </div>
                                                         <div className="set-your-key-right">
-                                                            <h3 className="blue-text">Migration using my existing Safex address</h3>
+                                                            <h3 className="blue-text">Migration using my existing Safex
+                                                                address</h3>
                                                         </div>
                                                     </div>
 
                                                     <form onSubmit={this.setYourKeys}>
                                                         <div className="form-group">
-                                                            <input className="col-xs-8" name="safex_address" placeholder="Safex address" id="safex_address" onChange={this.checkFields} />
-                                                            <label className="col-xs-4 col-form-label" htmlFor="safex_address">If you already have Safex address, enter it here.</label>
+                                                            <input className="col-xs-8" name="safex_address"
+                                                                   placeholder="Safex address" id="safex_address"
+                                                                   onChange={this.checkFields}/>
+                                                            <label className="col-xs-4 col-form-label"
+                                                                   htmlFor="safex_address">If you already have Safex
+                                                                address, enter it here.</label>
                                                         </div>
                                                         <div className="form-group">
-                                                            <input className="col-xs-8" name="spend_key" placeholder="Secret spend key" id="spend_key" onChange={this.checkFields} />
-                                                            <label className="col-xs-4 col-form-label" htmlFor="spend_key">Enter your Safex address secret spend key here</label>
+                                                            <input className="col-xs-8" name="spend_key"
+                                                                   placeholder="Secret spend key" id="spend_key"
+                                                                   onChange={this.checkFields}/>
+                                                            <label className="col-xs-4 col-form-label"
+                                                                   htmlFor="spend_key">Enter your Safex address secret
+                                                                spend key here</label>
                                                         </div>
                                                         <div className="form-group">
-                                                            <input className="col-xs-8" name="view_key" placeholder="Secret view key" id="view_key" onChange={this.checkFields} />
-                                                            <label className="col-xs-4 col-form-label" htmlFor="view_key">Enter your Safex address secret view key here</label>
+                                                            <input className="col-xs-8" name="view_key"
+                                                                   placeholder="Secret view key" id="view_key"
+                                                                   onChange={this.checkFields}/>
+                                                            <label className="col-xs-4 col-form-label"
+                                                                   htmlFor="view_key">Enter your Safex address secret
+                                                                view key here</label>
                                                         </div>
 
-                                                        <button className={this.state.all_field_filled ? "button-shine green-btn" : "button-shine"}>Set your address</button>
+                                                        <button
+                                                            className={this.state.all_field_filled ? "button-shine green-btn" : "button-shine"}>Set
+                                                            your address
+                                                        </button>
                                                     </form>
-                                                    <button className="button-shine" onClick={this.startOver}>Go back</button>
+                                                    <button className="button-shine" onClick={this.startOver}>Go back
+                                                    </button>
                                                 </div>
-                                            :
+                                                :
                                                 <div className="address-wrap-inner">
                                                     <div className="migrate-btns-wrap">
                                                         <div className="col-xs-4 btn-wrap">
-                                                            <button className={this.state.create_address ? "active" : ""} onClick={this.createSafexKey}>
-                                                                <img src="images/migration/cube.png" alt="Cube" />
+                                                            <button
+                                                                className={this.state.create_address ? "active" : ""}
+                                                                onClick={this.createSafexKey}>
+                                                                <img src="images/migration/cube.png" alt="Cube"/>
                                                                 <span>New Address</span>
                                                             </button>
                                                             <p>Create new address</p>
                                                         </div>
                                                         <div className="col-xs-4 btn-wrap">
-                                                            <button className={this.state.my_address ? "active" : ""} onClick={this.usedAddresses}>
-                                                                <img src="images/migration/my-keys.png" alt="My Keys" />
+                                                            <button className={this.state.my_address ? "active" : ""}
+                                                                    onClick={this.usedAddresses}>
+                                                                <img src="images/migration/my-keys.png" alt="My Keys"/>
                                                                 <span>Previously Used</span>
                                                             </button>
                                                             <p>Previously used address</p>
                                                         </div>
                                                         <div className="col-xs-4 btn-wrap">
-                                                            <button className={this.state.enter_address ? "active" : ""} onClick={this.existingAddresses}>
-                                                                <img src="images/migration/enter-key.png" alt="Enter Key" />
+                                                            <button className={this.state.enter_address ? "active" : ""}
+                                                                    onClick={this.existingAddresses}>
+                                                                <img src="images/migration/enter-key.png"
+                                                                     alt="Enter Key"/>
                                                                 <span>My Address</span>
                                                             </button>
                                                             <p>Use My Safex address</p>
