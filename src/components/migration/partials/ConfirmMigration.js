@@ -17,22 +17,15 @@ export default class ConfirmMigration extends React.Component {
                     }
                 >
                     <div className="resetMigrationInner">
-                        <span className="close" onClick={this.props.closeConfirmMigration}>
-                        X
-                        </span>
+                        <span className="close" onClick={this.props.closeConfirmMigration}>X</span>
 
-                        <p>You are burning {this.props.data.amount} Safe Exchange Coin(s) in the migration process.</p>
-
-                        <p>
-                            You will receive {this.props.data.amount} Safex Tokens (SFT)<br/>
-                            And in addition {this.props.data.amount * 0.00232830643} Safex Cash (SFX)<br/>
-                        </p>
-                        
+                        <p><span>You are burning</span> <input type="text" className="red-input" value={this.props.data.amount} readOnly />  Safe Exchange Coin(s) in the migration process.</p>
+                        <p><span>You will receive</span> <input type="text" value={this.props.data.amount} readOnly /> Safex Tokens (SFT)</p>
+                        <p><span>And in addition</span> <input type="text" value={this.props.data.amount * 0.00232830643} readOnly />  Safex Cash (SFX)<br/></p>
                         <p>Your SFT and SFX will appear on the Safex Blockchain</p>
-                        
                         <p>They are being sent to:</p>
                         
-                        <textarea>
+                        <textarea readOnly>
                             {this.props.data.address}
                         </textarea>
                         <p>Are you sure you want to proceed with your transaction?</p>

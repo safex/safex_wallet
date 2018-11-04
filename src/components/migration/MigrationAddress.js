@@ -424,10 +424,10 @@ export default class MigrationAddress extends React.Component {
                     <div className="head col-xs-12">
                         <table>
                             <tbody>
-                            <tr>
-                                <td className="border">Address</td>
-                                <td>{this.state.address}</td>
-                            </tr>
+                                <tr>
+                                    <td className="border">Address</td>
+                                    <td>{this.state.address}</td>
+                                </tr>
                             </tbody>
                         </table>
 
@@ -453,36 +453,36 @@ export default class MigrationAddress extends React.Component {
                     <div className="col-xs-4 address-wrap-inner-left">
                         <table>
                             <tbody>
-                              <tr>
-                                  <td className="blue-border">Safex</td>
-                                  <td>{this.state.safex_bal}</td>
-                              </tr>
+                                <tr>
+                                    <td className="blue-border">Safex</td>
+                                    <td>{this.state.safex_bal}</td>
+                                </tr>
 
-                              <tr>
-                                  <td className="blue-border">Pending safex</td>
-                                  <td>{this.state.pending_safex_bal}</td>
-                              </tr>
-                              <tr className="row-clearfix"/>
+                                <tr>
+                                    <td className="blue-border">Pending safex</td>
+                                    <td>{this.state.pending_safex_bal}</td>
+                                </tr>
+                                <tr className="row-clearfix"/>
 
-                              <tr>
-                                  <td className="orange-border">BTC</td>
-                                  <td>{this.state.btc_bal}</td>
-                              </tr>
+                                <tr>
+                                    <td className="orange-border">BTC</td>
+                                    <td>{this.state.btc_bal}</td>
+                                </tr>
 
-                              <tr>
-                                  <td className="orange-border">Pending BTC</td>
-                                  <td>{this.state.pending_btc_bal}</td>
-                              </tr>
-                              <tr className="row-clearfix last"/>
+                                <tr>
+                                    <td className="orange-border">Pending BTC</td>
+                                    <td>{this.state.pending_btc_bal}</td>
+                                </tr>
+                                <tr className="row-clearfix last"/>
 
-                              <tr>
-                                  <td className="green-border">
-                                      Migrated Balance
-                                  </td>
-                                  <td className="green-text">
-                                      {migrated_balance}
-                                  </td>
-                              </tr>
+                                <tr>
+                                    <td className="green-border">
+                                        Migrated Balance
+                                    </td>
+                                    <td className="green-text">
+                                        {migrated_balance}
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -496,9 +496,11 @@ export default class MigrationAddress extends React.Component {
                         >
                             <table>
                                 <thead>
-                                <th>Safex Address</th>
-                                <th>Tokens (SFT)</th>
-                                <th>Cash (SFX)</th>
+                                    <tr>
+                                        <th>Safex Address</th>
+                                        <th>Tokens (SFT)</th>
+                                        <th>Cash (SFX)</th>
+                                    </tr>
                                 </thead>
 
                                 <tbody>{safex_address}</tbody>
