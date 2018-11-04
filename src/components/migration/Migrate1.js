@@ -28,12 +28,15 @@ export default class Migrate1 extends React.Component {
                 <p>Step 1/4 - Understanding</p>
                 <p>
                     In this phase you will go through the steps in order to migrate your
-                    Safe Exchange Coins from the Bitcoin blockchain to the Safex
+                    <input type="text" className="red-input" defaultValue="Safe Exchange Coins" readOnly /> from the Bitcoin blockchain to the Safex
                     blockchain.
                 </p>
                 <p>
-                    In return you will receive an equal amount of Safex Tokens (SFT). Additionally, you
-                    will receive <input type="text" className="red-input" defaultValue="~0.0023" readOnly />  Safex Cash (SFX) for each Token you migrated in this process.
+                    In return you will receive <input type="text" className="blue-input" defaultValue="an equal amount" readOnly />  of
+                    <input type="text" className="blue-input" defaultValue="Safex Tokens (SFT)" readOnly />. Additionally, you
+                    will receive <input type="text" className="blue-input" defaultValue="~0.0023 Safex Cash " readOnly />
+                    <input type="text" className="blue-input" defaultValue="Safex Cash (SFX)" readOnly />
+                     for each Token you migrated in this process.
                 </p>
                 <p>
                     This process is irreversible and you should do so acknowledging that
