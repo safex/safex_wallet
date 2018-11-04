@@ -18,8 +18,8 @@ import {
     closeResetMigration,
     confirmReset
 } from "../../utils/modals";
-import MigrationAlert from "../partials/MigrationAlert";
-import ResetMigration from "../partials/ResetMigration";
+import MigrationAlert from "../migration/partials/MigrationAlert";
+import ResetMigration from "../migration/partials/ResetMigration";
 
 export default class MigrationAddress extends React.Component {
     constructor(props) {
@@ -47,7 +47,6 @@ export default class MigrationAddress extends React.Component {
             refreshInterval: "",
             table_expanded: false,
             reset_migration: false,
-            safex_address_meta: [],
             safex_addresses: [],
         };
         this.refresh = this.refresh.bind(this);
@@ -131,22 +130,14 @@ export default class MigrationAddress extends React.Component {
 
         Promise.all(promises)
             .then(values => {
-
                 var address_array = [];
-                var safex_address_meta = [];
                 if (values[4].hasOwnProperty('safex_addresses')) {
                     console.log("addresses length " + values[4].safex_addresses.length);
                     for (var i = 0; i < values[4].safex_addresses.length; i++) {
-                        var meta_info = {};
-                        meta_info.hidden = false;
-                        meta_info.address = values[4].safex_addresses[i].safex_address;
-                        safex_address_meta.push(meta_info);
                         address_array.push(values[4].safex_addresses[i]);
                     }
-                    console.log(safex_address_meta)
                     console.log(address_array)
                 }
-
 
                 this.setState({
                     safex_bal: values[0].balance,
@@ -155,7 +146,6 @@ export default class MigrationAddress extends React.Component {
                     pending_safex_bal: values[3],
                     migrated_balance: values[4].migrated_balance,
                     safex_addresses: address_array,
-                    safex_address_meta: safex_address_meta,
                     btc_sync: true,
                     safex_sync: true,
                     status_text: "Synchronized",
@@ -293,11 +283,7 @@ export default class MigrationAddress extends React.Component {
     }
 
     toggleAddress(index) {
-        var store_meta = this.state.safex_address_meta;
-        store_meta[index].hidden = !this.state.safex_address_meta[index].hidden;
-        this.setState(() => ({
-            safex_address_meta: store_meta
-        }));
+        this.setOpenMigrationAlert(index);
     }
 
     setOpenResetMigration() {
@@ -322,6 +308,7 @@ export default class MigrationAddress extends React.Component {
             safex_key,
             fee,
             pending_btc_bal,
+            pending_safex_bal,
             migrated_balance
         } = this.state;
         let migration_shot;
@@ -393,6 +380,7 @@ export default class MigrationAddress extends React.Component {
                 data["safex_key"] = safex_key;
                 data["fee"] = fee;
                 data["pending_bal"] = pending_btc_bal;
+                data["pending_safex_bal"] = pending_safex_bal;
                 //send to burn address
                 migration_shot = (
                     <Migrate5
@@ -410,31 +398,21 @@ export default class MigrationAddress extends React.Component {
         const safex_address = this.state.safex_addresses.map((address, index) => (
             <tr key={index}>
                 <td
-                    className={
-                        this.state.safex_address_meta[index].hidden
-                            ? "address expanded"
-                            : "address"
-                    }
+                    className="address"
                     id="address"
                 >
-          <span>
-            {this.state.safex_address_meta[index].hidden
-                ? address.safex_address
-                : address.safex_address.slice(0, 6) +
-                "..." +
-                address.safex_address.slice(address.safex_address.length - 4)}
-          </span>
-                    <button
-                        onClick={() => this.toggleAddress(index)}
-                        className="button-shine"
-                    >
-                        {this.state.safex_address_meta[index].hidden
-                            ? "collapse"
-                            : "expand"}
-                    </button>
+                  <span>
+                    {address.safex_address.slice(0, 6) + "..." + address.safex_address.slice(address.safex_address.length - 4)}
+                  </span>
+                  <button
+                      onClick={() => this.toggleAddress(address.safex_address)}
+                      className="button-shine"
+                  >
+                  expand
+                  </button>
                 </td>
-                <td className="col-60">{address.balance}</td>
-                <td className="col-60">
+                <td>{address.balance}</td>
+                <td>
                     {(address.balance * 0.00232830643).toFixed(10)}
                 </td>
             </tr>
@@ -475,44 +453,36 @@ export default class MigrationAddress extends React.Component {
                     <div className="col-xs-4 address-wrap-inner-left">
                         <table>
                             <tbody>
-                            <tr>
-                                <td className="blue-border">Safex</td>
-                                <td>{this.state.safex_bal}</td>
-                            </tr>
+                              <tr>
+                                  <td className="blue-border">Safex</td>
+                                  <td>{this.state.safex_bal}</td>
+                              </tr>
 
-                            <tr>
-                                <td className="blue-border">Pending safex</td>
-                                <td>{this.state.pending_safex_bal}</td>
-                            </tr>
-                            <tr className="row-clearfix"/>
+                              <tr>
+                                  <td className="blue-border">Pending safex</td>
+                                  <td>{this.state.pending_safex_bal}</td>
+                              </tr>
+                              <tr className="row-clearfix"/>
 
-                            <tr>
-                                <td className="orange-border">BTC</td>
-                                <td>{this.state.btc_bal}</td>
-                            </tr>
+                              <tr>
+                                  <td className="orange-border">BTC</td>
+                                  <td>{this.state.btc_bal}</td>
+                              </tr>
 
-                            <tr>
-                                <td className="orange-border">Pending BTC</td>
-                                <td>{this.state.pending_btc_bal}</td>
-                            </tr>
-                            <tr className="row-clearfix last"/>
+                              <tr>
+                                  <td className="orange-border">Pending BTC</td>
+                                  <td>{this.state.pending_btc_bal}</td>
+                              </tr>
+                              <tr className="row-clearfix last"/>
 
-                            <tr>
-                                <td
-                                    className={
-                                        migrated_balance >= 0 ? "green-border" : "red-border"
-                                    }
-                                >
-                                    Migrated Balance
-                                </td>
-                                <td
-                                    className={
-                                        migrated_balance >= 0 ? "green-text" : "red-text"
-                                    }
-                                >
-                                    {migrated_balance}
-                                </td>
-                            </tr>
+                              <tr>
+                                  <td className="green-border">
+                                      Migrated Balance
+                                  </td>
+                                  <td className="green-text">
+                                      {migrated_balance}
+                                  </td>
+                              </tr>
                             </tbody>
                         </table>
                     </div>
@@ -536,17 +506,47 @@ export default class MigrationAddress extends React.Component {
                         </div>
                     </div>
                 </div>
-
-                {/*
-                    <button
+                
+                {/* <button
+                        className="button-shine"
+                        onClick={() => {
+                            this.setMigrationProgress(0);
+                        }}
+                    >
+                    show 1
+                </button>
+                <button
+                        className="button-shine"
+                        onClick={() => {
+                            this.setMigrationProgress(1);
+                        }}
+                    >
+                    show 2
+                </button>
+                <button
                         className="button-shine"
                         onClick={() => {
                             this.setMigrationProgress(2);
                         }}
                     >
-                        show 3
-                    </button>
-                */}
+                    show 3
+                </button>
+                <button
+                        className="button-shine"
+                        onClick={() => {
+                            this.setMigrationProgress(3);
+                        }}
+                    >
+                    show 4
+                </button>
+                <button
+                        className="button-shine"
+                        onClick={() => {
+                            this.setMigrationProgress(4);
+                        }}
+                    >
+                    show 5
+                </button> */}
 
                 <button className="button-shine" onClick={this.setMigrationVisible}>
                     {this.state.show_migration ? "Hide Migration" : "Migrate"}

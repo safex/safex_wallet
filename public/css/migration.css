@@ -118,6 +118,9 @@
 .address-wrap .keys-table-wrap .table-wrap table {
   width: calc(100% - 1px);
 }
+.address-wrap .keys-table-wrap .table-wrap table tr:nth-child(even) {
+  background: rgba(0, 126, 162, .2);
+}
 .address-wrap .keys-table-wrap .table-wrap table tr td {
   padding: 5px !important;
   border: 1px solid #009dbf;
@@ -164,7 +167,7 @@
 .address-wrap p,
 .safex-wrap p {
   background: transparent;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   margin-top: 0;
   margin-bottom: 5px;
@@ -219,9 +222,14 @@
   background: url("../images/input-bg.png") repeat-y top left;
   background-size: 100% 100%;
   color: #fff;
+  height: 32px;
+  font-size: 16px;
   -webkit-transition: all 0.2s ease-out;
   -moz-transition: all 0.2s ease-out;
   transition: all 0.2s ease-out;
+}
+.migration-step-wrap .new-address-input {
+  width: 100%;
 }
 .migration-step-wrap .target-address {
   width: 100%;
@@ -318,8 +326,6 @@
 }
 .migration-wrap .set-your-key-head .set-your-key-right {
   padding-left: 15px;
-}
-.migration-step-wrap .final-step .reset-btn {
 }
 .migration-step-wrap .final-step-form {
   margin-bottom: 10px;
@@ -481,7 +487,7 @@
   text-transform: uppercase;
   font-size: 17px;
   padding: 12px 15px 15px;
-  width: 500px;
+  width: 530px;
   visibility: hidden;
   opacity: 0;
   transition: all ease 0.3s;
@@ -520,7 +526,7 @@
   background: transparent;
   border: 0px none;
   margin-right: 0;
-  padding-right: 15px;
+  padding-right: 25px;
   font-size: 17px;
   margin-bottom: 0;
   text-transform: initial;
@@ -547,7 +553,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.7);
   z-index: 10001;
   opacity: 0;
   visibility: hidden;
@@ -782,12 +788,31 @@
   background: transparent;
   border: 0px none;
   margin-right: 0;
-  padding-right: 15px;
+  padding-right: 25px;
   font-size: 17px;
   margin-bottom: 0;
   text-transform: initial;
   line-height: 1.2;
   text-align: left;
+}
+.confirmMigration p {
+  margin-bottom: 15px;
+}
+.confirmMigration textarea {
+  margin: 0px 0 10px;
+  display: inline-block;
+  border: 1px solid rgba(0, 157, 191, 0.82);
+  border-radius: 5px;
+  padding: 6px 10px;
+  background: url(../images/input-bg.png) repeat-y top left;
+  background-size: 100% 100%;
+  color: #fff;
+  width: 100%;
+  max-width: 568px;
+  max-height: 62px;
+  -webkit-transition: all 0.2s ease-out;
+  -moz-transition: all 0.2s ease-out;
+  transition: all 0.2s ease-out;
 }
 .resetMigration .btns-wrap,
 .confirmMigration .btns-wrap {
@@ -799,6 +824,10 @@
 .resetMigration .btns-wrap button,
 .confirmMigration .btns-wrap button {
   min-width: 75px;
+}
+.resetMigration .btns-wrap button:last-of-type,
+.confirmMigration .btns-wrap button:last-of-type {
+  margin-right: 0;
 }
 .resetMigrationBackdrop,
 .confirmMigrationBackdrop {
@@ -812,7 +841,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.7);
   z-index: 10001;
   opacity: 0;
   visibility: hidden;

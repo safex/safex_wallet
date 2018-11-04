@@ -11,7 +11,7 @@ import {
     closeMigrationAlert,
     confirmReset
 } from "../../utils/modals";
-import MigrationAlert from "../partials/MigrationAlert";
+import MigrationAlert from "../migration//partials/MigrationAlert";
 
 //Set First Half of the Safex Address
 export default class Migrate3 extends React.Component {

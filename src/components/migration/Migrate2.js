@@ -5,7 +5,7 @@ import {openMigrationAlert, closeMigrationAlert} from '../../utils/modals';
 
 const fs = window.require('fs');
 import {encrypt} from "../../utils/utils";
-import MigrationAlert from "../partials/MigrationAlert";
+import MigrationAlert from "../migration//partials/MigrationAlert";
 
 var swg = window.require('safex-addressjs');
 const fileDownload = require('react-file-download');
@@ -380,7 +380,8 @@ export default class Migrate2 extends React.Component {
                                 Keep this information safe at all times!
                             </p>
                             <p>Wallet Address</p>
-                            <p>{this.state.safex_address}</p>
+                            <input type="text" className="new-address-input" defaultValue={this.state.safex_address} />
+                            {/* <p>{this.state.safex_address}</p> */}
                             <p>Spend Key</p>
                             <p>public: {this.state.safex_spend_pub}</p>
                             <p>secret: {this.state.safex_spend_sec}</p>
@@ -438,7 +439,7 @@ export default class Migrate2 extends React.Component {
                                                                    onChange={this.checkFields}/>
                                                             <label className="col-xs-4 col-form-label"
                                                                    htmlFor="safex_address">If you already have Safex
-                                                                address, enter it here.</label>
+                                                                address, enter it here</label>
                                                         </div>
                                                         <div className="form-group">
                                                             <input className="col-xs-8" name="spend_key"

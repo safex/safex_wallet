@@ -50,7 +50,7 @@ export default class Migrate1 extends React.Component {
                 </p>
 
                 <button
-                    className="button-shine"
+                    className="button-shine green-btn"
                     onClick={() => {
                         this.props.setMigrationProgress(1);
                     }}

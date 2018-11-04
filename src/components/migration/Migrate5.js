@@ -13,7 +13,7 @@ import {
     confirmReset
 } from "../../utils/modals";
 
-import MigrationAlert from "../partials/MigrationAlert";
+import MigrationAlert from "../migration/partials/MigrationAlert";
 import ConfirmMigration from "../migration/partials/ConfirmMigration";
 
 //Burn Safe Exchange Coins
@@ -109,8 +109,6 @@ export default class Migrate5 extends React.Component {
 
     burnSafex(e) {
         e.preventDefault();
-
-
             const amount_value = document.getElementById("amount").value;
             const amount = parseInt(amount_value);
             this.setState({loading: true, amount: amount});
@@ -131,7 +129,7 @@ export default class Migrate5 extends React.Component {
                         loading: false,
                     });
                     this.props.refresh();
-                    this.toggleConfirmMigration();
+                    this.toggleConfirmMigration(e);
                 })
                 .catch(err => {
                     console.log("error broadcasting transaction " + err);
@@ -141,16 +139,29 @@ export default class Migrate5 extends React.Component {
     }
 
     validateAmount(e) {
-        if (parseInt(e.target.value) > this.state.safex_bal) {
-            console.log(
-                "Not enough safex balance for that transaction, max is " +
-                this.state.safex_bal
-            );
-            this.setOpenMigrationAlert(
-                "Not enough safex balance for that transaction, max is" +
-                this.state.safex_bal
-            );
-            e.target.value = this.state.safex_bal;
+        let amount = e.target.value;
+        if  (this.state.migration_alert) {
+            if (isNaN(e.target.value)) {
+                amount = e.target.value.slice(0, e.target.value.length - 1);
+            } else {
+                this.setState(() => ({
+                    migration_alert: false
+                }));
+            }
+            } else {
+            if (parseInt(amount) > this.state.safex_bal) {
+                console.log(
+                    "Not enough safex balance for that transaction, max is " +
+                    this.state.safex_bal
+                );
+                this.setOpenMigrationAlert(
+                    "Not enough safex balance for that transaction, max is " +
+                    this.state.safex_bal
+                );
+                e.target.value = this.state.safex_bal;
+            } else if (isNaN(e.target.value)) {
+                this.setOpenMigrationAlert("Please enter a valid Safex amount");
+            }
         }
     }
 
@@ -164,29 +175,27 @@ export default class Migrate5 extends React.Component {
 
     toggleConfirmMigration(e) {
         e.preventDefault();
-    if (this.props.data.pending_bal != 0) {
-        this.setOpenMigrationAlert("warning you have unconfirmed transactions, please wait until they are confirmed");
-
-    } else {
-        const amount_value = document.getElementById("amount").value;
-        const amount = parseInt(amount_value);
-
-        if (amount === "" || isNaN(amount)) {
-            this.setOpenMigrationAlert("Please enter a valid Safex amount");
-        } else if (this.state.btc_bal < this.state.txn_fee) {
-            this.setOpenMigrationAlert("Not enough btc to complete this transaction, you need " + this.state.txn_fee);
+        if (this.props.data.pending_bal !== 0 || this.props.data.pending_safex_bal !== 0) {
+            this.setOpenMigrationAlert("Warning: You have unconfirmed transactions, please wait until they are confirmed");
         } else {
-            this.setState({
-                amount: amount,
-                confirm_migration: !this.state.confirm_migration
-            });
+            const amount_value = document.getElementById("amount").value;
+            const amount = parseInt(amount_value);
+
+            if (amount === "" || isNaN(amount)) {
+                this.setOpenMigrationAlert("Please enter a valid Safex amount");
+            } else if (this.state.btc_bal < this.state.txn_fee) {
+                this.setOpenMigrationAlert("Not enough btc to complete this transaction, you need " + this.state.txn_fee);
+            } else {
+                this.setState({
+                    amount: amount,
+                    confirm_migration: !this.state.confirm_migration
+                });
+            }
         }
-    }
     }
 
     //create safex blockchain key set
     render() {
-
         var data = {};
         data["amount"] = this.state.amount;
         data["address"] = this.state.safex_key.public_addr;
@@ -211,7 +220,7 @@ export default class Migrate5 extends React.Component {
                             placeholder="Amount"
                             id="amount"
                         />
-                        <button className="button-shine">send</button>
+                        <button className="button-shine green-btn">send</button>
                     </form>
 
                     <p>
@@ -239,7 +248,6 @@ export default class Migrate5 extends React.Component {
                         burnSafex={this.burnSafex}
                         closeConfirmMigration={this.toggleConfirmMigration}
                         data={data}
-
                     />
                 </div>
             </div>

@@ -318,14 +318,15 @@ input::-webkit-inner-spin-button {
 
 .spinner-wrap {
   position: relative;
+  height: 100%;
 }
 .lds-dual-ring {
   position: absolute;
   top: 50%;
   left: 50%;
   display: inline-block;
-  width: 64px;
-  height: 64px;
+  width: 46px;
+  height: 46px;
 }
 .lds-dual-ring:after {
   content: " ";

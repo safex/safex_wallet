@@ -3,7 +3,7 @@ import React from 'react';
 import MigrationAddress from './MigrationAddress';
 import Navigation from '../partials/Navigation';
 import {getFee} from '../../utils/migration';
-import InstructionsModal from "../partials/InstructionsModal";
+import InstructionsModal from "../migration/partials/InstructionsModal";
 
 export default class Migration extends React.Component {
     constructor(props) {
@@ -138,18 +138,20 @@ export default class Migration extends React.Component {
         if (this.state.loading) {
             return (
                 <div>
-                <Navigation
-                    safexPrice={this.state.safex_price}
-                    btcPrice={this.state.btc_price}
-                    wallet={this.wallet}
-                    instructionsModal={this.state.instructionsModal}
-                    openInstructionsModal={this.openInstructionsModal}
-                    closeInstructionsModal={this.closeInstructionsModal}
-                />
+                    <Navigation
+                        safexPrice={this.state.safex_price}
+                        btcPrice={this.state.btc_price}
+                        wallet={this.wallet}
+                        instructionsModal={this.state.instructionsModal}
+                        openInstructionsModal={this.openInstructionsModal}
+                        closeInstructionsModal={this.closeInstructionsModal}
+                    />
 
-                <div className="spinner-wrap">
-                    <div className="lds-dual-ring"></div>
-                </div>
+                    <div className="container migration-wrap fadeIn">
+                        <div className="spinner-wrap">
+                            <div className="lds-dual-ring"></div>
+                        </div>
+                    </div>
                 </div>
             )
         } else {
