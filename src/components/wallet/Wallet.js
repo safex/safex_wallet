@@ -1579,11 +1579,11 @@ export default class Wallet extends React.Component {
                     });
                 }).catch(err => {
                     console.log("generate safex transaction error" + err);
-                    this.openMainAlertPopup("generate safex transaction error" + err);
+                    this.openMainAlertPopup("Safex Transaction Error; You may have a 0 balance \n" + err);
                 })
             .catch(err => {
                 console.log("error getting UTXOs " + err);
-                this.openMainAlertPopup("error getting UTXOs " + err);
+                this.openMainAlertPopup("error getting UTXOs; You may have a connectivity issue " + err);
             });
         } else {
             get_utxos(this.state.send_public_key)
@@ -1602,11 +1602,11 @@ export default class Wallet extends React.Component {
                     });
                 }).catch(err => {
                     console.log("generate btc transaction error you might have no money " + err);
-                    this.openMainAlertPopup("generate btc transaction error you might be out of bitcoins " + err);
+                    this.openMainAlertPopup("BTC Transaction Error; You may have a 0 balance \n" + err);
                 })
             .catch(err => {
                 console.log("error getting UTXOs " + err);
-                this.openMainAlertPopup("error getting UTXOs " + err);
+                this.openMainAlertPopup("error getting UTXOs; You may have a connectivity issue " + err);
             });
         }
     }
