@@ -1251,14 +1251,6 @@ export default class Wallet extends React.Component {
 
     exportUnencryptedWallet() {
         var wallet_data = JSON.parse(localStorage.getItem('wallet'));
-        var nice_keys = "";
-        var keys = wallet_data['keys'];
-        keys.forEach((key) => {
-            nice_keys += "private key: " + key.private_key + '\n';
-            nice_keys += "public key: " + key.public_key + '\n';
-            nice_keys += '\n';
-        });
-
 
         var date = Date.now();
 
