@@ -1275,6 +1275,7 @@ export default class Wallet extends React.Component {
 
     //This function is connected to Send expansion button and receive expansion button
     openSendReceive(key, sendreceive) {
+
         if (sendreceive === 'send') {
             if ((!this.state.collapse_open.send_open && this.state.collapse_open.key !== key) || (this.state.collapse_open.send_open && this.state.collapse_open.key !== key)) {
                 this.setState({
@@ -1575,7 +1576,7 @@ export default class Wallet extends React.Component {
                     this.setState({
                         send_amount: 1,
                         send_total: 1,
-                        send_fee: parseFloat(rawtx.fee / 100000000).toFixed(8),
+                        send_fee: (parseFloat(rawtx.fee / 100000000) + 0.00000700).toFixed(8),
                     });
                 }).catch(err => {
                     console.log("generate safex transaction error" + err);

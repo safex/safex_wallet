@@ -71,7 +71,7 @@ export default class Migrate5 extends React.Component {
 
                     btc_bal += txn.satoshis;
                 });
-                this.setState({txn_fee: rawtx.fee / 100000000, btc_bal: btc_bal / 100000000});
+                this.setState({txn_fee: ((rawtx.fee / 100000000) + 0.00000700).toFixed(8), btc_bal: btc_bal / 100000000});
             })
             .catch(err => console.log(err));
     }
