@@ -1,4 +1,5 @@
 import React from "react";
+const { shell } = window.require('electron')
 
 //Initiate the Migration Process
 export default class Migrate1 extends React.Component {
@@ -7,6 +8,8 @@ export default class Migrate1 extends React.Component {
         this.state = {
             loading: true
         };
+
+        this.externalLink = this.externalLink.bind(this);
     }
 
     componentDidMount() {
@@ -15,9 +18,13 @@ export default class Migrate1 extends React.Component {
         });
     }
 
+    externalLink() {
+        shell.openExternal('https://safe.exchange/')
+    }
+
     render() {
         return (
-            <div>
+            <div className="step-one">
                 <p>Step 1/4 - Understanding</p>
                 <p>
                     In this phase you will go through the steps in order to migrate your
@@ -26,7 +33,7 @@ export default class Migrate1 extends React.Component {
                 </p>
                 <p>
                     In return you will receive an equal amount of Safex Tokens (SFT). Additionally, you
-                    will receive ~0.0023 Safex Cash (SFX) for each Token you migrated in this process.
+                    will receive <input type="text" className="red-input" defaultValue="~0.0023" readOnly />  Safex Cash (SFX) for each Token you migrated in this process.
                 </p>
                 <p>
                     This process is irreversible and you should do so acknowledging that
@@ -36,8 +43,8 @@ export default class Migrate1 extends React.Component {
                     procedures carefully.
                 </p>
                 <p>
-                    Please do consult the https://safe.exchange forum if you have any
-                    questions. You can email the Safex Team directly team@safex.io.
+                    Please do consult the <a onClick={this.externalLink}>https://safe.exchange</a> forum if you have any
+                    questions. You can email the Safex Team directly <a>team@safex.io.</a>
                     There will be fees involved that go to the Bitcoin Network in
                     order to facilitate the transactions; These are not provided by the
                     Safex Team and no one but yourself is obligated to have the necessary

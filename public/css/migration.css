@@ -175,6 +175,23 @@
   color: rgba(255, 255, 255, 0.9);
   word-break: break-word;
 }
+.step-one p {
+  margin-bottom: 10px !important;
+}
+.step-one p a {
+  color: rgba(0, 157, 191, .8);
+  transition: all 0.2s ease-out;
+}
+.step-one p a:hover {
+  cursor: pointer;
+  color: rgba(0, 157, 191, 1);
+  text-decoration: none;
+}
+.step-one input {
+  margin: 0 5px !important;
+  padding: 3px 10px 4px !important;
+  height: initial !important;
+}
 .address-wrap span {
   width: 125px;
   display: inline-block;
@@ -222,7 +239,7 @@
   background: url("../images/input-bg.png") repeat-y top left;
   background-size: 100% 100%;
   color: #fff;
-  height: 32px;
+  height: 36px;
   font-size: 16px;
   -webkit-transition: all 0.2s ease-out;
   -moz-transition: all 0.2s ease-out;
@@ -328,7 +345,7 @@
   padding-left: 15px;
 }
 .migration-step-wrap .final-step-form {
-  margin-bottom: 10px;
+  margin-bottom: 0;
   display: inline-block;
 }
 .migration-step-wrap .final-step-form input {
@@ -809,6 +826,8 @@
   margin-bottom: 0;
   background: rgba(0, 191, 162, .9);
   border: 1px solid rgba(0, 191, 162, .9);
+  padding: 4px 10px;
+  height: initial;
 }
 .confirmMigration input:hover,
 .confirmMigration input:focus {
@@ -834,7 +853,7 @@
   background-size: 100% 100%;
   color: #fff;
   width: 100%;
-  max-width: 708px;
+  max-width: 678px;
   max-height: 62px;
   -webkit-transition: all 0.2s ease-out;
   -moz-transition: all 0.2s ease-out;
