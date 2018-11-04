@@ -218,10 +218,14 @@ export default class ImportWallet extends React.Component {
                 // We are done. Save the wallet to storage and log user in.
 
                 const duplicatesMessage = importedCount < targetKeys.length
-                    ? ` (found ${targetKeys.length - importedCount} duplicates)`
+                    ? ` (found ${targetKeys.length - importedCount} BTC Key duplicates)`
+                    : '';
+                const duplicatesSafexMessage = importedSafexCount < targetSafexKeys.length
+                    ? ` (found ${targetSafexKeys.length - importedSafexCount} Safex Key duplicates)`
                     : '';
                 if (this.state.walletImportAlerts === false) {
-                    this.openWalletImportAlert(`Imported ${importedCount} out of ${targetKeys.length} keys${duplicatesMessage}.`, 4000);
+                    this.openWalletImportAlert(`Imported ${importedCount} out of ${targetKeys.length} keys ${duplicatesMessage}.
+                     Import ${importedSafexCount} out of ${targetSafexKeys.length} keys ${duplicatesSafexMessage}`, 4000);
                 }
 
                 localStorage.setItem('encrypted_wallet', reEncrypted);
