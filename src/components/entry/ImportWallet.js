@@ -165,10 +165,14 @@ export default class ImportWallet extends React.Component {
             }
 
             decrypted.keys = decrypted.keys || [];
+            decrypted.safex_keys = decrypted.safex_keys || [];
 
             // We have both wallets. Add keys from the disk wallet into user's current wallet
             let importedCount = 0;
+            let importedSafexCount = 0;
             const targetKeys = targetWallet.decrypted.keys || [];
+            const targetSafexKeys = targetWallet.decrypted.safex_keys || [];
+
             targetKeys.forEach(keyInfo => {
                 const alreadyExists = decrypted.keys.some(existingKeyInfo => {
                     return existingKeyInfo.private_key === keyInfo.private_key;
@@ -181,6 +185,20 @@ export default class ImportWallet extends React.Component {
 
                 decrypted.keys.push(keyInfo);
                 importedCount++;
+            });
+
+            targetSafexKeys.forEach(keyInfo => {
+                const alreadyExists = decrypted.safex_keys.some(existingKeyInfo => {
+                    return existingKeyInfo.public_addr === keyInfo.public_addr;
+                });
+                if (alreadyExists) {
+                    // This is a duplicate key. For now, just remember how many duplicates we had.
+                    // When we have better UI, we might offer the user more options (keep old / take new / etc.)
+                    return;
+                }
+
+                decrypted.safex_keys.push(keyInfo);
+                importedSafexCount++;
             });
 
             // We now need to re-encrypt the wallet and save it to disk with imported keys
