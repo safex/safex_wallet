@@ -175,7 +175,7 @@ export default class Migrate5 extends React.Component {
 
     toggleConfirmMigration(e) {
         e.preventDefault();
-        if (this.props.data.pending_bal !== 0 || this.props.data.pending_safex_bal !== 0) {
+        if (parseFloat(this.props.data.pending_bal) !== 0 || parseFloat(this.props.data.pending_safex_bal) !== 0) {
             this.setOpenMigrationAlert("Warning: You have unconfirmed transactions, please wait until they are confirmed");
         } else {
             const amount_value = document.getElementById("amount").value;
