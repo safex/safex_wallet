@@ -37,7 +37,8 @@ export default class Migrate5 extends React.Component {
             migration_alert_text: "",
             migration_complete: false,
             fee: this.props.data.fee,
-            confirm_migration: false
+            confirm_migration: false,
+            amount: 0
         };
 
         this.burnSafex = this.burnSafex.bind(this);
@@ -127,8 +128,8 @@ export default class Migrate5 extends React.Component {
                 .then(rawtx => broadcastTransaction(rawtx))
                 .then(() => {
                     this.setState({
+                        amount: amount,
                         loading: false,
-                        migration_complete: true
                     });
                     this.props.refresh();
                     this.toggleConfirmMigration();
@@ -185,6 +186,10 @@ export default class Migrate5 extends React.Component {
 
     //create safex blockchain key set
     render() {
+
+        var data = {};
+        data["amount"] = this.state.amount;
+
         return (
             <div className="final-step">
                 <div>
@@ -230,6 +235,8 @@ export default class Migrate5 extends React.Component {
                         confirmMigraton={this.state.confirm_migration}
                         burnSafex={this.burnSafex}
                         closeConfirmMigration={this.toggleConfirmMigration}
+                        data={data}
+
                     />
                 </div>
             </div>

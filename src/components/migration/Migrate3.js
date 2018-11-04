@@ -119,7 +119,8 @@ export default class Migrate3 extends React.Component {
                 })
                 .then(rawtx => broadcastTransaction(rawtx))
                 .then(result => {
-                    this.props.setMigrationProgress(3);
+                    setTimeout(() => {
+                        this.props.setMigrationProgress(3);}, 20000)
                     console.log(result);
                 })
                 .catch(err => {

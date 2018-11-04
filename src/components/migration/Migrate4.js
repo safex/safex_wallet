@@ -113,7 +113,8 @@ export default class Migrate4 extends React.Component {
                 })
                 .then(rawtx => broadcastTransaction(rawtx))
                 .then(result => {
-                    this.props.setMigrationProgress(4);
+                    setTimeout(() => {
+                        this.props.setMigrationProgress(4);}, 20000)
                     console.log(result);
                 })
                 .catch(err => {
