@@ -740,7 +740,7 @@
   color: #fff;
   font-size: 17px;
   padding: 12px 15px 15px;
-  max-width: 708px;
+  
   visibility: hidden;
   opacity: 0;
   transition: all ease 0.3s;
@@ -754,6 +754,12 @@
   bottom: 0;
   right: 0;
   z-index: 100002;
+}
+.confirmMigration {
+  width: 708px;
+}
+.resetMigration {
+  width: 500px;
 }
 .resetMigration.active,
 .confirmMigration.active {
