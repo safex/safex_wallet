@@ -360,7 +360,7 @@ export default class Migrate2 extends React.Component {
 
         return (
             <div>
-                <p>Step 2/4</p>
+                <p>Step 2/4 - Selecting The Safex Key</p>
                 {
                     this.state.create_address
                         ?

@@ -137,8 +137,19 @@ export default class Migration extends React.Component {
 
         if (this.state.loading) {
             return (
+                <div>
+                <Navigation
+                    safexPrice={this.state.safex_price}
+                    btcPrice={this.state.btc_price}
+                    wallet={this.wallet}
+                    instructionsModal={this.state.instructionsModal}
+                    openInstructionsModal={this.openInstructionsModal}
+                    closeInstructionsModal={this.closeInstructionsModal}
+                />
+
                 <div className="spinner-wrap">
                     <div className="lds-dual-ring"></div>
+                </div>
                 </div>
             )
         } else {

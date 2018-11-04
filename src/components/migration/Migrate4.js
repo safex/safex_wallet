@@ -114,7 +114,7 @@ export default class Migrate4 extends React.Component {
                 .then(rawtx => broadcastTransaction(rawtx))
                 .then(result => {
                     setTimeout(() => {
-                        this.props.setMigrationProgress(4);}, 20000)
+                        this.props.setMigrationProgress(4);}, 5000)
                     console.log(result);
                 })
                 .catch(err => {
@@ -140,7 +140,7 @@ export default class Migrate4 extends React.Component {
     render() {
         return (
             <div>
-                <p>Step 3/4</p>
+                <p>Step 4/4 - Setting the Second Half</p>
 
                 <p>
                     Setting your Safex Address for Migration requires two steps. In this

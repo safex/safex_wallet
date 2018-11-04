@@ -113,7 +113,7 @@ export default class Migrate5 extends React.Component {
 
             const amount_value = document.getElementById("amount").value;
             const amount = parseInt(amount_value);
-            this.setState({loading: true});
+            this.setState({loading: true, amount: amount});
             get_utxos(this.state.address)
                 .then(utxos => {
                     const rawtx = generateSafexBtcTransaction(
@@ -128,7 +128,6 @@ export default class Migrate5 extends React.Component {
                 .then(rawtx => broadcastTransaction(rawtx))
                 .then(() => {
                     this.setState({
-                        amount: amount,
                         loading: false,
                     });
                     this.props.refresh();
@@ -178,6 +177,7 @@ export default class Migrate5 extends React.Component {
             this.setOpenMigrationAlert("Not enough btc to complete this transaction, you need " + this.state.txn_fee);
         } else {
             this.setState({
+                amount: amount,
                 confirm_migration: !this.state.confirm_migration
             });
         }
@@ -189,11 +189,14 @@ export default class Migrate5 extends React.Component {
 
         var data = {};
         data["amount"] = this.state.amount;
+        data["address"] = this.state.safex_key.public_addr;
+
+        console.log(data)
 
         return (
             <div className="final-step">
                 <div>
-                    <p>Final Step</p>
+                    <p>Final Step - Burning your Safe Exchange Coins</p>
                     <p>
                         <span>You will need</span> {this.state.txn_fee} btc{" "}
                     </p>
