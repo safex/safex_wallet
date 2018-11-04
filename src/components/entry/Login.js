@@ -1,94 +1,97 @@
 import React from 'react';
-import crypto from 'crypto';
-var fs = window.require('fs');
-import { decrypt } from '../../utils/utils';
 import {Link} from 'react-router';
 
-export default class Login extends React.Component {
+import {
+    decryptWalletData,
+    flashField,
+} from '../../utils/wallet';
 
+import {walletImportAlert} from '../../utils/modals';
+import packageJson from "../../../package";
+
+export default class Login extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            wrong_password: false
+            wrongPassword: false,
         };
 
-        this.wrongPassword = this.wrongPassword.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.walletImportAlertsClose = this.walletImportAlertsClose.bind(this);
     }
 
     wrongPassword() {
+        flashField(this, 'wrongPassword');
+    }
+
+    openWalletImportAlert(message, duration) {
+        walletImportAlert(this, message, duration);
+    }
+
+    walletImportAlertsClose() {
         this.setState({
-            wrong_password: true
+            walletImportAlerts: false,
+            walletImportAlertsText: ''
         });
-        setTimeout(() => {
-            this.setState({
-                wrong_password: false
-            });
-        }, 1000)
     }
 
     handleSubmit(e) {
         e.preventDefault();
-        var crypto = require('crypto'),
-            algorithm = 'aes-256-ctr',
-            password = e.target.password.value;
 
-        localStorage.setItem('password', password);
+        localStorage.setItem('password', e.target.password.value);
 
-        var cipher_text = localStorage.getItem('encrypted_wallet');
-
-
-            var decrypted_wallet = decrypt(cipher_text, algorithm, password);
-
+        let wallet;
         try {
-            var parse_wallet = JSON.parse(decrypted_wallet);
-
-            if (parse_wallet['version'] === '1') {
-                localStorage.setItem('wallet', decrypted_wallet);
-
-                this.context.router.push('/wallet');
-            } else {
-                this.wrongPassword();
-                console.log('wrong password');
-            }
-
-        } catch (e) {
-            this.wrongPassword();
-            console.log('error parsing wallet');
+            wallet = decryptWalletData();
         }
+        catch (err) {
+            console.error(err);
+            this.wrongPassword();
+            this.openWalletImportAlert('Wrong password', 5000);
+            return;
+        }
+
+        localStorage.setItem('wallet', JSON.stringify(wallet));
+        this.context.router.push('/wallet');
     }
 
     //here we load up the wallet into the local storage and move on with life.
     render() {
         return (
-          <div className="container">
-               <div className="col-xs-12 Login-logo">
-                   <h2>Safex</h2>
-                   <h3>Wallet</h3>
-                   <Link className="back-button" to="/"><img src="images/back.png" alt="back button"/> Back</Link>
-               </div>
-               <div className="col-xs-12 Login-form">
+            <div className="container">
+                <div className="col-xs-12 Login-logo">
+                    <h2>Safex</h2>
+                    <h3>Wallet</h3>
+                    <p>{packageJson.version}</p>
+                    <Link className="back-button" to="/"><img src="images/back.png" alt="back button"/> Back</Link>
+                </div>
+                <div className="col-xs-12 Login-form">
                     <form className="form-group" onSubmit={this.handleSubmit}>
-                        {
-                            this.state.wrong_password
-                            ?
-                                <input className="form-control shake" type="password" name="password" placeholder="Enter Password" />
-                            :
-                                <input className="form-control" type="password" name="password" placeholder="Enter Password" />
-                        }
+                        <input className={this.state.wrongPassword ? 'form-control shake' : 'form-control'} type="password" name="password" placeholder="Enter Password" autoFocus />
                         <button className="btn btn-default button-neon-blue" type="submit">Proceed </button>
                     </form>
-               </div>
-               <div className="col-xs-12 text-center Intro-footer">
-                   <img src="images/footer-logo.png" alt="Safex Icon Footer"/>
-                   <p className="text-center">2014-2018 All Rights Reserved Safe Exchange Developers &copy;</p>
-               </div>
-          </div>
+                </div>
+                <div className="col-xs-12 text-center Intro-footer">
+                    <img src="images/footer-logo.png" alt="Safex Icon Footer"/>
+                    <p className="text-center">2014-2018 All Rights Reserved Safe Exchange Developers &copy;</p>
+                </div>
+
+                <div className={this.state.walletImportAlerts
+                    ? 'overflow sendModal walletResetModal active'
+                    : 'overflow sendModal walletResetModal'}>
+                    <div className="container">
+                        <h3>Wallet Login
+                            <span onClick={this.walletImportAlertsClose} className="close">X</span>
+                        </h3>
+                        <p>{this.state.walletImportAlertsText}</p>
+                    </div>
+                </div>
+            </div>
         );
     }
 }
 
 Login.contextTypes = {
     router: React.PropTypes.object.isRequired
-}
+};

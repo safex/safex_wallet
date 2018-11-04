@@ -4,7 +4,7 @@ Official repository for SAFEX electron wallet.
 
 ## Releases
 
-You can download [SAFEX Wallet](https://github.com/safex/safex_wallet/releases) on the github release page or on [Safex.io](https://safex.io)
+You can download [SAFEX Wallet](https://github.com/safex/safex_wallet/releases) on the github release page or on [Safex.io](https://safex.io/safexwallet)
 
 Available for Mac, Windows (64, 32) and Linux.
 
@@ -30,11 +30,32 @@ npm start
 
 This will start webpack dev server and open a browser window. You will not be able to develop frontend in the browser, as it will lack some of electron's native API-s. So you can close that browser tab and instead debug frontend directly in the electron window you have started as described above.
 
+## Build:
+
+Run
+
+```
+npm run make-all-installers
+```
+
+to make all installer. This will work only on Mac because of Mac.
+
+You can also run
+
+```
+npm run make-win-installer
+npm run make-mac-installer
+npm run make-linux-installer
+```
+separately.
+
+For linux builds, you will need to have `rpmbuild` available on system (`apt-get install rpm`).
+
 ## License
 
-MIT License 
+MIT License
 
-Copyright (c) 2017 Safex Developers 
+Copyright (c) 2018 Safex Developers
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

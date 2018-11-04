@@ -1,7 +1,7 @@
 {
   "name": "SafexWallet",
   "description": "Safex Community Wallet",
-  "version": "0.0.6",
+  "version": "v0.0.7",
   "homepage": ".",
   "repository": {
     "type": "git",
@@ -17,6 +17,11 @@
       "name": "Daniel Dabek",
       "url": "https://github.com/ddabek",
       "email": "daniel@safex.io"
+    },
+    {
+      "name": "Uroš Mitrović",
+      "url": "https://github.com/Kiu0612",
+      "email": "uros@balkaneum.com"
     }
   ],
   "license": "MIT",
@@ -33,6 +38,7 @@
     "electron-builder": "^19.41.0",
     "electron-installer-dmg": "^0.2.1",
     "electron-packager": "^8.7.2",
+    "electron-react-devtools": "^0.5.3",
     "electron-winstaller": "^2.6.3",
     "foreman": "^2.0.0",
     "react-scripts": "^0.8.5"
@@ -40,17 +46,20 @@
   "dependencies": {
     "axios": "^0.16.2",
     "binstring": "^0.2.1",
-    "bitcoinjs-lib": "^3.1.1",
+    "bitcoinjs-lib": "^4.0.1",
     "bitcore-lib": "^0.14.0",
     "bs58": "^4.0.1",
     "electron-context-menu": "^0.9.1",
     "qrcode.react": "^0.7.1",
-    "react": "^15.4.2",
+    "react": "^15.6.2",
+    "react-copy-to-clipboard": "^5.0.1",
     "react-dom": "^15.6.2",
     "react-file-download": "^0.3.4",
     "react-file-input": "^0.2.5",
     "react-number-format": "^2.0.3",
-    "react-router": "^3.2.1"
+    "react-router": "^3.2.1",
+    "safe-buffer": "^5.1.1",
+    "safex-addressjs": "git+https://github.com/safex/safex_addressjs.git"
   },
   "main": "src/electron-wallet.js",
   "scripts": {
@@ -75,12 +84,13 @@
       "build/css/*.*",
       "build/fonts/*.*",
       "build/images/*.*",
+      "build/images/migration/*.*",
       "build/static/css/*.*",
       "build/static/js/*.*"
     ],
     "mac": {
       "category": "public.app-category.business",
-      "icon": "public/images/icons/wallet-icon2.png",
+      "icon": "public/images/icons/wallet-icon2.icns",
       "type": "distribution",
       "target": [
         "dmg"
@@ -88,13 +98,14 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "public/images/icons/wallet-icon2.png",
+      "icon": "public/images/icons/wallet-icon2.ico",
       "certificateFile": "../../../safexDevelopersCertificate.p12",
       "certificatePassword": ""
     },
     "linux": {
       "target": [
-        "deb"
+        "deb",
+        "rpm"
       ],
       "category": "Utility",
       "icon": "public/images/icons/"

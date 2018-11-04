@@ -11,6 +11,7 @@ const {app, Menu} = require('electron');
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
 
+const os = require('os');
 const path = require('path');
 const url = require('url');
 
@@ -27,23 +28,19 @@ function createWindow() {
         minHeight: 768,
         webPreferences: {
             webSecurity: false
-        }
+        },
+        useContentSize: true
     });
 
     // and load the index.html of the app.
     const startUrl = process.env.ELECTRON_START_URL || url.format({
-            pathname: path.join(__dirname, '/../build/index.html'),
-            protocol: 'file:',
-            slashes: true
-        });
+        pathname: path.join(__dirname, '/../build/index.html'),
+        protocol: 'file:',
+        slashes: true
+    });
     mainWindow.loadURL(startUrl);
 
-    mainWindow.webContents.openDevTools();
-
-    // Open the DevTools.
-    if (process.env.ELECTRON_DEV) {
-        mainWindow.webContents.openDevTools();
-    }
+    //mainWindow.webContents.openDevTools();
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
@@ -52,27 +49,29 @@ function createWindow() {
         // when you should delete the corresponding element.
         mainWindow = null
     });
-    
-    const template = [{
-        label: "Safex Wallet 0.0.6",
-        submenu: [
-            { label: "About Safex Wallet v0.0.6", selector: "orderFrontStandardAboutPanel:" },
-            { type: "separator" },
-            { label: "Quit", accelerator: "Command+Q", click: function() { app.quit(); }}
-        ]}, {
-        label: "Edit",
-        submenu: [
-            { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
-            { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
-            { type: "separator" },
-            { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
-            { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
-            { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
-            { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
-        ]}
-    ];
 
-    Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+    if (os.platform() !== 'win32') {
+        const template = [{
+            label: "Safex Wallet 0.0.7",
+            submenu: [
+                { label: "About Safex Wallet v0.0.7", selector: "orderFrontStandardAboutPanel:" },
+                { type: "separator" },
+                { label: "Quit", accelerator: "Command+Q", click: function() { app.quit(); }}
+            ]}, {
+            label: "Edit",
+            submenu: [
+                { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
+                { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
+                { type: "separator" },
+                { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
+                { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
+                { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
+                { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
+            ]}
+        ];
+
+        Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+    }
 }
 
 // This method will be called when Electron has finished

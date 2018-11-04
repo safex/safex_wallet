@@ -1,6 +1,6 @@
-import crypto from 'crypto';
 var bitcoin = window.require('bitcoinjs-lib');
 var bs58 = require('bs58');
+const swg = window.require('safex-addressjs');
 import { toHexString } from './utils';
 
 module.exports = {
@@ -27,6 +27,16 @@ module.exports = {
 
         var key_pair = bitcoin.ECPair.fromWIF(priv_key_wif);
         return key_pair;
+    },
+
+    genSafexKey: function() {
+        const seed = swg.sc_reduce32(swg.rand_32());
+        const keys = swg.create_address(seed);
+        const pubkey = swg.pubkeys_to_string(keys.spend.pub, keys.view.pub);
+
+        console.log(keys);
+        console.log(pubkey);
+        return keys;
     }
 
 }

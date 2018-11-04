@@ -1,18 +1,60 @@
 import React from 'react';
 import axios from 'axios';
 
-var fileDownload = require('react-file-download');
-var fs = window.require('fs');
-var os = window.require('os');
-var bs58 = require('bs58');
-var bitcoin = window.require('bitcoinjs-lib');
-var bitcore = window.require('bitcore-lib');
-import {toHexString, encrypt, safexPayload, decrypt} from '../../utils/utils';
-import {genkey} from '../../utils/keys';
+const fileDownload = require('react-file-download');
+const fs = window.require('fs');
+const bitcoin = window.require('bitcoinjs-lib');
+const bitcore = window.require('bitcore-lib');
 import QRCode from 'qrcode.react';
-import NumberFormat from 'react-number-format';
 
-import Navigation from '../Navigation';
+import {encrypt} from '../../utils/utils';
+import {genkey} from '../../utils/keys';
+
+import {
+    downloadWallet,
+    loadAndDecryptWalletFromFile,
+    flashField,
+} from '../../utils/wallet';
+
+import {
+    openDividendModal,
+    closeDividendModal,
+    openAffiliateModal,
+    closeAffiliateModal,
+    openSettingsModal,
+    closeSettingsModal,
+    openMainAlert,
+    coinModalOpenSettings,
+    coinModalClosedSettings,
+    archiveView,
+    homeView,
+    openHistoryModal,
+    closeHistoryModal,
+    closeSuccessModal,
+    closeCoinModal,
+    closePrivateModal,
+    closeMainAlertPopup,
+    openCreateKey,
+    closeSendReceiveModal,
+    closeSendReceivePopup,
+    openExportUnencryptedWalletPopup,
+    openExportEncryptedWalletPopup
+} from '../../utils/modals';
+
+import Navigation from '../partials/Navigation';
+import KeyLabel from "../partials/KeyLabel";
+import HistoryModal from "../partials/HistoryModal";
+import MainAlertPopup from "../partials/MainAlertPopup";
+import ImportModal from "../partials/ImportModal";
+import SendingModal from "../partials/SendingModal";
+import TransactionSentModal from "../partials/TransactionSentModal";
+import SettingsModal from "../partials/SettingsModal";
+import DividendModal from "../partials/DividendModal";
+import AffiliateModal from "../partials/AffiliateModal";
+import Footer from "../partials/Footer";
+
+import {CopyToClipboard} from 'react-copy-to-clipboard';
+import {BURN_ADDRESS, generateSafexBtcTransaction, get_utxos, getFee, generate_btc_transaction} from "../../utils/migration";
 
 export default class Wallet extends React.Component {
     constructor(props) {
@@ -20,11 +62,11 @@ export default class Wallet extends React.Component {
 
         this.state = {
             //wallet state
+            activeHomePage: true,
             keys: [],
             wallet: {},
             import_key: '',
             archive_active: false,
-
             //transaction
             send_coin: 'safex',
             send_amount: 1,
@@ -45,6 +87,7 @@ export default class Wallet extends React.Component {
             active_fee: 'fast',
             safex_price: 0,
             btc_price: 0,
+            fee_in_$: false,
 
             //Dividend calculator
             totalTradeVolume: 500000000,
@@ -65,12 +108,20 @@ export default class Wallet extends React.Component {
             btc_sync: false,
             safex_sync: false,
             is_loading: false,
+            loging_out: false,
             receive_amount: 0.00000001.toFixed(8),
             collapse_open: {
                 key: '',
                 receive_open: false,
                 send_open: false
             },
+            private_key_open: {
+                key: '',
+                display_private_key: '',
+                private_key_popup: false,
+            },
+            send_disabled: false,
+            sidebar_open: false,
             settings_active: false,
             refreshTimer: 0,
             refreshInterval: '',
@@ -78,10 +129,26 @@ export default class Wallet extends React.Component {
             dividend_active: false,
             affiliate_active: false,
             import_wrap_glow: false,
-            wrong_old_password: false,
-            wrong_new_password: false,
-            wrong_repeat_password: false,
-        }
+            wrongOldPassword: false,
+            wrongNewPassword: false,
+            wrongRepeatPassword: false,
+            transfer_key_to_archive: false,
+            transfer_key_to_home: false,
+            info_popup: false,
+            info_text: '',
+            send_receive_popup: false,
+            send_receive_info: '',
+            main_alert_popup: false,
+            main_alert_popup_text: '',
+            export_unencrypted_wallet: false,
+            export_encrypted_wallet: false,
+            create_key_active: false,
+            import_modal_active: false,
+            savedLabel: '',
+            value: '',
+            copied: false,
+            current_public_key: '',
+        };
 
         this.createKey = this.createKey.bind(this);
         this.importKey = this.importKey.bind(this);
@@ -90,28 +157,32 @@ export default class Wallet extends React.Component {
         this.prepareDisplay = this.prepareDisplay.bind(this);
         this.prepareDisplayPendingTx = this.prepareDisplayPendingTx.bind(this);
         this.openCoinModal = this.openCoinModal.bind(this);
-        this.closeCoinModal = this.closeCoinModal.bind(this);
-        this.openHistoryModal = this.openHistoryModal.bind(this);
+        this.setCloseCoinModal = this.setCloseCoinModal.bind(this);
+        this.setCoinModalOpenSettings = this.setCoinModalOpenSettings.bind(this);
+        this.setCoinModalClosedSettings = this.setCoinModalClosedSettings.bind(this);
+        this.setOpenHistoryModal = this.setOpenHistoryModal.bind(this);
         this.showPrivateModal = this.showPrivateModal.bind(this);
-        this.closeHistoryModal = this.closeHistoryModal.bind(this);
+        this.setClosePrivateModal = this.setClosePrivateModal.bind(this);
+        this.setCloseHistoryModal = this.setCloseHistoryModal.bind(this);
         this.sendAmountOnChange = this.sendAmountOnChange.bind(this);
         this.sendFeeOnChange = this.sendFeeOnChange.bind(this);
-        this.sendFeeOnBlur = this.sendFeeOnBlur.bind(this);
         this.sendTotalAdjustCoinChange = this.sendTotalAdjustCoinChange.bind(this);
-        this.closeSuccessModal = this.closeSuccessModal.bind(this);
-        this.openDividendModal = this.openDividendModal.bind(this);
-        this.closeDividendModal = this.closeDividendModal.bind(this);
-        this.openAffiliateModal = this.openAffiliateModal.bind(this);
-        this.closeAffiliateModal = this.closeAffiliateModal.bind(this);
-        this.closeSendReceiveModal = this.closeSendReceiveModal.bind(this);
+        this.setCloseSuccessModal = this.setCloseSuccessModal.bind(this);
+        this.setOpenDividendModal = this.setOpenDividendModal.bind(this);
+        this.setCloseDividendModal = this.setCloseDividendModal.bind(this);
+        this.setOpenAffiliateModal = this.setOpenAffiliateModal.bind(this);
+        this.setCloseAffiliateModal = this.setCloseAffiliateModal.bind(this);
+        this.setCloseSendReceiveModal = this.setCloseSendReceiveModal.bind(this);
 
+        this.setOpenExportUnencryptedWalletPopup = this.setOpenExportUnencryptedWalletPopup.bind(this);
         this.exportUnencryptedWallet = this.exportUnencryptedWallet.bind(this);
+        this.setOpenExportEncryptedWallet = this.setOpenExportEncryptedWallet.bind(this);
         this.exportEncryptedWallet = this.exportEncryptedWallet.bind(this);
         this.getFee = this.getFee.bind(this);
+        this.getPrices = this.getPrices.bind(this);
         this.refreshWallet = this.refreshWallet.bind(this);
-        this.feeChange = this.feeChange.bind(this);
-        this.openSettingsModal = this.openSettingsModal.bind(this);
-        this.closeSettingsModal = this.closeSettingsModal.bind(this);
+        this.setOpenSettingsModal = this.setOpenSettingsModal.bind(this);
+        this.setCloseSettingsModal = this.setCloseSettingsModal.bind(this);
         this.changePassword = this.changePassword.bind(this);
         this.logout = this.logout.bind(this);
         this.listTransactions = this.listTransactions.bind(this);
@@ -124,11 +195,60 @@ export default class Wallet extends React.Component {
         this.wrongOldPassword = this.wrongOldPassword.bind(this);
         this.wrongNewPassword = this.wrongNewPassword.bind(this);
         this.wrongRepeatPassword = this.wrongRepeatPassword.bind(this);
+        this.closeSettingsInfoPopup = this.closeSettingsInfoPopup.bind(this);
+        this.resetSettingsForm = this.resetSettingsForm.bind(this);
+        this.setCloseSendReceivePopup = this.setCloseSendReceivePopup.bind(this);
+        this.setCloseMainAlertPopup = this.setCloseMainAlertPopup.bind(this);
+        this.openImportModal = this.openImportModal.bind(this);
+        this.closeImportModal = this.closeImportModal.bind(this);
+        this.saveLabel = this.saveLabel.bind(this);
+        this.editLabel = this.editLabel.bind(this);
+        this.setOpenCreateKey = this.setOpenCreateKey.bind(this);
+        this.amountChange = this.amountChange.bind(this);
+        this.convertBtcToDollars = this.convertBtcToDollars.bind(this);
+        this.copyToClipboard = this.copyToClipboard.bind(this);
+        this.migrate = this.migrate.bind(this);
+    }
+
+    componentWillUnmount() {
+        this.setState({
+            activeHomePage: false,
+
+            sidebar_open: false,
+            // Close Settings Modal
+            settings_active: false,
+
+            // Close Send Receive Modal
+            collapse_open: {
+                send_open: false,
+                receive_open: false
+            },
+        });
+        clearInterval(this.state.refreshInterval);
     }
 
     logout() {
         localStorage.clear();
-        this.context.router.push('/');
+        this.setState({
+            sidebar_open: false,
+            // Close Settings Modal
+            settings_active: false,
+
+            // Close Send Receive Modal
+            collapse_open: {
+                send_open: false,
+                receive_open: false
+            },
+
+            loging_out: true,
+        });
+        setTimeout(() => {
+            this.context.router.push('/');
+        }, 1500)
+    }
+
+    migrate() {
+        this.context.router.push('/migration');
     }
 
     refreshWallet() {
@@ -138,8 +258,12 @@ export default class Wallet extends React.Component {
             this.setState({
                 refreshTimer: 23,
                 refreshInterval: interval,
+                copied: false,
             });
-            this.prepareDisplayPendingTx()
+            this.prepareDisplayPendingTx();
+            this.getFee();
+            this.getPrices();
+            console.log('Page refreshed');
         }
     }
 
@@ -150,7 +274,7 @@ export default class Wallet extends React.Component {
         else {
             clearInterval(this.state.refreshInterval);
         }
-    }
+    };
 
     componentWillMount() {
         axios({method: 'post', url: 'https://safex.io/api/price/'}).then(res => {
@@ -180,15 +304,17 @@ export default class Wallet extends React.Component {
             this.setState({
                 safexQuantity: total_supply
             });
-        }).catch(function(error) {
+        }).catch(function (error) {
             console.log(error);
         });
 
         try {
-            var json = JSON.parse(localStorage.getItem('wallet'));
+            const json = JSON.parse(localStorage.getItem('wallet'));
             this.setState({wallet: json, keys: json['keys']});
         } catch (e) {
-            alert('failed to parse wallet')
+            this.setState({
+                status_text: 'Failed to parse wallet'
+            });
             this.context.router.push('/');
         }
     }
@@ -196,25 +322,71 @@ export default class Wallet extends React.Component {
     componentDidMount() {
         this.refreshWallet();
         this.getFee();
+        this.getPrices();
+        let setRefreshInterval = setInterval(this.refreshWalletInterval, 600000);
     }
 
-    componentWillUnmount() {
-        clearInterval(this.timerID);
+    refreshWalletInterval = () => {
+        var i;
+        this.getFee();
+        this.getPrices();
+        for (i = 0; i < 5; i++) {
+            this.prepareDisplay();
+            this.prepareDisplayPendingTx();
+            console.log('Page refreshed');
+        }
+    };
+
+    getPrices() {
+        fetch('https://safex.io/api/price/', {method: "POST"})
+            .then(resp => resp.json())
+            .then((resp) => {
+                try {
+                    var safex = 0.02;
+                    if (resp.price_usd !== null) {
+                        safex = parseFloat(resp.price_usd).toFixed(8);
+                        this.setState({safex_price: safex});
+                    }
+                    localStorage.setItem('safex_price', safex);
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+
+        fetch('https://api.coinmarketcap.com/v1/ticker/bitcoin/', {method: "GET"})
+            .then(resp => resp.json())
+            .then((resp) => {
+                try {
+                    var btc = 0;
+                    if (resp[0].symbol === 'BTC') {
+                        btc = parseFloat(resp[0].price_usd).toFixed(2);
+                        localStorage.setItem('btc_price', btc);
+                        this.setState({btc_price: btc});
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            });
     }
 
     getFee() {
         fetch('http://omni.safex.io:3001/getfee')
             .then(resp => resp.text())
             .then((resp) => {
-                this.setState({average_fee: resp, send_fee: resp});
+                var coin = this.state.send_coin;
+                this.setState({
+                    average_fee: resp,
+                    send_fee: resp,
+                });
             })
             .catch(e => {
-                alert('unable to fetch average fee')
+                console.log("gfee fetch error " + e)
                 this.setState({
                     btc_sync: false,
                     safex_sync: false,
-                    status_text: 'Sync error, please refresh again'
+                    status_text: 'Sync error, please refresh'
                 });
+                this.openMainAlertPopup('Unable to fetch average fee');
             });
     }
 
@@ -314,119 +486,19 @@ export default class Wallet extends React.Component {
             this.setState({
                 btc_sync: false,
                 safex_sync: false,
-                status_text: 'Sync error, please refresh again'
+                status_text: 'Sync error, please refresh'
             });
         });
-    }
-
-    sendCoins(e) {
-        e.preventDefault();
-        //check whether Bitcoin or Safex is selected
-        if (this.state.send_coin === 'safex') {
-            //open the modal by setting transaction_being_sent
-            try {
-                this.setState({
-                    transaction_being_sent: true,
-                    settings_active: false,
-                });
-
-                //set the signing key for the transaction
-                var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
-                //set the source of the transaction
-                var source = e.target.public_key.value;
-                //set the amount provided by the user
-                var amount = e.target.amount.value;
-                //set the fee provided by the user
-                var fee = e.target.fee.value;
-                //set the destination provided by the user
-                var destination = e.target.destination.value;
-
-                //here we will check to make sure that the destination is a valid bitcoin address
-
-                var address = bitcore.Address.fromString(destination);
-                var address2 = bitcore.Address.fromString(source);
-                //here we try to get the unspent transactions from the source we send from
-                try {
-                    fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
-                        .then(resp => resp.json())
-                        .then((resp) => {
-                            //enter into the safex transaction method
-                            this.formSafexTransaction(resp,
-                                amount,
-                                parseFloat((fee * 100000000).toFixed(0)),
-                                destination,
-                                keys,
-                                source);
-                        });
-                } catch (e) {
-                    //if the fetch fails then we have a network problem and can't get unspent transaction history
-                    alert('network communication error, please try again later');
-                    this.setState({
-                        transaction_being_sent: false,
-
-                    });
-                }
-            } catch (e) {
-                //this is triggered if the destination address is not a valid bitcoin address
-                alert('Invalid destination address');
-            }
-
-            //if safex is not selected then it must be Bitcoin
-        } else if(this.state.send_coin === 'btc') {
-            try {  //open the modal by setting transaction_being_sent
-                this.setState({
-                    transaction_being_sent: true,
-                    settings_active: false,
-                });
-
-                //set the signing key for the transaction
-                var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
-                //set the source of the transaction
-                var source = e.target.public_key.value;
-                //set the amount provided by the user
-                var amount = e.target.amount.value;
-                //set the fee provided by the user
-                var fee = e.target.fee.value;
-                //set the destination provided by the user
-                var destination = e.target.destination.value;
-
-                //here we will check to make sure that the destination is a valid bitcoin address
-
-                var address = bitcore.Address.fromString(destination);
-                var address2 = bitcore.Address.fromString(source);
-                //here we try to get the unspent transactions from the source we send from
-                try {
-                    fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
-                        .then(resp => resp.json())
-                        .then((resp) => {
-                            //enter into the bitcoin transaction method
-                            this.formBitcoinTransaction(resp,
-                                parseFloat((amount * 100000000).toFixed(0)),
-                                parseFloat((fee * 100000000).toFixed(0)),
-                                destination,
-                                keys,
-                                source);
-                        });
-                } catch (e) {
-                    //if the fetch fails then we have a network problem and can't get unspent transaction history
-                    alert('Network communication error, please try again later');
-                    this.setState({
-                        transaction_being_sent: false,
-                    });
-                }
-            } catch (e) {
-                //this is triggered if the destination address is not a valid bitcoin address
-                alert('Invalid destination address');
-            }
-        }
     }
 
     formBitcoinTransaction(utxos, amount, fee, destination, key, source) {
         var running_total = 0;
         var tx = new bitcoin.TransactionBuilder();
         var inputs_num = 0;
-        utxos.forEach(txn => {
+        var pending_safex_bal = document.getElementById('pending_safex_bal').value;
+        var pending_btc_bal = document.getElementById('pending_btc_bal').value;
 
+        utxos.forEach(txn => {
             if (!txn.confirmations > 0) {
 
             } else {
@@ -438,6 +510,7 @@ export default class Wallet extends React.Component {
                 }
             }
         });
+
         tx.addOutput(destination, amount);
 
         if ((running_total - (amount + fee)) > 0) {
@@ -452,13 +525,53 @@ export default class Wallet extends React.Component {
         fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
             .then(resp => resp.text())
             .then((resp) => {
+                if (resp === "") {
+                    this.setCoinModalOpenSettings('There was an error with the transaction');
+                    this.setCloseMainAlertPopup();
+                    this.setState({
+                        send_disabled: false,
+                    });
+                    setTimeout(() => {
+                        this.setState({
+                            transaction_being_sent: false,
+                        });
+                    }, 500);
+                    throw new Error("There was an error with the transaction.");
+                }
                 this.setState({
+                    sidebar_open: true,
                     transaction_sent: true,
                     transaction_being_sent: false,
+                    send_disabled: true,
                     txid: resp,
+
+                    // Close main alert popup
+                    main_alert_popup: false,
+                    main_alert_popup_text: '',
                 });
+                if (pending_safex_bal >= 0 || pending_btc_bal >= 0) {
+                    this.prepareDisplayInterval = setInterval(() => {
+                        this.prepareDisplay();
+                        this.prepareDisplayPendingTx();
+                        this.setState({
+                            send_disabled: true,
+                        });
+                        console.log('refresh');
+                    }, 200);
+                    this.setCloseSendReceiveModal();
+                } else {
+                    clearInterval(this.prepareDisplayInterval);
+                }
+                setTimeout(() => {
+                    clearInterval(this.prepareDisplayInterval);
+                    this.prepareDisplay();
+                    this.prepareDisplayPendingTx();
+                    console.log('clear refresh');
+                    this.setState({
+                        send_disabled: false,
+                    });
+                }, 4000);
             });
-        this.closeSendReceiveModal();
     }
 
     formSafexTransaction(utxos, amount, fee, destination, key, source) {
@@ -467,6 +580,8 @@ export default class Wallet extends React.Component {
         var inputs_num = 0;
         var check = 0;
         var checks = [source, destination];
+        var pending_safex_bal = document.getElementById('pending_safex_bal').value;
+        var pending_btc_bal = document.getElementById('pending_btc_bal').value;
 
         utxos.forEach(txn => {
             if (running_total < (700 + fee)) {
@@ -493,7 +608,7 @@ export default class Wallet extends React.Component {
                 var decoded_txn = bitcoin.Transaction.fromHex(resp);
                 var txn = bitcoin.TransactionBuilder.fromTransaction(decoded_txn);
                 checks.forEach(function(item) {
-                    txn.tx.outs.some(out => {
+                    txn.__tx.outs.some(out => {
                         try {
                             var pubkey = bitcoin.address.fromOutputScript(out.script, bitcoin.networks.livenet);
                         } catch (e) {
@@ -516,76 +631,363 @@ export default class Wallet extends React.Component {
                         .then(resp => resp.text())
                         .then((resp) => {
                             if (resp === "") {
-                                throw "There was an error with the transaction.";
+                                this.setCoinModalOpenSettings('There was an error with the transaction');
+                                this.setCloseMainAlertPopup();
+                                this.setState({
+                                    send_disabled: false,
+                                });
+                                setTimeout(() => {
+                                    this.setState({
+                                        transaction_being_sent: false,
+                                    });
+                                }, 500);
+                                throw new Error("There was an error with the transaction.");
                             }
                             this.setState({
+                                sidebar_open: true,
                                 transaction_sent: true,
                                 transaction_being_sent: false,
-                                txid: resp
+                                send_disabled: true,
+                                txid: resp,
+
+                                // Close main alert popup
+                                main_alert_popup: false,
+                                main_alert_popup_text: '',
                             });
+                            if (pending_safex_bal >= 0 || pending_btc_bal >= 0) {
+                                this.prepareDisplayInterval = setInterval(() => {
+                                    this.prepareDisplay();
+                                    this.prepareDisplayPendingTx();
+                                    this.setState({
+                                        send_disabled: true,
+                                    });
+                                    console.log('refresh');
+                                }, 200);
+                                this.setCloseSendReceiveModal();
+                            } else {
+                                clearInterval(this.prepareDisplayInterval);
+                            }
+                            setTimeout(() => {
+                                clearInterval(this.prepareDisplayInterval);
+                                this.prepareDisplay();
+                                this.prepareDisplayPendingTx();
+                                this.setState({
+                                    send_disabled: false,
+                                });
+                                console.log('clear refresh');
+                            }, 4000);
                         })
                 } else {
-                    alert("error with transaction")
+                    if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                        this.setCoinModalOpenSettings('Error with transaction');
+                    } else {
+                        this.setCoinModalClosedSettings('Error with transaction');
+                    }
+                    this.setState({
+                        sidebar_open: true,
+                        transaction_being_sent: false,
+                    });
                 }
             });
-        this.closeSendReceiveModal();
     }
 
-    //TODO: needs more testing - safex not sent
-    formSafexTransactionBeta(utxos, amount, fee, destination, key, source) {
-        var running_total = 0;
-        var tx = new bitcoin.TransactionBuilder();
-        var inputs_num = 0;
+    sendCoins(e) {
+        e.preventDefault();
+        //set the signing key for the transaction
+        var keys = bitcoin.ECPair.fromWIF(e.target.private_key.value);
+        //set the source of the transaction
+        var source = e.target.public_key.value;
+        //set the amount provided by the user
+        var amount = e.target.amount.value;
+        //set the fee provided by the user
+        var fee = e.target.fee.value;
+        //set the destination provided by the user
+        var destination = e.target.destination.value;
 
-        // here we list btc tx from our wallet, remove 700sats, put back (the rest - fee) to ourself
-        utxos.forEach(txn => {
-            if (running_total < (700 + fee)) {
-                running_total += txn.satoshis;
-                tx.addInput(txn.txid, txn.vout);
-                inputs_num += 1;
+        var key_btc_bal = 0;
+        var key_safex_bal = 0;
+        this.state.keys.map(key => {
+            if (key.public_key === e.target.public_key.value) {
+                key_btc_bal = key.btc_bal;
+                key_safex_bal = key.safex_bal;
             }
         });
-        tx.addOutput(destination, 700);
 
-        var btc_remaining = (running_total - (700 + fee));
-        if (btc_remaining > 0) {
-            tx.addOutput(source, btc_remaining);
+        //check whether Bitcoin or Safex is selected
+        if (this.state.send_coin === 'safex') {
+            if (this.state.send_fee < 0.00001) {
+                if (this.sidebar_open) {
+                    this.setState({
+                        send_fee: parseFloat(0.00001).toFixed(8),
+                    });
+                    this.setCoinModalOpenSettings('The fee is too small. Minimum fee is 0.00001000 BTC');
+                } else {
+                    this.setState({
+                        send_fee: parseFloat(0.00001).toFixed(8),
+                    });
+                    this.setCoinModalClosedSettings('The fee is too small. Minimum fee is 0.00001000 BTC');
+                }
+            } else if ((this.state.send_coin === 'safex' && this.state.send_fee > key_btc_bal) || (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal)) {
+                if (this.sidebar_open) {
+                    this.setCoinModalOpenSettings('You do not have enough BITCOIN to cover the fee');
+                } else {
+                    this.setCoinModalClosedSettings('You do not have enough BITCOIN to cover the fee');
+                }
+            } else if (this.state.send_coin === 'safex' && this.state.send_amount > key_safex_bal) {
+                if (this.sidebar_open) {
+                    this.setCoinModalOpenSettings('You do not have enough SAFEX to cover this transaction');
+                } else {
+                    this.setCoinModalClosedSettings('You do not have enough SAFEX to cover this transaction');
+                }
+            } else {
+                //open the modal by setting transaction_being_sent
+                try {
+                    this.setState({
+                        // Open Sending Modal
+                        sidebar_open: true,
+                        transaction_being_sent: true,
+                        settings_active: false,
+
+                        // Disable send button
+                        send_disabled: true,
+
+                        // Open main alert popup
+                        main_alert_popup: true,
+                        main_alert_popup_text: 'Sending...',
+
+                        // Close send receive popup
+                        send_receive_popup: false,
+                    });
+
+                    //here we try to get the unspent transactions from the source we send from
+                    try {
+                        fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
+                            .then(resp => resp.json())
+                            .then((resp) => {
+                                //enter into the safex transaction method
+                                this.formSafexTransaction(resp,
+                                    amount,
+                                    parseFloat((fee * 100000000).toFixed(0)),
+                                    destination,
+                                    keys,
+                                    source);
+                            });
+                    } catch (e) {
+                        //if the fetch fails then we have a network problem and can't get unspent transaction history
+                        if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                            this.setCoinModalOpenSettings('Network communication error, please try again later');
+                        } else {
+                            this.setCoinModalClosedSettings('Network communication error, please try again later');
+                        }
+                        throw new Error('Network communication error, please try again later');
+                    }
+                } catch (e) {
+                    //this is triggered if the destination address is not a valid bitcoin address
+                    if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                        this.setCoinModalOpenSettings('Invalid destination address');
+                    } else {
+                        this.setCoinModalClosedSettings('Invalid destination address');
+                    }
+                    throw new Error('Invalid destination address');
+                }
+            }
+
+        //if safex is not selected then it must be Bitcoin
+        } else if (this.state.send_coin === 'btc') {
+            if (this.state.send_fee < 0.00001) {
+                if (this.sidebar_open) {
+                    this.setState({
+                        send_fee: parseFloat(0.00001).toFixed(8),
+                    });
+                    this.setCoinModalOpenSettings('The fee is too small. Minimum fee is 0.00001000 BTC');
+                } else {
+                    this.setState({
+                        send_fee: parseFloat(0.00001).toFixed(8),
+                    });
+                    this.setCoinModalClosedSettings('The fee is too small. Minimum fee is 0.00001000 BTC');
+                }
+            } else if (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal) {
+                if (this.sidebar_open) {
+                    this.setCoinModalOpenSettings('You do not have enough BITCOIN to cover this transaction');
+                } else {
+                    this.setCoinModalClosedSettings('You do not have enough BITCOIN to cover this transaction');
+                }
+            } else {
+                try {
+                    //open the modal by setting transaction_being_sent
+                    this.setState({
+                        // Open Sending Modal
+                        sidebar_open: true,
+                        transaction_being_sent: true,
+                        settings_active: false,
+
+                        // Disable send button
+                        send_disabled: true,
+
+                        // Open main alert popup
+                        main_alert_popup: true,
+                        main_alert_popup_text: 'Sending...',
+
+                        // Close send receive popup
+                        send_receive_popup: false,
+                    });
+
+                    //here we try to get the unspent transactions from the source we send from
+                    try {
+                        fetch('http://bitcoin.safex.io:3001/insight-api/addr/' + e.target.public_key.value + '/utxo')
+                            .then(resp => resp.json())
+                            .then((resp) => {
+                                //enter into the bitcoin transaction method
+                                this.formBitcoinTransaction(resp,
+                                    parseFloat((amount * 100000000).toFixed(0)),
+                                    parseFloat((fee * 100000000).toFixed(0)),
+                                    destination,
+                                    keys,
+                                    source);
+                            });
+                    } catch (e) {
+                        //if the fetch fails then we have a network problem and can't get unspent transaction history
+                        if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                            this.setCoinModalOpenSettings('Network communication error, please try again later');
+                        } else {
+                            this.setCoinModalClosedSettings('Network communication error, please try again later');
+                        }
+                        throw new Error('Network communication error, please try again later');
+                    }
+                } catch (e) {
+                    //this is triggered if the destination address is not a valid bitcoin address
+                    if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                        this.setCoinModalOpenSettings('Invalid destination address');
+                    } else {
+                        this.setCoinModalClosedSettings('Invalid destination address');
+                    }
+                    throw new Error('Invalid destination address');
+                }
+            }
         }
-
-        var btc = require('bitcoinjs-lib');
-        if (amount <= 0.1) {
-            alert("Transaction not processed - Amount is too low. ")
-            return;
-        }
-
-        // payload omni tx
-        var data = new Buffer("0000000000000056" + String("0000000000000000" + amount).slice(-16));
-        var dataScript = btc.script.nullData.output.encode(data);
-        tx.addOutput(dataScript, 1000)
-
-        for (var i = 0; i < inputs_num; i++) {
-            tx.sign(i, key);
-        }
-        var json = {};
-        json['rawtx'] = tx.build().toHex();
-        fetch('http://omni.safex.io:3001/broadcast', {method: "POST", body: JSON.stringify(json)})
-            .then(resp => resp.text())
-            .then((resp) => {
-
-                this.setState({
-                    transaction_sent: true,
-                    transaction_being_sent: false,
-                    txid: resp
-                });
-            });
     }
 
-    createKey() {
+    //Activates send_overflow_active state which opens Modal screen displaying transaction pre-confirmation information
+    openCoinModal(e) {
+        e.preventDefault();
+        var key_btc_bal = 0;
+        var key_safex_bal = 0;
+        var pending_safex_bal = 0;
+        var pending_btc_bal = 0;
+        var send_fee = this.state.send_fee;
+
+        this.state.keys.map(key => {
+            if (key.public_key === e.target.public_key.value) {
+                key_btc_bal = key.btc_bal;
+                key_safex_bal = key.safex_bal;
+                pending_safex_bal = key.pending_safex_bal;
+                pending_btc_bal = key.pending_btc_bal;
+            }
+        });
+
+        if ((this.state.send_coin === 'safex' && this.state.send_fee > key_btc_bal) || (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal)) {
+            if (this.state.sidebar_open) {
+                this.setCoinModalOpenSettings('You do not have enough BITCOIN to cover the fee');
+            } else {
+                this.setCoinModalClosedSettings('You do not have enough BITCOIN to cover the fee');
+            }
+        } else if (this.state.send_coin === 'safex' && this.state.send_amount > key_safex_bal) {
+            if (this.state.sidebar_open) {
+                this.setCoinModalOpenSettings('You do not have enough SAFEX to cover this transaction');
+            } else {
+                this.setCoinModalClosedSettings('You do not have enough SAFEX to cover this transaction');
+            }
+        } else if (this.state.send_coin === 'safex' && (this.state.send_amount === '' || this.state.send_amount === 0 || isNaN(this.state.send_amount))) {
+            if (this.state.sidebar_open) {
+                this.setCoinModalOpenSettings('Invalid SAFEX amount');
+            } else {
+                this.setCoinModalClosedSettings('Invalid SAFEX amount');
+            }
+        } else if (this.state.send_coin === 'btc' && (this.state.send_amount === '' || parseFloat(this.state.send_amount) === 0 || isNaN(this.state.send_total))) {
+            if (this.state.sidebar_open) {
+                this.setCoinModalOpenSettings('Invalid BITCOIN amount');
+            } else {
+                this.setCoinModalClosedSettings('Invalid BITCOIN amount');
+            }
+        } else if (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal) {
+            if (this.state.sidebar_open) {
+                this.setCoinModalOpenSettings('You do not have enough BITCOIN to cover this transaction');
+            } else {
+                this.setCoinModalClosedSettings('You do not have enough BITCOIN to cover this transaction');
+            }
+        } else if (e.target.destination.value === '') {
+            if (this.state.sidebar_open) {
+                this.setCoinModalOpenSettings('Destination field is empty');
+            } else {
+                this.setCoinModalClosedSettings('Destination field is empty');
+            }
+        } else if (e.target.destination.value === e.target.public_key.value) {
+            if (this.state.sidebar_open) {
+                this.setCoinModalOpenSettings('Invalid sending address');
+            } else {
+                this.setCoinModalClosedSettings('Invalid sending address');
+            }
+        } else if (pending_safex_bal < 0 || pending_btc_bal < 0) {
+            if (this.state.sidebar_open) {
+                this.setCoinModalOpenSettings('Cannot send transaction, this key has a pending minus. Please try again later.');
+            } else {
+                this.setCoinModalClosedSettings('Cannot send transaction, this key has a pending minus. Please try again later.');
+            }
+            this.setCloseCoinModal();
+        } else if (this.state.fee_in_$) {
+            if (this.state.sidebar_open) {
+                this.setCoinModalOpenSettings('Please convert the transaction to BTC to proceed');
+            } else {
+                this.setCoinModalClosedSettings('Please convert the transaction to BTC to proceed');
+            }
+        } else if (send_fee < 0.00001 || send_fee === '' || isNaN(send_fee)) {
+            if (this.state.sidebar_open) {
+                this.setState({
+                    send_fee: parseFloat(0.00001).toFixed(8),
+                });
+                this.setCoinModalOpenSettings('The fee is too small. Minimum fee is 0.00001000 BTC');
+            } else {
+                this.setState({
+                    send_fee: parseFloat(0.00001).toFixed(8),
+                });
+                this.setCoinModalClosedSettings('The fee is too small. Minimum fee is 0.00001000 BTC');
+            }
+        } else {
+            try {
+                bitcore.Address.fromString(e.target.destination.value);
+                this.setState({
+                    sidebar_open: true,
+                    send_overflow_active: true,
+                    send_to: e.target.destination.value,
+                    send_keys: {
+                        public_key: e.target.public_key.value,
+                        private_key: e.target.private_key.value
+                    },
+                    settings_active: false,
+                    dividend_active: false,
+                    affiliate_active: false,
+                    transaction_sent: false,
+                    send_receive_popup: false,
+                    send_receive_info: ''
+                });
+            } catch (e) {
+                if (this.state.settings_active || this.state.affiliate_active || this.state.dividend_active) {
+                    this.setCoinModalOpenSettings('Destination address is invalid');
+                } else {
+                    this.setCoinModalClosedSettings('Destination address is invalid');
+                }
+            }
+        }
+    }
+
+    createKey(e) {
+        e.preventDefault();
+        this.prepareDisplay();
+
         this.setState({is_loading: true});
 
         var key_pair = genkey();
-
-        var address = key_pair.getAddress();
+        const {address} = bitcoin.payments.p2pkh({pubkey: key_pair.publicKey})
 
         var key_json = {};
         key_json['public_key'] = address;
@@ -595,36 +997,47 @@ export default class Wallet extends React.Component {
         key_json['pending_safex_bal'] = 0;
         key_json['pending_btc_bal'] = 0;
         key_json['archived'] = false;
+        key_json['label'] = e.target.label.value || 'Enter your label here';
 
         try {
             var json = JSON.parse(localStorage.getItem('wallet'));
         } catch (e) {
-            alert('error parsing the wallet data')
+            this.openMainAlertPopup('Error parsing the wallet data.');
         }
 
         json['keys'].push(key_json);
 
-        var crypto = require('crypto'),
-            algorithm = 'aes-256-ctr',
-            password = localStorage.getItem('password');
-
+        var algorithm = 'aes-256-ctr';
+        var password = localStorage.getItem('password');
         var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
 
         fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
             if (err) {
-                alert('problem communicating to the wallet file')
+                this.openMainAlertPopup('Problem communicating to the wallet file.');
             } else {
                 localStorage.setItem('wallet', JSON.stringify(json));
                 try {
                     var json2 = JSON.parse(localStorage.getItem('wallet'));
-                    this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
+                    this.setState({
+                        wallet: json2,
+                        keys: json2['keys'],
+                        is_loading: false,
+                        create_key_active: false,
+                        history_overflow_active: false,
+                        history_key: '',
+                        private_key_open: {
+                            private_key_popup: false,
+                        }
+                    });
                     this.prepareDisplay();
-                    this.closeHistoryModal();
-                    alert('key added to wallet')
+                    this.prepareDisplayPendingTx();
+                    document.getElementById("label").value = '';
                 } catch (e) {
-                    alert('an error adding a key to the wallet contact team@safex.io')
+                    this.setState({
+                        create_key_active: false,
+                    });
+                    this.openMainAlertPopup('An error adding a key to the wallet. Please contact team@safex.io');
                 }
-
             }
         });
     }
@@ -635,11 +1048,66 @@ export default class Wallet extends React.Component {
         });
     }
 
+    openImportModal(e) {
+        e.preventDefault();
+        try {
+            var key_pair = bitcoin.ECPair.fromWIF(e.target.key.value);
+            const {address} = bitcoin.payments.p2pkh({pubkey: key_pair.publicKey})
+
+            try {
+                var json = JSON.parse(localStorage.getItem('wallet'));
+                var key_exists = false;
+
+                if (key_exists === false) {
+                    this.setState({
+                        import_modal_active: true,
+
+                        // Close Private Key Popup
+                        private_key_open: {
+                            private_key_popup: false,
+                        },
+                    });
+                }
+
+                for (var i = 0; i < json['keys'].length; i++) {
+                    // look for the entry with a matching `code` value
+                    if (json['keys'][i].public_key === address) {
+                        this.setState({
+                            history_overflow_active: false,
+                            history_key: '',
+                            import_modal_active: false,
+                        });
+                        this.openMainAlertPopup('Key exists');
+                        console.log('Key exists');
+                    }
+                }
+            } catch (e) {
+                console.log(e);
+            }
+        } catch (e) {
+            this.setState({
+                history_overflow_active: false,
+                history_key: '',
+                import_modal_active: false,
+
+                // Close Private Key Popup
+                private_key_open: {
+                    private_key_popup: false,
+                },
+            });
+            this.openMainAlertPopup('Invalid private key');
+        }
+    }
+
+    setOpenCreateKey() {
+        openCreateKey(this);
+    }
+
     importKey(e) {
         e.preventDefault();
         try {
             var key_pair = bitcoin.ECPair.fromWIF(e.target.key.value);
-            var address = key_pair.getAddress();
+            const {address} = bitcoin.payments.p2pkh({pubkey: key_pair.publicKey})
 
             var key_json = {};
             key_json['public_key'] = address;
@@ -649,11 +1117,12 @@ export default class Wallet extends React.Component {
             key_json['pending_safex_bal'] = 0;
             key_json['pending_btc_bal'] = 0;
             key_json['archived'] = false;
-
+            key_json['label'] = e.target.label.value || 'Enter your label here';
 
             try {
                 var json = JSON.parse(localStorage.getItem('wallet'));
                 var key_exists = false;
+
 
                 for (var i = 0; i < json['keys'].length; i++) {
                     // look for the entry with a matching `code` value
@@ -666,12 +1135,9 @@ export default class Wallet extends React.Component {
 
                     json['keys'].push(key_json);
 
-                    var crypto = require('crypto'),
-                        algorithm = 'aes-256-ctr',
-                        password = localStorage.getItem('password');
-
+                    var algorithm = 'aes-256-ctr';
+                    var password = localStorage.getItem('password');
                     var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
-
 
                     fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
                         if (err) {
@@ -679,81 +1145,150 @@ export default class Wallet extends React.Component {
                         } else {
                             localStorage.setItem('wallet', JSON.stringify(json));
                             this.setState({
-                                import_key: ''
+                                import_key: '',
                             })
                             try {
                                 var json2 = JSON.parse(localStorage.getItem('wallet'));
-                                this.setState({wallet: json2, keys: json2['keys'], is_loading: false});
+                                this.setState({
+                                    wallet: json2,
+                                    keys: json2['keys'],
+                                    is_loading: false,
+                                    import_modal_active: false,
+
+                                    // Close History Modal
+                                    history_overflow_active: false,
+                                    history_key: '',
+
+                                    // Close Private Key Popup
+                                    private_key_open: {
+                                        private_key_popup: false,
+                                    },
+                                });
                                 this.prepareDisplay();
+                                this.prepareDisplayPendingTx();
+                                document.getElementById("label").value = '';
                             } catch (e) {
                                 console.log(e);
                             }
-
                         }
                     });
                 } else {
-                    console.log('key exists');
+                    console.log('Key exists');
                 }
-
-
             } catch (e) {
                 console.log(e);
             }
         } catch (e) {
-            alert('invalid private key')
+            this.setState({
+                // Close Private Key Popup
+                private_key_open: {
+                    private_key_popup: false,
+                },
+            });
+            this.openMainAlertPopup('Invalid private key');
         }
-        this.closeHistoryModal();
+        this.setState({
+            history_overflow_active: false,
+            history_key: '',
+
+            // Close Private Key Popup
+            private_key_open: {
+                private_key_popup: false,
+            },
+        });
     }
 
-    exportUnencryptedWallet() {
-        alert("This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is not for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the 'import key' feature in another wallet.");
+    closeImportModal() {
+        this.setState({
+            import_modal_active: false,
+            create_key_active: false,
+        })
+    }
 
-        var wallet_data = JSON.parse(localStorage.getItem('wallet'));
-        var nice_keys = "";
-        var keys = wallet_data['keys'];
-        keys.map((key) => {
-            nice_keys += "private key: " + key.private_key + '\n';
-            nice_keys += "public key: " + key.public_key + '\n';
-            nice_keys += '\n';
+    importGlow() {
+        this.setState({
+            import_wrap_glow: true
         });
-        var date = Date.now();
+    }
 
-        fileDownload(nice_keys, date + 'unsafex.txt');
+    importGlowDeactivate() {
+        this.setState({
+            import_wrap_glow: false
+        });
+    }
+
+    setCloseMainAlertPopup() {
+        closeMainAlertPopup(this);
+    }
+
+    setOpenExportEncryptedWallet() {
+        openExportEncryptedWalletPopup(this);
+        this.openMainAlertPopup('This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the \'import key\' feature in another wallet. Press OK to proceed.');
     }
 
     exportEncryptedWallet() {
-        alert("This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is not for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the 'import key' feature in another wallet.");
-
-        fs.readFile(localStorage.getItem('wallet_path'), (err, fd) => {
+        return downloadWallet(localStorage.getItem('wallet_path'), err => {
             if (err) {
-                //if the error is that No File exists, let's step through and make the file
-                if (err.code === 'ENOENT') {
-                    console.log('error');
-                }
-            } else {
-                var date = Date.now();
-                fileDownload(fd, date + 'safexwallet.dat');
+                this.openMainAlertPopup(err.message);
             }
+
+            this.setState({
+                main_alert_popup: false
+            });
+
+            setTimeout(() => {
+                this.setState({
+                    export_encrypted_wallet: false
+                })
+            }, 300);
         });
     }
 
-    amountChange(receive_amount) {
+    setOpenExportUnencryptedWalletPopup() {
+        openExportUnencryptedWalletPopup(this);
+        this.openMainAlertPopup('This will create a file where you can see your private keys. It is a very sensitive file, please be responsible with it. This file is not for importing. It is for showing you the private keys which you can bring into a new wallet. You import keys using the \'import key\' feature in another wallet. Press OK to proceed.');
+    }
+
+    exportUnencryptedWallet() {
+        var wallet_data = JSON.parse(localStorage.getItem('wallet'));
+
+        var date = Date.now();
+
+        fileDownload(JSON.stringify(wallet_data), date + 'unsafex.txt');
+
         this.setState({
-            receive_amount: receive_amount.value
+            main_alert_popup: false,
+        });
+
+        setTimeout(() => {
+            this.setState({
+                export_unencrypted_wallet: false,
+            })
+        }, 300);
+    }
+
+    amountChange = (receive_amount) => {
+        this.setState({
+            receive_amount: receive_amount.target.value
         });
     }
 
     //This function is connected to Send expansion button and receive expansion button
     openSendReceive(key, sendreceive) {
+
         if (sendreceive === 'send') {
-            if (!this.state.collapse_open.send_open && this.state.collapse_open.key !== key || this.state.collapse_open.send_open && this.state.collapse_open.key !== key) {
+            if ((!this.state.collapse_open.send_open && this.state.collapse_open.key !== key) || (this.state.collapse_open.send_open && this.state.collapse_open.key !== key)) {
                 this.setState({
+                    private_key_open: {
+                        private_key_popup: false,
+                    },
                     collapse_open: {
                         key: key,
                         send_open: true,
                         receive_open: false
                     },
-                    send_public_key: this.state.keys[key].public_key
+                    send_private_key: this.state.keys[key].private_key,
+                    send_public_key: this.state.keys[key].public_key,
                 });
             }
 
@@ -764,99 +1299,101 @@ export default class Wallet extends React.Component {
                         send_open: false,
                         receive_open: false
                     },
-                    send_public_key: ''
+                    send_private_key: this.state.keys[key].private_key,
+                    send_public_key: this.state.keys[key].public_key,
                 });
+                if (this.state.send_overflow_active) {
+                    this.setCloseCoinModal();
+                }
             }
 
             if (!this.state.collapse_open.send_open && this.state.collapse_open.key === key) {
                 this.setState({
+                    private_key_open: {
+                        private_key_popup: false,
+                    },
                     collapse_open: {
                         key: key,
                         send_open: true,
                         receive_open: false
                     },
-                    send_public_key: ''
+                    send_private_key: this.state.keys[key].private_key,
+                    send_public_key: this.state.keys[key].public_key,
                 });
             }
         }
         if (sendreceive === 'receive') {
-            if (!this.state.collapse_open.receive_open && this.state.collapse_open.key !== key || this.state.collapse_open.receive_open && this.state.collapse_open.key !== key) {
+            if ((!this.state.collapse_open.receive_open && this.state.collapse_open.key !== key) || (this.state.collapse_open.receive_open && this.state.collapse_open.key !== key)) {
                 this.setState({
+                    private_key_open: {
+                        private_key_popup: false,
+                    },
                     collapse_open: {
                         key: key,
                         send_open: false,
                         receive_open: true
-                    }
+                    },
+                    receive_amount: 0.00000001.toFixed(8),
                 });
             }
-            if (this.state.collapse_open.receive_open && this.state.collapse_open.key === key || !this.state.collapse_open.receive_open && this.state.collapse_open.key === key) {
+            if ((this.state.collapse_open.receive_open && this.state.collapse_open.key === key) || (!this.state.collapse_open.receive_open && this.state.collapse_open.key === key)) {
                 this.setState({
+                    private_key_open: {
+                        private_key_popup: false,
+                    },
                     collapse_open: {
                         key: key,
                         send_open: false,
                         receive_open: !this.state.collapse_open.receive_open
-                    }
+                    },
+                    send_receive_popup: false,
+                    receive_amount: 0.00000001.toFixed(8),
                 });
+                if (this.state.send_overflow_active) {
+                    this.setCloseCoinModal();
+                }
             }
         }
+        this.setState({
+            // Close Send Receive Popup
+            send_receive_popup: false,
+            send_receive_info: ''
+        });
     }
 
     showPrivateModal(e) {
-        alert("The following key is to control your coins, do not share it.")
-        alert("Keep your private key for yourself only!" + '\n' + '\n' + this.state.keys[e].private_key);
-    }
-
-    openHistoryModal(e) {
-        document.getElementById("history_txs").innerHTML = "<h5>Loading...</h5>";
         this.setState({
-            history_overflow_active: true,
-        })
-        this.listTransactions(this.state.keys[e].public_key);
-        this.closeCoinModal();
-        this.closeSuccessModal();
-        this.closeSettingsModal();
-        this.closeDividendModal();
-        this.closeAffiliateModal();
+            private_key_open: {
+                private_key_popup: true,
+                display_private_key: this.state.keys[e].private_key,
+                current_public_key: this.state.keys[e].public_key
+            },
+
+            // Close Send Receive Modal
+            collapse_open: {
+                send_open: false,
+                receive_open: false
+            },
+
+            // Close Send Receive Popup
+            send_receive_popup: false,
+            send_receive_info: '',
+
+            copied: false
+        });
     }
 
-    //Activates send_overflow_active state which opens Modal screen displaying transaction pre-confirmation information
-    openCoinModal(e) {
-        e.preventDefault();
-        var key_btc_bal = 0;
-        var key_safex_bal = 0;
+    setClosePrivateModal() {
+        closePrivateModal(this);
+    }
 
-        this.state.keys.map(key => {
-            if (key.public_key === e.target.public_key.value) {
-                key_btc_bal = key.btc_bal;
-                key_safex_bal = key.safex_bal;
-            }
-        });
+    setOpenHistoryModal(e) {
+        openHistoryModal(this);
+        this.listTransactions(this.state.keys[e].public_key);
+    }
 
-        if ((this.state.send_coin === 'safex' && this.state.send_fee > key_btc_bal) | (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal)) {
-            alert('you do not have enough BTC to cover the fee');
-        } else if (this.state.send_coin === 'safex' && this.state.send_amount > key_safex_bal) {
-            alert('you do not have enough SAFEX to cover this transaction');
-        } else if (this.state.send_coin === 'btc' && this.state.send_total > key_btc_bal) {
-            alert('you do not have enough BTC to cover this transaction');
-        } else if (e.target.destination.value === '') {
-            alert('destination field is empty');
-        } else {
-            try {
-                bitcore.Address.fromString(e.target.destination.value)
-                this.setState({
-                    send_overflow_active: true,
-                    send_to: e.target.destination.value,
-                    send_keys: {
-                        public_key: e.target.public_key.value,
-                        private_key: e.target.private_key.value
-                    },
-                    dividend_active: false,
-                    affiliate_active: false
-                })
-            } catch (e) {
-                alert('destination address is invalid');
-            }
-        }
+    setCloseSendReceivePopup() {
+        closeSendReceivePopup(this);
     }
 
     changePassword(e) {
@@ -869,134 +1406,107 @@ export default class Wallet extends React.Component {
         if (new_pass.length > 0) {
             //check that the new password matches the repeated password
             if (new_pass === repeat_pass) {
+                loadAndDecryptWalletFromFile(localStorage.getItem('wallet_path'), now_pass, (err, wallet) => {
+                    if (!err) {
+                        const decrypted_wallet_str = JSON.stringify(wallet.decrypted);
 
-                //read from the expected path the encrypted wallet
-                fs.readFile(localStorage.getItem('wallet_path'), (err, fd) => {
-                    if (err) {
-                        //if the error is that No File exists, let's step through and make the file
-                        if (err.code === 'ENOENT') {
-                            alert('no wallet was found');
-                        }
-                    } else {
+                        const crypto = require('crypto');
+                        const hash1 = crypto.createHash('sha256');
+                        const hash2 = crypto.createHash('sha256');
 
-                        //prepare to decrypt the wallet file from the path
-                        var crypto = require('crypto'),
-                            algorithm = 'aes-256-ctr',
-                            password = now_pass;
+                        //hash the wallet on the path
+                        hash1.update(decrypted_wallet_str);
 
-                        //decrypt the wallet
-                        var decrypted_wallet = decrypt(fd.toString(), algorithm, password);
+                        //hash the wallet in localstorage
+                        hash2.update(localStorage.getItem('wallet'));
 
-                        //try to parse the decrypted wallet that it is valid
-                        try {
+                        //check that both hashes the active wallet and encrypted wallet are identical
+                        if (hash1.toString() === hash2.toString()) {
+                            //encrypt the wallet data with the new password
+                            const algorithm = 'aes-256-ctr';
+                            const password = new_pass;
+                            const encrypted_wallet = encrypt(decrypted_wallet_str, algorithm, password);
 
-                            var parse_wallet = JSON.parse(decrypted_wallet);
-
-                            //check the version number of the wallet
-                            if (parse_wallet['version'] === '1') {
-
-                                const hash1 = crypto.createHash('sha256');
-                                const hash2 = crypto.createHash('sha256');
-
-                                //hash the wallet on the path
-                                hash1.update(decrypted_wallet);
-
-                                //hash the wallet in localstorage
-                                hash2.update(localStorage.getItem('wallet'));
-
-                                //check that both hashes the active wallet and encrypted wallet are identical
-                                if (hash1.toString() === hash2.toString()) {
-                                    var password = new_pass;
-
-                                    //encrypt the wallet data with the new password
-                                    var encrypted_wallet = encrypt(decrypted_wallet, algorithm, password);
-
-                                    //write the new file to the path
-                                    fs.writeFile(localStorage.getItem('wallet_path'), encrypted_wallet, (err) => {
-                                        if (err) {
-                                            alert('there was a problem writing the new encrypted file to disk')
-                                        } else {
-                                            //set the active password and wallet to the new file
-                                            localStorage.setItem('password', new_pass);
-                                            localStorage.setItem('wallet', decrypted_wallet);
-                                            alert('password has been changed')
-                                        }
+                            //write the new file to the path
+                            fs.writeFile(localStorage.getItem('wallet_path'), encrypted_wallet, (err) => {
+                                if (err) {
+                                    this.setState({
+                                        info_popup: true,
+                                        info_text: 'There was a problem writing the new encrypted file to disk'
+                                    });
+                                } else {
+                                    //set the active password and wallet to the new file
+                                    localStorage.setItem('password', new_pass);
+                                    localStorage.setItem('wallet', decrypted_wallet_str);
+                                    this.setState({
+                                        info_popup: true,
+                                        info_text: 'Password has been changed. Write it down, keep it safe.'
                                     });
                                 }
-                            } else {
-                                alert('wrong password');
-                                this.wrongOldPassword();
-                            }
-                        } catch (e) {
-                            alert('wrong password');
-                            this.wrongOldPassword();
+                            });
                         }
+                    } else {
+                        // Failed to load wallet
+                        console.error(err);
+                        this.setState({
+                            info_popup: true,
+                            info_text: err.message
+                        });
+                        this.wrongOldPassword();
                     }
                 });
             } else {
-                alert('new password does not match repeated password');
+                this.setState({
+                    info_popup: true,
+                    info_text: 'New password does not match repeated password'
+                });
                 this.wrongRepeatPassword();
             }
         } else {
-            alert('new password field is empty');
+            this.setState({
+                info_popup: true,
+                info_text: 'New password field is empty'
+            });
             this.wrongNewPassword();
         }
     }
 
-    closeCoinModal() {
+    closeSettingsInfoPopup() {
         this.setState({
-            send_overflow_active: false,
-            send_to: '',
-            send_keys: {
-                public_key: '',
-                private_key: ''
-            }
+            info_popup: false
         })
     }
 
-    closeHistoryModal() {
-        this.setState({
-            history_overflow_active: false,
-            history_key: ''
-        })
-    }
+    resetSettingsForm() {
+        document.getElementsByClassName('password-input').value = '';
 
-    closeSuccessModal() {
         this.setState({
-            transaction_sent: false,
-            send_overflow_active: false,
-            send_to: '',
-            send_keys: {
-                public_key: '',
-                private_key: ''
-            }
+            info_popup: false
         });
-        this.prepareDisplay();
-        setTimeout(() => {
-            this.prepareDisplay();
-        }, 35000)
     }
 
-    openSettingsModal(e) {
+    setCloseCoinModal() {
+        closeCoinModal(this);
+    }
+
+    setCloseHistoryModal() {
+        closeHistoryModal(this);
+    }
+
+    setCloseSuccessModal(e) {
         e.preventDefault();
-        this.setState({
-            settings_active: true
-        });
-        this.closeHistoryModal();
-        this.closeCoinModal();
-        this.closeSuccessModal();
-        this.closeDividendModal();
-        this.closeAffiliateModal();
+        closeSuccessModal(this);
+        this.prepareDisplay();
+        this.prepareDisplayPendingTx();
     }
 
-    closeSettingsModal() {
-        document.getElementById('old_pass').value = '';
-        document.getElementById('new_pass').value = '';
-        document.getElementById('repeat_pass').value = '';
+    setOpenSettingsModal(e) {
+        e.preventDefault();
+        openSettingsModal(this);
+    }
 
-        this.setState({
-            settings_active: false
-        });
+    setCloseSettingsModal() {
+        closeSettingsModal(this);
     }
 
     //This is fired when amount is changed
@@ -1004,10 +1514,10 @@ export default class Wallet extends React.Component {
         var send_fee = this.state.send_fee;
         var send_total = 0;
         if (this.state.send_coin === 'safex') {
-            send_total = parseInt(e.target.value);
+            send_total = parseFloat(e.target.value);
             this.setState({
-                send_amount: parseInt(e.target.value),
-                send_total: parseInt(send_total)
+                send_amount: parseFloat(e.target.value),
+                send_total: parseFloat(send_total)
             });
         } else {
             send_total = parseFloat(e.target.value) + parseFloat(send_fee);
@@ -1022,35 +1532,27 @@ export default class Wallet extends React.Component {
     sendFeeOnChange(e) {
         var send_amount = this.state.send_amount;
         var send_fee = parseFloat(e.target.value);
+        var send_total = parseFloat(send_amount);
 
         if (this.state.send_coin === 'safex') {
-            var send_total = parseFloat(send_amount);
+            this.setState({
+                send_fee: send_fee,
+                send_total: send_total.toFixed(0)
+            });
         } else {
-            var send_total = parseFloat(send_fee) + parseFloat(send_amount);
+            send_total = parseFloat(send_fee) + parseFloat(send_amount);
+            this.setState({
+                send_fee: send_fee,
+                send_total: send_total.toFixed(8)
+            });
         }
-        this.setState({
-            send_fee: send_fee,
-            send_total: send_total.toFixed(8)
-        });
-    }
-
-    //This is protection against way too small fees
-    sendFeeOnBlur(e) {
-        var send_fee;
-        if (this.state.send_fee <= 0.00001) {
-            send_fee = 0.00001;
-        } else {
-            send_fee = this.state.send_fee;
-        }
-        this.setState({
-            send_fee: send_fee
-        })
     }
 
     //This fires the currency selection method and sets the currency state
     sendCoinChoose(coin) {
         this.setState({
-            send_coin: coin
+            send_coin: coin,
+            fee_in_$: false
         });
         this.sendTotalAdjustCoinChange(coin);
     }
@@ -1058,239 +1560,250 @@ export default class Wallet extends React.Component {
     //This is fired when change of currency is selected BTC SAFEX
     sendTotalAdjustCoinChange(coin) {
         var send_amount = this.state.send_amount;
-        if (this.state.average_fee > 0) {
-            var send_fee = this.state.average_fee;
-        } else {
-            var send_fee = this.state.send_fee;
-        }
+        var send_total = parseFloat(send_amount);
 
         //if this.state.average_fee > 0 send_fee == fast. Set active fee selection fastest.
         if (coin === 'safex') {
-            send_amount = parseFloat(this.state.send_amount).toFixed(0);
-            var send_total = parseFloat(send_amount);
-            this.setState({
-                send_amount: 1,
-                send_fee: parseFloat(this.state.average_fee).toFixed(8),
-                send_total: 1,
-                active_fee: 'fast'
+            get_utxos(this.state.send_public_key)
+                .then(utxos => {
+                    const rawtx = generateSafexBtcTransaction(
+                        utxos,
+                        BURN_ADDRESS,
+                        this.state.send_private_key,
+                        1,
+                        this.state.average_fee * 100000000
+                    );
+                    this.setState({
+                        send_amount: 1,
+                        send_total: 1,
+                        send_fee: (parseFloat(rawtx.fee / 100000000) + 0.00000700).toFixed(8),
+                    });
+                }).catch(err => {
+                    console.log("generate safex transaction error" + err);
+                    this.openMainAlertPopup("Safex Transaction Error; You may have a 0 balance \n" + err);
+                })
+            .catch(err => {
+                console.log("error getting UTXOs " + err);
+                this.openMainAlertPopup("error getting UTXOs; You may have a connectivity issue " + err);
             });
         } else {
-            var send_total = parseFloat(this.state.average_fee) / 4 + 0.00001;
-            this.setState({
-                send_amount: 0.00001.toFixed(8),
-                send_fee: parseFloat(parseFloat(this.state.average_fee) / 4).toFixed(8),
-                send_total: send_total.toFixed(8),
-                active_fee: 'fast'
+            get_utxos(this.state.send_public_key)
+                .then(utxos => {
+                    const rawtx = generate_btc_transaction(
+                        utxos,
+                        BURN_ADDRESS,
+                        this.state.send_private_key,
+                        0.00000001.toFixed(8),
+                        this.state.average_fee * 100000000
+                    );
+                    this.setState({
+                        send_amount: 0.00000001.toFixed(8),
+                        send_fee: parseFloat(rawtx.fee / 100000000).toFixed(8),
+                        send_total: parseFloat(parseFloat(0.00000001) + parseFloat(rawtx.fee / 100000000)).toFixed(8)
+                    });
+                }).catch(err => {
+                    console.log("generate btc transaction error you might have no money " + err);
+                    this.openMainAlertPopup("BTC Transaction Error; You may have a 0 balance \n" + err);
+                })
+            .catch(err => {
+                console.log("error getting UTXOs " + err);
+                this.openMainAlertPopup("error getting UTXOs; You may have a connectivity issue " + err);
             });
         }
-
     }
 
-    feeChange(speed) {
-        var coin = this.state.send_coin;
-        if (coin === 'safex') {
-            if (speed === 'fast') {
-                this.setState({
-                    send_fee: parseFloat(this.state.average_fee).toFixed(8),
-                    active_fee: speed
-                });
-            }
-            if (speed === 'med') {
-                this.setState({
-                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 2).toFixed(8),
-                    active_fee: speed
-                });
-            }
-            if (speed === 'slow') {
-                this.setState({
-                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 4).toFixed(8),
-                    active_fee: speed
-                });
-            }
-        }
-        if (coin === 'btc') {
-            if (speed === 'fast') {
-                this.setState({
-                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 4).toFixed(8),
-                    send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.average_fee) / 4).toFixed(8),
-                    active_fee: speed
-                });
-            }
-            if (speed === 'med') {
-                this.setState({
-                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 6).toFixed(8),
-                    send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.average_fee) / 6).toFixed(8),
-                    active_fee: speed
-                });
-            }
-            if (speed === 'slow') {
-                this.setState({
-                    send_fee: parseFloat(parseFloat(this.state.average_fee) / 8).toFixed(8),
-                    send_total: parseFloat(parseFloat(this.state.send_amount) + parseFloat(this.state.average_fee) / 8).toFixed(8),
-                    active_fee: speed
-                });
-            }
-        }
-    }
 
-    //TODO: Add API for Bitcoin transactions
     listTransactions(key) {
         var render = '';
         var bodyFormData = new FormData();
         var promises = [];
         bodyFormData.set('addr', key);
 
+        // promises.push(axios({
+        //     method: 'post',
+        //     url: 'https://api.omniexplorer.info/v1/transaction/address/0',
+        //     data: bodyFormData,
+        //     config: {
+        //         headers: {'Content-Type': 'multipart/form-data', 'origin': '', 'referrer': '', 'referer': ''}
+        //     }
+        // }));
+
         promises.push(
             fetch('https://api.omniexplorer.info/v1/transaction/address/0', {
                 method: 'POST',
                 body: bodyFormData,
             })
-            .then(res => {
-                return res.json();
-            })
-        );
-
-        promises.push(
-            fetch(`https://chain.api.btc.com/v3/address/${key}/tx`)
                 .then(res => {
                     return res.json();
                 })
         );
 
-
-        // Promise.all(promises).then(responses =>
-        //     Promise.all(responses.map(res => re;s.json())).then(response => {
-        //         var txArray = [];
-        //         var historySafex = JSON.stringify(response[0].data.transactions);
-        //         var historyBitcoin = JSON.stringify(response[1]);
-        //
-        //         console.log(historySafex);
-        //         console.log(historyBitcoin);
-        //     })
-        // );
+        promises.push(
+            fetch(`http://bitcoin.safex.io:3001/insight-api/txs/?address=${key}`)
+                .then(res => {
+                    return res.json();
+                })
+        );
 
         Promise.all(promises)
             .then(function (response) {
-                var txArray = [];
                 var historySafex = response[0].transactions;
-                var historyBtc = response[1].data.list;
-                console.log(historySafex, historyBtc);
-                
-                // TODO: Continue from here
-                
-                /*txArray.push(historySafex);
-                txArray.push(historyBtc);
+                var historyBtc = response[1].txs;
+                var render = '';
+                var safex_direction = '';
+                var coin = '';
+                var date_time = 0;
+                var safex_confirmations = '';
+                var btc_reference_address = '';
+                var btc_confirmations = '';
+                var btc_amount = '';
+                var btc_amount_arr = [];
+                var scriptPubKey = [];
+                var btc_send_addr = '';
+                var btc_receive_addr = '';
+                var btc_send_direction = [];
+                var btc_sending_direction = [];
+                var btc_tx_direction = [];
+                var btc_tx_send_direction = '';
 
-                var safexDirection = txArray[0]['referenceaddress'] === key ? "Received" : "Sent";
-                var safexDateTime = new Date(txArray[0]['blocktime'] * 1000);
-                var safexConfirmations = txArray[0]['confirmations'] > 15 ? "(16/16)" : "(" + txArray[0]['confirmations'] + "/16)";
+                historyBtc.unshift.apply(historyBtc, historySafex);
 
+                var array = historyBtc.map(tx => ({
+                    safex_direction: tx.referenceaddress === key ? "Received" : "Sent",
+                    safex_reference_address: tx.referenceaddress,
+                    date_time: tx.propertyname === "SafeExchangeCoin" ? tx.blocktime : tx.time,
+                    safex_txid: tx.txid,
+                    safex_sending_address: tx.sendingaddress,
+                    safex_amount: tx.amount,
+                    confirmations: tx.confirmations,
+                    coin: tx.propertyname === "SafeExchangeCoin" ? "safex" : "bitcoin",
+                    btc_txid: tx.txid,
+                    btc_sending_address: tx.vout,
+                    btc_fees: tx.propertyname === "SafeExchangeCoin" ? 0 : tx.fees
+                }));
 
-                txArray.forEach((tx) => {
+                array.sort(function (a, b) {
+                    return parseFloat(b.date_time) - parseFloat(a.date_time);
+                });
 
-                });*/
+                var txArray = JSON.stringify(array);
 
+                JSON.parse(txArray).forEach((tx) => {
+                    safex_direction = tx['safex_direction'];
+                    coin = tx['coin'];
+                    date_time = new Date(tx['date_time'] * 1000);
+                    safex_confirmations = tx['confirmations'] > 15 ? "(16/16)" : "(" + tx['confirmations'] + "/16)";
+                    btc_amount = tx['btc_fees'] !== undefined ? tx['btc_fees'] : 0;
+                    btc_reference_address = tx['btc_sending_address'];
+                    btc_confirmations = tx['confirmations'];
+
+                    if (btc_reference_address !== undefined) {
+                        btc_reference_address.forEach(function (nestedProp) {
+                            scriptPubKey.push(nestedProp['scriptPubKey']['addresses']);
+                        });
+
+                        btc_amount_arr = btc_reference_address.filter(function (el) {
+                            return el.n === 0;
+                        });
+
+                        btc_amount = btc_amount_arr[0]['value'];
+                    }
+
+                    if (scriptPubKey.length > 0 && scriptPubKey !== undefined) {
+                        btc_send_addr = scriptPubKey[0];
+                        btc_receive_addr = scriptPubKey[1];
+                    }
+
+                    if (btc_send_addr[0] !== undefined && btc_send_addr[0].length) {
+                        btc_send_addr.forEach(function (addr) {
+                            btc_send_direction.push(addr);
+                        })
+                    }
+
+                    if (btc_send_direction[0] !== undefined) {
+                        btc_sending_direction.push(btc_send_direction[0]);
+                    }
+
+                    if (btc_sending_direction[0] !== undefined && btc_sending_direction[0].length > 0) {
+                        btc_sending_direction.forEach(function (addr) {
+                            btc_tx_direction.push(addr);
+                        })
+                    }
+
+                    if (btc_tx_direction !== []) {
+                        btc_tx_direction.forEach(function (send_addr) {
+                            btc_tx_send_direction = send_addr;
+                        })
+                    }
+
+                    if (btc_tx_send_direction === key) {
+                        btc_tx_send_direction = "Received";
+                    } else {
+                        btc_tx_send_direction = "Sent";
+                    }
+
+                    if (safex_direction === "Received" && coin === 'safex') {
+                        render += `
+                        <div class="history">
+                            <p class="coin-name">SAFEX</p><br /> ` + safex_direction + ` <br />
+                            <img class="coin-logo" src="images/coin-white.png" alt="Safex Coin">
+                            <p class="date">` + date_time + `</p><br />
+                            <p class="address"><b>TX: </b> ` + tx['safex_txid'] + `</p><br />
+                            <p class="address address-green">` + tx['safex_sending_address'] + `</p> <p class="address-arrow"> ➡ </p> <p class="address address-green">` + tx['safex_reference_address'] + `</p>
+                            <div class="col-xs-12 confirmations_wrap">
+                                ` + tx['safex_amount'] + ` safex ` + safex_confirmations + ` confirmations
+                            </div>
+                        </div>`;
+                    } else if (safex_direction === "Sent" && coin === 'safex') {
+                        render += `
+                        <div class="history">
+                            <p class="coin-name">SAFEX</p><br /> ` + safex_direction + ` <br />
+                            <img class="coin-logo" src="images/coin-white.png" alt="Safex Coin">
+                            <p class="date">` + date_time + `</p><br />
+                            <p class="address"><b>TX: </b> ` + tx['safex_txid'] + `</p><br />
+                            <p class="address address-blue">` + tx['safex_sending_address'] + `</p> <p class="address-arrow"> ➡ </p> <p class="address address-blue">` + tx['safex_reference_address'] + `</p>
+                            <div class="col-xs-12 confirmations_wrap">
+                                ` + tx['safex_amount'] + ` safex ` + safex_confirmations + ` confirmations
+                            </div>
+                        </div>`;
+                    }
+                    else if (btc_tx_send_direction === "Received" && coin === 'bitcoin') {
+                        render += `
+                        <div class="history">
+                            <p class="coin-name">BITCOIN</p><br /> ` + btc_tx_send_direction + ` <br />
+                            <img class="coin-logo" src="images/btc-coin.png" alt="Bitcoin Logo">
+                            <p class="date">` + date_time + `</p><br />
+                            <p class="address"><b>TX: </b> ` + tx['btc_txid'] + `</p><br />
+                            <p class="address address-green">` + btc_receive_addr + `</p> <p class="address-arrow"> ➡ </p> <p class="address address-green">` + btc_send_addr + `</p>
+                            <div class="col-xs-12 confirmations_wrap">
+                                ` + btc_amount + ` bitcoin(s) ` + btc_confirmations + ` confirmations
+                            </div>
+                        </div>`;
+                    } else if (btc_tx_send_direction === "Sent" && coin === 'bitcoin') {
+                        render += `
+                        <div class="history">
+                            <p class="coin-name">BITCOIN</p><br /> ` + btc_tx_send_direction + ` <br />
+                            <img class="coin-logo" src="images/btc-coin.png" alt="Bitcoin Logo">
+                            <p class="date">` + date_time + `</p><br />
+                            <p class="address"><b>TX: </b> ` + tx['btc_txid'] + `</p><br />
+                            <p class="address address-blue">` + btc_receive_addr + `</p> <p class="address-arrow"> ➡ </p> <p class="address address-blue">` + btc_send_addr + `</p>
+                            <div class="col-xs-12 confirmations_wrap">
+                                ` + btc_amount + ` bitcoin(s) ` + btc_confirmations + ` confirmations
+                            </div>
+                        </div>`;
+                    }
+                });
+                if (response[1].txs.length === 0) {
+                    render = `<h5>No transaction history</h5>`;
+                }
+                document.getElementById("history_txs").innerHTML = render;
             })
             .catch(function (error) {
                 console.log(error);
-                alert("Could not fetch transaction history...");
+                render += `<h5>Could not fetch transaction history, plese try again later</h5>`
             });
 
     }
-
-    // listTransactions(key) {
-    //     var render = '';
-    //     var bodyFormData = new FormData();
-    //     bodyFormData.set('addr', key);
-    //
-    //     axios({
-    //         method: 'post',
-    //         url: 'https://api.omniexplorer.info/v1/transaction/address/0',
-    //         data: bodyFormData,
-    //         config: {
-    //             headers: {'Content-Type': 'multipart/form-data', 'origin': '', 'referrer': '', 'referer': ''}
-    //         }
-    //     })
-    //         .then(function (response) {
-    //             localStorage.setItem("history_txs", JSON.stringify(response.data.transactions));
-    //             var history = JSON.stringify(response.data.transactions);
-    //             var render = '';
-    //
-    //             JSON.parse(history).forEach((tx) => {
-    //                 var direction = tx['referenceaddress'] === key ? "Received" : "Sent";
-    //                 var dateTime = new Date(tx['blocktime'] * 1000);
-    //                 var confirmations = tx['confirmations'] > 15 ? "(16/16)" : "("+ tx['confirmations'] + "/16)";
-    //                 var coin = tx['propertyname'];
-    //
-    //                 if (direction === "Received" && coin === 'SafeExchangeCoin') {
-    //                     render +=`
-    //                 <div className="history">
-    //                     <p class="coin-name">SAFEX</p><br /> ` + direction + ` <br />
-    //                     <img class="coin-logo" src="images/coin-white.png" alt="Safex Coin">
-    //                     <p class="date">` + dateTime + `</p><br />
-    //                     <p class="address"><b>TX: </b> `+ tx['txid'] +`</p><br />
-    //                     <p class="address address-green">`+ tx['sendingaddress'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-green">`+ tx['referenceaddress'] +`</p>
-    //                 </div>
-    //                 <div className="col-xs-2">
-    //                     `+ tx['amount'] +` safex <br />
-    //                     `+ confirmations +` confirmations
-    //                 </div>`;
-    //                     console.log('safex received')
-    //                 } else if (direction === "Sent" && coin === 'SafeExchangeCoin') {
-    //                     render +=`
-    //                 <div class="history">
-    //                     <p class="coin-name">SAFEX</p><br /> ` + direction + ` <br />
-    //                     <img class="coin-logo" src="images/coin-white.png" alt="Safex Coin">
-    //                     <p class="date">` + dateTime + `</p><br />
-    //                     <p class="address"><b>TX: </b> `+ tx['txid'] +`</p><br />
-    //                     <p class="address address-blue">`+ tx['sendingaddress'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-blue">`+ tx['referenceaddress'] +`</p>
-    //                 </div>
-    //                 <div className="col-xs-2">
-    //                     `+ tx['amount'] +` safex <br />
-    //                     `+ confirmations +` confirmations
-    //                 </div>`;
-    //                     console.log('safex sent')
-    //                 } else if (direction === "Received" && coin === 'Bitcoin') {
-    //                     render +=`
-    //                 <div class="history">
-    //                     <p class="coin-name">BITCOIN</p><br /> ` + direction + ` <br />
-    //                     <img class="coin-logo" src="images/btc-coin.png" alt="Bitcoin Logo">
-    //                     <p class="date">` + dateTime + `</p><br />
-    //                     <p class="address"><b>TX: </b> `+ tx['txid'] +`</p><br />
-    //                     <p class="address address-green">`+ tx['sendingaddress'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-green">`+ tx['referenceaddress'] +`</p>
-    //                 </div>
-    //                 <div className="col-xs-2">
-    //                     `+ tx['amount'] +` bitcoin <br />
-    //                     `+ confirmations +` confirmations
-    //                 </div>`;
-    //                     console.log('bitcoin received')
-    //                 } else if (direction === "Sent" && coin === 'Bitcoin') {
-    //                     render +=`
-    //                 <div class="history">
-    //                     <p class="coin-name">BITCOIN</p><br /> ` + direction + ` <br />
-    //                     <img class="coin-logo" src="images/btc-coin.png" alt="Bitcoin Logo">
-    //                     <p class="date">` + dateTime + `</p><br />
-    //                     <p class="address"><b>TX: </b> `+ tx['txid'] +`</p><br />
-    //                     <p class="address address-blue">`+ tx['sendingaddress'] +`</p> <p class="address-arrow"> ➡ </p> <p class="address address-blue">`+ tx['referenceaddress'] +`</p>
-    //                 </div>
-    //                 <div className="col-xs-2">
-    //                     `+ tx['amount'] +` bitcoin <br />
-    //                     `+ confirmations +` confirmations
-    //                 </div>`;
-    //                     console.log('bitcoin sent')
-    //                 }
-    //
-    //             });
-    //             if (response.data.transactions.length == 0) {
-    //                 render =`<h5>No transaction history</h5>`;
-    //             }
-    //             document.getElementById("history_txs").innerHTML = render;
-    //         })
-    //         .catch(function (error) {
-    //             console.log(error);
-    //             alert("Could not fetch transaction history...");
-    //         });
-    // }
 
     sendToArchive(index) {
         try {
@@ -1303,15 +1816,13 @@ export default class Wallet extends React.Component {
 
             json.keys[index] = json_index;
 
-            var crypto = require('crypto'),
-                algorithm = 'aes-256-ctr',
-                password = localStorage.getItem('password');
-
+            var algorithm = 'aes-256-ctr';
+            var password = localStorage.getItem('password');
             var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
 
             fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
                 if (err) {
-                    alert('problem communicating to the wallet file')
+                    this.openMainAlertPopup('Problem communicating to the wallet file.');
                 } else {
                     localStorage.setItem('wallet', JSON.stringify(json));
                     try {
@@ -1330,14 +1841,22 @@ export default class Wallet extends React.Component {
                             is_loading: false
                         });
                     } catch (e) {
-                        alert('an error adding a key to the wallet contact team@safex.io')
+                        this.openMainAlertPopup('An error adding a key to the wallet. Please contact team@safex.io');
                     }
 
                 }
             });
         } catch (e) {
-            alert('error parsing the wallet data')
+            this.openMainAlertPopup('Error parsing the wallet data.');
         }
+        this.setState({
+            transfer_key_to_archive: true,
+        });
+        setTimeout(() => {
+            this.setState({
+                transfer_key_to_archive: false
+            });
+        }, 800);
     }
 
     removeFromArchive(index) {
@@ -1351,16 +1870,13 @@ export default class Wallet extends React.Component {
 
             json.keys[index] = json_index;
 
-            var crypto = require('crypto'),
-                algorithm = 'aes-256-ctr',
-                password = localStorage.getItem('password');
-
+            var algorithm = 'aes-256-ctr';
+            var password = localStorage.getItem('password');
             var cipher_text = encrypt(JSON.stringify(json), algorithm, password);
-
 
             fs.writeFile(localStorage.getItem('wallet_path'), cipher_text, (err) => {
                 if (err) {
-                    alert('problem communicating to the wallet file')
+                    this.openMainAlertPopup('Problem communicating to the wallet file.');
                 } else {
                     localStorage.setItem('wallet', JSON.stringify(json));
                     try {
@@ -1380,98 +1896,77 @@ export default class Wallet extends React.Component {
                         });
                         this.prepareDisplay(json.keys[index]);
                     } catch (e) {
-                        alert('An error occured while adding a key to the wallet. Please contact team@safex.io')
+                        this.openMainAlertPopup('An error occured while adding a key to the wallet. Please contact team@safex.io');
                     }
                 }
             });
         } catch (e) {
-            alert('error parsing the wallet data')
+            this.openMainAlertPopup('Error parsing the wallet data');
         }
+        this.setState({
+            transfer_key_to_home: true,
+        });
+        setTimeout(() => {
+            this.setState({
+                transfer_key_to_home: false
+            });
+        }, 800);
     }
 
     setArchiveView() {
-        this.setState({
-            archive_active: true
-        });
-        this.closeSendReceiveModal();
-        this.closeHistoryModal();
+        archiveView(this);
     }
 
     setHomeView() {
-        this.setState({
-            archive_active: false
-        });
-        this.closeSendReceiveModal();
-        this.closeHistoryModal();
+        homeView(this);
     }
 
-    openDividendModal(e) {
+    setOpenDividendModal(e) {
         e.preventDefault();
-        this.setState({
-            dividend_active: true
-        });
-        this.closeHistoryModal();
-        this.closeCoinModal();
-        this.closeSuccessModal();
-        this.closeSettingsModal();
-        this.closeAffiliateModal();
+        openDividendModal(this);
     }
 
-    closeDividendModal() {
-        this.setState({
-            dividend_active: false
-        });
+    setCloseDividendModal() {
+        closeDividendModal(this);
     }
 
-    openAffiliateModal(e) {
+    setOpenAffiliateModal(e) {
         e.preventDefault();
-        this.setState({
-            affiliate_active: true,
-        });
-        this.closeHistoryModal();
-        this.closeCoinModal();
-        this.closeSuccessModal();
-        this.closeSettingsModal();
-        this.closeDividendModal();
+        openAffiliateModal(this);
     }
 
-    closeAffiliateModal() {
-        this.setState({
-            affiliate_active: false
-        });
+    setCloseAffiliateModal() {
+        closeAffiliateModal(this);
     }
 
-    closeSendReceiveModal() {
-        this.setState({
-            collapse_open: {
-                send_open: false,
-                receive_open: false
-            }
-        });
+    setCloseSendReceiveModal() {
+        closeSendReceiveModal(this)
     }
 
     safexDividendOnChange(e) {
         e.preventDefault();
+        var safexDividendYield = 0;
+
         if (e.target.name === "total_trade_volume") {
-            var safexDividendYield = parseFloat(e.target.value) * (parseFloat(this.state.marketplaceFee) / 100) / parseFloat(this.state.safexMarketCap);
+            safexDividendYield = parseFloat(e.target.value) * (parseFloat(this.state.marketplaceFee) / 100) / parseFloat(this.state.safexMarketCap);
             this.setState({
                 totalTradeVolume: e.target.value,
                 safexDividendYield: (safexDividendYield * 100).toFixed(2)
             })
         } else if (e.target.name === "marketplace_fee") {
-            var safexDividendYield = (parseFloat(e.target.value) / 100) * parseFloat(this.state.totalTradeVolume) / parseFloat(this.state.safexMarketCap);
+            safexDividendYield = (parseFloat(e.target.value) / 100) * parseFloat(this.state.totalTradeVolume) / parseFloat(this.state.safexMarketCap);
             this.setState({
                 marketplaceFee: e.target.value,
                 safexDividendYield: (safexDividendYield * 100).toFixed(2)
             })
         } else if (e.target.name === "safex_market_cap") {
-            var safexDividendYield = (parseFloat(this.state.marketplaceFee) / 100) * parseFloat(this.state.totalTradeVolume) / parseFloat(e.target.value);
+            safexDividendYield = (parseFloat(this.state.marketplaceFee) / 100) * parseFloat(this.state.totalTradeVolume) / parseFloat(e.target.value);
             this.setState({
                 safexMarketCap: e.target.value,
                 safexDividendYield: (safexDividendYield * 100).toFixed(2)
             })
         } else if (e.target.name === "safex_holdings") {
-            var safexDividendYield = ((parseFloat(this.state.marketplaceFee) / 100) * parseFloat(this.state.totalTradeVolume) / 2147483647) * parseFloat(e.target.value) * (100 / (parseFloat(this.state.holdingsByMarket)));
+            safexDividendYield = ((parseFloat(this.state.marketplaceFee) / 100) * parseFloat(this.state.totalTradeVolume) / 2147483647) * parseFloat(e.target.value) * (100 / (parseFloat(this.state.holdingsByMarket)));
             this.setState({
                 safexHolding: e.target.value,
                 safexDividendYield: safexDividendYield.toFixed(2)
@@ -1479,49 +1974,63 @@ export default class Wallet extends React.Component {
         }
     }
 
-    importGlow() {
-        this.setState({
-            import_wrap_glow: true
-        });
-    }
-
-    importGlowDeactivate() {
-        this.setState({
-            import_wrap_glow: false
-        });
-    }
-
     wrongOldPassword() {
-        this.setState({
-            wrong_old_password: true
-        });
-        setTimeout(() => {
-            this.setState({
-                wrong_old_password: false
-            });
-        }, 1000)
+        flashField(this, 'wrongOldPassword');
     }
 
     wrongNewPassword() {
-        this.setState({
-            wrong_new_password: true
-        });
-        setTimeout(() => {
-            this.setState({
-                wrong_new_password: false
-            });
-        }, 1000)
+        flashField(this, 'wrongNewPassword');
     }
 
     wrongRepeatPassword() {
+        flashField(this, 'wrongRepeatPassword');
+    }
+
+    saveLabel(e) {
         this.setState({
-            wrong_repeat_password: true
+            savedLabel: e.target.value
         });
-        setTimeout(() => {
-            this.setState({
-                wrong_repeat_password: false
-            });
-        }, 1000)
+    }
+
+    editLabel(label, key) {
+        key.label = label;
+    }
+
+    openMainAlertPopup(message) {
+        openMainAlert(this, message)
+    }
+
+    setCoinModalOpenSettings(alert) {
+        coinModalOpenSettings(this, alert)
+    }
+
+    setCoinModalClosedSettings(alert) {
+        coinModalClosedSettings(this, alert)
+    }
+
+    convertBtcToDollars() {
+        this.setState({
+            fee_in_$: !this.state.fee_in_$,
+            send_fee: parseFloat(this.state.send_fee).toFixed(8),
+        });
+        this.setCloseSendReceivePopup();
+    }
+
+    copyToClipboard(e) {
+        e.preventDefault();
+        var selected_public_key = e.target.current_public_key.value;
+
+        this.setState({
+            current_public_key: selected_public_key
+        })
+    }
+
+    sendAll() {
+        if (this.state.send_coin === 'safex') {
+
+        } else if (this.state.send_coin === 'btc') {
+
+        }
     }
 
     render() {
@@ -1533,8 +2042,37 @@ export default class Wallet extends React.Component {
             || (!keys[key].hasOwnProperty('archived') && archive_active === false)
                 ? 'col-xs-12 single-key'
                 : 'col-xs-12 single-key hidden-xs hidden-sm hidden-md hidden-lg'} key={key}>
-                <div className="col-xs-7">
-                    <div className="key">{keys[key].public_key}</div>
+                <div className="col-xs-8 single-key-inner">
+                    <KeyLabel
+                        keyReference={keys[key]}
+                        keyLabel={keys[key].label}
+                        editLabel={this.editLabel}
+                    />
+                    <div className="key">
+                        <form onSubmit={this.copyToClipboard}>
+                            {
+                                this.state.copied && keys[key].public_key === this.state.current_public_key
+                                ?
+                                    <CopyToClipboard text={keys[key].public_key}
+                                        onCopy={() => this.setState({copied: true})}
+                                        className="button-shine">
+                                        <button>
+                                            Copied
+                                        </button>
+                                    </CopyToClipboard>
+                                :
+                                    <CopyToClipboard text={keys[key].public_key}
+                                        onCopy={() => this.setState({copied: true})}
+                                        className="button-shine">
+                                        <button>
+                                            Copy
+                                        </button>
+                                    </CopyToClipboard>
+                            }
+                            <input type="text" value={keys[key].public_key} onChange={({target: {value}}) => this.setState({value, copied: false})} disabled/>
+                            <input type="hidden" name="current_public_key" id="current_public_key" readOnly value={keys[key].public_key}/>
+                        </form>
+                    </div>
                     <span>
                         {
                             keys[key].pending_safex_bal > 0
@@ -1555,34 +2093,42 @@ export default class Wallet extends React.Component {
                 <div className="pull-right single-key-btns-wrap">
                     {
                         this.state.collapse_open.send_open && this.state.collapse_open.key === key
-                            ?
+                        ?
                             <div>
-                                <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
-                                        onClick={this.openSendReceive.bind(this, key, 'send')}
-                                        className="send-btn button-shine active">
+                                <button
+                                    disabled={(keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0) || this.state.send_disabled === false ? '' : 'disabled'}
+                                    onClick={this.openSendReceive.bind(this, key, 'send')}
+                                    className={(this.state.collapse_open.key === key && this.state.transaction_being_sent) || this.state.send_disabled ? 'send-btn button-shine disabled-btn' : 'send-btn button-shine active'}>
                                     <span className="img-wrap">
-                                        <img src="images/outbox-white.png" alt="Outbox Logo"/>
+                                        {
+                                            (this.state.collapse_open.key === key && this.state.transaction_being_sent) || this.state.send_disabled
+                                            ?
+                                                <img src="images/outbox-gray.png" alt="Outbox Logo"/>
+                                            :
+                                                <img src="images/outbox-white.png" alt="Outbox Logo"/>
+                                        }
                                     </span>
                                     <span>SEND</span>
                                 </button>
-                                <button className="receive-btn button-shine disabled" onClick={this.openSendReceive.bind(this, key, 'receive')}>
+                                <button className="receive-btn button-shine disabled"
+                                        onClick={this.openSendReceive.bind(this, key, 'receive')}>
                                     <img src="images/receive-gray.png" alt="Receive"/>
                                     <span>RECEIVE</span>
                                 </button>
                             </div>
-                            :
+                        :
                             <div>
-                                <button disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
-                                        onClick={this.openSendReceive.bind(this, key, 'send')}
-                                        className={this.state.collapse_open.key === key && this.state.collapse_open.receive_open ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
-
+                                <button
+                                    disabled={keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0 ? '' : 'disabled'}
+                                    onClick={this.openSendReceive.bind(this, key, 'send')}
+                                    className={(this.state.collapse_open.key === key && this.state.collapse_open.receive_open) || this.state.send_disabled ? 'send-btn button-shine disabled' : 'send-btn button-shine'}>
                                     {
-                                        this.state.collapse_open.key === key && this.state.collapse_open.receive_open
-                                            ?
+                                        (this.state.collapse_open.key === key && this.state.collapse_open.receive_open) || this.state.transaction_being_sent || this.state.send_disabled
+                                        ?
                                             <span className="img-wrap">
                                                 <img src="images/outbox-gray.png" alt="Outbox Logo"/>
                                             </span>
-                                            :
+                                        :
                                             <span className="img-wrap">
                                             {
                                                 keys[key].pending_btc_bal >= 0 && this.state.average_fee !== 0
@@ -1594,10 +2140,10 @@ export default class Wallet extends React.Component {
                                             }
                                             </span>
                                     }
-
                                     <span>SEND</span>
                                 </button>
-                                <button className="receive-btn button-shine-green" onClick={this.openSendReceive.bind(this, key, 'receive')}>
+                                <button className="receive-btn button-shine-green"
+                                        onClick={this.openSendReceive.bind(this, key, 'receive')}>
                                     {
                                         this.state.collapse_open.key === key && this.state.collapse_open.receive_open
                                             ?
@@ -1617,36 +2163,36 @@ export default class Wallet extends React.Component {
                         <div className="row amounts">
                             <div className="col-xs-5 amount-btns-wrap">
                                 <button onClick={() => this.removeFromArchive(key)}
-                                        className={keys[key].archived === true
-                                        || (!keys[key].hasOwnProperty('archived') && archive_active === true)
-                                            ? 'archive-button button-shine to-home-btn'
-                                            : 'archive-button button-shine hidden-xs hidden-sm hidden-md hidden-lg to-home-btn'}>
+                                    className={keys[key].archived === true
+                                    || (!keys[key].hasOwnProperty('archived') && archive_active === true)
+                                        ? 'archive-button button-shine to-home-btn'
+                                        : 'archive-button button-shine hidden-xs hidden-sm hidden-md hidden-lg to-home-btn'}>
                                     <span>TO HOME</span>
                                 </button>
 
                                 <button onClick={() => this.sendToArchive(key)}
-                                        className={keys[key].archived === false
-                                        || (!keys[key].hasOwnProperty('archived') && archive_active === false)
-                                            ? 'archive-button button-shine to-archive-btn'
-                                            : 'archive-button button-shine hidden-xs hidden-sm hidden-md hidden-lg to-archive-btn'}>
+                                    className={keys[key].archived === false
+                                    || (!keys[key].hasOwnProperty('archived') && archive_active === false)
+                                        ? 'archive-button button-shine to-archive-btn'
+                                        : 'archive-button button-shine hidden-xs hidden-sm hidden-md hidden-lg to-archive-btn'}>
                                     <span>TO ARCHIVE</span>
                                 </button>
                                 {
                                     this.state.history_overflow_active
-                                        ?
-                                        <button onClick={this.closeHistoryModal}
-                                                className='archive-button history-button button-shine history-btn'>
+                                    ?
+                                        <button onClick={this.setCloseHistoryModal}
+                                            className='archive-button history-button button-shine history-btn'>
                                             <span>HISTORY</span>
                                         </button>
-                                        :
-                                        <button onClick={() => this.openHistoryModal(key)}
-                                                className='archive-button history-button button-shine history-btn'>
+                                    :
+                                        <button onClick={() => this.setOpenHistoryModal(key)}
+                                            className='archive-button history-button button-shine history-btn'>
                                             <span>HISTORY</span>
                                         </button>
                                 }
 
                                 <button onClick={() => this.showPrivateModal(key)}
-                                        className='archive-button show-private-button button-shine show-private-btn'>
+                                    className='archive-button show-private-button button-shine show-private-btn'>
                                     <span>show private</span>
                                 </button>
                             </div>
@@ -1696,13 +2242,19 @@ export default class Wallet extends React.Component {
                             <label htmlFor="which">Currency:</label>
                             <img className={this.state.send_coin === 'safex'
                                 ? 'coin active'
-                                : 'coin'} onClick={this.sendCoinChoose.bind(this, 'safex')} src="images/coin-white.png"  alt="Safex Coin"/>
+                                : 'coin'} onClick={this.sendCoinChoose.bind(this, 'safex')} src="images/coin-white.png"
+                                 alt="Safex Coin"/>
                             <img className={this.state.send_coin === 'btc'
                                 ? 'coin active'
-                                : 'coin'} onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png" alt="Bitcoin Coin"/>
-                            <input type="hidden" name="which" readOnly value={this.state.send_coin} />
-                            <input type="hidden" name="private_key" readOnly value={keys[key].private_key} />
-                            <input type="hidden" name="public_key" readOnly value={keys[key].public_key} />
+                                : 'coin'} onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
+                                 alt="Bitcoin Coin"/>
+                            <input type="hidden" name="which" readOnly value={this.state.send_coin}/>
+                            <input type="hidden" name="private_key" readOnly value={keys[key].private_key}/>
+                            <input type="hidden" name="public_key" readOnly value={keys[key].public_key}/>
+                            <input type="hidden" name="pending_safex_bal" readOnly value={keys[key].pending_safex_bal}
+                                   id="pending_safex_bal"/>
+                            <input type="hidden" name="pending_btc_bal" readOnly value={keys[key].pending_btc_bal}
+                                   id="pending_btc_bal"/>
                             <div className="input-group">
                                 <span className="input-group-addon" id="basic-addon1">From:</span>
                                 <input name="from" type="text" className="form-control" placeholder="From"
@@ -1710,42 +2262,124 @@ export default class Wallet extends React.Component {
                             </div>
                             <div className="input-group">
                                 <span className="input-group-addon" id="basic-addon1">To:</span>
-                                <input name="destination" type="text" className="form-control" placeholder="Address"
-                                       aria-describedby="basic-addon1"/>
+                                <input name="destination" type="text" className="form-control" id="to"
+                                       placeholder="Address"
+                                       aria-describedby="basic-addon1" onChange={this.setCloseSendReceivePopup}/>
                             </div>
                         </div>
                         <div className="col-xs-5 send-right">
                             <div className="form-group">
-                                <label htmlFor="amount">Amount<span className={this.state.send_coin === "safex"
-                                    ? ''
-                                    : 'hidden-xs hidden-sm hidden-md hidden-lg'}>(Safex)</span>:</label>
-                                <input type="number" name="amount" onChange={this.sendAmountOnChange}
-                                       value={this.state.send_amount}/>
+                                <label htmlFor="amount">Amount&nbsp;
+                                    <span className={this.state.send_coin === "safex"
+                                        ? ''
+                                        : 'hidden-xs hidden-sm hidden-md hidden-lg'}>
+                                        {
+                                            this.state.fee_in_$ ? '($)' : '(Safex)'
+                                        }
+                                    </span>
+                                    <span className={this.state.send_coin === "btc"
+                                        ? ''
+                                        : 'hidden-xs hidden-sm hidden-md hidden-lg'}>
+                                        {
+                                            this.state.fee_in_$ ? '($)' : '(BTC)'
+                                        }
+                                    </span>
+                                </label>
+                                {
+                                    this.state.send_coin === 'safex'
+                                    ?
+                                        <input type="number" name="amount" id="amount"
+                                            onChange={this.sendAmountOnChange}
+                                            readOnly={this.state.fee_in_$ ? 'readonly' : ''}
+                                            value={this.state.fee_in_$ ? (this.state.send_amount * this.state.safex_price).toFixed(8) : this.state.send_amount}/>
+                                    :
+                                        <input type="number" name="amount" id="amount"
+                                            onChange={this.sendAmountOnChange}
+                                            readOnly={this.state.fee_in_$ ? 'readonly' : ''}
+                                            value={this.state.fee_in_$ ? (this.state.send_amount * this.state.btc_price).toFixed(8) : this.state.send_amount}/>
+                                }
                             </div>
                             <div className="form-group">
-                                <label htmlFor="fee">Fee(BTC):</label>
+                                <label htmlFor="fee">{this.state.fee_in_$ ? 'Fee ($)' : 'Fee (BTC):'}</label>
                                 <input type="number" name="fee" onChange={this.sendFeeOnChange}
-                                       onBlur={this.sendFeeOnBlur} value={this.state.send_fee}/>
+                                    readOnly={this.state.fee_in_$ ? 'readonly' : ''}
+                                    value={this.state.fee_in_$ ? (this.state.send_fee * this.state.btc_price).toFixed(8) : this.state.send_fee}/>
                             </div>
                             <div className="form-group fee-buttons">
-                                <span className={this.state.active_fee === 'slow'
-                                    ? 'slow slow-btn button-shine-orange active'
-                                    : 'slow-btn button-shine-orange'} onClick={this.feeChange.bind(this, 'slow')}>Slow</span>
-                                <span className={this.state.active_fee === 'med'
-                                    ? 'medium medium-btn button-shine-green active'
-                                    : 'medium-btn button-shine-green'} onClick={this.feeChange.bind(this, 'med')}>Med</span>
                                 <span className={this.state.active_fee === 'fast'
                                     ? 'fast fast-btn button-shine active'
-                                    : 'fast-btn button-shine'} onClick={this.feeChange.bind(this, 'fast')}>Fast</span>
+                                    : 'fast-btn button-shine'} onClick={this.sendAll.bind(this)}>All</span>
                             </div>
                             <div className="form-group">
-                                <label htmlFor="total" className="total-label">Total:</label>
-                                <input className="total-input" type="number" name="total" readOnly value={this.state.send_total} />
+                                <label htmlFor="total" className="total-label">
+                                    Total&nbsp;
+                                    <span className={this.state.send_coin === "safex"
+                                        ? ''
+                                        : 'hidden-xs hidden-sm hidden-md hidden-lg'}>
+                                        {
+                                            this.state.fee_in_$ ? '($)' : '(Safex)'
+                                        }
+                                    </span>
+                                    <span className={this.state.send_coin === "btc"
+                                        ? ''
+                                        : 'hidden-xs hidden-sm hidden-md hidden-lg'}>
+                                        {
+                                            this.state.fee_in_$ ? '($)' : '(BTC)'
+                                        }
+                                    </span>
+                                </label>
+                                {
+                                    this.state.send_coin === 'safex'
+                                    ?
+                                        <input className="total-input" type="number" name="total" readOnly
+                                            value={this.state.fee_in_$ ? (this.state.send_total * this.state.safex_price).toFixed(8) : this.state.send_total}/>
+                                    :
+                                        <input className="total-input" type="number" name="total" readOnly
+                                            value={this.state.fee_in_$ ? (this.state.send_total * this.state.btc_price).toFixed(8) : this.state.send_total}/>
+                                }
                             </div>
-                            <button type="submit" className="form-send-submit button-shine-green" onClick={this.closeSettingsModal}>
-                                <img src="images/outgoing.png" alt="Outgoing Icon"/>
-                                Send
-                            </button>
+                            <div className="form-group">
+                                {
+                                    this.state.send_coin === 'safex'
+                                    ?
+                                        <span></span>
+                                    :
+                                        <button type="button" className="btc-convert-btn button-shine"
+                                            onClick={this.convertBtcToDollars}
+                                            disabled={this.state.send_overflow_active && this.state.transaction_sent === false ? 'disabled' : ''}>
+                                            {this.state.fee_in_$ ? '$ to btc' : 'Btc to $'}
+                                        </button>
+                                }
+
+                                {
+                                    this.state.send_overflow_active && this.state.transaction_sent === false
+                                    ?
+                                        <button type="submit"
+                                            name="form_send_submit"
+                                            className="form-send-submit button-shine"
+                                            disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
+                                            <img src="images/outgoing.png" alt="Outgoing Icon"/>
+                                            Send
+                                        </button>
+                                    :
+                                        <button type="submit"
+                                            name="form_send_submit"
+                                            className="form-send-submit button-shine"
+                                            disabled={this.state.transaction_being_sent ? 'disabled' : ''}>
+                                            <img src="images/outgoing-blue.png" alt="Outgoing Icon"/>
+                                            Send
+                                        </button>
+                                }
+                            </div>
+                            <div className="send_receive_popup_wrap">
+                                <div className={this.state.send_receive_popup
+                                    ? 'send_receive_info active'
+                                    : 'send_receive_info'}>
+                                    <p>{this.state.send_receive_info}</p>
+                                    <span className="close"
+                                        onClick={keys[key].pending_btc_bal < 0 || keys[key].pending_safex_bal < 0 ? this.setCloseSendReceiveModal : this.setCloseSendReceivePopup}>X</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -1753,363 +2387,194 @@ export default class Wallet extends React.Component {
                 <div className={this.state.collapse_open.receive_open && this.state.collapse_open.key === key
                     ? 'col-xs-12 receive active'
                     : 'col-xs-12 receive'}>
-                    <div className="col-xs-12 sendCloseButton" onClick={this.openSendReceive.bind(this, key, 'receive')}>
+                    <div className="col-xs-12 sendCloseButton"
+                         onClick={this.openSendReceive.bind(this, key, 'receive')}>
                         <div className="close">
                             X
                         </div>
                     </div>
-                    <div className="col-xs-7 receive-address-wrap">
-                        <label htmlFor="receive-address">Address:</label>
-                        <input name="receive-address" value={keys[key].public_key}/>
+                    <div className="row">
+                        <div className="col-xs-7 receive-address-wrap">
+                            <label htmlFor="receive-address">Address:</label>
+                            <input name="receive-address" value={keys[key].public_key}/>
 
-                        <label htmlFor="amount">Amount:</label>
-                        <input type="amount" placeholder="1" onChange={this.amountChange.bind(this)}
-                               value={this.state.receive_amount}/>
+                            <label htmlFor="amount">Amount:</label>
+                            <input type="number" name="amount" placeholder="1" onChange={this.amountChange}
+                                value={this.state.receive_amount}/>
+                        </div>
+                        <div className="col-xs-5 qr-code-wrap">
+                            <QRCode value={"bitcoin:" + keys[key].public_key + "?amount=" + this.state.receive_amount}/>
+                        </div>
                     </div>
-                    <div className="col-xs-5 qr-code-wrap">
-                        <QRCode value={"bitcoin:" + keys[key].public_key + "?amount=" + this.state.receive_amount}/>
-                    </div>
+                </div>
+
+                <div
+                    className={this.state.private_key_open.private_key_popup && keys[key].public_key === this.state.private_key_open.current_public_key
+                        ? 'col-xs-12 private_key_popup active'
+                        : 'col-xs-12 private_key_popup'}>
+                    <h4>The following key is to control your coins, do not share it. Keep your private key for yourself
+                        only!</h4>
+                    <p>{this.state.private_key_open.display_private_key}</p>
+                    <button className="button-shine" onClick={this.setClosePrivateModal}>
+                        Ok
+                    </button>
                 </div>
             </div>
         });
 
         return (
-            <div className="wallet-page">
-                <Navigation/>
-                <div className="wallet-tabs fadeIn">
-                    <div onClick={this.setHomeView}
-                         className={archive_active === false ? 'btn btn-default button-shine active' : 'btn btn-default button-shine'}>
-                        Home
-                    </div>
-                    <div onClick={this.setArchiveView}
-                         className={archive_active === true ? 'btn btn-default button-shine active' : 'btn btn-default button-shine'}>
-                        Archive
-                    </div>
-                </div>
-                <div className='container keys-container'>
-                    <div className={this.state.settings_active || this.state.send_overflow_active || this.state.dividend_active || this.state.affiliate_active
-                        ? 'col-xs-12 sidebar-opened keys-wrap fadeIn'
-                        : 'col-xs-12 keys-wrap fadeIn'}>
-                        <div className="row">
+            <div className={this.state.loging_out ? 'wallet-page fadeOutUp' : 'wallet-page'}>
+                <Navigation
+                    wallet={this.wallet}
+                    migrate={this.migrate}
+                    safexPrice={this.state.safex_price}
+                    btcPrice={this.state.btc_price}
+                    archiveActive={this.state.archive_active}
+                    setHomeView={this.setHomeView}
+                    setArchiveView={this.setArchiveView}
+                    keyToHome={this.state.transfer_key_to_home}
+                    keyToArchive={this.state.transfer_key_to_archive}
+                    getPrices={this.getPrices}
+                    activeHomePage={this.state.activeHomePage}
+                />
+
+                <div className="container keys-container fadeIn">
+                    <div
+                        className={this.state.settings_active || this.state.send_overflow_active || this.state.dividend_active || this.state.affiliate_active
+                            ? 'col-xs-12 sidebar-opened keys-wrap fadeIn'
+                            : 'col-xs-12 keys-wrap fadeIn'}>
+                        <div className={this.state.history_overflow_active ? "row row-hidden" : "row"}>
                             {table}
                         </div>
                     </div>
-                </div>
-                <div className={this.state.history_overflow_active
-                    ? 'overflow historyModal fadeIn active'
-                    : 'overflow historyModal'}>
-                    <div className="col-xs-12 history-inner">
-                        <h3>History <span className="close" onClick={this.closeHistoryModal}>X</span></h3>
-                        <div id="history_txs">
-                            <h5>Loading...</h5>
-                        </div>
-                    </div>
+
+                    <div className={this.state.send_overflow_active ? "keys-backdrop active" : "keys-backdrop"} onClick={this.state.send_overflow_active ? this.setCloseCoinModal : ''}></div>
                 </div>
 
-                <div className={this.state.send_overflow_active && this.state.transaction_sent === false
+                <HistoryModal
+                    historyOverflowActive={this.state.history_overflow_active}
+                    closeHistoryModal={this.setCloseHistoryModal}
+                />
+
+                <div className={this.state.sidebar_open
                     ? 'overflow sendModal active'
                     : 'overflow sendModal'}>
-                    <form className="container" onSubmit={this.sendCoins}>
-                        <div className="head">
-                            <h3>Sending </h3>
-                            <span className="close" onClick={this.closeCoinModal}>X</span>
-                        </div>
-                        <div className="currency">
-                            <span>Currency:</span>
-                            <img className={this.state.send_coin === 'safex'
-                                ? 'coin'
-                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                 onClick={this.sendCoinChoose.bind(this, 'safex')}
-                                 src="images/coin-white.png" alt="Safex Coin"/>
-                            <img className={this.state.send_coin === 'btc'
-                                ? 'coin'
-                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                 onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
-                                 alt="Bitcoin Coin"/>
-                        </div>
-                        <div className="input-group">
-                            <label htmlFor="from">From:</label>
-                            <textarea name="from" className="form-control" readOnly aria-describedby="basic-addon1" value={this.state.send_keys.public_key}>
-                            </textarea>
-                        </div>
-                        <div className="input-group">
-                            <label htmlFor="destination">To:</label>
-                            <textarea name="destination" className="form-control" readOnly aria-describedby="basic-addon1" value={this.state.send_to}>
-                            </textarea>
-                        </div>
-                        <input type="hidden" readOnly name="private_key"
-                               value={this.state.send_keys.private_key} />
-                        <input type="hidden" readOnly name="public_key"
-                               value={this.state.send_keys.public_key} />
-                        <div className="form-group">
-                            <label htmlFor="amount">Amount:</label>
-                            <input readOnly name="amount" value={this.state.send_amount}/>
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="fee">Fee(BTC):</label>
-                            <input readOnly name="fee" value={this.state.send_fee}/>
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="total">Total:</label>
-                            <input readOnly name="total" value={this.state.send_total} />
-                        </div>
-                        <button className="confirm-btn button-shine-green" type="submit" disabled={this.state.transaction_being_sent ? 'disabled' : ''}> {this.state.transaction_being_sent ? 'Pending' : 'CONFIRM'}</button>
-                    </form>
-                </div>
-                <div className={this.state.transaction_sent
-                    ? 'overflow sendModal active'
-                    : 'overflow sendModal'}>
-                    <form className="container"  onSubmit={this.closeSuccessModal}>
-                        <div className="head">
-                            <h3>Sent </h3>
-                            <span className="close" onClick={this.closeSuccessModal}>X</span>
-                        </div>
-                        <div className="currency">
-                            <span>Currency:</span>
-                            <img className={this.state.send_coin === 'safex'
-                                ? 'coin'
-                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                 onClick={this.sendCoinChoose.bind(this, 'safex')}
-                                 src="images/coin-white.png" alt="Safex Coin"/>
-                            <img className={this.state.send_coin === 'btc'
-                                ? 'coin'
-                                : 'coin hidden-xs hidden-sm hidden-md hidden-lg'}
-                                 onClick={this.sendCoinChoose.bind(this, 'btc')} src="images/btc-coin.png"
-                                 alt="Bitcoin Coin"/>
-                        </div>
-                        <div className="input-group">
-                            <label htmlFor="from">From:</label>
-                            <textarea name="from" className="form-control" readOnly
-                                      value={this.state.send_keys.public_key} placeholder="Address"
-                                      aria-describedby="basic-addon1">
-                            </textarea>
-                        </div>
-                        <div className="input-group">
-                            <label htmlFor="destination">To:</label>
-                            <textarea name="destination" className="form-control" readOnly
-                                      value={this.state.send_to} placeholder="Address"
-                                      aria-describedby="basic-addon1">
-                            </textarea>
-                        </div>
-                        <div className="input-group">
-                            <label htmlFor="txid">TX ID:</label>
-                            <textarea name="txid" className="form-control" readOnly
-                                      value={this.state.txid}  placeholder="Address"
-                                      aria-describedby="basic-addon1" rows="3">
-                            </textarea>
-                        </div>
-                        <input type="hidden" readOnly name="private_key"
-                               value={this.state.send_keys.private_key} />
-                        <input type="hidden" readOnly name="public_key"
-                               value={this.state.send_keys.public_key} />
-                        <div className="form-group">
-                            <label htmlFor="amount">Amount:</label>
-                            <input readOnly name="amount" value={this.state.send_amount} />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="fee">Fee(BTC):</label>
-                            <input readOnly name="fee" value={this.state.send_fee} />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="total">Total:</label>
-                            <input readOnly name="total" value={this.state.send_total} />
-                        </div>
-                        <button type="submit" className="sent-close button-shine" onClick={this.closeSendReceiveModal}>Close</button>
-                    </form>
-                </div>
-                <div className={this.state.settings_active && this.state.send_overflow_active === false
-                    ? 'overflow sendModal settingsModal active'
-                    : 'overflow sendModal settingsModal'}>
-                    <div className="container form-wrap">
-                        <div className="head">
-                            <img src="images/mixer.png" alt="Transfer Icon"/>
-                            <h3>
-                                User<br />
-                                Settings
-                            </h3>
-                            <span className="close" onClick={this.closeSettingsModal}>X</span>
-                        </div>
+                    <SendingModal
+                        overflowActive={this.state.send_overflow_active}
+                        transactionSent={this.state.transaction_sent}
+                        sendCoins={this.sendCoins}
+                        transactionBeingSent={this.state.transaction_being_sent}
+                        closeCoinModal={this.setCloseCoinModal}
+                        sendCoin={this.state.send_coin}
+                        sendCoinSafex={this.sendCoinChoose.bind(this, 'safex')}
+                        sendCoinBtc={this.sendCoinChoose.bind(this, 'btc')}
+                        publicKey={this.state.send_keys.public_key}
+                        receiveAddress={this.state.send_to}
+                        privateKey={this.state.send_keys.private_key}
+                        sendAmount={this.state.send_amount}
+                        sendFee={this.state.send_fee}
+                        sendTotal={this.state.send_total}
+                    />
 
-                        <form onSubmit={this.changePassword}>
-                            <div className="form-group">
-                                <label htmlFor="old_pass">Old Password:</label>
-                                {
-                                    this.state.wrong_old_password
-                                        ?
-                                        <input type="password" className="form-control shake" id="old_pass" name="old_pass" />
-                                        :
-                                        <input type="password" className="form-control" id="old_pass" name="old_pass" />
-                                }
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="new_pass">New Password:</label>
-                                {
-                                    this.state.wrong_new_password
-                                        ?
-                                        <input type="password" className="form-control shake" id="new_pass" name="new_pass" />
-                                        :
-                                        <input type="password" className="form-control" id="new_pass" name="new_pass"/>
-                                }
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="repeat_pass">Repeat Password:</label>
-                                {
-                                    this.state.wrong_repeat_password
-                                        ?
-                                        <input type="password" className="form-control shake" id="repeat_pass" name="repeat_pass"/>
-                                        :
-                                        <input type="password" className="form-control" id="repeat_pass" name="repeat_pass"/>
-                                }
-                            </div>
-                            <div className="col-xs-12 submit-wrap">
-                                <div className="row">
-                                    <button className="reset-btn button-shine" type="reset">Reset</button>
-                                    <button className="submit-btn button-shine-green" type="submit">Submit</button>
-                                </div>
-                            </div>
-                        </form>
-                        <button className="keys-btn button-shine" onClick={this.exportEncryptedWallet}>Export Encrypted Wallet <span className="blue-text">(.dat)</span></button>
-                        <button className="keys-btn button-shine" onClick={this.exportUnencryptedWallet}>Export Unencrypted Keys</button>
-                        <button className="logout-btn button-shine-red" onClick={this.logout}>Logout</button>
-                    </div>
-                </div>
-                <div className={this.state.dividend_active
-                    ? 'overflow sendModal dividendModal active'
-                    : 'overflow sendModal dividendModal'}>
-                    <form className="container" onChange={this.safexDividendOnChange.bind(this)}>
-                        <div className="head">
-                            <img src="images/dividend-logo.png" alt="Transfer Icon"/>
-                            <h3>
-                                Dividend<br />
-                                Calculator
-                            </h3>
-                            <span className="close" onClick={this.closeDividendModal}>X</span>
-                        </div>
+                    <TransactionSentModal
+                        transactionSent={this.state.transaction_sent}
+                        closeSuccessModal={this.setCloseSuccessModal}
+                        sendCoin={this.state.send_coin}
+                        sendCoinSafex={this.sendCoinChoose.bind(this, 'safex')}
+                        sendCoinBtc={this.sendCoinChoose.bind(this, 'btc')}
+                        publicKey={this.state.send_keys.public_key}
+                        receiveAddress={this.state.send_to}
+                        txid={this.state.txid}
+                        privateKey={this.state.send_keys.private_key}
+                        sendAmount={this.state.send_amount}
+                        sendFee={this.state.send_fee}
+                        sendTotal={this.state.send_total}
+                    />
 
-                        <div className="form-group">
-                            <label>
-                                Projected Marketplace Volume $
-                            </label>
-                            <input type="text" name="total_trade_volume" value={this.state.totalTradeVolume}/>
-                        </div>
-                        <div className="form-group">
-                            <label>
-                                Marketplace Fee %
-                            </label>
-                            <input type="text" name="marketplace_fee" value={this.state.marketplaceFee}/>
-                        </div>
-                        <div className="form-group">
-                            <label>
-                                Safex Market Cap $
-                            </label>
-                            <input type="text" name="safex_market_cap" value={this.state.safexMarketCap}/>
-                        </div>
-                        <div className="form-group">
-                            <label>
-                                Number of SAFEX Held
-                            </label>
-                            <input type="text" name="safex_holdings" value={this.state.safexHolding}/>
-                        </div>
-                        <div className="form-group">
-                            <label>
-                                Cost of Safex Holdings $
-                            </label>
-                            <input type="text" name="safex_holdings_by_market" value={this.state.holdingsByMarket} readOnly/>
-                        </div>
-                        <div className="form-group">
-                            <label>
-                                Annual Return on Investment %
-                            </label>
-                            <input type="text" name="safex_dividend_yield" value={this.state.safexDividendYield}/>
-                        </div>
-                    </form>
-                </div>
-                <div className={this.state.affiliate_active
-                    ? 'overflow sendModal affiliateModal active'
-                    : 'overflow sendModal affiliateModal'}>
-                    <form className="container">
-                        <div className="head">
-                            <img src="images/affiliate-logo.png" alt="Transfer Icon"/>
-                            <h3>
-                                Affiliate<br />
-                                System
-                            </h3>
-                            <span className="close" onClick={this.closeAffiliateModal}>X</span>
-                        </div>
-                    </form>
-                </div>
-                <div className="container key-buttons status bounceInUp">
-                    <div className="status-left-wrap">
-                        <span>Status:</span>
-                        <span className={this.state.safex_sync
-                            ? 'status-green'
-                            : 'status-red'}>SAFEX</span>
-                        <span className={this.state.btc_sync
-                            ? 'status-green'
-                            : 'status-red'}>BTC</span><br />
-                        <img src="images/transfer.png" alt="Transfer Icon"/>
-                        <span className="sync-span">{this.state.status_text}</span>
-                    </div>
-                    <div className={this.state.import_wrap_glow ? 'import-form-wrap active' :'import-form-wrap'}>
-                        <form onChange={this.importKeyChange} onSubmit={this.importKey}>
-                            <input name="key" value={this.state.import_key} onFocus={this.importGlow} onBlur={this.importGlowDeactivate} />
-                            <button type="submit" className="button-shine" title="Import Key">Import</button>
-                        </form>
-                        <button onClick={this.createKey} className="create-btn button-shine" title="Create New Key">
-                            <img src="images/plus.png" alt="Plus Logo"/>
-                        </button>
-                    </div>
-                    <div className="right-options">
-                        {
-                            this.state.affiliate_active
-                                ?
-                                <button className="aff-btn aff-btn-active button-shine" title="Affiliate System" onClick={this.closeAffiliateModal}>
-                                    <img src="images/world-blue.png" alt="World Logo"/>
-                                </button>
-                                :
-                                <button className="aff-btn button-shine" title="Affiliate System" onClick={this.openAffiliateModal}>
-                                    <img src="images/world.png" alt="World Logo"/>
-                                </button>
-                        }
+                    <SettingsModal
+                        settingsActive={this.state.settings_active}
+                        sendOverflowActive={this.state.send_overflow_active}
+                        closeSettingsModal={this.setCloseSettingsModal}
+                        changePassword={this.changePassword}
+                        closeSettingsInfoPopup={this.closeSettingsInfoPopup}
+                        wrongOldPassword={this.state.wrongOldPassword}
+                        wrongNewPassword={this.state.wrongNewPassword}
+                        wrongRepeatPassword={this.state.wrongRepeatPassword}
+                        resetSettingsForm={this.resetSettingsForm}
+                        infoPopup={this.state.info_popup}
+                        infoText={this.state.info_text}
+                        openExportEncryptedWallet={this.setOpenExportEncryptedWallet}
+                        openExportUnencryptedWalletPopup={this.setOpenExportUnencryptedWalletPopup}
+                        logout={this.logout}
+                    />
 
-                        {
-                            this.state.dividend_active
-                                ?
-                                <button className="dividend-btn dividend-btn-active button-shine" title="Dividend Calculator" onClick={this.closeDividendModal}>
-                                    <img src="images/calculator-blue.png" alt="Calculator Logo"/>
-                                </button>
-                                :
-                                <button className="dividend-btn button-shine" title="Dividend Calculator" onClick={this.openDividendModal}>
-                                    <img src="images/calculator.png" alt="Calculator Logo"/>
-                                </button>
-                        }
+                    <DividendModal
+                        dividendActive={this.state.dividend_active}
+                        safexDividendOnChange={this.safexDividendOnChange.bind(this)}
+                        closeDividendModal={this.setCloseDividendModal}
+                        totalTradeVolume={this.state.totalTradeVolume}
+                        marketplaceFee={this.state.marketplaceFee}
+                        safexMarketCap={this.state.safexMarketCap}
+                        safexHolding={this.state.safexHolding}
+                        holdingsByMarket={this.state.holdingsByMarket}
+                        safexDividendYield={this.state.safexDividendYield}
+                    />
 
-                        {
-                            this.state.settings_active
-                                ?
-                                <button className="settings button-shine settings-btn-active" onClick={this.closeSettingsModal} title="Settings">
-                                    <img src="images/mixer-blue.png" alt="Mixer Logo"/>
-                                </button>
-                                :
-                                <button className="settings button-shine" onClick={this.openSettingsModal} title="Settings">
-                                    <img src="images/mixer.png" alt="Mixer Logo"/>
-                                </button>
-                        }
-
-                        {
-                            this.state.refreshTimer === 0
-                                ?
-                                <button className="refresh-btn button-shine"  onClick={this.refreshWallet} title="Refresh">
-                                    <img src="images/refresh.png" alt="Refresh Logo"/>
-                                </button>
-                                :
-                                <button className="refresh-btn button-shine disabled" title="Refresh">
-                                    <img src="images/refresh-blue.png" alt="Refresh Logo"/>
-                                    <span><p>{this.state.refreshTimer + 's'}</p></span>
-                                </button>
-                        }
-                    </div>
+                    <AffiliateModal
+                        affiliateActive={this.state.affiliate_active}
+                        closeAffiliateModal={this.setCloseAffiliateModal}
+                    />
                 </div>
+
+                <Footer
+                    activeHomePage={this.state.activeHomePage}
+                    safexSync={this.state.safex_sync}
+                    btcSync={this.state.btc_sync}
+                    statusText={this.state.status_text}
+                    importWrapGlow={this.state.import_wrap_glow}
+                    importKeyChange={this.importKeyChange}
+                    openImportModal={this.openImportModal}
+                    importKey={this.state.import_key}
+                    importGlow={this.importGlow}
+                    importGlowDeactivate={this.importGlowDeactivate}
+                    openCreateKey={this.setOpenCreateKey}
+                    affiliateActive={this.state.affiliate_active}
+                    openAffiliateModal={this.setOpenAffiliateModal}
+                    closeAffiliateModal={this.setCloseAffiliateModal}
+                    dividendActive={this.state.dividend_active}
+                    openDividendModal={this.setOpenDividendModal}
+                    closeDividendModal={this.setCloseDividendModal}
+                    settingsActive={this.state.settings_active}
+                    openSettingsModal={this.setOpenSettingsModal}
+                    closeSettingsModal={this.setCloseSettingsModal}
+                    refreshTimer={this.state.refreshTimer}
+                    refreshWallet={this.refreshWallet}
+                />
+
+                <ImportModal
+                    importModalActive={this.state.import_modal_active}
+                    createKeyActive={this.state.create_key_active}
+                    importKeyState={this.state.import_key}
+                    importKey={this.importKey}
+                    createKey={this.createKey}
+                    saveLabel={this.saveLabel}
+                    closeImportModal={this.closeImportModal}
+                />
+
+                <MainAlertPopup
+                    mainAlertPopup={this.state.main_alert_popup}
+                    mainAlertPopupText={this.state.main_alert_popup_text}
+                    exportUnencryptedWalletState={this.state.export_unencrypted_wallet}
+                    exportEncryptedWalletState={this.state.export_encrypted_wallet}
+                    exportEncryptedWallet={this.exportEncryptedWallet}
+                    exportUnencryptedWallet={this.exportUnencryptedWallet}
+                    transactionBeingSent={this.state.transaction_being_sent}
+                    importModalActive={this.state.import_modal_active}
+                    createKeyActive={this.state.create_key_active}
+                    closeMainAlertPopup={this.setCloseMainAlertPopup}
+                    closeImportModal={this.closeImportModal}
+                />
+
             </div>
         );
     }
