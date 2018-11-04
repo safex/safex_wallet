@@ -54,10 +54,10 @@
   background: rgba(0, 157, 191, 0.43);
 }
 .migration-wrap .green-btn {
-  background: #0ec8c1;
+  background: #00bfa2;
 }
 .migration-wrap .green-btn:hover {
-  box-shadow: 0 0 30px 0 rgba(14, 200, 193, 0.5) !important;
+  box-shadow: 0 0 30px 0 rgba(14, 200, 193, 0.6) !important;
 }
 .migration-wrap .green-btn:active,
 .migration-wrap .red-btn:active {
@@ -740,7 +740,7 @@
   color: #fff;
   font-size: 17px;
   padding: 12px 15px 15px;
-  width: 600px;
+  max-width: 708px;
   visibility: hidden;
   opacity: 0;
   transition: all ease 0.3s;
@@ -796,23 +796,49 @@
   text-align: left;
 }
 .confirmMigration p {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
+}
+.confirmMigration input {
+  margin-right: 10px;
+  margin-bottom: 0;
+  background: rgba(0, 191, 162, .9);
+  border: 1px solid rgba(0, 191, 162, .9);
+}
+.confirmMigration input:hover,
+.confirmMigration input:focus {
+  box-shadow: 0 0 30px 0 rgba(14, 200, 193, 0.6) !important;
+}
+.confirmMigration input.red-input {
+  background: rgba(200, 14, 75, 1);
+  border: 1px solid rgba(200, 14, 75, 1);
+}
+.confirmMigration input.red-input:hover,
+.confirmMigration input.red-input:focus {
+  color: white;
+  box-shadow: 0 0 30px 0 rgba(200, 14, 75, 1) !important;
 }
 .confirmMigration textarea {
-  margin: 0px 0 10px;
+  margin: 0;
   display: inline-block;
   border: 1px solid rgba(0, 157, 191, 0.82);
   border-radius: 5px;
   padding: 6px 10px;
+  /* background: rgba(0, 126, 162, .2); */
   background: url(../images/input-bg.png) repeat-y top left;
   background-size: 100% 100%;
   color: #fff;
   width: 100%;
-  max-width: 568px;
+  max-width: 708px;
   max-height: 62px;
   -webkit-transition: all 0.2s ease-out;
   -moz-transition: all 0.2s ease-out;
   transition: all 0.2s ease-out;
+}
+.confirmMigration textarea:hover,
+.confirmMigration textarea:focus {
+  -webkit-box-shadow: 0 0 10px 0 rgba(0, 199, 236, 0.7) !important;
+  -moz-box-shadow: 0 0 10px 0 rgba(0, 199, 236, 0.7) !important;
+  box-shadow: 0 0 10px 0 rgba(0, 199, 236, 0.7) !important;
 }
 .resetMigration .btns-wrap,
 .confirmMigration .btns-wrap {
