@@ -317,7 +317,7 @@ export default class SelectWallet extends React.Component {
                                         <div className="col-xs-12">
                                             <img src="images/import-main.png" alt="Safex Icon Circle"/>
                                             <button className="btn btn-default button-neon-green">Import</button>
-                                            <p>Import a safexwallet .dat file</p>
+                                            <p>Load a safexwallet .dat file</p>
                                         </div>
                                     </Link>
                                 </div>
