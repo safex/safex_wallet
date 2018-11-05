@@ -71,6 +71,7 @@ export default class MigrationAddress extends React.Component {
             fee: this.props.data.fee
         });
         this.getBalances(this.props.data.address);
+        this.getMigrationBalance();
     }
 
     getBalances(address) {
@@ -118,6 +119,35 @@ export default class MigrationAddress extends React.Component {
                     return resp;
                 })
         );
+
+        Promise.all(promises)
+            .then(values => {
+
+                this.setState({
+                    safex_bal: values[0].balance,
+                    btc_bal: (values[1] / 100000000).toFixed(8),
+                    pending_btc_bal: (values[2] / 100000000).toFixed(8),
+                    pending_safex_bal: values[3],
+                    btc_sync: true,
+                    safex_sync: true,
+                    status_text: "Synchronized",
+                    safex_price: localStorage.getItem("safex_price"),
+                    btc_price: localStorage.getItem("btc_price"),
+                    loading: false
+                });
+            })
+            .catch(e => {
+                console.log(e);
+                this.setState({
+                    status_text: "Sync error, please refresh",
+                    loading: false
+                });
+            });
+    }
+
+    getMigrationBalance() {
+        this.setState({loading: true});
+        var promises = [];
         promises.push(
             fetch("http://omni.safex.io:3010/api/" + this.state.address, {
                 method: "POST"
@@ -130,27 +160,19 @@ export default class MigrationAddress extends React.Component {
 
         Promise.all(promises)
             .then(values => {
+                console.log(values)
                 var address_array = [];
-                if (values[4].hasOwnProperty('safex_addresses')) {
-                    console.log("addresses length " + values[4].safex_addresses.length);
-                    for (var i = 0; i < values[4].safex_addresses.length; i++) {
-                        address_array.push(values[4].safex_addresses[i]);
+                if (values[0].hasOwnProperty('safex_addresses')) {
+                    console.log("addresses length " + values[0].safex_addresses.length);
+                    for (var i = 0; i < values[0].safex_addresses.length; i++) {
+                        address_array.push(values[0].safex_addresses[i]);
                     }
                     console.log(address_array)
                 }
 
                 this.setState({
-                    safex_bal: values[0].balance,
-                    btc_bal: (values[1] / 100000000).toFixed(8),
-                    pending_btc_bal: (values[2] / 100000000).toFixed(8),
-                    pending_safex_bal: values[3],
-                    migrated_balance: values[4].migrated_balance,
+                    migrated_balance: values[0].migrated_balance,
                     safex_addresses: address_array,
-                    btc_sync: true,
-                    safex_sync: true,
-                    status_text: "Synchronized",
-                    safex_price: localStorage.getItem("safex_price"),
-                    btc_price: localStorage.getItem("btc_price"),
                     loading: false
                 });
             })
@@ -203,6 +225,7 @@ export default class MigrationAddress extends React.Component {
                 refreshInterval: interval
             });
             this.getBalances(this.state.address);
+            this.getMigrationBalance();
             console.log("Page refreshed");
         }
     }
