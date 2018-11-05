@@ -60,5 +60,4 @@ dist/
 .DS_Store
 .idea/
 /build
-package-lock.json
 release-builds/
