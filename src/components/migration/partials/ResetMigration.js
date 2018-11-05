@@ -20,7 +20,16 @@ export default class ResetMigration extends React.Component {
             <span className="close" onClick={this.props.closeResetMigration}>
               X
             </span>
-            Are you sure you want to reset your migration?
+            <p>
+               You do not need to do this for addresses that have already been set.
+            </p>
+            <p>
+              You should only do this if you want to set a new Safex address for migration.
+            </p>
+            <p>
+              Are you sure you want to reset your migration?
+            </p>
+            
             <div className="btns-wrap">
               <button
                 className="button-shine red-btn"

@@ -776,7 +776,7 @@
   width: 708px;
 }
 .resetMigration {
-  width: 500px;
+  width: 570px;
 }
 .resetMigration.active,
 .confirmMigration.active {
@@ -820,6 +820,9 @@
 }
 .confirmMigration p {
   margin-bottom: 10px;
+}
+.confirmMigration p span {
+  width: 115px;
 }
 .confirmMigration input {
   margin-right: 10px;
