@@ -88,10 +88,12 @@ export default class Migrate4 extends React.Component {
 
     setSafexAddress(e) {
         e.preventDefault();
+        this.setState({loading: true});
         console.log(this.state.safex_key);
         //public spend key is first half
         if (this.props.data.pending_bal != 0) {
             this.setOpenMigrationAlert("warning you have unconfirmed transactions, please wait until they are confirmed");
+            this.setState({loading: false});
 
         } else {
             get_utxos(this.state.address)
@@ -168,7 +170,7 @@ export default class Migrate4 extends React.Component {
                     className="button-shine green-btn"
                     onClick={this.setSafexAddress}
                 >
-                    Set the second half
+                    {this.state.loading ? "Loading" : "Set the second half"}
                 </button>
 
                 <MigrationAlert

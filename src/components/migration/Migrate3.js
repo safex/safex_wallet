@@ -93,9 +93,11 @@ export default class Migrate3 extends React.Component {
     setSafexAddress(e) {
         e.preventDefault();
         console.log(this.props.data.pending_bal);
+        this.setState({loading: true});
         //public spend key is first half
         if (this.props.data.pending_bal != 0) {
             this.setOpenMigrationAlert("warning you have unconfirmed transactions, please wait until they are confirmed");
+            this.setState({loading: false});
 
         } else {
 
@@ -175,7 +177,7 @@ export default class Migrate3 extends React.Component {
                     className="button-shine green-btn"
                     onClick={this.setSafexAddress}
                 >
-                    Set the first half
+                    {this.state.loading ? "Loading" : "Set the first half"}
                 </button>
 
                 <MigrationAlert

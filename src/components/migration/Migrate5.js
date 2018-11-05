@@ -220,7 +220,8 @@ export default class Migrate5 extends React.Component {
                             placeholder="Amount"
                             id="amount"
                         />
-                        <button className="button-shine green-btn">send</button>
+                        <button className="button-shine green-btn">
+                            {this.state.loading ? "Loading" : "Send"}</button>
                     </form>
 
                     <p>
