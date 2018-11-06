@@ -93,7 +93,7 @@ function generateSafexBtcTransaction(utxos, destination, wif, amount, fee) {
     var inputs_num = 0;
     let fee_adj;
     utxos.forEach(txn => {
-        if (running_total < (700 + fee)) {
+        if (running_total < (700 + fee) && txn.satoshis > 700) {
             running_total += txn.satoshis;
             inputs_num += 1;
         }
@@ -106,7 +106,7 @@ function generateSafexBtcTransaction(utxos, destination, wif, amount, fee) {
     var inputs_num = 0;
     var running_total = 0;
     utxos.forEach(txn => {
-        if (running_total < (700 + fee)) {
+        if (running_total < (700 + fee) && txn.satoshis > 700) {
             running_total += txn.satoshis;
             tx.addInput(txn.txid, txn.vout);
             inputs_num += 1;
