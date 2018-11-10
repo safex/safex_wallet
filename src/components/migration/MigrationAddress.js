@@ -48,6 +48,7 @@ export default class MigrationAddress extends React.Component {
             table_expanded: false,
             reset_migration: false,
             safex_addresses: [],
+            migration_exists: false
         };
         this.refresh = this.refresh.bind(this);
         this.setMigrationVisible = this.setMigrationVisible.bind(this);
@@ -132,14 +133,21 @@ export default class MigrationAddress extends React.Component {
             .then(values => {
                 var address_array = [];
                 if (values[4].hasOwnProperty('safex_addresses')) {
+                    this.setState(() => ({
+                        migration_exists: true
+                    }));
                     console.log("addresses length " + values[4].safex_addresses.length);
                     for (var i = 0; i < values[4].safex_addresses.length; i++) {
                         address_array.push(values[4].safex_addresses[i]);
                     }
                     console.log(address_array)
+                } else {
+                    this.setState(() => ({
+                        migration_exists: false
+                    }));
                 }
-
-                this.setState({
+                
+                this.setState(() => ({
                     safex_bal: values[0].balance,
                     btc_bal: (values[1] / 100000000).toFixed(8),
                     pending_btc_bal: (values[2] / 100000000).toFixed(8),
@@ -152,14 +160,14 @@ export default class MigrationAddress extends React.Component {
                     safex_price: localStorage.getItem("safex_price"),
                     btc_price: localStorage.getItem("btc_price"),
                     loading: false
-                });
+                }));
             })
             .catch(e => {
                 console.log(e);
-                this.setState({
+                this.setState(() => ({
                     status_text: "Sync error, please refresh",
                     loading: false
-                });
+                }));
             });
     }
 
@@ -394,7 +402,7 @@ export default class MigrationAddress extends React.Component {
                 );
                 break;
         }
-
+        
         const safex_address = this.state.safex_addresses.map((address, index) => (
             <tr key={index}>
                 <td
@@ -488,24 +496,30 @@ export default class MigrationAddress extends React.Component {
                     </div>
 
                     <div className="col-xs-8 keys-table-wrap">
-                        <h3>Migrations Table</h3>
-                        <div
-                            className={
-                                this.state.table_expanded ? "table-wrap expanded" : "table-wrap"
-                            }
-                        >
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Safex Address</th>
-                                        <th>Tokens (SFT)</th>
-                                        <th>Cash (SFX)</th>
-                                    </tr>
-                                </thead>
+                        {
+                            this.state.migration_exists 
+                            ?
+                                <div>
+                                    <h3>Migrations Table</h3>
+                                    <div
+                                        className="table-wrap"
+                                    >
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Safex Address</th>
+                                                    <th>Tokens (SFT)</th>
+                                                    <th>Cash (SFX)</th>
+                                                </tr>
+                                            </thead>
 
-                                <tbody>{safex_address}</tbody>
-                            </table>
-                        </div>
+                                            <tbody>{safex_address}</tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            :
+                                <div className="hidden"></div>
+                        }
                     </div>
                 </div>
                 
