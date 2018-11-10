@@ -165,7 +165,7 @@ export default class MigrationAddress extends React.Component {
             .catch(e => {
                 console.log(e);
                 this.setState(() => ({
-                    status_text: "Sync error, please refresh",
+                    status_text: "Cannot fetch migrations table, please refresh",
                     loading: false
                 }));
             });
@@ -517,9 +517,15 @@ export default class MigrationAddress extends React.Component {
                                         </table>
                                     </div>
                                 </div>
-                            :
+                            :   
                                 <div>
-                                    <h3>No Migrations</h3>
+                                    {
+                                        this.state.status_text !== 'Syncronized' 
+                                        ?
+                                            <h3>No Migrations</h3>
+                                        :
+                                            <h3>{this.state.status_text}</h3>
+                                    }
                                 </div>
                         }
                     </div>

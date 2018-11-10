@@ -52,6 +52,7 @@
 }
 .migration-wrap .refresh-btn.disabled {
   background: rgba(0, 157, 191, 0.43);
+  text-transform: initial;
 }
 .migration-wrap .green-btn {
   background: #00bfa2;
