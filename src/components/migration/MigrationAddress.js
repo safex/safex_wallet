@@ -402,7 +402,7 @@ export default class MigrationAddress extends React.Component {
                 );
                 break;
         }
-        
+
         const safex_address = this.state.safex_addresses.map((address, index) => (
             <tr key={index}>
                 <td
@@ -518,7 +518,9 @@ export default class MigrationAddress extends React.Component {
                                     </div>
                                 </div>
                             :
-                                <div className="hidden"></div>
+                                <div>
+                                    <h3>No Migrations</h3>
+                                </div>
                         }
                     </div>
                 </div>
