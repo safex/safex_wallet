@@ -520,6 +520,9 @@
   right: 0;
   z-index: 100002;
 }
+.addressAlert {
+  width: 100%;
+}
 .migrationAlert.active {
   visibility: visible;
   opacity: 1;
@@ -550,6 +553,9 @@
   text-transform: initial;
   line-height: 1.2;
   text-align: left;
+}
+.addressAlert p {
+  font-size: 16px;
 }
 .migrationAlert .btns-wrap {
   display: flex;

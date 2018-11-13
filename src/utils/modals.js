@@ -482,6 +482,25 @@ function closeResetMigration(target) {
     })
 }
 
+/**
+ * Open Address Alert Popup
+ */
+function openAddressAlert(target, address) {
+    target.setState({
+        address_alert: true,
+        address_alert_text: address,
+    });
+}
+
+/**
+ * Close Address Alert Popup
+ */
+function closeAddressAlert(target) {
+    target.setState({
+        address_alert: false
+    });
+}
+
 module.exports = {
     openDividendModal,
     closeDividendModal,
@@ -511,5 +530,7 @@ module.exports = {
     openMigrationAlert,
     closeMigrationAlert,
     openResetMigration,
-    closeResetMigration
+    closeResetMigration,
+    openAddressAlert,
+    closeAddressAlert
 };

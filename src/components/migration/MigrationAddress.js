@@ -16,9 +16,12 @@ import {
     closeMigrationAlert,
     openResetMigration,
     closeResetMigration,
-    confirmReset
+    confirmReset,
+    openAddressAlert,
+    closeAddressAlert,
 } from "../../utils/modals";
 import MigrationAlert from "../migration/partials/MigrationAlert";
+import AddressAlert from "../migration/partials/AddressAlert";
 import ResetMigration from "../migration/partials/ResetMigration";
 
 export default class MigrationAddress extends React.Component {
@@ -48,7 +51,9 @@ export default class MigrationAddress extends React.Component {
             table_expanded: false,
             reset_migration: false,
             safex_addresses: [],
-            migration_exists: false
+            migration_exists: false,
+            address_alert: false,
+            address_alert_text: "",
         };
         this.refresh = this.refresh.bind(this);
         this.setMigrationVisible = this.setMigrationVisible.bind(this);
@@ -60,6 +65,8 @@ export default class MigrationAddress extends React.Component {
         this.setCloseResetMigration = this.setCloseResetMigration.bind(this);
         this.confirmReset = this.confirmReset.bind(this);
         this.getUnconfirmed = this.getUnconfirmed.bind(this);
+        this.setOpenAddressAlert = this.setOpenAddressAlert.bind(this);
+        this.setCloseAddressAlert = this.setCloseAddressAlert.bind(this);
     }
 
     componentDidMount() {
@@ -290,8 +297,8 @@ export default class MigrationAddress extends React.Component {
         closeMigrationAlert(this);
     }
 
-    toggleAddress(index) {
-        this.setOpenMigrationAlert(index);
+    toggleAddress(address) {
+        this.setOpenAddressAlert(address);
     }
 
     setOpenResetMigration() {
@@ -300,6 +307,14 @@ export default class MigrationAddress extends React.Component {
 
     setCloseResetMigration() {
         closeResetMigration(this);
+    }
+
+    setOpenAddressAlert(address) {
+        openAddressAlert(this, address);
+    }
+
+    setCloseAddressAlert() {
+        closeAddressAlert(this);
     }
 
     confirmReset() {
@@ -593,6 +608,12 @@ export default class MigrationAddress extends React.Component {
                     migrationAlert={this.state.migration_alert}
                     migrationAlertText={this.state.migration_alert_text}
                     closeMigrationAlert={this.setCloseMigrationAlert}
+                />
+
+                <AddressAlert
+                    addressAlert={this.state.address_alert}
+                    addressAlertText={this.state.address_alert_text}
+                    closeAddressAlert={this.setCloseAddressAlert}
                 />
 
                 <ResetMigration
