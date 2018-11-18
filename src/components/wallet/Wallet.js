@@ -526,8 +526,7 @@ export default class Wallet extends React.Component {
             .then(resp => resp.text())
             .then((resp) => {
                 if (resp === "") {
-                    this.setCoinModalOpenSettings('There was an error with the transaction');
-                    this.setCloseMainAlertPopup();
+                    this.openMainAlertPopup('There was an error with the transaction');
                     this.setState({
                         send_disabled: false,
                     });
@@ -631,8 +630,7 @@ export default class Wallet extends React.Component {
                         .then(resp => resp.text())
                         .then((resp) => {
                             if (resp === "") {
-                                this.setCoinModalOpenSettings('There was an error with the transaction');
-                                this.setCloseMainAlertPopup();
+                                this.openMainAlertPopup('There was an error with the transaction');
                                 this.setState({
                                     send_disabled: false,
                                 });
