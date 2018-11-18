@@ -32,10 +32,13 @@ export default class Migrate1 extends React.Component {
                     blockchain.
                 </p>
                 <p>
-                    In return you will receive <input type="text" className="blue-input" defaultValue="an equal amount" readOnly />  of
-                    <input type="text" className="blue-input" defaultValue="Safex Tokens (SFT)" readOnly />. Additionally, you
+                    In return you will receive <input type="text" className="blue-input" defaultValue="an equal amount" readOnly />  of &nbsp;
+                    <input type="text" className="blue-input" defaultValue="Safex Tokens (SFT)" readOnly />
+                </p>
+                <p>
+                    Additionally, you
                     will receive <input type="text" className="blue-input" defaultValue="~0.0023 Safex Cash " readOnly />
-                    <input type="text" className="blue-input" defaultValue="Safex Cash (SFX)" readOnly />
+                    <input type="text" className="blue-input" defaultValue="Safex Cash (SFX)" readOnly /> &nbsp;
                      for each Token you migrated in this process.
                 </p>
                 <p>
