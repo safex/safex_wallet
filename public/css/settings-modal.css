@@ -131,4 +131,13 @@
   opacity: 1;
   font-size: 16px;
   font-family: "Brandon Grotesque Bold", Helvetica, Arial, sans-serif;
+  transition: all ease 0.3s;
+  -o-transition: all ease 0.3s;
+  -moz-transition: all ease 0.3s;
+  -webkit-transition: all ease 0.3s;
+}
+.settingsModal .info-wrap .info-text .close:hover {
+  color: #54BCD9;
+  text-shadow: 0 1px 0 #54BCD9;
+  opacity: 1;
 }

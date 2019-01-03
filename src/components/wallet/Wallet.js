@@ -716,12 +716,13 @@ export default class Wallet extends React.Component {
             if (this.state.send_fee < 0.00001) {
                 if (this.sidebar_open) {
                     this.setState({
-                        send_fee: parseFloat(0.00001).toFixed(8),
+                        send_fee: parseFloat(0.00001).toFixed(8)
                     });
+                    
                     this.setCoinModalOpenSettings('The fee is too small. Minimum fee is 0.00001000 BTC');
                 } else {
                     this.setState({
-                        send_fee: parseFloat(0.00001).toFixed(8),
+                        send_fee: parseFloat(0.00001).toFixed(8)
                     });
                     this.setCoinModalClosedSettings('The fee is too small. Minimum fee is 0.00001000 BTC');
                 }
@@ -795,12 +796,12 @@ export default class Wallet extends React.Component {
             if (this.state.send_fee < 0.00001) {
                 if (this.sidebar_open) {
                     this.setState({
-                        send_fee: parseFloat(0.00001).toFixed(8),
+                        send_fee: parseFloat(0.00001).toFixed(8)
                     });
                     this.setCoinModalOpenSettings('The fee is too small. Minimum fee is 0.00001000 BTC');
                 } else {
                     this.setState({
-                        send_fee: parseFloat(0.00001).toFixed(8),
+                        send_fee: parseFloat(0.00001).toFixed(8)
                     });
                     this.setCoinModalClosedSettings('The fee is too small. Minimum fee is 0.00001000 BTC');
                 }
@@ -1610,7 +1611,6 @@ export default class Wallet extends React.Component {
         }
     }
 
-
     listTransactions(key) {
         var render = '';
         var bodyFormData = new FormData();
@@ -2230,7 +2230,7 @@ export default class Wallet extends React.Component {
                       className={this.state.collapse_open.send_open && this.state.collapse_open.key === key
                           ? 'col-xs-12 form-inline form-send active'
                           : 'col-xs-12 form-inline form-send'}>
-                    <div className="col-xs-12 sendCloseButton" onClick={this.openSendReceive.bind(this, key, 'send')}>
+                    <div className="col-xs-12 sendCloseButton button-shine" onClick={this.openSendReceive.bind(this, key, 'send')}>
                         <div className="close text-right">
                             X
                         </div>
@@ -2385,7 +2385,7 @@ export default class Wallet extends React.Component {
                 <div className={this.state.collapse_open.receive_open && this.state.collapse_open.key === key
                     ? 'col-xs-12 receive active'
                     : 'col-xs-12 receive'}>
-                    <div className="col-xs-12 sendCloseButton"
+                    <div className="col-xs-12 sendCloseButton button-shine"
                          onClick={this.openSendReceive.bind(this, key, 'receive')}>
                         <div className="close">
                             X

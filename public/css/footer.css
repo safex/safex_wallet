@@ -184,6 +184,9 @@
   cursor: pointer;
   box-shadow: none !important;
 }
+.status .right-options button[disabled] img {
+  opacity: .5;
+}
 .status .right-options button[disabled]:before,
 .status .right-options html input[disabled]:before {
   box-shadow: none;

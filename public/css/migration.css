@@ -488,7 +488,7 @@
   z-index: 100002;
 }
 .addressAlert {
-  width: 100%;
+  width: 95%;
 }
 .migrationAlert.active {
   visibility: visible;
@@ -504,11 +504,20 @@
   width: auto;
   position: absolute;
   right: 15px;
-  top: 14px;
+  top: 13px;
   color: #fff;
   opacity: 1;
   font-size: 19px;
   font-family: "Brandon Grotesque Bold", Helvetica, Arial, sans-serif;
+  transition: all ease 0.3s;
+  -o-transition: all ease 0.3s;
+  -moz-transition: all ease 0.3s;
+  -webkit-transition: all ease 0.3s;
+}
+.migrationAlert .close:hover {
+  color: #54BCD9;
+  text-shadow: 0 1px 0 #54BCD9;
+  opacity: 1;
 }
 .migrationAlert p {
   background: transparent;
@@ -522,7 +531,7 @@
   text-align: left;
 }
 .addressAlert p {
-  font-size: 16px;
+  font-size: 15px;
 }
 .migrationAlert .btns-wrap {
   display: flex;
@@ -544,7 +553,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.9);
   z-index: 10001;
   opacity: 0;
   visibility: hidden;
@@ -604,6 +613,15 @@
   opacity: 1;
   font-size: 19px;
   font-family: "Brandon Grotesque Bold", Helvetica, Arial, sans-serif;
+  transition: all ease 0.3s;
+  -o-transition: all ease 0.3s;
+  -moz-transition: all ease 0.3s;
+  -webkit-transition: all ease 0.3s;
+}
+.instructionsModal .close:hover {
+  color: #54BCD9;
+  text-shadow: 0 1px 0 #54BCD9;
+  opacity: 1;
 }
 .instructionsModal h3 {
   text-align: center;
@@ -672,7 +690,7 @@
   transition: all 0.2s ease-in;
 }
 .instructionsModal .lang-bts-wrap button.active {
-  background: #0ec8c1;
+  background: #54bcd9;
   border: 2px solid #0ec8c1;
 }
 .instructionsModal .lang-bts-wrap button.active:hover {
@@ -774,6 +792,16 @@
   opacity: 1;
   font-size: 19px;
   font-family: "Brandon Grotesque Bold", Helvetica, Arial, sans-serif;
+  transition: all ease 0.3s;
+  -o-transition: all ease 0.3s;
+  -moz-transition: all ease 0.3s;
+  -webkit-transition: all ease 0.3s;
+}
+.resetMigration .close:hover,
+.confirmMigration .close:hover {
+  color: #54BCD9;
+  text-shadow: 0 1px 0 #54BCD9;
+  opacity: 1;
 }
 .resetMigration h3,
 .confirmMigration h3 {
@@ -869,7 +897,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.9);
   z-index: 10001;
   opacity: 0;
   visibility: hidden;

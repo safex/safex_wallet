@@ -232,6 +232,15 @@ input::-webkit-inner-spin-button {
   opacity: 1;
   font-size: 20px;
   font-family: "Brandon Grotesque Bold", Helvetica, Arial, sans-serif;
+  transition: all ease 0.3s;
+  -o-transition: all ease 0.3s;
+  -moz-transition: all ease 0.3s;
+  -webkit-transition: all ease 0.3s;
+}
+.overflow.sendModal .head span:hover {
+  color: #54BCD9;
+  text-shadow: 0 1px 0 #54BCD9;
+  opacity: 1;
 }
 .overflow.sendModal .head span.disabled {
   pointer-events: none;
@@ -246,8 +255,15 @@ input::-webkit-inner-spin-button {
   bottom: -1px;
   left: 0;
   background: rgba(18, 190, 221, .35);
-  border-bottom-left-radius: 10px;
-  border-top-right-radius: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 30%;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 30%;
+  border: 0px none;
+  overflow: hidden;
+}
+.sendCloseButton:hover {
+  cursor: pointer;
 }
 .sending-wrap {
   display: none;
