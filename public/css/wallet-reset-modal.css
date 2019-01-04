@@ -35,6 +35,15 @@
   margin-left: 10px;
   font-size: 20px;
   font-family: "Brandon Grotesque Bold", Helvetica, Arial, sans-serif;
+  transition: all ease 0.2s;
+  -o-transition: all ease 0.2s;
+  -moz-transition: all ease 0.2s;
+  -webkit-transition: all ease 0.2s;
+}
+.overflow.sendModal.walletResetModal h3 .close:hover {
+  color: #54BCD9;
+  text-shadow: 0 1px 0 #54BCD9;
+  opacity: 1;
 }
 .overflow.sendModal.walletResetModal form button {
   display: block;

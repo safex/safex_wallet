@@ -8,6 +8,7 @@ import {
 
 import {walletImportAlert} from '../../utils/modals';
 import packageJson from "../../../package";
+import IntroFooter from "./partials/IntroFooter";
 
 export default class Login extends React.Component {
     constructor(props) {
@@ -72,10 +73,8 @@ export default class Login extends React.Component {
                         <button className="btn btn-default button-neon-blue" type="submit">Proceed </button>
                     </form>
                 </div>
-                <div className="col-xs-12 text-center Intro-footer">
-                    <img src="images/footer-logo.png" alt="Safex Icon Footer"/>
-                    <p className="text-center">2014-2018 All Rights Reserved Safe Exchange Developers &copy;</p>
-                </div>
+                
+                <IntroFooter />
 
                 <div className={this.state.walletImportAlerts
                     ? 'overflow sendModal walletResetModal active'

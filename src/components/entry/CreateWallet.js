@@ -10,6 +10,8 @@ import {
     flashField,
     walletImportAlert,
 } from '../../utils/wallet';
+
+import IntroFooter from "./partials/IntroFooter";
 import packageJson from "../../../package";
 
 export default class CreateWallet extends React.Component {
@@ -123,10 +125,8 @@ export default class CreateWallet extends React.Component {
                         Write it down, keep it safe. <br />
                     </p>
                 </div>
-                <div className="col-xs-12 text-center Intro-footer">
-                    <img src="images/footer-logo.png" alt="Safex Icon Footer"/>
-                    <p className="text-center">2014-2018 All Rights Reserved Safe Exchange Developers &copy;</p>
-                </div>
+                
+                <IntroFooter />
 
                 <div className={this.state.walletImportAlerts
                     ? 'overflow sendModal walletResetModal active'

@@ -15,6 +15,7 @@ import {
     walletResetModalStep
 } from '../../utils/modals';
 
+import IntroFooter from "./partials/IntroFooter";
 import packageJson from "../../../package";
 const fs = window.require('fs');
 const fileDownload = require('react-file-download');
@@ -284,10 +285,8 @@ export default class SelectWallet extends React.Component {
                                 </div>
                             </div>
                         </div>
-                        <div className="col-xs-12 text-center Intro-footer">
-                            <img src="images/footer-logo.png" alt="Safex Icon Footer"/>
-                            <p className="text-center">2014-2018 All Rights Reserved Safe Exchange Developers &copy;</p>
-                        </div>
+                        
+                        <IntroFooter />
                     </div>
                 );
             } else {
@@ -323,10 +322,8 @@ export default class SelectWallet extends React.Component {
                                 </div>
                             </div>
                         </div>
-                        <div className="col-xs-12 text-center Intro-footer">
-                            <img src="images/footer-logo.png" alt="Safex Icon Footer"/>
-                            <p className="text-center">2014-2018 All Rights Reserved Safe Exchange Developers &copy;</p>
-                        </div>
+                        
+                        <IntroFooter />
                     </div>
                 );
             }

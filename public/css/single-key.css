@@ -292,6 +292,11 @@
   -moz-transition: all ease 0.2s;
   -webkit-transition: all ease 0.2s;
 }
+.sendCloseButton .close:hover {
+  color: #54BCD9;
+  text-shadow: 0 1px 0 #54BCD9;
+  opacity: 1;
+}
 .single-key .single-key-btns-wrap {
   position: absolute;
   top: 3px;
