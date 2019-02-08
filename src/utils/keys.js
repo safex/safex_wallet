@@ -1,42 +1,43 @@
-var bitcoin = window.require('bitcoinjs-lib');
-var bs58 = require('bs58');
-const swg = window.require('safex-addressjs');
-import { toHexString } from './utils';
+import { toHexString } from "./utils";
+var bitcoin = window.require("bitcoinjs-lib");
+var bs58 = require("bs58");
+const swg = window.require("safex-addressjs");
 
-module.exports = {
-    genkey: function() {
-        var random_array = new Uint8Array(32);
-        window.crypto.getRandomValues(random_array);
-        var priv_key_bytes = [];
+function genkey() {
+  var random_array = new Uint8Array(32);
+  window.crypto.getRandomValues(random_array);
+  var priv_key_bytes = [];
 
-        for (var i = 0; i < random_array.length; ++i) {
-            priv_key_bytes[i] = random_array[i];
-        }
+  for (var i = 0; i < random_array.length; ++i) {
+    priv_key_bytes[i] = random_array[i];
+  }
 
-        var hex_string = toHexString(priv_key_bytes).toUpperCase();
+  var hex_string = toHexString(priv_key_bytes).toUpperCase();
 
-        var priv_key_and_version = "80" + hex_string;
-        var first_bytes = Buffer.from(priv_key_and_version, 'hex');
-        var first_sha = bitcoin.crypto.sha256(first_bytes);
-        var second_sha = bitcoin.crypto.sha256(first_sha);
-        var checksum = toHexString(second_sha).substr(0, 8).toUpperCase();
-        var key_with_checksum = priv_key_and_version + checksum;
+  var priv_key_and_version = "80" + hex_string;
+  var first_bytes = Buffer.from(priv_key_and_version, "hex");
+  var first_sha = bitcoin.crypto.sha256(first_bytes);
+  var second_sha = bitcoin.crypto.sha256(first_sha);
+  var checksum = toHexString(second_sha)
+    .substr(0, 8)
+    .toUpperCase();
+  var key_with_checksum = priv_key_and_version + checksum;
 
-        var final_bytes = Buffer.from(key_with_checksum, 'hex');
-        var priv_key_wif = bs58.encode(final_bytes);
+  var final_bytes = Buffer.from(key_with_checksum, "hex");
+  var priv_key_wif = bs58.encode(final_bytes);
 
-        var key_pair = bitcoin.ECPair.fromWIF(priv_key_wif);
-        return key_pair;
-    },
-
-    genSafexKey: function() {
-        const seed = swg.sc_reduce32(swg.rand_32());
-        const keys = swg.create_address(seed);
-        const pubkey = swg.pubkeys_to_string(keys.spend.pub, keys.view.pub);
-
-        console.log(keys);
-        console.log(pubkey);
-        return keys;
-    }
-
+  var key_pair = bitcoin.ECPair.fromWIF(priv_key_wif);
+  return key_pair;
 }
+
+function genSafexKey() {
+  const seed = swg.sc_reduce32(swg.rand_32());
+  const keys = swg.create_address(seed);
+  const pubkey = swg.pubkeys_to_string(keys.spend.pub, keys.view.pub);
+
+  console.log(keys);
+  console.log(pubkey);
+  return keys;
+}
+
+export { genkey, genSafexKey };

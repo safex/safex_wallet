@@ -52,6 +52,12 @@ fabric.properties
 # Editor-based Rest Client
 .idea/httpRequests
 
+# dotenv environment variables file
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
 ########################################################################################################################
 
 node_modules/

@@ -6,14 +6,13 @@ export default class InstructionsModal extends React.Component {
     this.state = {
       instructions_lang: "english"
     };
-    this.changeInstructionLang = this.changeInstructionLang.bind(this);
   }
 
-  changeInstructionLang(lang) {
+  changeInstructionLang = lang => {
     this.setState({
       instructions_lang: lang
     });
-  }
+  };
 
   render() {
     return (
