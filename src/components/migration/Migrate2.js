@@ -313,7 +313,7 @@ export default class Migrate2 extends React.Component {
     closeMigrationAlert(this);
   };
 
-  checkFields() {
+  checkFields = () => {
     var safex_address = document.getElementById("safex_address").value;
     var spend_key = document.getElementById("spend_key").value;
     var view_key = document.getElementById("view_key").value;
@@ -329,19 +329,19 @@ export default class Migrate2 extends React.Component {
     }
   }
 
-  usedAddresses() {
+  usedAddresses = () => {
     this.setState({
       used_addresses: true
     });
   }
 
-  existingAddresses() {
+  existingAddresses = () => {
     this.setState({
       existing_addresses: true
     });
   }
 
-  exportNewWalletAddress() {
+  exportNewWalletAddress = () => {
     var wallet_data = JSON.parse(localStorage.getItem("new_wallet_address"));
     var new_wallet = "";
 
