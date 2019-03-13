@@ -2254,9 +2254,19 @@ export default class Wallet extends React.Component {
     });
   };
 
-  sendAll = () => {
+  sendAll = (safex_bal, btc_bal) => {
     if (this.state.send_coin === "safex") {
+        this.setState({
+            send_amount: parseInt(safex_bal),
+            send_total: parseInt(safex_bal)
+        });
     } else if (this.state.send_coin === "btc") {
+        var fee = parseFloat(this.state.send_fee).toFixed(8);
+        var btc = parseFloat(btc_bal).toFixed(8);
+        this.setState({
+            send_amount: (btc - fee).toFixed(8),
+            send_total: btc
+        });
     }
   };
 
@@ -2675,7 +2685,7 @@ export default class Wallet extends React.Component {
                         ? "fast fast-btn button-shine active"
                         : "fast-btn button-shine"
                     }
-                    onClick={this.sendAll.bind(this)}
+                    onClick={this.sendAll.bind(this, keys[key].safex_bal, keys[key].btc_bal)}
                   >
                     All
                   </span>
