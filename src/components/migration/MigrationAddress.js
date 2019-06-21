@@ -520,7 +520,7 @@ export default class MigrationAddress extends React.Component {
           </div>
         </div>
 
-        <button
+        {/* <button
           className="button-shine"
           onClick={() => {
             this.setMigrationProgress(0);
@@ -563,7 +563,7 @@ export default class MigrationAddress extends React.Component {
 
         <button className="button-shine" onClick={this.setMigrationVisible}>
           {this.state.show_migration ? "Hide Migration" : "Migrate"}
-        </button>
+        </button> */}
 
         <button
           className={
