@@ -371,7 +371,7 @@ export default class Migrate2 extends React.Component {
 
     return (
       <div>
-        <p>Step 2/4 - Selecting The Safex Key</p>
+        <h5>Step 2/4 - Selecting The Safex Key</h5>
         {this.state.create_address ? (
           <div>
             <div className="set-your-key-head">
@@ -523,21 +523,15 @@ export default class Migrate2 extends React.Component {
                 ) : (
                   <div className="address-wrap-inner">
                     <div className="migrate-btns-wrap">
-                      <div className="col-xs-4 btn-wrap">
-                        <button
-                          className={this.state.create_address ? "active" : ""}
-                          onClick={this.createSafexKey}
-                        >
+                      <div className="col-xs-4 btn-wrap" onClick={this.createSafexKey}>
+                        <button className={this.state.create_address ? "active" : ""}>
                           <img src="images/migration/cube.png" alt="Cube" />
                           <span>New Address</span>
                         </button>
                         <p>Create new address</p>
                       </div>
-                      <div className="col-xs-4 btn-wrap">
-                        <button
-                          className={this.state.my_address ? "active" : ""}
-                          onClick={this.usedAddresses}
-                        >
+                      <div  className="col-xs-4 btn-wrap" onClick={this.usedAddresses}>
+                        <button className={this.state.my_address ? "active" : ""}>
                           <img
                             src="images/migration/my-keys.png"
                             alt="My Keys"
@@ -546,11 +540,8 @@ export default class Migrate2 extends React.Component {
                         </button>
                         <p>Previously used address</p>
                       </div>
-                      <div className="col-xs-4 btn-wrap">
-                        <button
-                          className={this.state.enter_address ? "active" : ""}
-                          onClick={this.existingAddresses}
-                        >
+                      <div className="col-xs-4 btn-wrap" onClick={this.existingAddresses}>
+                        <button className={this.state.enter_address ? "active" : ""}>
                           <img
                             src="images/migration/enter-key.png"
                             alt="Enter Key"

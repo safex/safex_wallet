@@ -55,7 +55,7 @@ For linux builds, you will need to have `rpmbuild` available on system (`apt-get
 
 MIT License
 
-Copyright (c) 2019 Safex Developers
+Copyright (c) 2018 Safex Developers
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

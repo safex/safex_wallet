@@ -82,6 +82,15 @@ body {
   background-position: top center;
   font-family: "Brandon Grotesque", Helvetica, Arial, sans-serif;
 }
+img {
+  pointer-events: none;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+}
 ::-webkit-scrollbar {
   display: none;
 }
@@ -102,6 +111,42 @@ input::-webkit-inner-spin-button {
   /* display: none; <- Crashes Chrome on hover */
   -webkit-appearance: none;
   margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+.__react_component_tooltip.type-dark {
+  background-color: rgba(0, 0, 0, 0.8);
+  /* background: url(../images/tooltip-bg.png); */
+  border: 1px solid #00e7ff;
+  background-size: 100% 100%;
+  opacity: 1;
+  z-index: 10001;
+}
+.__react_component_tooltip.type-dark.place-top:after {
+  border-top-color: #00e7ff;
+}
+.__react_component_tooltip.type-dark.place-right:after {
+  border-right-color: #00e7ff;
+}
+.__react_component_tooltip.type-dark.place-bottom:after {
+  border-bottom-color: #00e7ff;
+}
+.__react_component_tooltip.type-dark.place-left:after {
+  border-left-color: #00e7ff;
+}
+.__react_component_tooltip p {
+  font-size: 15px !important;
+  margin-bottom: 0px !important;
+  font-family: "Avenir", sans-serif !important;
+  color: #fff !important;
+  text-transform: initial !important;
+  letter-spacing: 0 !important;
+  right: 0 !important;
+}
+.__react_component_tooltip .blue-text {
+  color: #60c9e6;
+  font-weight: 600;
+  text-transform: initial;
+  margin-right: 0;
 }
 
 /* Buttons and Transitions */
@@ -133,7 +178,7 @@ input::-webkit-inner-spin-button {
   animation: shine 0.5s 0s linear;
 }
 .button-shine:active {
-  box-shadow: 0 0 0 0 transparent;
+  box-shadow: none !important;
   -webkit-transition: box-shadow 0.2s ease-in;
   -moz-transition: box-shadow 0.2s ease-in;
   transition: box-shadow 0.2s ease-in;

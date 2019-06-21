@@ -1,13 +1,7 @@
 import React from "react";
+import ReactTooltip from "react-tooltip";
 
 export default class Footer extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-
-        };
-    }
-
     render() {
         return (
             <div className="key-buttons status fadeInUp">
@@ -25,62 +19,71 @@ export default class Footer extends React.Component {
                     </div>
                     <div className={this.props.importWrapGlow ? 'import-form-wrap active' :'import-form-wrap'}>
                         <form onChange={this.props.importKeyChange} onSubmit={this.props.openImportModal}>
-                            <input name="key" value={this.props.importKey} onFocus={this.props.importGlow} onBlur={this.props.importGlowDeactivate} placeholder="Paste your private key"/>
+                            <input name="key" value={this.props.importKey} onFocus={this.props.importGlow} onBlur={this.props.importGlowDeactivate} placeholder="Enter your private key"/>
                             <button type="submit" className="button-shine" title="Import Key">Import</button>
                         </form>
-                        <button onClick={this.props.openCreateKey} className="create-btn button-shine" title="Create New Key">
+                        <button 
+                            onClick={this.props.openCreateKey} 
+                            className="create-btn button-shine" 
+                            title=""
+                            data-tip 
+                            data-for="new-key-tooltip"
+                        >
                             <img src="images/plus.png" alt="Plus Logo"/>
                         </button>
+                        <ReactTooltip id="new-key-tooltip">
+                            <p>Create New Key</p>
+                        </ReactTooltip>
                     </div>
                     <div className="right-options">
-                        {
-                            this.props.affiliateActive
-                            ?
-                                <button className="aff-btn aff-btn-active button-shine" title="Affiliate System (Under development)" onClick={this.props.closeAffiliateModal} disabled>
-                                    <img src="images/world-blue.png" alt="World Logo"/>
-                                </button>
-                            :
-                                <button className="aff-btn button-shine" title="Affiliate System (Under development)" onClick={this.props.openAffiliateModal} disabled>
-                                    <img src="images/world.png" alt="World Logo"/>
-                                </button>
-                        }
+                        <button
+                            className={this.props.affiliateActive ? "aff-btn aff-btn-active button-shine" : "aff-btn button-shine"}
+                            onClick={this.props.affiliateActive ? this.props.closeAffiliateModal : this.props.openAffiliateModal}
+                            disabled
+                        >
+                            <img src={this.props.affiliateActive ? "images/world-blue.png" : "images/world.png"} alt="World Logo" />
+                            <span data-tip data-for="affiliate-tooltip"></span>
+                        </button>
+                        <ReactTooltip id="affiliate-tooltip">
+                            <p className="text-center">Affiliate System</p>
+                            <p>(Under development)</p>
+                        </ReactTooltip>
+                        
+                        <button 
+                            className={this.props.dividendActive ? "dividend-btn dividend-btn-active button-shine" : "dividend-btn button-shine"}
+                            onClick={this.props.dividendActive ? this.props.closeDividendModal : this.props.openDividendModal}
+                            // disabled
+                        >
+                            <img src={this.props.dividendActive ? "images/calculator-blue.png" : "images/calculator.png"} alt="Calculator Logo" />
+                            <span data-tip data-for="dividend-tooltip"></span>
+                        </button>
+                        <ReactTooltip id="dividend-tooltip">
+                            <p className="text-center">Dividend Calculator</p>
+                            {/* <p>(Under development)</p> */}
+                        </ReactTooltip>
 
-                        {
-                            this.props.dividendActive
-                            ?
-                                <button className="dividend-btn dividend-btn-active button-shine" title="Dividend Calculator (Under development)" onClick={this.props.closeDividendModal} disabled>
-                                    <img src="images/calculator-blue.png" alt="Calculator Logo"/>
-                                </button>
-                            :
-                                <button className="dividend-btn button-shine" title="Dividend Calculator (Under development)" onClick={this.props.openDividendModal} disabled>
-                                    <img src="images/calculator.png" alt="Calculator Logo"/>
-                                </button>
-                        }
+                        <button 
+                            className={this.props.settingsActive ? "settings button-shine settings-btn-active" : "settings button-shine"} 
+                            onClick={this.props.settingsActive ? this.props.closeSettingsModal : this.props.openSettingsModal}
+                        >
+                            <img src={this.props.settingsActive ? "images/settings-blue.png" : "images/settings.png"} alt="Mixer Logo" />
+                            <span data-tip data-for="setting-tooltip"></span>
+                        </button>
+                        <ReactTooltip id="setting-tooltip">
+                            <p>Settings</p>
+                        </ReactTooltip>
 
-                        {
-                            this.props.settingsActive
-                            ?
-                                <button className="settings button-shine settings-btn-active" onClick={this.props.closeSettingsModal} title="Settings">
-                                    <img src="images/settings-blue.png" alt="Mixer Logo"/>
-                                </button>
-                            :
-                                <button className="settings button-shine" onClick={this.props.openSettingsModal} title="Settings">
-                                    <img src="images/settings.png" alt="Mixer Logo"/>
-                                </button>
-                        }
-
-                        {
-                            this.props.refreshTimer === 0
-                            ?
-                                <button className="refresh-btn button-shine"  onClick={this.props.refreshWallet} title="Refresh">
-                                    <img src="images/refresh.png" alt="Refresh Logo"/>
-                                </button>
-                            :
-                                <button className="refresh-btn button-shine disabled" title="Refresh">
-                                    <img src="images/refresh-blue.png" alt="Refresh Logo"/>
-                                    <span><p>{this.props.refreshTimer + 's'}</p></span>
-                                </button>
-                        }
+                        <button
+                            onClick={this.props.refreshTimer === 0 ? this.props.refreshWallet : ""}
+                            className={this.props.refreshTimer === 0 ? "refresh-btn button-shine" : "refresh-btn button-shine disabled"}
+                        >
+                            <img src={this.props.refreshTimer === 0 ? "images/refresh.png" : "images/refresh-blue.png"} alt="Refresh Logo" />
+                            <span data-tip data-for="refresh-tooltip"></span>
+                            <span data-tip data-for="refresh-tooltip" id="timer"><p>{this.props.refreshTimer + 's'}</p></span>
+                        </button>
+                        <ReactTooltip id="refresh-tooltip">
+                            <p>Refresh</p>
+                        </ReactTooltip>
                     </div>
                 </div>
             </div>

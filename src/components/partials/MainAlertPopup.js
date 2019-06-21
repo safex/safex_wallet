@@ -1,13 +1,6 @@
 import React from "react";
 
 export default class MainAlertPopup extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-
-        };
-    }
-
     render() {
         return (
             <div>
@@ -20,7 +13,7 @@ export default class MainAlertPopup extends React.Component {
                             this.props.exportUnencryptedWalletState === false && this.props.exportEncryptedWalletState
                             ?
                                 <div className="mainAlertProceedWrap">
-                                    <button className="mainAlertProceed active" onClick={this.props.exportEncryptedWallet}>
+                                    <button className="button-shine mainAlertProceed active" onClick={this.props.exportEncryptedWallet}>
                                         Ok
                                     </button>
                                 </div>
@@ -29,15 +22,15 @@ export default class MainAlertPopup extends React.Component {
                                     {
                                         this.props.exportUnencryptedWalletState && this.props.exportEncryptedWalletState === false
                                         ?
-                                            <button className="mainAlertProceed active" onClick={this.props.exportUnencryptedWallet}>
+                                            <button className="button-shine mainAlertProceed active" onClick={this.props.exportUnencryptedWallet}>
                                                 Ok
                                             </button>
                                         :
-                                            <button className="mainAlertProceed">
+                                            <button className="button-shine mainAlertProceed">
                                                 Ok
                                             </button>
                                     }
-                                    <button className="mainAlertProceed">
+                                    <button className="button-shine mainAlertProceed">
                                         Ok
                                     </button>
                                 </div>

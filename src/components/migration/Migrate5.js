@@ -138,17 +138,7 @@ export default class Migrate5 extends React.Component {
         }));
       }
     } else {
-      if (parseInt(amount) > this.state.safex_bal) {
-        console.log(
-          "Not enough safex balance for that transaction, max is " +
-            this.state.safex_bal
-        );
-        this.setOpenMigrationAlert(
-          "Not enough safex balance for that transaction, max is " +
-            this.state.safex_bal
-        );
-        e.target.value = this.state.safex_bal;
-      } else if (isNaN(e.target.value)) {
+      if (isNaN(e.target.value)) {
         this.setOpenMigrationAlert("Please enter a valid Safex amount");
       }
     }
@@ -164,31 +154,34 @@ export default class Migrate5 extends React.Component {
 
   toggleConfirmMigration = e => {
     e.preventDefault();
-    if (
-      parseFloat(this.props.data.pending_bal) !== 0 ||
-      parseFloat(this.props.data.pending_safex_bal) !== 0
-    ) {
-      this.setOpenMigrationAlert(
-        "Warning: You have unconfirmed transactions, please wait until they are confirmed"
-      );
-    } else {
-      const amount_value = document.getElementById("amount").value;
-      const amount = parseInt(amount_value);
+    let amount_value = document.getElementById("amount").value;
+    let amount = parseInt(amount_value);
 
-      if (amount === "" || isNaN(amount)) {
-        this.setOpenMigrationAlert("Please enter a valid Safex amount");
-      } else if (this.state.btc_bal < this.state.txn_fee) {
-        this.setOpenMigrationAlert(
-          "Not enough btc to complete this transaction, you need " +
-            this.state.txn_fee
-        );
-      } else {
-        this.setState({
-          amount: amount,
-          confirm_migration: !this.state.confirm_migration
-        });
-      }
+    if (amount > this.props.data.safex_bal) {
+      this.setOpenMigrationAlert("Not enough Safex Coins available");
+      return false;
     }
+    if (this.props.data.safex_bal === 0) {
+      this.setOpenMigrationAlert("Enter valid Safex Coins amount");
+      return false;
+    }
+    if (amount === "" || isNaN(amount)) {
+      this.setOpenMigrationAlert("Please enter a valid Safex amount");
+      return false;
+    }
+    if (this.state.btc_bal < this.state.txn_fee) {
+      this.setOpenMigrationAlert("Not enough btc to complete this transaction, you need " + this.state.txn_fee);
+      return false;
+    }
+    if (parseFloat(this.props.data.pending_bal) !== 0 || parseFloat(this.props.data.pending_safex_bal) !== 0) {
+      this.setOpenMigrationAlert("Warning: You have unconfirmed transactions, please wait until they are confirmed");
+      return false;
+    }
+    this.setState({
+      amount: amount,
+      confirm_migration: !this.state.confirm_migration
+    });
+    console.log(this.props.data.safex_bal)
   };
 
   //create safex blockchain key set
@@ -202,7 +195,7 @@ export default class Migrate5 extends React.Component {
     return (
       <div className="final-step">
         <div>
-          <p>Final Step - Burning your Safe Exchange Coins</p>
+          <h5>Final Step - Burning your Safe Exchange Coins</h5>
           <p>
             <span>You will need</span> {this.state.txn_fee} btc{" "}
           </p>
@@ -214,7 +207,7 @@ export default class Migrate5 extends React.Component {
             <input
               onChange={this.validateAmount}
               name="amount"
-              placeholder="Amount"
+              placeholder="Enter Amount of Coins to Burn"
               id="amount"
             />
             <button className="button-shine green-btn">send</button>
@@ -226,12 +219,13 @@ export default class Migrate5 extends React.Component {
             <input
               className="target-address"
               value={this.state.safex_key.public_addr}
+              readOnly
             />
           </p>
           <p>
             <span className="span-200">The burn address:</span>
             <br />
-            <input className="target-address" value={BURN_ADDRESS} />
+            <input className="target-address" value={BURN_ADDRESS} readOnly />
           </p>
 
           <MigrationAlert

@@ -60,6 +60,9 @@
   margin: 10px auto;
   font-weight: 600;
 }
+.settingsModal .submit-btn:active {
+  box-shadow: none !important;
+}
 .settingsModal .logout-btn {
   display: block;
   border: 1px solid #c80e4b;
@@ -72,6 +75,9 @@
   width: 70%;
   margin: 20px auto;
   font-weight: 600;
+}
+.settingsModal .logout-btn:active {
+  box-shadow: none !important;
 }
 .settingsModal label{
   width: 100%;
@@ -107,9 +113,6 @@
 }
 .settingsModal .info-wrap .info-text:hover {
   outline: 0px none;
-  -webkit-box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5) !important;
-  box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5) !important;
-  border: 1px solid #00e7ff !important;
 }
 .settingsModal .info-wrap .info-text p {
   background: transparent;

@@ -125,7 +125,7 @@ export default class Navigation extends React.Component {
           <div className="collapse navbar-collapse" id="navbar-collapse">
             <ul className="nav navbar-nav navbar-right coin-amounts">
               <li>
-                <span className="currency">SAFEX</span>{" "}
+                <span className="currency">Safe Exchange Coin</span>{" "}
                 <span className="amount">${this.props.safexPrice}</span>
               </li>
               <li>

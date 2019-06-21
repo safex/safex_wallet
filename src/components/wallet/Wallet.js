@@ -84,20 +84,6 @@ export default class Wallet extends React.Component {
       safex_price: 0,
       btc_price: 0,
       fee_in_$: false,
-      //Dividend calculator
-      totalTradeVolume: 500000000,
-      marketplaceFee: 5,
-      marketplaceEarnings: 0,
-      safexMarketCap: 0,
-      safexDividendYield: 0,
-      safexDividendInfo: false,
-      safexHoldingsInfo: false,
-      safexHolding: 100000,
-      holdingsByMarket: 0,
-      holdingsYield: 0,
-      safexPrice: 0,
-      selectedAmount: 0,
-      safexQuantity: 0,
       //UI state
       btc_sync: false,
       safex_sync: false,
@@ -205,37 +191,6 @@ export default class Wallet extends React.Component {
 
   componentWillMount = () => {
     axios({
-      method: "post",
-      url: "https://safex.io/api/price/"
-    })
-      .then(res => {
-        var safex_price = parseFloat(res.data.price_usd);
-        var safex_dividend =
-          ((parseFloat(this.state.totalTradeVolume) *
-            (parseFloat(this.state.marketplaceFee) / 100)) /
-            parseFloat(safex_price * 2147483647)) *
-          100;
-
-        var dividend_yield = (
-          safex_price *
-          100000 *
-          (safex_dividend / 100)
-        ).toFixed(2);
-        var holdings_market = safex_price * 100000;
-
-        this.setState({
-          holdingsYield: dividend_yield,
-          holdingsByMarket: holdings_market.toFixed(2),
-          safexPrice: safex_price,
-          safexMarketCap: (safex_price * 2147483647).toFixed(0),
-          safexDividendYield: safex_dividend.toFixed(2)
-        });
-      })
-      .catch(function(error) {
-        console.log(error);
-      });
-
-    axios({
       method: "get",
       url: "https://api.coinmarketcap.com/v1/ticker/safe-exchange-coin/"
     })
@@ -283,21 +238,21 @@ export default class Wallet extends React.Component {
   };
 
   getPrices = () => {
-    fetch("https://safex.io/api/price/", {
-      method: "POST"
+    axios({
+      method: "get",
+      url: "https://api.coingecko.com/api/v3/coins/safe-exchange-coin"
     })
-      .then(resp => resp.json())
-      .then(resp => {
-        try {
-          var safex = 0.02;
-          if (resp.price_usd !== null) {
-            safex = parseFloat(resp.price_usd).toFixed(8);
-            this.setState({ safex_price: safex });
-          }
-          localStorage.setItem("safex_price", safex);
-        } catch (e) {
-          console.log(e);
-        }
+      .then(res => {
+        var safex = parseFloat(
+          res.data.market_data.current_price.usd
+        ).toFixed(8);
+
+        this.setState({ safex_price: safex });
+
+        localStorage.setItem("safex_price", safex);
+      })
+      .catch(function (error) {
+        console.log(error);
       });
 
     fetch("https://api.coinmarketcap.com/v1/ticker/bitcoin/", { method: "GET" })
@@ -1756,15 +1711,6 @@ export default class Wallet extends React.Component {
     let promises = [];
     bodyFormData.set("addr", key);
 
-    // promises.push(axios({
-    //     method: 'post',
-    //     url: 'https://api.omniexplorer.info/v1/transaction/address/0',
-    //     data: bodyFormData,
-    //     config: {
-    //         headers: {'Content-Type': 'multipart/form-data', 'origin': '', 'referrer': '', 'referer': ''}
-    //     }
-    // }));
-
     promises.push(
       fetch("https://api.omniexplorer.info/v1/transaction/address/0", {
         method: "POST",
@@ -1972,30 +1918,30 @@ export default class Wallet extends React.Component {
           } else if (btc_tx_send_direction === "Sent" && coin === "bitcoin") {
             render +=
               `
-                        <div class="history">
-                            <p class="coin-name">BITCOIN</p><br /> ` +
+              <div class="history">
+              <p class="coin-name">BITCOIN</p><br /> ` +
               btc_tx_send_direction +
               ` <br />
-                            <img class="coin-logo" src="images/btc-coin.png" alt="Bitcoin Logo">
-                            <p class="date">` +
+              <img class="coin-logo" src="images/btc-coin.png" alt="Bitcoin Logo">
+              <p class="date">` +
               date_time +
               `</p><br />
-                            <p class="address"><b>TX: </b> ` +
+              <p class="address"><b>TX: </b> ` +
               tx["btc_txid"] +
               `</p><br />
-                            <p class="address address-blue">` +
+              <p class="address address-blue">` +
               btc_receive_addr +
               `</p> <p class="address-arrow"> ➡ </p> <p class="address address-blue">` +
               btc_send_addr +
               `</p>
-                            <div class="col-xs-12 confirmations_wrap">
-                                ` +
+                <div class="col-xs-12 confirmations_wrap">
+                    ` +
               btc_amount +
               ` bitcoin(s) ` +
               btc_confirmations +
               ` confirmations
-                            </div>
-                        </div>`;
+                    </div>
+                </div>`;
           }
         });
         if (response[1].txs.length === 0) {
@@ -2997,14 +2943,7 @@ export default class Wallet extends React.Component {
 
           <DividendModal
             dividendActive={this.state.dividend_active}
-            safexDividendOnChange={this.safexDividendOnChange.bind(this)}
             closeDividendModal={this.setCloseDividendModal}
-            totalTradeVolume={this.state.totalTradeVolume}
-            marketplaceFee={this.state.marketplaceFee}
-            safexMarketCap={this.state.safexMarketCap}
-            safexHolding={this.state.safexHolding}
-            holdingsByMarket={this.state.holdingsByMarket}
-            safexDividendYield={this.state.safexDividendYield}
           />
 
           <AffiliateModal

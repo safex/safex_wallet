@@ -1,5 +1,4 @@
 import React from "react";
-import axios from "axios";
 
 export default class DividendModal extends React.Component {
     constructor(props) {
@@ -16,67 +15,53 @@ export default class DividendModal extends React.Component {
             holdingsByMarket: 0,
             holdingsYield: 0,
             safexPrice: 0,
-            selectedAmount: 0,
-            safexQuantity: 0,
+            selectedAmount: 0
         };
+        this.totalTradeVolume = 500000000;
+        this.marketplaceFee = 5;
     }
 
     componentWillMount() {
-        axios({method: 'post', url: 'https://safex.io/api/price/'}).then(res => {
+        this.setCalculatorData();
+    }
 
-            var safex_price = parseFloat(res.data.price_usd);
-            var safex_dividend = (parseFloat(this.state.totalTradeVolume) *
-                (parseFloat(this.state.marketplaceFee) / 100) /
-                parseFloat(safex_price * 2147483647)) * 100;
+    setCalculatorData = () => {
+        var safex_price = parseFloat(localStorage.getItem('safex_price'));
+        var safex_dividend = (parseFloat(this.totalTradeVolume) *
+            (parseFloat(this.marketplaceFee) / 100) /
+            parseFloat(safex_price * 2147483647)) * 100;
 
-            var dividend_yield = (safex_price * 100000 * (safex_dividend / 100)).toFixed(2);
-            var holdings_market = safex_price * 100000;
+        var dividend_yield = (safex_price * 100000 * (safex_dividend / 100)).toFixed(2);
+        var holdings_market = safex_price * 100000;
 
-            this.setState({
-                holdingsYield: dividend_yield,
-                holdingsByMarket: holdings_market.toFixed(2),
-                safexPrice: safex_price,
-                safexMarketCap: (safex_price * 2147483647).toFixed(0),
-                safexDividendYield: safex_dividend.toFixed(2)
-            });
-        }).catch(function (error) {
-            console.log(error);
-        });
-
-        axios({method: 'get', url: 'https://api.coinmarketcap.com/v1/ticker/safe-exchange-coin/'}).then(res => {
-            var total_supply = res.data[0].total_supply;
-
-            this.setState({
-                safexQuantity: total_supply
-            });
-        }).catch(function(error) {
-            console.log(error);
+        this.setState({
+            totalTradeVolume: 500000000,
+            marketplaceFee: 5,
+            holdingsYield: dividend_yield,
+            holdingsByMarket: holdings_market.toFixed(2),
+            safexPrice: safex_price,
+            safexHolding: 100000,
+            safexMarketCap: (safex_price * 2147483647).toFixed(0),
+            safexDividendYield: safex_dividend.toFixed(2)
         });
     }
 
-    safexDividendOnChange(e) {
-        e.preventDefault();
+    safexDividendOnChange(target, e) {
         var safexDividendYield = 0;
 
-        if (e.target.name === "total_trade_volume") {
+        if (target === "total_trade_volume") {
             safexDividendYield = parseFloat(e.target.value) * (parseFloat(this.state.marketplaceFee) / 100) / parseFloat(this.state.safexMarketCap);
             this.setState({
                 totalTradeVolume: e.target.value,
                 safexDividendYield: (safexDividendYield * 100).toFixed(2)
             })
-        } else if (e.target.name === "marketplace_fee") {
+        } else if (target === "marketplace_fee") {
             safexDividendYield = (parseFloat(e.target.value) / 100) * parseFloat(this.state.totalTradeVolume) / parseFloat(this.state.safexMarketCap);
             this.setState({
                 marketplaceFee: e.target.value,
                 safexDividendYield: (safexDividendYield * 100).toFixed(2)
             })
-        } else if (e.target.name === "safex_market_cap") {
-            safexDividendYield = (parseFloat(this.state.marketplaceFee) / 100) * parseFloat(this.state.totalTradeVolume) / parseFloat(e.target.value);
-            this.setState({
-                safexMarketCap: e.target.value,
-                safexDividendYield: (safexDividendYield * 100).toFixed(2)
-            })
-        } else if (e.target.name === "safex_holdings") {
+        } else if (target === "safex_holdings") {
             safexDividendYield = ((parseFloat(this.state.marketplaceFee) / 100) * parseFloat(this.state.totalTradeVolume) / 2147483647) * parseFloat(e.target.value) * (100 / (parseFloat(this.state.holdingsByMarket)));
             this.setState({
                 safexHolding: e.target.value,
@@ -91,7 +76,7 @@ export default class DividendModal extends React.Component {
                 {
                     this.props.dividendActive
                     ?
-                        <form className="container" onChange={this.safexDividendOnChange.bind(this)}>
+                        <form className="container">
                             <div className="head">
                                 <img src="images/dividend-logo.png" alt="Transfer Icon"/>
                                 <h3>
@@ -105,25 +90,40 @@ export default class DividendModal extends React.Component {
                                 <label>
                                     Projected Marketplace Volume $
                                 </label>
-                                <input type="number" name="total_trade_volume" value={this.state.totalTradeVolume}/>
+                                <input 
+                                    type="number" 
+                                    name="total_trade_volume" 
+                                    value={this.state.totalTradeVolume}
+                                    onChange={this.safexDividendOnChange.bind(this, "total_trade_volume")}
+                                />
                             </div>
                             <div className="form-group">
                                 <label>
                                     Marketplace Fee %
                                 </label>
-                                <input type="number" name="marketplace_fee" value={this.state.marketplaceFee}/>
+                                <input 
+                                    type="number" 
+                                    name="marketplace_fee" 
+                                    value={this.state.marketplaceFee}
+                                    onChange={this.safexDividendOnChange.bind(this, "marketplace_fee")}
+                                />
                             </div>
                             <div className="form-group">
                                 <label>
                                     Safex Market Cap $
                                 </label>
-                                <input type="number" name="safex_market_cap" value={this.state.safexMarketCap}/>
+                                <input type="number" name="safex_market_cap" value={this.state.safexMarketCap} readOnly/>
                             </div>
                             <div className="form-group">
                                 <label>
                                     Number of SAFEX Held
                                 </label>
-                                <input type="number" name="safex_holdings" value={this.state.safexHolding}/>
+                                <input 
+                                    type="number" 
+                                    name="safex_holdings" 
+                                    value={this.state.safexHolding}
+                                    onChange={this.safexDividendOnChange.bind(this, "safex_holdings")}
+                                />
                             </div>
                             <div className="form-group">
                                 <label>
@@ -135,8 +135,10 @@ export default class DividendModal extends React.Component {
                                 <label>
                                     Annual Return on Investment %
                                 </label>
-                                <input type="number" name="safex_dividend_yield" value={isNaN(this.state.safexDividendYield) ? '0' : this.state.safexDividendYield}/>
+                                <input type="number" name="safex_dividend_yield" value={this.state.safexDividendYield} readOnly/>
                             </div>
+
+                            <button type="button" className="reset-btn button-shine" onClick={this.setCalculatorData}>Reset</button>
                         </form>
                     :
                         <div></div>

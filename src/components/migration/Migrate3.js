@@ -138,7 +138,7 @@ export default class Migrate3 extends React.Component {
   render() {
     return (
       <div>
-        <p>Step 3/4 - Setting the First Half</p>
+        <h5>Step 3/4 - Setting the First Half</h5>
 
         <p>
           Setting your Safex Address for Migration requires two steps. In this
@@ -152,6 +152,7 @@ export default class Migrate3 extends React.Component {
           <input
             className="target-address"
             value={this.state.safex_key.public_addr}
+            readOnly
           />
         </p>
 

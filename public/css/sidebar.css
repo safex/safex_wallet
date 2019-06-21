@@ -90,8 +90,8 @@
   border-bottom-left-radius: 8px !important;
   border-bottom-right-radius: 8px;
   color: #fff;
-  font-size: 12px;
-  padding: 3px 5px 2px;
+  font-size: 14px;
+  padding: 1px 5px 1px;
   width: 100%;
   height: initial;
   font-family: Helvetica, sans-serif;
@@ -119,8 +119,8 @@
   border-bottom-left-radius: 8px !important;
   border-bottom-right-radius: 8px;
   color: #fff;
-  font-size: 12px;
-  padding: 3px 5px 2px;
+  font-size: 14px;
+  padding: 1px 5px 1px;
   width: 100%;
   font-family: Helvetica, sans-serif;
   text-align: left;
@@ -176,9 +176,6 @@
   margin: 0px auto;
   font-weight: 600;
 }
-.overflow.sendModal .cancel-btn:hover {
-
-}
 .overflow.sendModal .input-group {
   width: 100%;
 }
@@ -198,7 +195,8 @@
   text-align: left;
   margin-right: 5px;
   color: #fff;
-  margin-bottom: 2px;
+  margin-bottom: 1px;
+  font-size: 15px;
 }
 .overflow.sendModal .form-group {
   margin-bottom: 7px;

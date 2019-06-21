@@ -366,7 +366,8 @@ function closeMainAlertPopup(target) {
   setTimeout(() => {
     target.setState({
       export_encrypted_wallet: false,
-      export_unencrypted_wallet: false
+      export_unencrypted_wallet: false,
+      main_alert_popup_text: false
     });
   }, 300);
 }
@@ -404,9 +405,13 @@ function closeSendReceiveModal(target) {
  */
 function closeSendReceivePopup(target) {
   target.setState({
-    send_receive_popup: false,
-    send_receive_info: ""
+    send_receive_popup: false
   });
+  setTimeout(() => {
+    this.setState({
+      send_receive_info: ''
+    })
+  }, 300);
 }
 
 /**

@@ -5,7 +5,7 @@ export default class IntroFooter extends React.Component {
         return (
             <div className="col-xs-12 text-center Intro-footer">
                 <img src="images/footer-logo.png" alt="Safex Icon Footer" />
-                <p className="text-center">2014-2019 All Rights Reserved Safe Exchange Developers &copy;</p>
+                <p className="text-center">2014-2018 All Rights Reserved Safe Exchange Developers &copy;</p>
             </div>
         );
     }

@@ -5,6 +5,18 @@
   display: flex;
   width: 100%;
 }
+.dividend-wrap .reset-btn {
+  display: block;
+  border: 1px solid rgba(0, 231, 255, 1);
+  border-radius: 10px;
+  background: transparent;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 12px;
+  padding: 6px 1px 5px;
+  width: 60%;
+  margin: 20px auto;
+}
 .overflow.dividendModal > form input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
   opacity: .8;
   color: #fff;

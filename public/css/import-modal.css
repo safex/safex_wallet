@@ -30,9 +30,6 @@
 }
 .importModal:hover {
   outline: 0px none;
-  -webkit-box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5);
-  box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5);
-  border: 1px solid #00e7ff;
 }
 .importModal .importModalInner {
   display: table-cell;

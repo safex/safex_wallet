@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router";
 import {
   decryptWalletData,
   DEFAULT_WALLET_PATH,
@@ -92,6 +91,10 @@ export default class SelectWallet extends React.Component {
         isLoading: false
       });
     });
+  }
+
+  goToPage = (page) => {
+    this.context.router.push(page);
   }
 
   openWalletResetModal(step, message) {
@@ -320,32 +323,34 @@ export default class SelectWallet extends React.Component {
             <div className="col-xs-8 col-xs-offset-2 App-intro">
               <div className="row text-center">
                 <div className="col-xs-6 login-wrap fadeInDown">
-                  <Link to="/login">
-                    <div className="col-xs-12">
-                      <img
-                        src="images/safex-icon-circle.png"
-                        alt="Safex Icon Circle"
-                      />
-                      <button className="btn btn-default button-neon-blue">
-                        Login
-                      </button>
-                      <p>Enter your password</p>
-                    </div>
-                  </Link>
+                  <div 
+                    className="col-xs-12" 
+                    onClick={this.goToPage.bind(this, '/login')}
+                  >
+                    <img
+                      src="images/safex-icon-circle.png"
+                      alt="Safex Icon Circle"
+                    />
+                    <button className="btn btn-default button-neon-blue">
+                      Login
+                    </button>
+                    <p>Enter your password</p>
+                  </div>
                 </div>
                 <div className="col-xs-6 importwallet-wrap fadeInDown">
-                  <Link to="/importwallet">
-                    <div className="col-xs-12">
-                      <img
-                        src="images/import-main.png"
-                        alt="Safex Icon Circle"
-                      />
-                      <button className="btn btn-default button-neon-green">
-                        Import
-                      </button>
-                      <p>Import your wallet or recover from backup file</p>
-                    </div>
-                  </Link>
+                  <div 
+                    className="col-xs-12" 
+                    onClick={this.goToPage.bind(this, '/importwallet')}
+                  >
+                    <img
+                      src="images/import-main.png"
+                      alt="Safex Icon Circle"
+                    />
+                    <button className="btn btn-default button-neon-green">
+                      Import
+                    </button>
+                    <p>Import your wallet or recover from backup file</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -374,32 +379,34 @@ export default class SelectWallet extends React.Component {
             <div className="col-xs-8 col-xs-offset-2 App-intro">
               <div className="row text-center">
                 <div className="col-xs-6 login-wrap fadeInDown">
-                  <Link to="/createwallet">
-                    <div className="col-xs-12">
-                      <img
-                        src="images/safex-icon-circle.png"
-                        alt="Safex Icon Circle"
-                      />
-                      <button className="btn btn-default button-neon-blue">
-                        New Wallet
-                      </button>
-                      <p>Create a new Wallet</p>
-                    </div>
-                  </Link>
+                  <div 
+                    className="col-xs-12"
+                    onClick={this.goToPage.bind(this, '/createwallet')}
+                  >
+                    <img
+                      src="images/safex-icon-circle.png"
+                      alt="Safex Icon Circle"
+                    />
+                    <button className="btn btn-default button-neon-blue">
+                      New Wallet
+                    </button>
+                    <p>Create a new Wallet</p>
+                  </div>
                 </div>
                 <div className="col-xs-6 importwallet-wrap fadeInDown">
-                  <Link to="/importwallet">
-                    <div className="col-xs-12">
-                      <img
-                        src="images/import-main.png"
-                        alt="Safex Icon Circle"
-                      />
-                      <button className="btn btn-default button-neon-green">
-                        Import
-                      </button>
-                      <p>Load a safexwallet .dat file</p>
-                    </div>
-                  </Link>
+                  <div 
+                    className="col-xs-12" 
+                    onClick={this.goToPage.bind(this, '/importwallet')}
+                  >
+                    <img
+                      src="images/import-main.png"
+                      alt="Safex Icon Circle"
+                    />
+                    <button className="btn btn-default button-neon-green">
+                      Import
+                    </button>
+                    <p>Load a safexwallet .dat file</p>
+                  </div>
                 </div>
               </div>
             </div>

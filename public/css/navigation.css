@@ -47,7 +47,7 @@
 }
 .navbar-default .navbar-nav > li > a:hover,
 .navbar-default .navbar-nav > li > a:focus,
-.navbar-default .navbar-nav > li > a:active, {
+.navbar-default .navbar-nav > li > a:active {
   outline: 0px none;
   color: #fff;
   text-transform: uppercase;
@@ -72,7 +72,6 @@
 }
 .wallet-tabs {
   display: inline-block;
-  float: right;
   text-align: right;
   padding-top: 6px;
   animation-duration: 1s;

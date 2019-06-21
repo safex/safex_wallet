@@ -23,7 +23,7 @@ export default class Migrate1 extends React.Component {
   render() {
     return (
       <div className="step-one">
-        <p>Step 1/4 - Understanding</p>
+        <h5>Step 1/4 - Understanding</h5>
         <p>
           In this phase you will go through the steps in order to migrate your
           <input
@@ -42,7 +42,7 @@ export default class Migrate1 extends React.Component {
             defaultValue="an equal amount"
             readOnly
           />{" "}
-          of &nbsp;
+          of{" "}
           <input
             type="text"
             className="blue-input"
@@ -75,9 +75,9 @@ export default class Migrate1 extends React.Component {
         </p>
         <p>
           Please do consult the &nbsp;
-          <a onClick={this.externalLink}>https://safe.exchange</a> forum if you
+          <button onClick={this.externalLink}>https://safe.exchange</button>&nbsp; forum if you
           have any questions. You can email the Safex Team directly &nbsp;
-          <a>team@safex.io.</a>
+          <button>team@safex.io.</button>&nbsp;
           There will be fees involved that go to the Bitcoin Network in order to
           facilitate the transactions; These are not provided by the Safex Team
           and no one but yourself is obligated to have the necessary Bitcoin

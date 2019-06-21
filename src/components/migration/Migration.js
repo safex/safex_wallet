@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 import MigrationAddress from "./MigrationAddress";
 import Navigation from "../partials/Navigation";
 import { getFee } from "../../utils/migration";
@@ -36,19 +37,21 @@ export default class Migration extends React.Component {
   }
 
   getPrices = () => {
-    fetch("https://safex.io/api/price/", { method: "POST" })
-      .then(resp => resp.json())
-      .then(resp => {
-        try {
-          var safex = 0.02;
-          if (resp.price_usd !== null) {
-            safex = parseFloat(resp.price_usd).toFixed(8);
-            this.setState({ safex_price: safex });
-          }
-          localStorage.setItem("safex_price", safex);
-        } catch (e) {
-          console.log(e);
-        }
+    axios({
+      method: "get",
+      url: "https://api.coingecko.com/api/v3/coins/safe-exchange-coin"
+    })
+      .then(res => {
+        var safex = parseFloat(
+          res.data.market_data.current_price.usd
+        ).toFixed(8);
+
+        this.setState({ safex_price: safex });
+
+        localStorage.setItem("safex_price", safex);
+      })
+      .catch(function (error) {
+        console.log(error);
       });
 
     fetch("https://api.coinmarketcap.com/v1/ticker/bitcoin/", { method: "GET" })
@@ -172,8 +175,6 @@ export default class Migration extends React.Component {
 
           <div className="container migration-wrap fadeIn">
             <div className="col-xs-12 migration-inner">{table}</div>
-
-            {/*<button className="button-shine" onClick={this.goNext}> To the Real Safex Wallet</button>*/}
           </div>
 
           <InstructionsModal

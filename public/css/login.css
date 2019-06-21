@@ -69,11 +69,7 @@
   display: block;
   margin: auto;
 }
-.App-intro .col-xs-6 a{
-  color: #5ACFFA;
-  text-decoration: none;
-}
-.App-intro .col-xs-6 a > div {
+.App-intro .col-xs-6 > div {
   padding-top: 55px;
   padding-bottom: 35px;
   border-bottom-left-radius: 15px;
@@ -81,7 +77,10 @@
   min-height: 389px;
   margin-bottom: 0;
 }
-.App-intro .col-xs-6 a > div > img{
+.App-intro .col-xs-6 > div:hover {
+  cursor: pointer;
+}
+.App-intro .col-xs-6 > div > img{
   height: 190px;
   margin: auto;
   padding-top: 15px;
@@ -214,6 +213,12 @@
   border: 0px none;
   border-radius: 10px;
   min-width: 112px;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
 }
 .back-button:focus {
   outline: 0px none;

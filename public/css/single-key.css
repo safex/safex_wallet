@@ -19,7 +19,7 @@
   background: -o-linear-gradient(top,  rgba(0,0,0,0.55) 45%, rgba(255,255,255,0) 100%);
   background: -ms-linear-gradient(top,  rgba(0,0,0,0.55) 45%, rgba(255,255,255,0) 100%);
   background: linear-gradient(to bottom,  rgba(0,0,0,0.55) 45%, rgba(255,255,255,0) 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00ffffff',GradientType=0 )
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00ffffff',GradientType=0 );
   content: '';
   position: absolute;
   top: 85px;
@@ -53,7 +53,7 @@
   margin-bottom: 0;
 }
 .keys-container .keys-wrap .row:hover .single-key {
-  opacity: .8;
+  opacity: .65;
 }
 .keys-container .keys-wrap .row:hover .single-key:hover{
   opacity: 1;
@@ -186,7 +186,6 @@
 .single-key .safex-amounts {
   width: 200px;
   display: inline-block;
-  float: left;
   position: relative;
   left: 17px;
   top: 3px;
@@ -194,7 +193,6 @@
 .single-key .bitcoin-amounts {
   width: 240px;
   display: inline-block;
-  float: left;
   position: relative;
   left: 17px;
   top: 3px;
@@ -443,6 +441,7 @@
   width: 120px;
   padding: 10px;
   padding-top: 0;
+  pointer-events: initial;
   -webkit-transition: all 0.1s ease-out;
   -moz-transition: all 0.1s ease-out;
   transition: all 0.1s ease-out;
@@ -568,9 +567,6 @@
 }
 .form-send .send_receive_info:hover {
   outline: 0px none;
-  -webkit-box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5) !important;
-  box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5) !important;
-  border: 1px solid #00e7ff !important;
 }
 .form-send .send_receive_info p {
   background: transparent;

@@ -2,7 +2,7 @@
 .safex-wrap {
   overflow: hidden;
   height: 100%;
-  padding-bottom: 194px;
+  padding-bottom: 170px;
   padding-left: 10px;
   padding-right: 10px;
   animation-duration: 1s;
@@ -110,11 +110,23 @@
 }
 .address-wrap .keys-table-wrap h3 {
   font-size: 20px;
-  margin: 0 0 5px;
+  margin: 0 0 15px;
 }
 .address-wrap .keys-table-wrap .table-wrap {
   overflow: auto;
-  max-height: 120px;
+  max-height: 100px;
+}
+.address-wrap .keys-table-wrap #thead-top span {
+  font-size: 16px; 
+}
+.address-wrap .keys-table-wrap #thead-top #no {
+  width: 50px;
+}
+.address-wrap .keys-table-wrap #thead-top #address {
+  width: 288px;
+}
+.address-wrap .keys-table-wrap #thead-top #tokens {
+  width: 150px;
 }
 .address-wrap .keys-table-wrap .table-wrap table {
   width: calc(100% - 1px);
@@ -135,9 +147,16 @@
   float: left !important;
   margin: 1px 0 0 0;
 }
-.address-wrap .keys-table-wrap .table-wrap table tr td.address {
-  min-width: 210px;
+.address-wrap .keys-table-wrap .table-wrap table .no {
+  width: 50px;
+}
+.address-wrap .keys-table-wrap .table-wrap table .address {
+  width: 288px;
   word-break: break-all;
+}
+.address-wrap .keys-table-wrap .table-wrap table .token,
+.address-wrap .keys-table-wrap .table-wrap table .cash {
+  width: 150px;
 }
 .address-wrap .keys-table-wrap .table-wrap table tr td.address.expanded {
   max-width: 445px;
@@ -158,17 +177,10 @@
 .address-wrap .keys-table-wrap .table-wrap table tr td.col-60 {
   width: 60px;
 }
-.migration-wrap:hover .address-wrap {
-  opacity: 0.8;
-}
-.migration-wrap:hover .address-wrap:hover {
-  opacity: 1;
-  box-shadow: 0 0 7px 0 rgba(0, 199, 236, 0.5);
-}
 .address-wrap p,
 .safex-wrap p {
   background: transparent;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 600;
   margin-top: 0;
   margin-bottom: 5px;
@@ -176,25 +188,41 @@
   color: rgba(255, 255, 255, 0.9);
   word-break: break-word;
 }
+.address-wrap h5,
+.safex-wrap h5 {
+  background: transparent;
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 20px;
+  margin-bottom: 15px;
+  line-height: 1.2;
+  color: rgba(255, 255, 255, 0.9);
+} 
 .step-one p {
   margin-bottom: 10px !important;
 }
-.step-one p a {
-  color: rgba(0, 157, 191, .8);
+.step-one p button {
+  color: #12bedd;
   transition: all 0.2s ease-out;
+  background: none;
+  padding: 0;
+  text-transform: initial;
+  font-size: 17px;
+  margin-right: 0;
 }
-.step-one p a:hover {
+.step-one p button:hover {
   cursor: pointer;
   color: rgba(0, 157, 191, 1);
   text-decoration: none;
 }
 .step-one input {
   margin: 0 5px !important;
-  padding: 3px 10px 4px !important;
+  padding: 2px 10px !important;
   height: initial !important;
+  line-height: 1;
 }
 .address-wrap span {
-  width: 125px;
+  width: 150px;
   display: inline-block;
 }
 .address-wrap .span-200 {
@@ -218,7 +246,7 @@
   border-radius: 10px;
   text-align-last: left;
   width: 100%;
-  height: 30px;
+  height: 35px;
 }
 .migration-step-wrap select:focus {
   outline: none;
@@ -350,16 +378,18 @@
   display: inline-block;
 }
 .migration-step-wrap .final-step-form input {
-  width: 200px;
+  width: 300px;
+  padding: 5px 10px 6px;
 }
 .migration-step-wrap .final-step-form button {
   margin-left: 10px;
   position: relative;
   top: -1px;
+  padding: 11px 12px 12px;
 }
 .address-wrap .address-wrap-inner {
   padding-top: 15px;
-  padding-bottom: 15px;
+  padding-bottom: 20px;
 }
 .address-wrap .address-wrap-inner .migrate-btns-wrap {
   display: flex;
@@ -372,6 +402,9 @@
   float: none;
   display: inline-block;
   width: calc(33.3333333% - 10px);
+}
+.address-wrap .address-wrap-inner .migrate-btns-wrap .btn-wrap:hover {
+  cursor: pointer;
 }
 .address-wrap .address-wrap-inner .migrate-btns-wrap:hover .btn-wrap button {
   opacity: 0.55;
@@ -431,11 +464,8 @@
   color: #fff;
 }
 .address-wrap .address-wrap-inner .address-wrap-inner-left table tr.row-clearfix {
-  min-height: 15px;
-  display: block;
-}
-.address-wrap .address-wrap-inner .address-wrap-inner-left table tr.row-clearfix.last {
   min-height: 25px;
+  display: block;
 }
 .address-wrap .address-wrap-inner .address-wrap-inner-left table tr td {
   padding: 0 15px 0 10px;
@@ -493,12 +523,6 @@
 .migrationAlert.active {
   visibility: visible;
   opacity: 1;
-}
-.migrationAlert:hover {
-  outline: 0px none;
-  -webkit-box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5);
-  box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5);
-  border: 1px solid #00e7ff;
 }
 .migrationAlert .close {
   width: auto;
@@ -600,9 +624,6 @@
 }
 .instructionsModal:hover {
   outline: 0px none;
-  -webkit-box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5);
-  box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5);
-  border: 1px solid #00e7ff;
 }
 .instructionsModal .close {
   width: auto;
@@ -723,7 +744,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.85);
   z-index: 10001;
   opacity: 0;
   visibility: hidden;
@@ -774,13 +795,6 @@
 .confirmMigration.active {
   visibility: visible;
   opacity: 1;
-}
-.resetMigration:hover,
-.confirmMigration:hover {
-  outline: 0px none;
-  -webkit-box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5);
-  box-shadow: 0 0 20px 0 rgba(0, 199, 236, 0.5);
-  border: 1px solid #00e7ff;
 }
 .resetMigration .close,
 .confirmMigration .close {

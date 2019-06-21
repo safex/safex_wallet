@@ -194,6 +194,10 @@ function setSafexMigrationAddress(utxos, destination, wif, payload, fee) {
   return json;
 }
 
+const padZeroes = String.prototype.padStart
+  ? (str, length) => str.padStart(length, "0")
+  : (str, length) => Array(length - str.length).join("0") + str;
+
 /*
     Omni Payload creation helper functions This emulates the "Simple Send" Payload
  */
@@ -211,10 +215,6 @@ function createSafexPayload(propertyId, amount) {
 function createSafexPayloadBuffer(propertyId, amount) {
   return Buffer.from(createSafexPayload(propertyId, amount), "hex");
 }
-
-const padZeroes = String.prototype.padStart
-  ? (str, length) => str.padStart(length, "0")
-  : (str, length) => Array(length - str.length).join("0") + str;
 
 function createSafexAddressPayloadBuffer(keyset) {
   return Buffer.from(keyset, "hex");

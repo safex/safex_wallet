@@ -24,13 +24,14 @@ export default class MigrationAddress extends React.Component {
     super(props);
     this.state = {
       loading: true,
+      data: {},
       label: "",
       address: this.props.data.address,
       wif: "",
       safex_bal: 0,
       pending_safex_bal: 0,
-      btc_bal: 0,
-      pending_btc_bal: 0,
+      btc_bal: (0).toFixed(8),
+      pending_btc_bal: (0).toFixed(8),
       safex_price: 0,
       btc_price: 0,
       status_text: "",
@@ -126,7 +127,6 @@ export default class MigrationAddress extends React.Component {
           this.setState(() => ({
             migration_exists: true
           }));
-          console.log("addresses length " + values[4].safex_addresses.length);
           for (var i = 0; i < values[4].safex_addresses.length; i++) {
             address_array.push(values[4].safex_addresses[i]);
           }
@@ -142,7 +142,7 @@ export default class MigrationAddress extends React.Component {
           btc_bal: (values[1] / 100000000).toFixed(8),
           pending_btc_bal: (values[2] / 100000000).toFixed(8),
           pending_safex_bal: values[3],
-          migrated_balance: values[4].migrated_balance,
+          migrated_balance: values[4].migrated_balance ? values[4].migrated_balance : 0,
           safex_addresses: address_array,
           btc_sync: true,
           safex_sync: true,
@@ -155,14 +155,13 @@ export default class MigrationAddress extends React.Component {
       .catch(e => {
         console.log(e);
         this.setState(() => ({
-          status_text: "Cannot fetch migrations table, please refresh",
+          status_text: "Cannot fetch migrations table, please refresh or try again later",
           loading: false
         }));
       });
   };
 
   getUnconfirmed = address => {
-    this.setState({ loading: true });
     var promises = [];
     promises.push(
       fetch(
@@ -220,8 +219,6 @@ export default class MigrationAddress extends React.Component {
   };
 
   setMigrationProgress = step => {
-    this.setState({ loading: true });
-
     try {
       var json_lswallet = JSON.parse(localStorage.getItem("wallet"));
       var index = -1;
@@ -311,6 +308,7 @@ export default class MigrationAddress extends React.Component {
       wif,
       safex_key,
       fee,
+      safex_bal,
       pending_btc_bal,
       pending_safex_bal,
       migrated_balance
@@ -380,6 +378,7 @@ export default class MigrationAddress extends React.Component {
         data["safex_key"] = safex_key;
         data["fee"] = fee;
         data["pending_bal"] = pending_btc_bal;
+        data["safex_bal"] = safex_bal;
         data["pending_safex_bal"] = pending_safex_bal;
         //send to burn address
         migration_shot = (
@@ -397,6 +396,7 @@ export default class MigrationAddress extends React.Component {
 
     const safex_address = this.state.safex_addresses.map((address, index) => (
       <tr key={index}>
+        <td className="no">{parseFloat(index + 1)}</td>
         <td className="address" id="address">
           <span>
             {address.safex_address.slice(0, 6) +
@@ -410,8 +410,8 @@ export default class MigrationAddress extends React.Component {
             expand
           </button>
         </td>
-        <td>{address.balance}</td>
-        <td>{(address.balance * 0.00232830643).toFixed(10)}</td>
+        <td className="token">{address.balance}</td>
+        <td className="cash">{(address.balance * 0.00232830643).toFixed(10)}</td>
       </tr>
     ));
 
@@ -470,7 +470,7 @@ export default class MigrationAddress extends React.Component {
                   <td className="orange-border">Pending BTC</td>
                   <td>{this.state.pending_btc_bal}</td>
                 </tr>
-                <tr className="row-clearfix last" />
+                <tr className="row-clearfix" />
 
                 <tr>
                   <td className="green-border">Migrated Balance</td>
@@ -481,75 +481,85 @@ export default class MigrationAddress extends React.Component {
           </div>
 
           <div className="col-xs-8 keys-table-wrap">
-            {this.state.migration_exists ? (
-              <div>
-                <h3>Migrations Table</h3>
-                <div className="table-wrap">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Safex Address</th>
-                        <th>Tokens (SFT)</th>
-                        <th>Cash (SFX)</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>{safex_address}</tbody>
-                  </table>
+            {
+              this.state.loading
+              ?
+                <div className="spinner-wrap">
+                  <div className="lds-dual-ring" />
                 </div>
-              </div>
-            ) : (
-              <div>
-                {this.state.status_text !== "Syncronized" ? (
-                  <h3>No Migrations</h3>
-                ) : (
-                  <h3>{this.state.status_text}</h3>
-                )}
-              </div>
-            )}
+              :
+                <div>
+                  {this.state.migration_exists ? (
+                    <div>
+                      <h3>Migrations Table</h3>
+                      <div id="thead-top">
+                        <span id="no">No</span>
+                        <span id="address">Safex Address</span>
+                        <span id="tokens">Tokens (SFT)</span>
+                        <span>Cash (SFX)</span>
+                      </div>
+                      <div className="table-wrap">
+                        <table>
+                          <tbody>{safex_address}</tbody>
+                        </table>
+                      </div>
+                    </div>
+                  ) : (
+                      <div>
+                        {this.state.status_text === "Synchronized" ? (
+                          <h3>No Migrations</h3>
+                        ) : (
+                          <div>
+                            <h3>{this.state.status_text}</h3>
+                          </div>
+                          )}
+                      </div>
+                    )}
+                </div>
+            }
           </div>
         </div>
 
-        {/* <button
-                        className="button-shine"
-                        onClick={() => {
-                            this.setMigrationProgress(0);
-                        }}
-                    >
-                    show 1
-                </button>
-                <button
-                        className="button-shine"
-                        onClick={() => {
-                            this.setMigrationProgress(1);
-                        }}
-                    >
-                    show 2
-                </button>
-                <button
-                        className="button-shine"
-                        onClick={() => {
-                            this.setMigrationProgress(2);
-                        }}
-                    >
-                    show 3
-                </button>
-                <button
-                        className="button-shine"
-                        onClick={() => {
-                            this.setMigrationProgress(3);
-                        }}
-                    >
-                    show 4
-                </button>
-                <button
-                        className="button-shine"
-                        onClick={() => {
-                            this.setMigrationProgress(4);
-                        }}
-                    >
-                    show 5
-                </button> */}
+        <button
+          className="button-shine"
+          onClick={() => {
+            this.setMigrationProgress(0);
+          }}
+        >
+          show 1
+        </button>
+        <button
+          className="button-shine"
+          onClick={() => {
+            this.setMigrationProgress(1);
+          }}
+        >
+          show 2
+        </button>
+        <button
+          className="button-shine"
+          onClick={() => {
+            this.setMigrationProgress(2);
+          }}
+        >
+          show 3
+        </button>
+        <button
+          className="button-shine"
+          onClick={() => {
+            this.setMigrationProgress(3);
+          }}
+        >
+          show 4
+        </button>
+        <button
+          className="button-shine"
+          onClick={() => {
+            this.setMigrationProgress(4);
+          }}
+        > 
+          show 5
+        </button>
 
         <button className="button-shine" onClick={this.setMigrationVisible}>
           {this.state.show_migration ? "Hide Migration" : "Migrate"}
