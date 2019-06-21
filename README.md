@@ -30,26 +30,68 @@ npm start
 
 This will start webpack dev server and open a browser window. You will not be able to develop frontend in the browser, as it will lack some of electron's native API-s. So you can close that browser tab and instead debug frontend directly in the electron window you have started as described above.
 
+#### Windows
+
+Run Command Prompt as Administrator
+
+```
+$ npm install --global --production windows-build-tools
+$ npm install
+$ npm run dev
+```
+
+#### Linux
+
+```
+$ sudo apt update && sudo apt install build-essential cmake pkg-config \
+    libboost-all-dev libssl-dev libzmq3-dev libunbound-dev libminiupnpc-dev \
+    libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev \
+    libgtest-dev doxygen graphviz libpcsclite-dev
+$ npm install
+$ ./node_modules/.bin/electron-rebuild
+$ npm run dev
+```
+
+#### MacOS
+
+```
+$ brew tap jmuncaster/homebrew-header-only
+$ brew install cmake boost zmq czmq zeromq jmuncaster/header-only/cppzmq openssl pkg-config
+$ export LDFLAGS="-L/usr/local/opt/openssl/lib"
+$ export CPPFLAGS="-I/usr/local/opt/openssl/include"
+$ npm install
+$ ./node_modules/.bin/electron-rebuild
+$ npm run dev
+```
+
 ## Build:
 
-Run
+#### Windows
 
 ```
-npm run make-all-installers
+$ npm run make-win-installer
 ```
 
-to make all installer. This will work only on Mac because of Mac.
-
-You can also run
-
-```
-npm run make-win-installer
-npm run make-mac-installer
-npm run make-linux-installer
-```
-separately.
+#### Linux
 
 For linux builds, you will need to have `rpmbuild` available on system (`apt-get install rpm`).
+
+```
+$ npm run make-linux-installer
+```
+
+#### MacOS
+
+Log in the Apple Developer website https://developer.apple.com/.  
+Install Developer Tools v10.1  
+https://download.developer.apple.com/Developer_Tools/Command_Line_Tools_macOS_10.13_for_Xcode_10.1/Command_Line_Tools_macOS_10.13_for_Xcode_10.1.dmg  
+If you previousely exported open ssl flags, reboot your computer.
+
+Then run:
+
+```
+$ npm run make-mac-installer
+```
 
 ## License
 
