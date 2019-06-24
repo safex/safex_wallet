@@ -142,7 +142,9 @@ export default class MigrationAddress extends React.Component {
           btc_bal: (values[1] / 100000000).toFixed(8),
           pending_btc_bal: (values[2] / 100000000).toFixed(8),
           pending_safex_bal: values[3],
-          migrated_balance: values[4].migrated_balance ? values[4].migrated_balance : 0,
+          migrated_balance: values[4].migrated_balance
+            ? values[4].migrated_balance
+            : 0,
           safex_addresses: address_array,
           btc_sync: true,
           safex_sync: true,
@@ -155,7 +157,8 @@ export default class MigrationAddress extends React.Component {
       .catch(e => {
         console.log(e);
         this.setState(() => ({
-          status_text: "Cannot fetch migrations table, please refresh or try again later",
+          status_text:
+            "Cannot fetch migrations table, please refresh or try again later",
           loading: false
         }));
       });
@@ -411,7 +414,9 @@ export default class MigrationAddress extends React.Component {
           </button>
         </td>
         <td className="token">{address.balance}</td>
-        <td className="cash">{(address.balance * 0.00232830643).toFixed(10)}</td>
+        <td className="cash">
+          {(address.balance * 0.00232830643).toFixed(10)}
+        </td>
       </tr>
     ));
 
@@ -481,42 +486,40 @@ export default class MigrationAddress extends React.Component {
           </div>
 
           <div className="col-xs-8 keys-table-wrap">
-            {
-              this.state.loading
-              ?
-                <div className="spinner-wrap">
-                  <div className="lds-dual-ring" />
-                </div>
-              :
-                <div>
-                  {this.state.migration_exists ? (
-                    <div>
-                      <h3>Migrations Table</h3>
-                      <div id="thead-top">
-                        <span id="no">No</span>
-                        <span id="address">Safex Address</span>
-                        <span id="tokens">Tokens (SFT)</span>
-                        <span>Cash (SFX)</span>
-                      </div>
-                      <div className="table-wrap">
-                        <table>
-                          <tbody>{safex_address}</tbody>
-                        </table>
-                      </div>
+            {this.state.loading ? (
+              <div className="spinner-wrap">
+                <div className="lds-dual-ring" />
+              </div>
+            ) : (
+              <div>
+                {this.state.migration_exists ? (
+                  <div>
+                    <h3>Migrations Table</h3>
+                    <div id="thead-top">
+                      <span id="no">No</span>
+                      <span id="address">Safex Address</span>
+                      <span id="tokens">Tokens (SFT)</span>
+                      <span>Cash (SFX)</span>
                     </div>
-                  ) : (
+                    <div className="table-wrap">
+                      <table>
+                        <tbody>{safex_address}</tbody>
+                      </table>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    {this.state.status_text === "Synchronized" ? (
+                      <h3>No Migrations</h3>
+                    ) : (
                       <div>
-                        {this.state.status_text === "Synchronized" ? (
-                          <h3>No Migrations</h3>
-                        ) : (
-                          <div>
-                            <h3>{this.state.status_text}</h3>
-                          </div>
-                          )}
+                        <h3>{this.state.status_text}</h3>
                       </div>
                     )}
-                </div>
-            }
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -559,11 +562,11 @@ export default class MigrationAddress extends React.Component {
           }}
         > 
           show 5
-        </button>
+        </button> */}
 
         <button className="button-shine" onClick={this.setMigrationVisible}>
           {this.state.show_migration ? "Hide Migration" : "Migrate"}
-        </button> */}
+        </button>
 
         <button
           className={
