@@ -2,7 +2,7 @@
   "name": "SafexWallet",
   "description": "Safex Community Wallet",
   "version": "v0.0.8",
-  "homepage": ".",
+  "homepage": "https://safex.io",
   "repository": {
     "type": "git",
     "url": "git://github.com/safex/safex_wallet.git"
