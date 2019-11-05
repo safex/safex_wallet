@@ -40,7 +40,7 @@
     "react-scripts": "^0.8.5"
   },
   "dependencies": {
-    "axios": "^0.16.2",
+    "axios": "^0.19.0",
     "binstring": "^0.2.1",
     "bitcoinjs-lib": "^4.0.1",
     "bitcore-lib": "^0.14.0",
