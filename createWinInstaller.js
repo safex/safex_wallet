@@ -20,7 +20,7 @@ function getInstallerConfig () {
        outputDirectory: outPath,
        exe: 'SafexWallet8.exe',
        setupExe: 'SafexWallet8WindowsInstaller.exe',
-       setupIcon: 'public/images/icons/wallet-icon2.ico',
+       setupIcon: 'public/images/icons/wallet-icon3.ico',
        skipUpdateIcon: true
    })
 }
