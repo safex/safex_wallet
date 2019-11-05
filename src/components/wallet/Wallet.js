@@ -338,16 +338,16 @@ export default class Wallet extends React.Component {
     };
 
     getPrices() {
-        fetch('https://safex.io/api/price/', {method: "POST"})
+        fetch('https://api.coinmarketcap.com/v1/ticker/safex-token/', {method: "GET"})
             .then(resp => resp.json())
             .then((resp) => {
                 try {
-                    var safex = 0.02;
-                    if (resp.price_usd !== null) {
-                        safex = parseFloat(resp.price_usd).toFixed(8);
-                        this.setState({safex_price: safex});
+                    var sft = 0;
+                    if (resp[0].symbol === 'SFT') {
+                        sft = parseFloat(resp[0].price_usd).toFixed(2);
+                        localStorage.setItem('safex_price', sft);
+                        this.setState({safex_price: sft});
                     }
-                    localStorage.setItem('safex_price', safex);
                 } catch (e) {
                     console.log(e);
                 }
