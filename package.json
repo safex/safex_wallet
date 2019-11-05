@@ -17,17 +17,13 @@
       "name": "Daniel Dabek",
       "url": "https://github.com/ddabek",
       "email": "daniel@safex.io"
-    },
-    {
-      "name": "Uroš Mitrović",
-      "url": "https://github.com/Kiu0612",
-      "email": "uros@balkaneum.com"
     }
   ],
   "license": "MIT",
   "bugs": "https://github.com/safex/safex_wallet/issues",
   "keywords": [
-    "safex coin",
+    "safex cash",
+    "safex token",
     "wallet",
     "bitcoin",
     "blockchain",

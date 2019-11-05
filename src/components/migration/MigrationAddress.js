@@ -131,8 +131,6 @@ export default class MigrationAddress extends React.Component {
                     btc_sync: true,
                     safex_sync: true,
                     status_text: "Synchronized",
-                    safex_price: localStorage.getItem("safex_price"),
-                    btc_price: localStorage.getItem("btc_price"),
                     loading: false
                 });
             })

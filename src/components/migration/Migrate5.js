@@ -94,9 +94,7 @@ export default class Migrate5 extends React.Component {
         Promise.all(promises)
             .then(values => {
                 this.setState({
-                    safex_bal: values[0].balance,
-                    safex_price: localStorage.getItem("safex_price"),
-                    btc_price: localStorage.getItem("btc_price")
+                    safex_bal: values[0].balance
                 });
             })
             .catch(e => {

@@ -51,9 +51,7 @@ export default class Migrate3 extends React.Component {
             wif: this.props.data.wif,
             safex_key: this.props.data.safex_key,
             fee: this.props.data.fee,
-            loading: false,
-            safex_price: localStorage.getItem("safex_price"),
-            btc_price: localStorage.getItem("btc_price")
+            loading: false
         });
     }
 
@@ -121,10 +119,19 @@ export default class Migrate3 extends React.Component {
                 })
                 .then(rawtx => broadcastTransaction(rawtx))
                 .then(result => {
-                    alert('your transaction was successful, please wait to complete processing')
-                    setTimeout(() => {
-                        this.props.setMigrationProgress(3);}, 25000)
+                    //here fetch the unconfirmed balances before proceeding to the migration next step
                     console.log(result);
+                    if (result.length > 0) {
+
+                        alert('your transaction was successful, please wait to complete processing');
+                        this.props.setMigrationProgress(3)
+                    } else {
+                        alert('the transaction did not go through, you maybe should wait for your previous transaction to confirm first')
+
+                        this.setState({loading: false});
+                    }
+                   /* setTimeout(() => {
+                        ;}, 25000)*/
                 })
                 .catch(err => {
                     console.log("error broadcasting transaction " + err);
