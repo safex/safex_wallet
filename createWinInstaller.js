@@ -14,12 +14,12 @@ function getInstallerConfig () {
     const outPath = path.join(rootPath, 'installers')
 
     return Promise.resolve({
-       appDirectory: path.join(rootPath, 'release-builds', 'SafexWallet-win32-ia32'),
+       appDirectory: path.join(rootPath, 'release-builds', 'SafexWallet8-win32-ia32'),
        authors: 'Safex Developers',
        noMsi: true,
        outputDirectory: outPath,
-       exe: 'SafexWallet.exe',
-       setupExe: 'SafexWalletWindowsInstaller.exe',
+       exe: 'SafexWallet8.exe',
+       setupExe: 'SafexWallet8WindowsInstaller.exe',
        setupIcon: 'public/images/icons/wallet-icon2.ico',
        skipUpdateIcon: true
    })

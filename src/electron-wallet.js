@@ -52,9 +52,9 @@ function createWindow() {
 
     if (os.platform() !== 'win32') {
         const template = [{
-            label: "Safex Wallet 0.0.7",
+            label: "Safex Wallet 0.0.8",
             submenu: [
-                { label: "About Safex Wallet v0.0.7", selector: "orderFrontStandardAboutPanel:" },
+                { label: "About Safex Wallet v0.0.8", selector: "orderFrontStandardAboutPanel:" },
                 { type: "separator" },
                 { label: "Quit", accelerator: "Command+Q", click: function() { app.quit(); }}
             ]}, {
