@@ -344,29 +344,47 @@ export default class Wallet extends React.Component {
                 try {
                     var sft = 0;
                     if (resp[0].symbol === 'SFT') {
-                        sft = parseFloat(resp[0].price_usd).toFixed(2);
+                        sft = parseFloat(resp[0].price_usd).toFixed(6);
                         localStorage.setItem('safex_price', sft);
                         this.setState({safex_price: sft});
+                        fetch('https://api.coinmarketcap.com/v1/ticker/bitcoin/', {method: "GET"})
+                            .then(resp => resp.json())
+                            .then((resp) => {
+                                try {
+                                    var btc = 0;
+                                    if (resp[0].symbol === 'BTC') {
+                                        btc = parseFloat(resp[0].price_usd).toFixed(2);
+                                        localStorage.setItem('btc_price', btc);
+                                        this.setState({btc_price: btc});
+                                    }
+                                } catch (e) {
+                                    console.log(e);
+                                }
+                            });
                     }
                 } catch (e) {
                     console.log(e);
+
+                    localStorage.setItem('safex_price', 0.02);
+                    this.setState({safex_price: 0.02});
+                    fetch('https://api.coinmarketcap.com/v1/ticker/bitcoin/', {method: "GET"})
+                        .then(resp => resp.json())
+                        .then((resp) => {
+                            try {
+                                var btc = 0;
+                                if (resp[0].symbol === 'BTC') {
+                                    btc = parseFloat(resp[0].price_usd).toFixed(2);
+                                    localStorage.setItem('btc_price', btc);
+                                    this.setState({btc_price: btc});
+                                }
+                            } catch (e) {
+                                console.log(e);
+                            }
+                        });
                 }
             });
 
-        fetch('https://api.coinmarketcap.com/v1/ticker/bitcoin/', {method: "GET"})
-            .then(resp => resp.json())
-            .then((resp) => {
-                try {
-                    var btc = 0;
-                    if (resp[0].symbol === 'BTC') {
-                        btc = parseFloat(resp[0].price_usd).toFixed(2);
-                        localStorage.setItem('btc_price', btc);
-                        this.setState({btc_price: btc});
-                    }
-                } catch (e) {
-                    console.log(e);
-                }
-            });
+
     }
 
     getFee() {

@@ -25,6 +25,38 @@ export default class Migration extends React.Component {
     }
 
     getPrices() {
+        fetch('https://api.coinmarketcap.com/v1/ticker/safex-token/', {method: "GET"})
+            .then(resp => resp.json())
+            .then((resp) => {
+                try {
+                    var sft = 0;
+                    if (resp[0].symbol === 'SFT') {
+                        sft = parseFloat(resp[0].price_usd).toFixed(6);
+                        localStorage.setItem('safex_price', sft);
+                        this.setState({safex_price: sft});
+                    }
+                } catch (e) {
+                    console.log(e);
+
+                    localStorage.setItem('safex_price', 0.02);
+                    this.setState({safex_price: 0.02});
+                }
+            });
+
+        fetch('https://api.coinmarketcap.com/v1/ticker/bitcoin/', {method: "GET"})
+            .then(resp => resp.json())
+            .then((resp) => {
+                try {
+                    var btc = 0;
+                    if (resp[0].symbol === 'BTC') {
+                        btc = parseFloat(resp[0].price_usd).toFixed(2);
+                        localStorage.setItem('btc_price', btc);
+                        this.setState({btc_price: btc});
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            });
         getFee().then(fee => this.setState({
             fee: fee * 100000000,
             loading: false
