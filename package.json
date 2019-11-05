@@ -36,7 +36,7 @@
     "electron-packager": "^8.7.2",
     "electron-react-devtools": "^0.5.3",
     "electron-winstaller": "^2.6.3",
-    "foreman": "^2.0.0",
+    "foreman": "^3.0.1",
     "react-scripts": "^0.8.5"
   },
   "dependencies": {
