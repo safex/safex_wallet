@@ -30,7 +30,7 @@
     "electron"
   ],
   "devDependencies": {
-    "electron": "^1.7.11",
+    "electron": "^9.1.0",
     "electron-builder": "^19.41.0",
     "electron-installer-dmg": "^0.2.1",
     "electron-packager": "^8.7.2",
